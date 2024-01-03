@@ -24,8 +24,10 @@ all:
 	make deploy
 
 deploy:
-	cp -r build/html/* ../gh-pages/
-	touch ../gh-pages/.nojekyll
+	rm -rf gh-pages/
+	mkdir gh-pages/
+	cp -r build/html/* gh-pages/
+	touch gh-pages/.nojekyll
 
 
 # Catch-all target: route all unknown targets to Sphinx using the new

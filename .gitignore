@@ -36,4 +36,3 @@ docs/build/
 !/docs/source/_static/**
 !/docs/source/test-report/test_report_template.txt
 !requirements*.txt
-!/gh-pages/**
