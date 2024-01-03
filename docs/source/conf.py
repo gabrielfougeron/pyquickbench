@@ -78,7 +78,7 @@ html_logo_abs = os.path.join(__PROJECT_ROOT__,"docs","source","_static","img","e
 html_logo_rel = "_static/img/eight_icon.png"
 html_logo = html_logo_rel
 html_favicon = html_logo_rel
-
+html_baseurl = "https://github.com/gabrielfougeron/pyquickbench"
 html_show_sourcelink = True
 
 html_theme_options = {
