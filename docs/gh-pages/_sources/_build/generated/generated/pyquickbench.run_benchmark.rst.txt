@@ -1,0 +1,6 @@
+pyquickbench.run\_benchmark
+===========================
+
+.. currentmodule:: pyquickbench
+
+.. autofunction:: run_benchmark
