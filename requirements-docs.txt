@@ -1,0 +1,10 @@
+Sphinx
+pydata-sphinx-theme
+sphinx-gallery
+sphinx-pyproject
+sphinx-needs
+sphinx-test-reports
+sphinxcontrib.plantuml
+scipy
+mkl_fft
+numba

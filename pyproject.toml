@@ -1,0 +1,38 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "build",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyquickbench"  # as it would appear on PyPI
+version = "0.1.0"
+description = "A pure Pyton tool to perform time and accuracy benchmarks"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+keywords = ["Python","benchmark"]
+authors = [
+  {name = "Gabriel Fougeron", email = "gabriel.fougeron@hotmail.fr"},
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Natural Language :: English",
+]
+requires-python = ">= 3.9"
+dynamic = ["dependencies", "optional-dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies = {docs = { file = ["requirements-docs.txt"] }}
+
+[project.urls]
+Homepage = "https://gabrielfougeron.github.io/pyquickbench/"
+Documentation = "https://gabrielfougeron.github.io/pyquickbench/"
+Repository = "https://github.com/gabrielfougeron/pyquickbench"
+Changelog = "https://github.com/gabrielfougeron/pyquickbench/releases/"
+
+
+
