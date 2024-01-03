@@ -1,0 +1,6 @@
+pyquickbench.plot\_benchmark
+============================
+
+.. currentmodule:: pyquickbench
+
+.. autofunction:: plot_benchmark
