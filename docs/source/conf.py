@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.githubpages',
     'sphinx_gallery.gen_gallery',
     'sphinx_needs',
     'sphinxcontrib.test_reports',
@@ -56,6 +57,17 @@ autosummary_generate = True
 
 templates_path = ['templates']
 exclude_patterns = []
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+    'numpy': ('http://docs.scipy.org/doc/numpy', None),
+}
+
+intersphinx_disabled_reftypes = ["*"]
+intersphinx_cache_limit = -1
+intersphinx_timeout = 1
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

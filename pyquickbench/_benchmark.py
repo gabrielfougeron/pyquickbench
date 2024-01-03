@@ -157,15 +157,23 @@ def run_benchmark(
 
                         # Estimate time of everything
                         n_timeit_0dot2, est_time = Timer.autorange()
-
-                        n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
-
-                        times = Timer.repeat(
-                            repeat = n_repeat,
-                            number = n_timeit,
-                        )
                         
-                        all_vals[i_size, i_fun, :] = np.array(times) / n_timeit
+                        if (n_repeat == 1) and (time_per_test == 0.2):
+                            # Fast track: benchmark is not repeated and autorange results are kept as is.
+                            
+                            all_vals[i_size, i_fun, 0] = est_time / n_timeit_0dot2
+                            
+                        else:
+                            # Full benchmark is run
+
+                            n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
+
+                            times = Timer.repeat(
+                                repeat = n_repeat,
+                                number = n_timeit,
+                            )
+                            
+                            all_vals[i_size, i_fun, :] = np.array(times) / n_timeit
 
                     except Exception as exc:
                         if StopOnExcept:

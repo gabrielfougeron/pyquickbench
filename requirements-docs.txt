@@ -5,6 +5,7 @@ sphinx-pyproject
 sphinx-needs
 sphinx-test-reports
 sphinxcontrib.plantuml
+seed_intersphinx_mapping
 scipy
 mkl_fft
 numba

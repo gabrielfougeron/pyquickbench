@@ -4,8 +4,8 @@ Preparing inputs
 """
 
 # %% 
-# Most often, the functions to be benchmarked take data as input that is more complex than a simple integer. 
-# In pyquickbench, caching results in order to avoid a full re-run is as simple as providing a file name to :func:`run_benchmark`
+# Most often, the functions to be benchmarked take data as input that is more complex than a simple integer. This data can
+#
 #
 
 
@@ -13,7 +13,6 @@ Preparing inputs
 
 import os
 import sys
-import math
 
 try:
     __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.pardir,os.pardir))

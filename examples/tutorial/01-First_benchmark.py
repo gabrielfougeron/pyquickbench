@@ -61,7 +61,7 @@ all_funs = [
 # %% 
 # Let's define relevant sizes of lists to be timed.
 
-n_bench = 8
+n_bench = 12
 all_sizes = [2**n for n in range(n_bench)]
 
 # %% 
@@ -78,3 +78,6 @@ pyquickbench.run_benchmark(
     filename = timings_filename     ,
 # sphinx_gallery_end_ignore
 ) 
+
+# %% 
+# From this benchmark, it is easy to see that initializing a list to a given length filled with a single value is quickest using the star operator.
