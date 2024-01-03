@@ -5,8 +5,7 @@ import os
 import sys
 sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
-from sphinx_gallery.sorting import FileNameSortKey
-from sphinx_pyproject import SphinxConfig
+from sphinx_gallery.sorting import FileNameSortKey, ExplicitOrder
 
 __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.pardir,os.pardir))
 
@@ -19,7 +18,6 @@ author = "Gabriel Fougeron"
 project_copyright = "2024, Gabriel Fougeron"
 version = '0.1.0'
 
-
 # sys.path.append(os.path.abspath("./_pygments"))
 # from style import PythonVSMintedStyle
 # pygments_style = PythonVSMintedStyle.__qualname__
@@ -30,14 +28,19 @@ extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
+    "sphinx.ext.viewcode",
+    "sphinx.ext.todo",
     'sphinx.ext.autosummary',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.autosectionlabel',
     'sphinx_gallery.gen_gallery',
     'sphinx_needs',
     'sphinxcontrib.test_reports',
     'sphinxcontrib.plantuml',
 ]
+
 
 # The suffix of source filenames.
 source_suffix = ".rst"
@@ -124,6 +127,10 @@ sphinx_gallery_conf = {
     'ignore_pattern': r'NOTREADY',
     'examples_dirs': "../../examples/",
     "gallery_dirs": "_build/auto_examples/",
+    'subsection_order': ExplicitOrder([
+        '../../examples/tutorial'  ,
+        '../../examples/benchmarks',
+    ]),
     "within_subsection_order": FileNameSortKey,
     "backreferences_dir": "_build/generated",
     "image_scrapers": ("matplotlib",),
@@ -131,7 +138,7 @@ sphinx_gallery_conf = {
     "plot_gallery": True,
     'matplotlib_animations': True,
     'nested_sections':True,
-    # 'run_stale_examples': True, # Force rebuilding of examples even if the *py file did not change.
+    'reference_url': {'sphinx_gallery': None,},
 }
 
 

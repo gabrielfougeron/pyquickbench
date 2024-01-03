@@ -49,17 +49,6 @@ if not(os.path.isdir(timings_folder)):
 
 all_sizes = np.array([2**n for n in range(25)])
 
-dpi = 150
-
-figsize = (1600/dpi,  800 / dpi)
-
-fig, ax = plt.subplots(
-    figsize = figsize,
-    dpi = dpi   ,
-)
-
-all_funs = []
-
 # sphinx_gallery_end_ignore
 
 def numpy_ufunc_outofplace(x):
@@ -124,25 +113,16 @@ def prepare_x(n):
     return [(x, 'x')]
     
 basename = f'Inplace_conjugation_bench'
-timings_filename = os.path.join(timings_folder,basename+'.npy')
+timings_filename = os.path.join(timings_folder, basename+'.npy')
 
-all_times = pyquickbench.run_benchmark(
+_ = pyquickbench.run_benchmark(
     all_sizes                       ,
     all_funs                        ,
     setup = prepare_x               ,
     filename = timings_filename     ,
+    show = True                     ,
+    title = f'Inplace conjugation'  ,
 )
-
-pyquickbench.plot_benchmark(
-    all_times           ,
-    all_sizes           ,
-    all_funs            ,
-    fig = fig           ,
-    ax = ax             ,
-    title = f'Inplace conjugation'    ,
-)
-    
-plt.tight_layout()
 
 # sphinx_gallery_end_ignore
 

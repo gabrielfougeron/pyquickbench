@@ -23,7 +23,7 @@ default_color_list.append(mpl.colors.BASE_COLORS['k'])
 default_linestyle_list = ['solid']
 
 def run_benchmark(
-    all_sizes       : np.typing.ArrayLike                           ,
+    all_sizes       : typing.Iterable                               ,
     all_funs        : dict | typing.Iterable                        ,
     mode            : str                   = "timings"             ,
     setup           : typing.Callable[
@@ -34,7 +34,7 @@ def run_benchmark(
                 str         ,
             ]
         ]
-    ]                                       = (lambda n: [n,'n'])   ,
+    ]                                       = (lambda n: [(n,'n')]) ,
     n_repeat        : int                   = 1                     ,
     time_per_test   : float                 = 0.2                   ,
     filename        : str | None            = None                  ,
@@ -45,8 +45,7 @@ def run_benchmark(
         str,
         typing.Any
     ]          ,
-) -> np.typing.NDArray[np.float64] :
-    
+) -> np.typing.NDArray[np.float64] | None :
     """
     run_benchmark _summary_
 
@@ -56,20 +55,20 @@ def run_benchmark(
     ----------
     all_sizes : np.typing.ArrayLike
         _description_
-    all_funs : dict  |  typing.Iterable
+    all_funs : dict | typing.Iterable
         _description_
     mode : str, optional
         _description_, by default "timings"
     setup : _type_, optional
-        _description_, by default (lambda n: [n,'n'])
+        _description_, by default (lambda n: [(n,'n')])
     n_repeat : int, optional
         _description_, by default 1
     time_per_test : float, optional
         _description_, by default 0.2
-    filename : str  |  None, optional
+    filename : str | None, optional
         _description_, by default None
     ForceBenchmark : bool, optional
-        _description_, by default False
+        _description_, by default Falsex
     show : bool, optional
         _description_, by default False
     StopOnExcept : bool, optional
@@ -86,18 +85,17 @@ def run_benchmark(
         _description_
     ValueError
         _description_
-    """    
-    
-    if setup is None:
-        setup = lambda n: []
+    """
     
     if filename is None:
         Load_timings_file = False
         Save_timings_file = False
+        
     else:
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
+    all_sizes = np.array(all_sizes)
     n_sizes = len(all_sizes)
     
     if isinstance(all_funs, dict):
@@ -109,23 +107,29 @@ def run_benchmark(
     n_funs = len(all_funs_list)
 
     if Load_timings_file:
-
-        all_times = np.load(filename)
-
-        BenchmarkUpToDate = True
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_times.shape[0] == n_sizes  )
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_times.shape[1] == n_funs   )
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_times.shape[2] == n_repeat )
-
-        DoBenchmark = not(BenchmarkUpToDate)
         
+        try:
+
+            all_vals = np.load(filename)
+
+            BenchmarkUpToDate = True
+            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == n_sizes  )
+            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == n_funs   )
+            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == n_repeat )
+
+            DoBenchmark = not(BenchmarkUpToDate)
+
+        except:
+            
+            DoBenchmark = True
+            
     else:
 
         DoBenchmark = True
 
     if DoBenchmark:
 
-        all_times = np.zeros((n_sizes,n_funs,n_repeat))
+        all_vals = np.zeros((n_sizes, n_funs, n_repeat))
 
         if mode == "timings":
 
@@ -154,46 +158,58 @@ def run_benchmark(
                         # Estimate time of everything
                         n_timeit_0dot2, est_time = Timer.autorange()
 
-                        n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time)
+                        n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
 
                         times = Timer.repeat(
                             repeat = n_repeat,
                             number = n_timeit,
                         )
                         
-                        all_times[i_size, i_fun, :] = np.array(times) / n_timeit
+                        all_vals[i_size, i_fun, :] = np.array(times) / n_timeit
 
                     except Exception as exc:
                         if StopOnExcept:
                             raise exc
+                        
+                        all_vals[i_size, i_fun, :].fill(np.nan)
                         
         elif mode == "scalar_output":    
             
             for i_size, size in enumerate(all_sizes):
                 for i_fun, fun in enumerate(all_funs_list):
                     for i_repeat in range(n_repeat):
-                        all_times[i_size, i_fun, i_repeat] = fun(setup(size))
+                        
+                        try:
+                            out_val = fun(setup(size))
+                        
+                        except Exception as exc:
+                            if StopOnExcept:
+                                raise exc
+
+                            out_val = np.nan
+                            
+                        all_vals[i_size, i_fun, i_repeat] = out_val
                         
         else:
             
             raise ValueError(f'Unknown mode {mode}')
 
         if Save_timings_file:
-            np.save(filename, all_times)
+            np.save(filename, all_vals)
 
     if show:
-        plot_benchmark(
-            all_times           ,
+        return plot_benchmark(
+            all_vals           ,
             all_sizes           ,
             all_funs            ,
             show = show         ,
             **show_kwargs       ,
         )
 
-    return all_times
+    return all_vals
 
 def plot_benchmark(
-    all_times               : np.typing.ArrayLike   ,
+    all_vals               : np.typing.ArrayLike   ,
     all_sizes               : np.typing.ArrayLike   ,
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
@@ -214,6 +230,8 @@ def plot_benchmark(
     fig                     : matplotlib.figure.Figure | None   = None                  ,
     ax                      : plt.Axes | None                   = None                  ,
     title                   : str | None                        = None                  ,
+    xlabel                  : str | None                        = None                  ,
+    ylabel                  : str | None                        = None                  ,
     plot_legend             : bool                              = True                  ,
     plot_grid               : bool                              = True                  ,
     transform               : str | None                        = None                  ,
@@ -226,7 +244,7 @@ def plot_benchmark(
 
     Parameters
     ----------
-    all_times : np.typing.ArrayLike
+    all_vals : np.typing.ArrayLike
         _description_
     all_sizes : np.typing.ArrayLike
         _description_
@@ -248,9 +266,9 @@ def plot_benchmark(
         _description_, by default None
     logy_plot : bool | None, optional
         _description_, by default None
-    plot_ylim : bool | None, optional
+    plot_ylim : tuple | None, optional
         _description_, by default None
-    plot_xlim : bool | None, optional
+    plot_xlim : tuple | None, optional
         _description_, by default None
     clip_vals : bool, optional
         _description_, by default False
@@ -263,6 +281,10 @@ def plot_benchmark(
     ax : plt.Axes | None, optional
         _description_, by default None
     title : str | None, optional
+        _description_, by default None
+    xlabel : str | None, optional
+        _description_, by default None
+    ylabel : str | None, optional
         _description_, by default None
     plot_legend : bool, optional
         _description_, by default True
@@ -281,13 +303,13 @@ def plot_benchmark(
         _description_
     ValueError
         _description_
-    """    
-
+    """
     
-    n_sizes = all_times.shape[0] 
-    n_funs = all_times.shape[1]
-    n_repeat = all_times.shape[2]
+    n_sizes = all_vals.shape[0] 
+    n_funs = all_vals.shape[1]
+    n_repeat = all_vals.shape[2]
     
+    all_sizes = np.array(all_sizes)
     assert n_sizes == len(all_sizes)
 
     if all_names is None:
@@ -324,7 +346,13 @@ def plot_benchmark(
 
     if (ax is None) or (fig is None):
 
-        fig = plt.figure()  
+        dpi = 150
+        figsize = (1600/dpi, 800/dpi)
+
+        fig = plt.figure(
+            figsize = figsize,
+            dpi = dpi   ,
+        )  
         ax = fig.add_subplot(1,1,1)
         
     if (relative_to is None):
@@ -348,9 +376,7 @@ def plot_benchmark(
             else:
                 raise ValueError(f'Invalid relative_to argument {relative_to}')
             
-            assert np.all(all_times[:, relative_to_idx, :] > 0.)
-            
-            relative_to_array = (np.sum(all_times[:, relative_to_idx, :], axis=1) / n_repeat)
+            relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
         
     n_colors = len(color_list)
     n_linestyle = len(linestyle_list)
@@ -373,85 +399,83 @@ def plot_benchmark(
     leg_patch = []
     for i_fun in range(n_funs):
 
-        if (np.linalg.norm(all_times[:, i_fun, :]) > 0):
-            
-            color = color_list[i_fun % n_colors]
-            linestyle = linestyle_list[i_fun % n_linestyle]
-            
-            leg_patch.append(
-                mpl.patches.Patch(
-                    color = color                   ,
-                    label = all_names_list[i_fun]   ,
-                    linestyle = linestyle           ,
-                )
+        color = color_list[i_fun % n_colors]
+        linestyle = linestyle_list[i_fun % n_linestyle]
+        
+        leg_patch.append(
+            mpl.patches.Patch(
+                color = color                   ,
+                label = all_names_list[i_fun]   ,
+                linestyle = linestyle           ,
             )
+        )
 
-            for i_repeat in range(n_repeat):
+        for i_repeat in range(n_repeat):
 
-                plot_y_val = all_times[:, i_fun, i_repeat] / relative_to_array # Broadcast
-                plot_y_val /= all_y_scalings[i_fun]
+            plot_y_val = all_vals[:, i_fun, i_repeat] / relative_to_array # Broadcast
+            plot_y_val /= all_y_scalings[i_fun]
+            
+            if all_xvalues is None:
+                plot_x_val = all_sizes * all_x_scalings[i_fun]
+            else:   
+                plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
+            
+            if transform in ["pol_growth_order", "pol_cvgence_order"]:
                 
-                if all_xvalues is None:
-                    plot_x_val = all_sizes * all_x_scalings[i_fun]
-                else:   
-                    plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
+                transformed_plot_y_val = np.zeros_like(plot_y_val)
                 
-                if transform in ["pol_growth_order", "pol_cvgence_order"]:
+                for i_size in range(1,n_sizes):
                     
-                    transformed_plot_y_val = np.zeros_like(plot_y_val)
+                    ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
+                    ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
                     
-                    for i_size in range(1,n_sizes):
+                    try:
+                        transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
+
+                    except:
+                        transformed_plot_y_val[i_size] = np.nan
                         
-                        ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
-                        ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
-                        
-                        try:
-                            transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
-
-                        except:
-                            transformed_plot_y_val[i_size] = np.nan
-                            
-                    transformed_plot_y_val[0] = np.nan
-                                    
-                    plot_y_val = transformed_plot_y_val
-
-                    if transform == "pol_cvgence_order":
-                        plot_y_val = - transformed_plot_y_val
-                    else:
-                        plot_y_val = transformed_plot_y_val
-                    
-                if clip_vals:
-
-                    for i_size in range(n_sizes):
-                
-                        if plot_y_val[i_size] < plot_ylim[0]:
-
-                            if stop_after_first_clip:
-                                for j_size in range(i_size,n_sizes):
-                                    plot_y_val[j_size] = np.nan
-                                break
-                            else:
-                                plot_y_val[i_size] = np.nan
+                transformed_plot_y_val[0] = np.nan
                                 
-                        elif plot_y_val[i_size] > plot_ylim[1]:
+                plot_y_val = transformed_plot_y_val
 
-                            if stop_after_first_clip:
-                                for j_size in range(i_size,n_sizes):
-                                    plot_y_val[j_size] = np.nan
-                                break
-                            else:
-                                plot_y_val[i_size] = np.nan
-                        
-                mask = isnotfinite(plot_y_val)
-                masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
+                if transform == "pol_cvgence_order":
+                    plot_y_val = - transformed_plot_y_val
+                else:
+                    plot_y_val = transformed_plot_y_val
+                
+            if clip_vals:
 
-                if (np.ma.max(masked_plot_y_val) > 0):
-                    ax.plot(
-                        plot_x_val              ,
-                        plot_y_val              ,
-                        color = color           ,
-                        linestyle = linestyle   ,
-                    )
+                for i_size in range(n_sizes):
+            
+                    if plot_y_val[i_size] < plot_ylim[0]:
+
+                        if stop_after_first_clip:
+                            for j_size in range(i_size,n_sizes):
+                                plot_y_val[j_size] = np.nan
+                            break
+                        else:
+                            plot_y_val[i_size] = np.nan
+                            
+                    elif plot_y_val[i_size] > plot_ylim[1]:
+
+                        if stop_after_first_clip:
+                            for j_size in range(i_size,n_sizes):
+                                plot_y_val[j_size] = np.nan
+                            break
+                        else:
+                            plot_y_val[i_size] = np.nan
+                    
+            mask = isnotfinite(plot_y_val)
+            masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
+
+            if (np.ma.max(masked_plot_y_val) > 0):
+                ax.plot(
+                    plot_x_val              ,
+                    plot_y_val              ,
+                    color = color           ,
+                    linestyle = linestyle   ,
+                )
 
     if plot_legend:
         ax.legend(
@@ -473,6 +497,16 @@ def plot_benchmark(
 
     if title is not None:
         ax.set_title(title)
+        
+    if xlabel is None:
+        xlabel = "n"
+        
+    if ylabel is None:
+        ylabel = "Time (s)"
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
     if show:
-        plt.show()
+        plt.tight_layout()
+        return plt.show()

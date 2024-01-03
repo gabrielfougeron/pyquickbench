@@ -8,3 +8,4 @@ sphinxcontrib.plantuml
 scipy
 mkl_fft
 numba
+pyfftw
