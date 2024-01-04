@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.237** total execution time for 7 files **from all galleries**:
+**00:00.593** total execution time for 7 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``../../examples/tutorial/02-Caching_benchmarks.py``)
-     - 00:01.237
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``../../examples/tutorial/03-Preparing_inputs.py``)
+     - 00:00.593
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``../../examples/benchmarks/Benchmark_Hardware_Info.py``)
      - 00:00.000
@@ -47,7 +47,7 @@ Computation times
    * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``../../examples/tutorial/01-First_benchmark.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``../../examples/tutorial/03-Preparing_inputs.py``)
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``../../examples/tutorial/02-Caching_benchmarks.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_04-Error_handling.py` (``../../examples/tutorial/04-Error_handling.py``)

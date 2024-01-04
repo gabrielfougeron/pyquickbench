@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.figure
 import typing
+import inspect
 
 def isnotfinite(arr):
     res = np.isfinite(arr)
@@ -22,7 +23,12 @@ default_color_list.append(mpl.colors.BASE_COLORS['k'])
 
 default_linestyle_list = ['solid']
 
-def _return_setup_vars_dict(setup, size):
+def _return_setup_vars_dict(setup, size, fun):
+    
+    sig = inspect.signature(fun)
+    for param in sig.parameters.values():
+        if param.kind == param.POSITIONAL_ONLY:
+            raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
     
     setup_vars = setup(size)
 
@@ -187,15 +193,14 @@ def run_benchmark(
             for i_size, size in enumerate(all_sizes):
                 for i_fun, fun in enumerate(all_funs_list):
 
-                    setup_vars_dict = _return_setup_vars_dict(setup, size)
+                    setup_vars_dict = _return_setup_vars_dict(setup, size, fun)
                     
-                    vars_str = ''
-                    global_dict = {'all_funs_list' : all_funs_list}
-                    for name, var in setup_vars_dict.items():
-                        global_dict[name] = var
-                        vars_str += name+','
-                        
-                    code = f'all_funs_list[{i_fun}]({vars_str})'
+                    global_dict = {
+                        'fun'               : fun               ,
+                        'setup_vars_dict'   : setup_vars_dict   ,
+                    }
+
+                    code = f'fun(**setup_vars_dict)'
 
                     Timer = timeit.Timer(
                         code,
@@ -236,11 +241,13 @@ def run_benchmark(
             
             for i_size, size in enumerate(all_sizes):
                 for i_fun, fun in enumerate(all_funs_list):
+                    
+                    setup_vars_dict = _return_setup_vars_dict(setup, size, fun)
+                    
                     for i_repeat in range(n_repeat):
                         
                         try:
-                            
-                            setup_vars_dict = _return_setup_vars_dict(setup, size)
+
                             out_val = fun(**setup_vars_dict)
                         
                         except Exception as exc:

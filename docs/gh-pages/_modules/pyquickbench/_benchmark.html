@@ -400,6 +400,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.figure</span>
 <span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="k">def</span> <span class="nf">isnotfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
@@ -415,7 +416,12 @@ document.write(`
 
 <span class="n">default_linestyle_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solid&#39;</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">fun</span><span class="p">):</span>
+    
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">param</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Input argument </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s1"> to provided function </span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> is positional only. Positional-only arguments are unsupported&#39;</span><span class="p">)</span>
     
     <span class="n">setup_vars</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
@@ -582,15 +588,14 @@ document.write(`
             <span class="k">for</span> <span class="n">i_size</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_sizes</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i_fun</span><span class="p">,</span> <span class="n">fun</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_funs_list</span><span class="p">):</span>
 
-                    <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                    <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">fun</span><span class="p">)</span>
                     
-                    <span class="n">vars_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                    <span class="n">global_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;all_funs_list&#39;</span> <span class="p">:</span> <span class="n">all_funs_list</span><span class="p">}</span>
-                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">setup_vars_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="n">global_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
-                        <span class="n">vars_str</span> <span class="o">+=</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
-                        
-                    <span class="n">code</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;all_funs_list[</span><span class="si">{</span><span class="n">i_fun</span><span class="si">}</span><span class="s1">](</span><span class="si">{</span><span class="n">vars_str</span><span class="si">}</span><span class="s1">)&#39;</span>
+                    <span class="n">global_dict</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;fun&#39;</span>               <span class="p">:</span> <span class="n">fun</span>               <span class="p">,</span>
+                        <span class="s1">&#39;setup_vars_dict&#39;</span>   <span class="p">:</span> <span class="n">setup_vars_dict</span>   <span class="p">,</span>
+                    <span class="p">}</span>
+
+                    <span class="n">code</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;fun(**setup_vars_dict)&#39;</span>
 
                     <span class="n">Timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>
                         <span class="n">code</span><span class="p">,</span>
@@ -631,11 +636,13 @@ document.write(`
             
             <span class="k">for</span> <span class="n">i_size</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_sizes</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i_fun</span><span class="p">,</span> <span class="n">fun</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_funs_list</span><span class="p">):</span>
+                    
+                    <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">fun</span><span class="p">)</span>
+                    
                     <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeat</span><span class="p">):</span>
                         
                         <span class="k">try</span><span class="p">:</span>
-                            
-                            <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
                             <span class="n">out_val</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">**</span><span class="n">setup_vars_dict</span><span class="p">)</span>
                         
                         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>

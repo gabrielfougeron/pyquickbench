@@ -21,17 +21,67 @@
 Preparing inputs
 ================
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-10
+.. GENERATED FROM PYTHON SOURCE LINES 11-12
 
-Most often, the functions to be benchmarked take data as input that is more complex than a simple integer. This data can
+By default, the functions to be benchmarked with :func:`pyquickbench.run_benchmark` are expected to take as arguments a single integer ``n`` as in the following code.
 
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 10-35
+.. GENERATED FROM PYTHON SOURCE LINES 12-45
 
 .. code-block:: Python
 
 
+
+    def comprehension(n):
+        return ['' for _ in range(n)]
+
+    def star_operator(n):
+        return ['']*n
+
+    def for_loop_append(n):
+        l = []
+        for _ in range(n):
+            l.append('')
+    
+    all_funs = [
+        comprehension   ,
+        star_operator   ,
+        for_loop_append ,
+    ]
+
+    n_bench = 12
+    all_sizes = [2**n for n in range(n_bench)]
+
+    pyquickbench.run_benchmark(
+        all_sizes   ,
+        all_funs    ,
+        show = True ,
+    ) 
+
+
+
+
+
+
+
+
+
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
+   :alt: 03 Preparing inputs
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 78-80
+
+Most often however, the functions to be benchmarked take data as input that is more complex than a simple integer and a setup phase is needed. In the following example, we want to compare different implementations of array summation algorithms.
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 80-103
+
+.. code-block:: Python
 
 
     import numpy as np
@@ -52,27 +102,8 @@ Most often, the functions to be benchmarked take data as input that is more comp
         m_fsum      ,
     ]
 
-    def prepare_x(n):
-        x = np.random.random(n)
-        return [('x', x)]
- 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 63-64
-
-Let's define relevant sizes of lists to be timed.
-
-.. GENERATED FROM PYTHON SOURCE LINES 64-68
-
-.. code-block:: Python
-
-
-    n_bench = 8
+    n_bench = 12
     all_sizes = np.array([2**n for n in range(n_bench)])
 
 
@@ -82,31 +113,86 @@ Let's define relevant sizes of lists to be timed.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-70
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
 
-Now, let's import pyquickbench, run and plot the benchmark
+Here, we want the benchmark to measure the time taken by the different implementations as a function of the size of the input. The ``setup`` argument expects a callable that provides arguments for our different implementations to be timed. For instance, ``setup`` can return a dictionnnary ``kwargs``, so that each function to be benchmarked will be called as ``fun(**kwargs)``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-80
+.. GENERATED FROM PYTHON SOURCE LINES 110-121
 
 .. code-block:: Python
 
 
-    import pyquickbench
+    def setup(n):
+        x = np.random.random(n)
+        return {'x' : x}
 
     pyquickbench.run_benchmark(
-        all_sizes   ,
-        all_funs    ,
-        show = True ,
-        filename = timings_filename ,
+        all_sizes       ,
+        all_funs        ,
+        setup = setup   ,
+        show = True     ,
     ) 
 
 
 
-.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_002.png
    :alt: 03 Preparing inputs
-   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_002.png
    :class: sphx-glr-single-img
 
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 125-126
+
+This calling convention is why positional-only arguments are disallowed in :func:`pyquickbench.run_benchmark`. For instance, even though the following defines a legal Python function
+
+.. GENERATED FROM PYTHON SOURCE LINES 126-132
+
+.. code-block:: Python
+
+
+    def pos_only_fun(n,/):
+        return n
+
+    print(pos_only_fun(42))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    42
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 133-134
+
+It is not allowed in :func:`pyquickbench.run_benchmark` since the following raises an error:
+
+.. GENERATED FROM PYTHON SOURCE LINES 134-139
+
+.. code-block:: Python
+
+
+    try:
+        pos_only_fun(n=42)
+    except TypeError as err:
+        print(f'TypeError: {err}')
+    
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    TypeError: pos_only_fun() got some positional-only arguments passed as keyword arguments: 'n'
 
 
 
@@ -114,7 +200,7 @@ Now, let's import pyquickbench, run and plot the benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.265 seconds)
+   **Total running time of the script:** (0 minutes 0.593 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_03-Preparing_inputs.py:

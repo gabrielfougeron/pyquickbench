@@ -431,11 +431,11 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="a-first-benchmark">
 <span id="sphx-glr-build-auto-examples-tutorial-01-first-benchmark-py"></span><h1>A first benchmark<a class="headerlink" href="#a-first-benchmark" title="Link to this heading">#</a></h1>
-<p>Let’s run and plot a first simple benchmark in python.</p>
+<p>Let’s run and plot a first simple benchmark in Python.</p>
 <p>Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.</p>
 <p>Let’s define a separate python function for three different list pre-allocation strategies.
 These functions all take an integer called “n” as an input, which stands for the length of the list to be pre-allocated.
-The argument name “n” is the default in pyquickbench and can be changed in as described in <a class="reference internal" href="03-Preparing_inputs.html#sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"><span class="std std-ref">Preparing inputs</span></a></p>
+The argument name “n” is the default in pyquickbench and can be changed in as described in <a class="reference internal" href="03-Preparing_inputs.html#sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"><span class="std std-ref">Preparing inputs</span></a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comprehension</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
@@ -470,7 +470,7 @@ The argument name “n” is the default in pyquickbench and can be changed in a
 </pre></div>
 </div>
 <img src="../../../_images/sphx_glr_01-First_benchmark_001.png" srcset="../../../_images/sphx_glr_01-First_benchmark_001.png" alt="01 First benchmark" class = "sphx-glr-single-img"/><p>From this benchmark, it is easy to see that initializing a list to a given length filled with a single value is quickest using the star operator.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.352 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.367 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-01-first-benchmark-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/a97bdd5149b0f6baa3efc4e0f298d86f/01-First_benchmark.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">01-First_benchmark.ipynb</span></code></a></p>

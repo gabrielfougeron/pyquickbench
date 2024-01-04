@@ -1,14 +1,14 @@
+import inspect
 
-
-def titi():
+def toto(a,b=1):
     return None
 
-print(titi.__name__)
+sig = inspect.signature(toto)
 
-toto = titi
+print(inspect.signature(toto))
+print(type(sig))
+print(dir(sig))
 
-print(toto.__name__)
 
-tata = lambda : None
-
-print(tata.__name__)
+sig_str = str(sig)
+print(sig_str)
