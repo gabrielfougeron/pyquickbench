@@ -57,7 +57,7 @@ all_funs = [
 
 def prepare_x(n):
     x = np.random.random(n)
-    return [(x, 'x')]
+    return [('x', x)]
  
 # %% 
 # Let's define relevant sizes of lists to be timed.

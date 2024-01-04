@@ -115,7 +115,7 @@ Now, let's import pyquickbench, run and plot the benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.248 seconds)
+   **Total running time of the script:** (0 minutes 0.263 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_04-Error_handling.py:

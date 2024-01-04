@@ -31,19 +31,11 @@ file = ["requirements.txt"]
 docs = {file = ["requirements-docs.txt"]}
 tests = {file = ["requirements-tests.txt"]}
 
-test-cli = [
-  "choreo[cli]",
-  "attrs",
-  "pytest",
-  "pytest-xdist",
-]
-
 [project.urls]
 Homepage = "https://gabrielfougeron.github.io/pyquickbench/"
 Documentation = "https://gabrielfougeron.github.io/pyquickbench/"
 Repository = "https://github.com/gabrielfougeron/pyquickbench"
 Changelog = "https://github.com/gabrielfougeron/pyquickbench/releases/"
-
 
 [tool.pytest.ini_options]
 minversion = "6.0"

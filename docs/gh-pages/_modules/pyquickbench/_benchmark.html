@@ -57,7 +57,8 @@
     <script src="../../_static/sphinx-needs/libs/html/datatables_loader.js?v=a2cae175"></script>
     <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=f783d6a5"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pyquickbench/_benchmark';</script>
-    <link rel="icon" href="../../_static/eight_icon.png"/>
+    <link rel="canonical" href="https://github.com/gabrielfougeron/pyquickbench/_modules/pyquickbench/_benchmark.html" />
+    <link rel="icon" href="../../_static/plot_icon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -135,8 +136,8 @@
     
     
     
-    <img src="../../_static/eight_icon.png" class="logo__image only-light" alt="pyquickbench"/>
-    <script>document.write(`<img src="../../_static/eight_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
+    <img src="../../_static/plot_icon.png" class="logo__image only-light" alt="pyquickbench"/>
+    <script>document.write(`<img src="../../_static/plot_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
   
   
     <p class="title logo__title">pyquickbench</p>
@@ -414,31 +415,84 @@ document.write(`
 
 <span class="n">default_linestyle_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solid&#39;</span><span class="p">]</span>
 
+<span class="k">def</span> <span class="nf">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    
+    <span class="n">setup_vars</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">setup_vars</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">setup_vars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">setup_vars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">setup_vars</span><span class="p">))}</span>
+        
+    <span class="k">return</span> <span class="n">setup_vars_dict</span>
+
+<span class="k">def</span> <span class="nf">_load_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_sizes_in</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+    
+    <span class="n">file_bas</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npy&#39;</span><span class="p">:</span>
+        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>    
+
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        
+    <span class="k">elif</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npz&#39;</span><span class="p">:</span>
+        <span class="n">file_content</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">file_content</span><span class="p">[</span><span class="s1">&#39;all_vals&#39;</span><span class="p">]</span>
+
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        
+        <span class="n">all_sizes</span> <span class="o">=</span> <span class="n">file_content</span><span class="p">[</span><span class="s1">&#39;all_sizes&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">all_sizes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_sizes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">all_sizes</span> <span class="o">==</span> <span class="n">all_sizes_in</span><span class="p">)</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown file extension </span><span class="si">{</span><span class="n">file_ext</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">BenchmarkUpToDate</span>
+
+<span class="k">def</span> <span class="nf">_save_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">all_sizes</span><span class="p">):</span>
+    
+    <span class="n">file_bas</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npy&#39;</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">)</span>    
+        
+    <span class="k">elif</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npz&#39;</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span>
+            <span class="n">filename</span>                <span class="p">,</span>
+            <span class="n">all_vals</span> <span class="o">=</span> <span class="n">all_vals</span>     <span class="p">,</span>
+            <span class="n">all_sizes</span> <span class="o">=</span> <span class="n">all_sizes</span>   <span class="p">,</span>
+        <span class="p">)</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown file extension </span><span class="si">{</span><span class="n">file_ext</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+
 <div class="viewcode-block" id="run_benchmark">
 <a class="viewcode-back" href="../../_build/generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark">[docs]</a>
 <span class="k">def</span> <span class="nf">run_benchmark</span><span class="p">(</span>
-    <span class="n">all_sizes</span>       <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span>                               <span class="p">,</span>
-    <span class="n">all_funs</span>        <span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span>                        <span class="p">,</span>
-    <span class="n">mode</span>            <span class="p">:</span> <span class="nb">str</span>                   <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>             <span class="p">,</span>
-    <span class="n">setup</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span>
-        <span class="p">[</span><span class="nb">int</span><span class="p">]</span>   <span class="p">,</span>
-        <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span>
-            <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span>
-                <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>  <span class="p">,</span>
-                <span class="nb">str</span>         <span class="p">,</span>
-            <span class="p">]</span>
-        <span class="p">]</span>
-    <span class="p">]</span>                                       <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="p">[(</span><span class="n">n</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">)])</span> <span class="p">,</span>
-    <span class="n">n_repeat</span>        <span class="p">:</span> <span class="nb">int</span>                   <span class="o">=</span> <span class="mi">1</span>                     <span class="p">,</span>
-    <span class="n">time_per_test</span>   <span class="p">:</span> <span class="nb">float</span>                 <span class="o">=</span> <span class="mf">0.2</span>                   <span class="p">,</span>
-    <span class="n">filename</span>        <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>            <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
-    <span class="n">ForceBenchmark</span>  <span class="p">:</span> <span class="nb">bool</span>                  <span class="o">=</span> <span class="kc">False</span>                 <span class="p">,</span>
-    <span class="n">show</span>            <span class="p">:</span> <span class="nb">bool</span>                  <span class="o">=</span> <span class="kc">False</span>                 <span class="p">,</span>
-    <span class="n">StopOnExcept</span>    <span class="p">:</span> <span class="nb">bool</span>                  <span class="o">=</span> <span class="kc">False</span>                 <span class="p">,</span>
-    <span class="o">**</span><span class="n">show_kwargs</span>   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span>
-        <span class="nb">str</span><span class="p">,</span>
-        <span class="n">typing</span><span class="o">.</span><span class="n">Any</span>
-    <span class="p">]</span>          <span class="p">,</span>
+    <span class="n">all_sizes</span>       <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span>                                       <span class="p">,</span>
+    <span class="n">all_funs</span>        <span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span>                                <span class="p">,</span>
+    <span class="n">mode</span>            <span class="p">:</span> <span class="nb">str</span>           <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                             <span class="p">,</span>
+    <span class="n">setup</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+                                    <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">})</span>                  <span class="p">,</span>
+    <span class="n">n_repeat</span>        <span class="p">:</span> <span class="nb">int</span>           <span class="o">=</span> <span class="mi">1</span>                                     <span class="p">,</span>
+    <span class="n">time_per_test</span>   <span class="p">:</span> <span class="nb">float</span>         <span class="o">=</span> <span class="mf">0.2</span>                                   <span class="p">,</span>
+    <span class="n">filename</span>        <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>    <span class="o">=</span> <span class="kc">None</span>                                  <span class="p">,</span>
+    <span class="n">ForceBenchmark</span>  <span class="p">:</span> <span class="nb">bool</span>          <span class="o">=</span> <span class="kc">False</span>                                 <span class="p">,</span>
+    <span class="n">show</span>            <span class="p">:</span> <span class="nb">bool</span>          <span class="o">=</span> <span class="kc">False</span>                                 <span class="p">,</span>
+    <span class="n">StopOnExcept</span>    <span class="p">:</span> <span class="nb">bool</span>          <span class="o">=</span> <span class="kc">False</span>                                 <span class="p">,</span>
+    <span class="o">**</span><span class="n">show_kwargs</span>   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>                          <span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    run_benchmark _summary_</span>
@@ -503,17 +557,15 @@ document.write(`
     <span class="k">if</span> <span class="n">Load_timings_file</span><span class="p">:</span>
         
         <span class="k">try</span><span class="p">:</span>
-
-            <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">n_sizes</span>  <span class="p">)</span>
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">n_funs</span>   <span class="p">)</span>
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">n_repeat</span> <span class="p">)</span>
+            
+            <span class="n">all_vals</span><span class="p">,</span> <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">_load_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_sizes</span><span class="p">,</span> <span class="p">(</span><span class="n">n_sizes</span><span class="p">,</span> <span class="n">n_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">))</span>
 
             <span class="n">DoBenchmark</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">BenchmarkUpToDate</span><span class="p">)</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="n">StopOnExcept</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">exc</span>
             
             <span class="n">DoBenchmark</span> <span class="o">=</span> <span class="kc">True</span>
             
@@ -530,11 +582,11 @@ document.write(`
             <span class="k">for</span> <span class="n">i_size</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_sizes</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i_fun</span><span class="p">,</span> <span class="n">fun</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_funs_list</span><span class="p">):</span>
 
-                    <span class="n">setup_vars</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-
+                    <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                    
                     <span class="n">vars_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                     <span class="n">global_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;all_funs_list&#39;</span> <span class="p">:</span> <span class="n">all_funs_list</span><span class="p">}</span>
-                    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">setup_vars</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">setup_vars_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                         <span class="n">global_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
                         <span class="n">vars_str</span> <span class="o">+=</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;,&#39;</span>
                         
@@ -582,7 +634,9 @@ document.write(`
                     <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeat</span><span class="p">):</span>
                         
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="n">out_val</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="n">setup</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+                            
+                            <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                            <span class="n">out_val</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">**</span><span class="n">setup_vars_dict</span><span class="p">)</span>
                         
                         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
                             <span class="k">if</span> <span class="n">StopOnExcept</span><span class="p">:</span>
@@ -597,13 +651,14 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">Save_timings_file</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">)</span>
+            <span class="n">_save_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">all_sizes</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">plot_benchmark</span><span class="p">(</span>
             <span class="n">all_vals</span>           <span class="p">,</span>
             <span class="n">all_sizes</span>           <span class="p">,</span>
             <span class="n">all_funs</span>            <span class="p">,</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>         <span class="p">,</span>
             <span class="n">show</span> <span class="o">=</span> <span class="n">show</span>         <span class="p">,</span>
             <span class="o">**</span><span class="n">show_kwargs</span>       <span class="p">,</span>
         <span class="p">)</span>
@@ -614,12 +669,13 @@ document.write(`
 <div class="viewcode-block" id="plot_benchmark">
 <a class="viewcode-back" href="../../_build/generated/generated/pyquickbench.plot_benchmark.html#pyquickbench.plot_benchmark">[docs]</a>
 <span class="k">def</span> <span class="nf">plot_benchmark</span><span class="p">(</span>
-    <span class="n">all_vals</span>               <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span>   <span class="p">,</span>
+    <span class="n">all_vals</span>                <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span>   <span class="p">,</span>
     <span class="n">all_sizes</span>               <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span>   <span class="p">,</span>
     <span class="n">all_funs</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">callable</span><span class="p">]</span> <span class="o">|</span>
                               <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> 
                               <span class="kc">None</span>                              <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
     <span class="n">all_names</span>               <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>       <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
+    <span class="n">mode</span>                    <span class="p">:</span> <span class="nb">str</span>                               <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>             <span class="p">,</span>
     <span class="n">all_xvalues</span>             <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span>        <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
     <span class="n">all_x_scalings</span>          <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span>        <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
     <span class="n">all_y_scalings</span>          <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span>        <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
@@ -907,7 +963,10 @@ document.write(`
         <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span>
         
     <span class="k">if</span> <span class="n">ylabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Time (s)&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;timings&quot;</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Time (s)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>

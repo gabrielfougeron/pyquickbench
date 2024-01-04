@@ -22,29 +22,82 @@ default_color_list.append(mpl.colors.BASE_COLORS['k'])
 
 default_linestyle_list = ['solid']
 
+def _return_setup_vars_dict(setup, size):
+    
+    setup_vars = setup(size)
+
+    if isinstance(setup_vars, dict):
+        setup_vars_dict = setup_vars
+    else:
+        setup_vars_dict = {setup_vars[i][0] : setup_vars[i][1] for i in range(len(setup_vars))}
+        
+    return setup_vars_dict
+
+def _load_benchmark_file(filename, all_sizes_in, shape):
+    
+    file_bas, file_ext = os.path.splitext(filename)
+    
+    if file_ext == '.npy':
+        all_vals = np.load(filename)    
+
+        BenchmarkUpToDate = True
+        assert all_vals.ndim == 3
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
+        
+    elif file_ext == '.npz':
+        file_content = np.load(filename)
+
+        all_vals = file_content['all_vals']
+
+        BenchmarkUpToDate = True
+        assert all_vals.ndim == 3
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
+        
+        all_sizes = file_content['all_sizes']
+        assert all_sizes.ndim == 1
+        BenchmarkUpToDate = BenchmarkUpToDate and (all_sizes.shape[0] == shape[0])
+        BenchmarkUpToDate = BenchmarkUpToDate and np.all(all_sizes == all_sizes_in)
+    
+    else:
+        raise ValueError(f'Unknown file extension {file_ext}')
+
+    return all_vals, BenchmarkUpToDate
+
+def _save_benchmark_file(filename, all_vals, all_sizes):
+    
+    file_bas, file_ext = os.path.splitext(filename)
+    
+    if file_ext == '.npy':
+        np.save(filename, all_vals)    
+        
+    elif file_ext == '.npz':
+        np.savez(
+            filename                ,
+            all_vals = all_vals     ,
+            all_sizes = all_sizes   ,
+        )
+    
+    else:
+        raise ValueError(f'Unknown file extension {file_ext}')
+    
+
 def run_benchmark(
-    all_sizes       : typing.Iterable                               ,
-    all_funs        : dict | typing.Iterable                        ,
-    mode            : str                   = "timings"             ,
-    setup           : typing.Callable[
-        [int]   ,
-        typing.List[
-            typing.Tuple[
-                typing.Any  ,
-                str         ,
-            ]
-        ]
-    ]                                       = (lambda n: [(n,'n')]) ,
-    n_repeat        : int                   = 1                     ,
-    time_per_test   : float                 = 0.2                   ,
-    filename        : str | None            = None                  ,
-    ForceBenchmark  : bool                  = False                 ,
-    show            : bool                  = False                 ,
-    StopOnExcept    : bool                  = False                 ,
-    **show_kwargs   : typing.Dict[
-        str,
-        typing.Any
-    ]          ,
+    all_sizes       : typing.Iterable                                       ,
+    all_funs        : dict | typing.Iterable                                ,
+    mode            : str           = "timings"                             ,
+    setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
+                                    = (lambda n: {'n': n})                  ,
+    n_repeat        : int           = 1                                     ,
+    time_per_test   : float         = 0.2                                   ,
+    filename        : str | None    = None                                  ,
+    ForceBenchmark  : bool          = False                                 ,
+    show            : bool          = False                                 ,
+    StopOnExcept    : bool          = False                                 ,
+    **show_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> np.typing.NDArray[np.float64] | None :
     """
     run_benchmark _summary_
@@ -109,17 +162,15 @@ def run_benchmark(
     if Load_timings_file:
         
         try:
-
-            all_vals = np.load(filename)
-
-            BenchmarkUpToDate = True
-            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == n_sizes  )
-            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == n_funs   )
-            BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == n_repeat )
+            
+            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_sizes, (n_sizes, n_funs, n_repeat))
 
             DoBenchmark = not(BenchmarkUpToDate)
 
-        except:
+        except Exception as exc:
+            
+            if StopOnExcept:
+                raise exc
             
             DoBenchmark = True
             
@@ -136,11 +187,11 @@ def run_benchmark(
             for i_size, size in enumerate(all_sizes):
                 for i_fun, fun in enumerate(all_funs_list):
 
-                    setup_vars = setup(size)
-
+                    setup_vars_dict = _return_setup_vars_dict(setup, size)
+                    
                     vars_str = ''
                     global_dict = {'all_funs_list' : all_funs_list}
-                    for var, name in setup_vars:
+                    for name, var in setup_vars_dict.items():
                         global_dict[name] = var
                         vars_str += name+','
                         
@@ -188,7 +239,9 @@ def run_benchmark(
                     for i_repeat in range(n_repeat):
                         
                         try:
-                            out_val = fun(setup(size))
+                            
+                            setup_vars_dict = _return_setup_vars_dict(setup, size)
+                            out_val = fun(**setup_vars_dict)
                         
                         except Exception as exc:
                             if StopOnExcept:
@@ -203,13 +256,14 @@ def run_benchmark(
             raise ValueError(f'Unknown mode {mode}')
 
         if Save_timings_file:
-            np.save(filename, all_vals)
+            _save_benchmark_file(filename, all_vals, all_sizes)
 
     if show:
         return plot_benchmark(
             all_vals           ,
             all_sizes           ,
             all_funs            ,
+            mode = mode         ,
             show = show         ,
             **show_kwargs       ,
         )
@@ -217,12 +271,13 @@ def run_benchmark(
     return all_vals
 
 def plot_benchmark(
-    all_vals               : np.typing.ArrayLike   ,
+    all_vals                : np.typing.ArrayLike   ,
     all_sizes               : np.typing.ArrayLike   ,
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
                               None                              = None                  ,
     all_names               : typing.Iterable[str] | None       = None                  ,
+    mode                    : str                               = "timings"             ,
     all_xvalues             : np.typing.ArrayLike | None        = None                  ,
     all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
     all_y_scalings          : np.typing.ArrayLike | None        = None                  ,
@@ -510,7 +565,10 @@ def plot_benchmark(
         xlabel = "n"
         
     if ylabel is None:
-        ylabel = "Time (s)"
+        if mode == "timings":
+            ylabel = "Time (s)"
+        else:
+            ylabel = ""
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

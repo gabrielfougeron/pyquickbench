@@ -1,7 +1,9 @@
 """
-====
-Toto
-====
+============
+pyquickbench
+============
+
+Pyquickbench is a pure Python package 
 
 .. autosummary::
    :toctree: generated/

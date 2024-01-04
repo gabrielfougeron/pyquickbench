@@ -117,7 +117,7 @@ From this benchmark, it is easy to see that initializing a list to a given lengt
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.405 seconds)
+   **Total running time of the script:** (0 minutes 0.352 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_01-First_benchmark.py:

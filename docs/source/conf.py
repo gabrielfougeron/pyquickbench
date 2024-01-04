@@ -74,8 +74,8 @@ intersphinx_timeout = 1
 
 html_theme = "pydata_sphinx_theme"
 
-html_logo_abs = os.path.join(__PROJECT_ROOT__,"docs","source","_static","img","eight_icon.png")
-html_logo_rel = "_static/img/eight_icon.png"
+html_logo_abs = os.path.join(__PROJECT_ROOT__,"docs","source","_static","img","plot_icon.png")
+html_logo_rel = "_static/img/plot_icon.png"
 html_logo = html_logo_rel
 html_favicon = html_logo_rel
 html_baseurl = "https://github.com/gabrielfougeron/pyquickbench"

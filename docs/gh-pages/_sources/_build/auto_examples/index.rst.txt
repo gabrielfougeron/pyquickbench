@@ -116,10 +116,10 @@ Benchmarks
 
 .. only:: html
 
-  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_Benchmark Hardware Info_thumb.png
+  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_Benchmark_Hardware_Info_thumb.png
     :alt:
 
-  :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark Hardware Info.py`
+  :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py`
 
 .. raw:: html
 
@@ -146,18 +146,18 @@ Benchmarks
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Benchmark of FFT algorithms">
+    <div class="sphx-glr-thumbcontainer" tooltip="Summing elements of a numpy array">
 
 .. only:: html
 
-  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_PYFFTW_bench_thumb.png
+  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_Sum_thumb.png
     :alt:
 
-  :ref:`sphx_glr__build_auto_examples_benchmarks_PYFFTW_bench.py`
+  :ref:`sphx_glr__build_auto_examples_benchmarks_Sum.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Benchmark of FFT algorithms</div>
+      <div class="sphx-glr-thumbnail-title">Summing elements of a numpy array</div>
     </div>
 
 
