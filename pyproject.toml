@@ -24,15 +24,41 @@ classifiers = [
 ]
 requires-python = ">= 3.9"
 dynamic = ["dependencies", "optional-dependencies"]
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-optional-dependencies = {docs = { file = ["requirements-docs.txt"] }}
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements.txt"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+docs = {file = ["requirements-docs.txt"]}
+tests = {file = ["requirements-tests.txt"]}
+
+test-cli = [
+  "choreo[cli]",
+  "attrs",
+  "pytest",
+  "pytest-xdist",
+]
 
 [project.urls]
 Homepage = "https://gabrielfougeron.github.io/pyquickbench/"
 Documentation = "https://gabrielfougeron.github.io/pyquickbench/"
 Repository = "https://github.com/gabrielfougeron/pyquickbench"
 Changelog = "https://github.com/gabrielfougeron/pyquickbench/releases/"
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v -ra --junit-xml=docs/pytest_out/junit.xml -n auto"
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+junit_family = "xunit2"
+junit_logging = "system-out"
+junit_suite_name = "Pytest test results"
+junit_log_passing_tests = true
+
 
 
 
