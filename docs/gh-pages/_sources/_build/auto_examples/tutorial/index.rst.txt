@@ -82,6 +82,23 @@ Tutorial
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Convergence analysis of scipy&#x27;s Runge-Kutta methods for ODE IVP">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_05-Plotting_scalars_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convergence analysis of scipy's Runge-Kutta methods for ODE IVP</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -92,4 +109,5 @@ Tutorial
    /_build/auto_examples/tutorial/02-Caching_benchmarks
    /_build/auto_examples/tutorial/03-Preparing_inputs
    /_build/auto_examples/tutorial/04-Error_handling
+   /_build/auto_examples/tutorial/05-Plotting_scalars
 

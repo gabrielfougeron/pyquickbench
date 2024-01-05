@@ -21,11 +21,11 @@
 Preparing inputs
 ================
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-12
+.. GENERATED FROM PYTHON SOURCE LINES 7-8
 
 By default, the functions to be benchmarked with :func:`pyquickbench.run_benchmark` are expected to take as arguments a single integer ``n`` as in the following code.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-45
+.. GENERATED FROM PYTHON SOURCE LINES 8-37
 
 .. code-block:: Python
 
@@ -61,10 +61,6 @@ By default, the functions to be benchmarked with :func:`pyquickbench.run_benchma
 
 
 
-
-
-
-
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
    :alt: 03 Preparing inputs
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_03-Preparing_inputs_001.png
@@ -74,12 +70,12 @@ By default, the functions to be benchmarked with :func:`pyquickbench.run_benchma
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-80
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 Most often however, the functions to be benchmarked take data as input that is more complex than a simple integer and a setup phase is needed. In the following example, we want to compare different implementations of array summation algorithms.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-103
+.. GENERATED FROM PYTHON SOURCE LINES 72-95
 
 .. code-block:: Python
 
@@ -113,11 +109,11 @@ Most often however, the functions to be benchmarked take data as input that is m
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 101-102
 
 Here, we want the benchmark to measure the time taken by the different implementations as a function of the size of the input. The ``setup`` argument expects a callable that provides arguments for our different implementations to be timed. For instance, ``setup`` can return a dictionnnary ``kwargs``, so that each function to be benchmarked will be called as ``fun(**kwargs)``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-121
+.. GENERATED FROM PYTHON SOURCE LINES 102-113
 
 .. code-block:: Python
 
@@ -144,11 +140,11 @@ Here, we want the benchmark to measure the time taken by the different implement
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-126
+.. GENERATED FROM PYTHON SOURCE LINES 117-118
 
 This calling convention is why positional-only arguments are disallowed in :func:`pyquickbench.run_benchmark`. For instance, even though the following defines a legal Python function
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-132
+.. GENERATED FROM PYTHON SOURCE LINES 118-124
 
 .. code-block:: Python
 
@@ -171,20 +167,22 @@ This calling convention is why positional-only arguments are disallowed in :func
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-134
+.. GENERATED FROM PYTHON SOURCE LINES 125-126
 
 It is not allowed in :func:`pyquickbench.run_benchmark` since the following raises an error:
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-139
+.. GENERATED FROM PYTHON SOURCE LINES 126-133
 
 .. code-block:: Python
 
 
     try:
-        pos_only_fun(n=42)
+        print(pos_only_fun(n=42))
     except TypeError as err:
         print(f'TypeError: {err}')
     
+    
+
 
 
 
@@ -197,10 +195,39 @@ It is not allowed in :func:`pyquickbench.run_benchmark` since the following rais
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 134-135
+
+This comes with hardly any loss of generality since it is possible to wrap these positional-only arguments functions.
+
+.. GENERATED FROM PYTHON SOURCE LINES 135-142
+
+.. code-block:: Python
+
+
+    def wrap_fun(n):
+        return pos_only_fun(n)
+
+    print(wrap_fun(42))
+    print(wrap_fun(n=42))
+
+    
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    42
+    42
+
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.593 seconds)
+   **Total running time of the script:** (0 minutes 0.482 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_03-Preparing_inputs.py:

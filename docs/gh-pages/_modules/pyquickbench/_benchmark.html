@@ -657,6 +657,10 @@ document.write(`
             
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
+        <span class="c1"># Sort values, taking care of nans.</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
         <span class="k">if</span> <span class="n">Save_timings_file</span><span class="p">:</span>
             <span class="n">_save_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">all_sizes</span><span class="p">)</span>
 
@@ -703,6 +707,7 @@ document.write(`
     <span class="n">plot_legend</span>             <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">True</span>                  <span class="p">,</span>
     <span class="n">plot_grid</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">True</span>                  <span class="p">,</span>
     <span class="n">transform</span>               <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>                        <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
+    <span class="n">alpha</span>                   <span class="p">:</span> <span class="nb">float</span>                             <span class="o">=</span> <span class="mf">1.</span>                    <span class="p">,</span>
     <span class="n">relative_to</span>             <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span>        <span class="o">=</span> <span class="kc">None</span>                  <span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -849,17 +854,6 @@ document.write(`
     <span class="n">n_colors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_list</span><span class="p">)</span>
     <span class="n">n_linestyle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">linestyle_list</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">logx_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logx_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-        
-    <span class="k">if</span> <span class="n">logy_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">logy_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-        
-    <span class="k">if</span> <span class="n">logx_plot</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">logy_plot</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">clip_vals</span> <span class="ow">and</span> <span class="p">(</span><span class="n">plot_ylim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need a range to clip values&#39;</span><span class="p">)</span>
@@ -934,16 +928,20 @@ document.write(`
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                     
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">isnotfinite</span><span class="p">(</span><span class="n">plot_y_val</span><span class="p">)</span>
-            <span class="n">masked_plot_y_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">plot_y_val</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="p">)</span>
+<span class="c1">#             mask = isnotfinite(plot_y_val)</span>
+<span class="c1">#             masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)</span>
+<span class="c1"># </span>
+<span class="c1">#             if not(np.ma.max(masked_plot_y_val) &gt; 0):</span>
+                
+            <span class="n">alpha_</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">alpha</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_repeat</span><span class="o">**</span><span class="mf">0.8</span><span class="p">),</span> <span class="mf">1.</span><span class="o">/</span><span class="mi">255</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">masked_plot_y_val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                    <span class="n">plot_x_val</span>              <span class="p">,</span>
-                    <span class="n">plot_y_val</span>              <span class="p">,</span>
-                    <span class="n">color</span> <span class="o">=</span> <span class="n">color</span>           <span class="p">,</span>
-                    <span class="n">linestyle</span> <span class="o">=</span> <span class="n">linestyle</span>   <span class="p">,</span>
-                <span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">plot_x_val</span>              <span class="p">,</span>
+                <span class="n">plot_y_val</span>              <span class="p">,</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">color</span>           <span class="p">,</span>
+                <span class="n">linestyle</span> <span class="o">=</span> <span class="n">linestyle</span>   <span class="p">,</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_</span>          <span class="p">,</span>
+            <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">plot_legend</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
@@ -952,6 +950,17 @@ document.write(`
             <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span>
             <span class="n">borderaxespad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">logx_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logx_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">logy_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logy_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">logx_plot</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">logy_plot</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">plot_grid</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
@@ -967,7 +976,10 @@ document.write(`
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
         
     <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">all_xvalues</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         
     <span class="k">if</span> <span class="n">ylabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;timings&quot;</span><span class="p">:</span>
@@ -975,8 +987,8 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>

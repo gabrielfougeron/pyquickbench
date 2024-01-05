@@ -3,10 +3,6 @@ Preparing inputs
 ================
 """
 
-
-
-
-
 # %% 
 # By default, the functions to be benchmarked with :func:`pyquickbench.run_benchmark` are expected to take as arguments a single integer ``n`` as in the following code.
 
@@ -70,10 +66,6 @@ pyquickbench.run_benchmark(
 ) 
 
 
-
-
-
-
 # %%
 # Most often however, the functions to be benchmarked take data as input that is more complex than a simple integer and a setup phase is needed. In the following example, we want to compare different implementations of array summation algorithms.
 #
@@ -133,7 +125,18 @@ print(pos_only_fun(42))
 #  It is not allowed in :func:`pyquickbench.run_benchmark` since the following raises an error:
 
 try:
-    pos_only_fun(n=42)
+    print(pos_only_fun(n=42))
 except TypeError as err:
     print(f'TypeError: {err}')
+    
+    
+# %%
+# This comes with hardly any loss of generality since it is possible to wrap these positional-only arguments functions.
+
+def wrap_fun(n):
+    return pos_only_fun(n)
+
+print(wrap_fun(42))
+print(wrap_fun(n=42))
+
     

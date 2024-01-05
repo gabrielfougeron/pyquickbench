@@ -4,13 +4,7 @@ Handling errors
 """
 
 # %% 
-# Let's run and plot a first simple benchmark in python.
-#
-# Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.
-#
-# Let's define a separate python function for three different list pre-allocation strategies.
-# These functions all take an integer called "n" as an input, which stands for the length of the list to be pre-allocated.
-# The argument name "n" is the default in pyquickbench and can be changed in ????????
+# By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as possible even if the callables to be benchmarked throw errors. These errors are caught and the corresponding value in the benchmark is recorded as ``np.nan``, which will in turn show in plots as a missing value.
 
 # sphinx_gallery_start_ignore
 
@@ -37,19 +31,25 @@ if ("--no-show" in sys.argv):
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
 basename = f'Error_handling'
-timings_filename = os.path.join(timings_folder, basename+'.npy')
+timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 # sphinx_gallery_end_ignore
 
+import pyquickbench
+
 def comprehension(n):
-    if n == 16:
+    if n == 1 :
         raise ValueError('Forbidden value')
     return ['' for _ in range(n)]
 
 def star_operator(n):
+    if n == 8:
+        raise ValueError('Forbidden value')
     return ['']*n
 
 def for_loop_append(n):
+    if n == 32:
+        raise ValueError('Forbidden value')
     l = []
     for _ in range(n):
         l.append('')
@@ -59,23 +59,27 @@ all_funs = [
     star_operator   ,
     for_loop_append ,
 ]
- 
-# %% 
-# Let's define relevant sizes of lists to be timed.
 
 n_bench = 8
 all_sizes = np.array([2**n for n in range(n_bench)])
-
-# %% 
-#
-# Now, let's import pyquickbench, run and plot the benchmark
-
-import pyquickbench
 
 pyquickbench.run_benchmark(
     all_sizes   ,
     all_funs    ,
     show = True ,
-    filename = timings_filename     ,
-
+# sphinx_gallery_start_ignore
+    filename = timings_filename ,
+# sphinx_gallery_end_ignore
 ) 
+
+# %% This default can be overriden with the argument ``StopOnExcept`` set to ``True``.
+
+try:
+    pyquickbench.run_benchmark(
+        all_sizes           ,
+        all_funs            ,
+        show = True         ,
+        StopOnExcept = True ,
+    ) 
+except Exception as exc:
+    print(f'Exception thrown: {exc}') 

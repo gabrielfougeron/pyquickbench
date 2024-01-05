@@ -21,31 +21,31 @@
 Handling errors
 ===============
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-14
+.. GENERATED FROM PYTHON SOURCE LINES 7-8
 
-Let's run and plot a first simple benchmark in python.
+By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as possible even if the callables to be benchmarked throw errors. These errors are caught and the corresponding value in the benchmark is recorded as ``np.nan``, which will in turn show in plots as a missing value.
 
-Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.
-
-Let's define a separate python function for three different list pre-allocation strategies.
-These functions all take an integer called "n" as an input, which stands for the length of the list to be pre-allocated.
-The argument name "n" is the default in pyquickbench and can be changed in ????????
-
-.. GENERATED FROM PYTHON SOURCE LINES 14-35
+.. GENERATED FROM PYTHON SOURCE LINES 8-44
 
 .. code-block:: Python
 
 
 
+    import pyquickbench
+
     def comprehension(n):
-        if n == 16:
+        if n == 1 :
             raise ValueError('Forbidden value')
         return ['' for _ in range(n)]
 
     def star_operator(n):
+        if n == 8:
+            raise ValueError('Forbidden value')
         return ['']*n
 
     def for_loop_append(n):
+        if n == 32:
+            raise ValueError('Forbidden value')
         l = []
         for _ in range(n):
             l.append('')
@@ -55,51 +55,16 @@ The argument name "n" is the default in pyquickbench and can be changed in ?????
         star_operator   ,
         for_loop_append ,
     ]
- 
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 64-65
-
-Let's define relevant sizes of lists to be timed.
-
-.. GENERATED FROM PYTHON SOURCE LINES 65-69
-
-.. code-block:: Python
-
 
     n_bench = 8
     all_sizes = np.array([2**n for n in range(n_bench)])
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
-
-Now, let's import pyquickbench, run and plot the benchmark
-
-.. GENERATED FROM PYTHON SOURCE LINES 72-82
-
-.. code-block:: Python
-
-
-    import pyquickbench
 
     pyquickbench.run_benchmark(
         all_sizes   ,
         all_funs    ,
         show = True ,
-        filename = timings_filename     ,
-
     ) 
+
 
 
 
@@ -112,10 +77,36 @@ Now, let's import pyquickbench, run and plot the benchmark
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 76-85
+
+.. code-block:: Python
+
+
+    try:
+        pyquickbench.run_benchmark(
+            all_sizes           ,
+            all_funs            ,
+            show = True         ,
+            StopOnExcept = True ,
+        ) 
+    except Exception as exc:
+        print(f'Exception thrown: {exc}') 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Exception thrown: Forbidden value
+
+
+
+
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.263 seconds)
+   **Total running time of the script:** (0 minutes 0.201 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_04-Error_handling.py:

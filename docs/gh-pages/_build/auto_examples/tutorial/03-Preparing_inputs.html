@@ -356,12 +356,12 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="02-Caching_benchmarks.html">Caching benchmarks</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Convergence analysis of scipy’s Runge-Kutta methods for ODE IVP</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../benchmarks/Benchmark_Hardware_Info.html">Description of the benchmark machine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../benchmarks/Inplace_conjugate.html">Benchmark of inplace conjugation of arrays</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../benchmarks/Sum.html">Summing elements of a numpy array</a></li>
 </ul>
 </li>
 </ul>
@@ -508,7 +508,7 @@ to download the full example code</p>
 </div>
 <p>It is not allowed in <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> since the following raises an error:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
 <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;TypeError: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
@@ -516,7 +516,19 @@ to download the full example code</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TypeError: pos_only_fun() got some positional-only arguments passed as keyword arguments: &#39;n&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.593 seconds)</p>
+<p>This comes with hardly any loss of generality since it is possible to wrap these positional-only arguments functions.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">wrap_fun</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">wrap_fun</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wrap_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>42
+42
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.482 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-03-preparing-inputs-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/0dc9ac5121cfb7a79da8cdd1143c030d/03-Preparing_inputs.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">03-Preparing_inputs.ipynb</span></code></a></p>

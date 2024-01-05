@@ -48,23 +48,6 @@ Benchmarks
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Summing elements of a numpy array">
-
-.. only:: html
-
-  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_Sum_thumb.png
-    :alt:
-
-  :ref:`sphx_glr__build_auto_examples_benchmarks_Sum.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Summing elements of a numpy array</div>
-    </div>
-
-
-.. raw:: html
-
     </div>
 
 
@@ -73,5 +56,4 @@ Benchmarks
 
    /_build/auto_examples/benchmarks/Benchmark_Hardware_Info
    /_build/auto_examples/benchmarks/Inplace_conjugate
-   /_build/auto_examples/benchmarks/Sum
 
