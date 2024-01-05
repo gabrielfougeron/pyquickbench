@@ -5,6 +5,7 @@
 *.png
 *.jpg
 *.npy
+*.npz
 *.mp4
 *.html
 *.txt

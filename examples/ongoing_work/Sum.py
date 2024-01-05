@@ -50,13 +50,12 @@ if ("--no-show" in sys.argv):
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
 
-# ForceBenchmark = True
-ForceBenchmark = False
-
 if not(os.path.isdir(timings_folder)):
     os.makedirs(timings_folder)
 
 # sphinx_gallery_end_ignore
+
+small = 1e-40
 
 def builtin_sum(x):
     return sum(x)
@@ -90,15 +89,28 @@ def taylor_poly(n, alpha):
 
     return x
 
-def setup(alpha):
-    return taylor_poly(int(1e5), -alpha)
+def setup(alpha, n):
+    return {'x': taylor_poly(n, -alpha)}
 
 @functools.cache
-def exact_sum(alpha):
-    y = setup(alpha)
+def exact_sum(alpha, n):
+    y = setup(alpha, n)['x']
     return m.fsum(y)
     
-def compute_error(f, x):
+def compute_error_relative_to_exp(f, x):
+    
+    ex_res =  m.exp(-x[1])
+    res = f(x)
+    rel_err = abs(ex_res - res) / abs(ex_res)
+    
+    return rel_err + small
+
+def rel_upper_bound_lagrange(alpha, n):
+    
+    return small + abs(alpha)**(n+1) / scipy.special.factorial(n+1)
+
+ 
+def compute_error_relative_to_fsum(f, x):
     
     ex_res =  exact_sum(-x[1])
     res = f(x)
@@ -107,7 +119,6 @@ def compute_error(f, x):
     return rel_err + 1e-40
 
 # sphinx_gallery_start_ignore
-
 
 basename = 'sum_bench_accuracy'
 error_filename = os.path.join(timings_folder,basename+'.npy')
@@ -124,7 +135,9 @@ all_funs = [
     m_fsum,
 ]
 
-all_error_funs = { f.__name__ :  functools.partial(compute_error, f) for f in all_funs if f is not m_fsum}
+# %%
+
+all_error_funs = { f.__name__ :  functools.partial(compute_error_relative_to_fsum, f) for f in all_funs if f is not m_fsum}
 
 pyquickbench.run_benchmark(
     all_alphas                      ,
@@ -132,7 +145,6 @@ pyquickbench.run_benchmark(
     setup = setup                   ,
     mode = "scalar_output"          ,
     filename = error_filename       ,
-    ForceBenchmark = ForceBenchmark ,
     title = "Relative error for increasing conditionning"   ,
     show = True                             ,
 )
@@ -142,22 +154,6 @@ pyquickbench.run_benchmark(
 def prepare_x(n):
     x = np.random.random(n)
     return {'x': x}
-
-# sphinx_gallery_start_ignore
-dpi = 150
-
-figsize = (1600/dpi, 800 / dpi)
-
-fig, axs = plt.subplots(
-    nrows = 1,
-    ncols = 1,
-    sharex = True,
-    sharey = True,
-    figsize = figsize,
-    dpi = dpi   ,
-    squeeze = True,
-)
-
 
 basename = 'sum_bench_time'
 timings_filename = os.path.join(timings_folder,basename+'.npy')
@@ -172,22 +168,12 @@ all_funs = [
     m_fsum,
 ]
 
-all_times = pyquickbench.run_benchmark(
+pyquickbench.run_benchmark(
     all_sizes                       ,
     all_funs                        ,
     setup = prepare_x               ,
     filename = timings_filename     ,
-    ForceBenchmark = ForceBenchmark ,
-)
-
-pyquickbench.plot_benchmark(
-    all_times                               ,
-    all_sizes                               ,
-    all_funs                                ,
-    fig = fig                               ,
-    ax = axs                                ,
     title = "Time (s) as a function of array size"   ,
     show = True                             ,
 )
-    
-# sphinx_gallery_end_ignore
+

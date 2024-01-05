@@ -262,6 +262,10 @@ def run_benchmark(
             
             raise ValueError(f'Unknown mode {mode}')
 
+        # Sort values, taking care of nans.
+        idx = np.argsort(all_vals, axis=2)
+        all_vals = np.take_along_axis(all_vals, idx, axis=2)
+        
         if Save_timings_file:
             _save_benchmark_file(filename, all_vals, all_sizes)
 
@@ -305,6 +309,7 @@ def plot_benchmark(
     plot_legend             : bool                              = True                  ,
     plot_grid               : bool                              = True                  ,
     transform               : str | None                        = None                  ,
+    alpha                   : float                             = 1.                    ,
     relative_to             : np.typing.ArrayLike | None        = None                  ,
 ) -> None :
     """
@@ -451,17 +456,6 @@ def plot_benchmark(
     n_colors = len(color_list)
     n_linestyle = len(linestyle_list)
 
-    if logx_plot is None:
-        logx_plot = (transform is None)
-        
-    if logy_plot is None:
-        logy_plot = (transform is None)
-        
-    if logx_plot:
-        ax.set_xscale('log')
-    if logy_plot:
-        ax.set_yscale('log')
-
     if clip_vals and (plot_ylim is None):
         
         raise ValueError('Need a range to clip values')
@@ -536,16 +530,20 @@ def plot_benchmark(
                         else:
                             plot_y_val[i_size] = np.nan
                     
-            mask = isnotfinite(plot_y_val)
-            masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
+#             mask = isnotfinite(plot_y_val)
+#             masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
+# 
+#             if not(np.ma.max(masked_plot_y_val) > 0):
+                
+            alpha_ = max( alpha / (n_repeat**0.8), 1./255)
 
-            if (np.ma.max(masked_plot_y_val) > 0):
-                ax.plot(
-                    plot_x_val              ,
-                    plot_y_val              ,
-                    color = color           ,
-                    linestyle = linestyle   ,
-                )
+            ax.plot(
+                plot_x_val              ,
+                plot_y_val              ,
+                color = color           ,
+                linestyle = linestyle   ,
+                alpha = alpha_          ,
+            )
 
     if plot_legend:
         ax.legend(
@@ -554,6 +552,17 @@ def plot_benchmark(
             loc='upper left',
             borderaxespad=0.,
         )
+
+    if logx_plot is None:
+        logx_plot = (transform is None)
+        
+    if logy_plot is None:
+        logy_plot = (transform is None)
+        
+    if logx_plot:
+        ax.set_xscale('log')
+    if logy_plot:
+        ax.set_yscale('log')
 
     if plot_grid:
         ax.grid(True, which="major", linestyle="-")
@@ -569,7 +578,10 @@ def plot_benchmark(
         ax.set_title(title)
         
     if xlabel is None:
-        xlabel = "n"
+        if (all_xvalues is None):
+            xlabel = "n"
+        else:
+            xlabel = ""
         
     if ylabel is None:
         if mode == "timings":
@@ -577,8 +589,8 @@ def plot_benchmark(
         else:
             ylabel = ""
 
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
     if show:
         plt.tight_layout()

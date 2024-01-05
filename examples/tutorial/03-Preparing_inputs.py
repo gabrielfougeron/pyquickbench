@@ -125,7 +125,18 @@ print(pos_only_fun(42))
 #  It is not allowed in :func:`pyquickbench.run_benchmark` since the following raises an error:
 
 try:
-    pos_only_fun(n=42)
+    print(pos_only_fun(n=42))
 except TypeError as err:
     print(f'TypeError: {err}')
+    
+    
+# %%
+# This comes with hardly any loss of generality since it is possible to wrap these positional-only arguments functions.
+
+def wrap_fun(n):
+    return pos_only_fun(n)
+
+print(wrap_fun(42))
+print(wrap_fun(n=42))
+
     
