@@ -41,33 +41,33 @@ def _return_setup_vars_dict(setup, size, fun):
 
 def _load_benchmark_file(filename, all_sizes_in, shape):
     
-    file_bas, file_ext = os.path.splitext(filename)
+    file_base, file_ext = os.path.splitext(filename)
     
     if file_ext == '.npy':
         all_vals = np.load(filename)    
 
         BenchmarkUpToDate = True
-        assert all_vals.ndim == 3
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
-        
-    elif file_ext == '.npz':
-        file_content = np.load(filename)
+        assert all_vals.ndim == len(shape)
+        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values):
+            BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
 
-        all_vals = file_content['all_vals']
-
-        BenchmarkUpToDate = True
-        assert all_vals.ndim == 3
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
         
-        all_sizes = file_content['all_sizes']
-        assert all_sizes.ndim == 1
-        BenchmarkUpToDate = BenchmarkUpToDate and (all_sizes.shape[0] == shape[0])
-        BenchmarkUpToDate = BenchmarkUpToDate and np.all(all_sizes == all_sizes_in)
-    
+#     elif file_ext == '.npz':
+#         file_content = np.load(filename)
+# 
+#         all_vals = file_content['all_vals']
+# 
+#         BenchmarkUpToDate = True
+#         assert all_vals.ndim == 3
+#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
+#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
+#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
+#         
+#         all_sizes = file_content['all_sizes']
+#         assert all_sizes.ndim == 1
+#         BenchmarkUpToDate = BenchmarkUpToDate and (all_sizes.shape[0] == shape[0])
+#         BenchmarkUpToDate = BenchmarkUpToDate and np.all(all_sizes == all_sizes_in)
+#     
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
 
@@ -92,7 +92,7 @@ def _save_benchmark_file(filename, all_vals, all_sizes):
     
 
 def run_benchmark(
-    all_sizes       : typing.Iterable                                       ,
+    all_args        : dict | typing.Iterable                                ,
     all_funs        : dict | typing.Iterable                                ,
     mode            : str           = "timings"                             ,
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
@@ -154,22 +154,27 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    all_sizes = np.array(all_sizes)
-    n_sizes = len(all_sizes)
+    if not(isinstance(all_args, dict)):
+        all_args = {'n': all_args}
+    
+    assert not('fun' in all_args)
+    assert not('repeats' in all_args)
     
     if isinstance(all_funs, dict):
         all_funs_list = [fun for fun in all_funs.values()]
-        
     else:    
         all_funs_list = [fun for fun in all_funs]
-    
-    n_funs = len(all_funs_list)
+     
+    res_shape = {name : len(value) for name, value in all_args.items()}
+    res_shape['fun'] = len(all_funs)
+    res_shape['repeat'] = range(n_repeat)
+    n_vals = math.prod(res_shape.values())
 
     if Load_timings_file:
         
         try:
             
-            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_sizes, (n_sizes, n_funs, n_repeat))
+            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape)
 
             DoBenchmark = not(BenchmarkUpToDate)
 
@@ -271,8 +276,8 @@ def run_benchmark(
 
     if show:
         return plot_benchmark(
-            all_vals           ,
-            all_sizes           ,
+            all_vals            ,
+            all_args            ,
             all_funs            ,
             mode = mode         ,
             show = show         ,
