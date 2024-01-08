@@ -3,11 +3,13 @@ import numpy as np
 import numpy.typing
 import timeit
 import math
+import itertools
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.figure
 import typing
 import inspect
+
 
 def isnotfinite(arr):
     res = np.isfinite(arr)
@@ -23,14 +25,14 @@ default_color_list.append(mpl.colors.BASE_COLORS['k'])
 
 default_linestyle_list = ['solid']
 
-def _return_setup_vars_dict(setup, size, fun):
+def _return_setup_vars_dict(setup, args, fun):
     
     sig = inspect.signature(fun)
     for param in sig.parameters.values():
         if param.kind == param.POSITIONAL_ONLY:
             raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
     
-    setup_vars = setup(size)
+    setup_vars = setup(*args)
 
     if isinstance(setup_vars, dict):
         setup_vars_dict = setup_vars
@@ -80,16 +82,38 @@ def _save_benchmark_file(filename, all_vals, all_sizes):
     if file_ext == '.npy':
         np.save(filename, all_vals)    
         
-    elif file_ext == '.npz':
-        np.savez(
-            filename                ,
-            all_vals = all_vals     ,
-            all_sizes = all_sizes   ,
-        )
-    
+    # elif file_ext == '.npz':
+    #     np.savez(
+    #         filename                ,
+    #         all_vals = all_vals     ,
+    #         all_sizes = all_sizes   ,
+    #     )
+    # 
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
     
+def _build_args_shapes(all_args, all_funs, n_repeat):
+    
+    if not(isinstance(all_args, dict)):
+        all_args = {'n': all_args}
+    
+    assert not('fun' in all_args)
+    assert not('repeats' in all_args)
+    
+    if isinstance(all_funs, dict):
+        all_funs_list = [fun for fun in all_funs.values()]
+    else:    
+        all_funs_list = [fun for fun in all_funs]
+     
+    args_shape = {name : len(value) for name, value in all_args.items()}
+    
+    res_shape = args_shape.copy()
+    res_shape['fun'] = len(all_funs)
+    res_shape['repeat'] = n_repeat
+    
+    return all_funs_list, args_shape, res_shape
+
+
 
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
@@ -154,21 +178,7 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    if not(isinstance(all_args, dict)):
-        all_args = {'n': all_args}
-    
-    assert not('fun' in all_args)
-    assert not('repeats' in all_args)
-    
-    if isinstance(all_funs, dict):
-        all_funs_list = [fun for fun in all_funs.values()]
-    else:    
-        all_funs_list = [fun for fun in all_funs]
-     
-    res_shape = {name : len(value) for name, value in all_args.items()}
-    res_shape['fun'] = len(all_funs)
-    res_shape['repeat'] = range(n_repeat)
-    n_vals = math.prod(res_shape.values())
+    all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs)
 
     if Load_timings_file:
         
@@ -191,14 +201,18 @@ def run_benchmark(
 
     if DoBenchmark:
 
-        all_vals = np.zeros((n_sizes, n_funs, n_repeat))
+        all_vals = np.zeros(list(res_shape.values()))
 
         if mode == "timings":
 
-            for i_size, size in enumerate(all_sizes):
+            for i_args, args in zip(
+                itertools.product(*[range(i) for i in args_shape.values()])   ,
+                itertools.product(*list(all_args.values()))     ,
+            ):
+
                 for i_fun, fun in enumerate(all_funs_list):
 
-                    setup_vars_dict = _return_setup_vars_dict(setup, size, fun)
+                    setup_vars_dict = _return_setup_vars_dict(setup, args, fun)
                     
                     global_dict = {
                         'fun'               : fun               ,
@@ -221,8 +235,8 @@ def run_benchmark(
                         
                         if (n_repeat == 1) and (time_per_test == 0.2):
                             # Fast track: benchmark is not repeated and autorange results are kept as is.
-                            
-                            all_vals[i_size, i_fun, 0] = est_time / n_timeit_0dot2
+
+                            all_vals[i_args, i_fun, 0] = est_time / n_timeit_0dot2
                             
                         else:
                             # Full benchmark is run
@@ -234,20 +248,25 @@ def run_benchmark(
                                 number = n_timeit,
                             )
                             
-                            all_vals[i_size, i_fun, :] = np.array(times) / n_timeit
+                            all_vals[i_args, i_fun, :] = np.array(times) / n_timeit
 
                     except Exception as exc:
                         if StopOnExcept:
                             raise exc
                         
-                        all_vals[i_size, i_fun, :].fill(np.nan)
+                        all_vals[i_args, i_fun, :].fill(np.nan)
                         
         elif mode == "scalar_output":    
             
-            for i_size, size in enumerate(all_sizes):
+
+            for i_args, args in zip(
+                itertools.product(*[range(i) for i in args_shape.values()])   ,
+                itertools.product(*list(all_args.values()))     ,
+            ):
+
                 for i_fun, fun in enumerate(all_funs_list):
                     
-                    setup_vars_dict = _return_setup_vars_dict(setup, size, fun)
+                    setup_vars_dict = _return_setup_vars_dict(setup, args, fun)
                     
                     for i_repeat in range(n_repeat):
                         
@@ -261,19 +280,19 @@ def run_benchmark(
 
                             out_val = np.nan
                             
-                        all_vals[i_size, i_fun, i_repeat] = out_val
+                        all_vals[i_args, i_fun, i_repeat] = out_val
                         
         else:
             
             raise ValueError(f'Unknown mode {mode}')
 
-        # Sort values, taking care of nans.
-        idx = np.argsort(all_vals, axis=2)
-        all_vals = np.take_along_axis(all_vals, idx, axis=2)
+        # Sort values along "repeat" axis, taking care of nans.
+        idx = np.argsort(all_vals, axis=-1)
+        all_vals = np.take_along_axis(all_vals, idx, axis=-1)
         
         if Save_timings_file:
-            _save_benchmark_file(filename, all_vals, all_sizes)
-
+            _save_benchmark_file(filename, all_vals, args_shape)
+            
     if show:
         return plot_benchmark(
             all_vals            ,
@@ -288,7 +307,7 @@ def run_benchmark(
 
 def plot_benchmark(
     all_vals                : np.typing.ArrayLike   ,
-    all_sizes               : np.typing.ArrayLike   ,
+    all_args                : dict | typing.Iterable                                    ,
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
                               None                              = None                  ,
@@ -385,12 +404,14 @@ def plot_benchmark(
         _description_
     """
     
-    n_sizes = all_vals.shape[0] 
-    n_funs = all_vals.shape[1]
-    n_repeat = all_vals.shape[2]
-    
-    all_sizes = np.array(all_sizes)
-    assert n_sizes == len(all_sizes)
+    _, args_shape, res_shape = _build_args_shapes(all_args, all_funs)
+
+    assert all_vals.ndim == len(res_shape)
+    for loaded_axis_len, expected_axis_len in zip(all_vals.shape, res_shape.values):
+        assert loaded_axis_len == expected_axis_len
+
+    n_funs = res_shape['fun']
+    n_repeat = res_shape['repeat']
 
     if all_names is None:
         
@@ -436,12 +457,12 @@ def plot_benchmark(
         ax = fig.add_subplot(1,1,1)
         
     if (relative_to is None):
-        relative_to_array = np.ones((n_sizes))
+        relative_to_array = np.ones(list(args_shape.values()))
         
     else:
         if isinstance(relative_to, np.ndarray):
             relative_to_array = relative_to
-            assert relative_to_array.shape == (n_sizes,)
+            assert relative_to_array.shape == tuple(args_shape.values())
         
         else:
             
