@@ -10,10 +10,21 @@ import matplotlib.figure
 import typing
 import inspect
 
-
 def isnotfinite(arr):
     res = np.isfinite(arr)
     np.bitwise_not(res, out=res)  # in-place
+    return res
+
+def _mem_shift(idx, shape):
+    
+    res = 0
+    prod_shapes = 1
+    
+    # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681
+    for i in range(len(shape)-1,-1,-1):
+        res += i*prod_shapes
+        prod_shapes *= shape[i]
+        
     return res
 
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
@@ -23,7 +34,51 @@ default_color_list.append(mpl.colors.BASE_COLORS['r'])
 default_color_list.append(mpl.colors.BASE_COLORS['m'])
 default_color_list.append(mpl.colors.BASE_COLORS['k'])
 
-default_linestyle_list = ['solid']
+default_linestyle_list = [
+     ('solid', 'solid')             ,   # Same as (0, ()) or '-'
+     ('dotted', 'dotted')           ,   # Same as (0, (1, 1)) or ':'
+     ('dashed', 'dashed')           ,   # Same as '--'
+     ('dashdot', 'dashdot')         ,   # Same as '-.'
+     (0, (1, 10))                   ,   # loosely dotted   
+     (0, (1, 1))                    ,   # dotted
+     (0, (1, 1))                    ,   # densely dotted
+     (5, (10, 3))                   ,   # long dash with offset
+     (0, (5, 10))                   ,   # loosely dashed
+     (0, (5, 5))                    ,   # dashed
+     (0, (5, 1))                    ,   # densely dashed
+     (0, (3, 10, 1, 10))            ,   # loosely dashdotted
+     (0, (3, 5, 1, 5))              ,   # dashdotted
+     (0, (3, 1, 1, 1))              ,   # densely dashdotted
+     (0, (3, 5, 1, 5, 1, 5))        ,   # dashdotdotted
+     (0, (3, 10, 1, 10, 1, 10))     ,   # loosely dashdotdotted
+     (0, (3, 1, 1, 1, 1, 1))        ,   # densely dashdotdotted                    
+]
+
+default_pointstyle_list = [
+    "."	, # m00 point
+    ","	, # m01 pixel
+    "o"	, # m02 circle
+    "v"	, # m03 triangle_down
+    "^"	, # m04 triangle_up
+    "<"	, # m05 triangle_left
+    ">"	, # m06 triangle_right
+    "1"	, # m07 tri_down
+    "2"	, # m08 tri_up
+    "3"	, # m09 tri_left
+    "4"	, # m10 tri_right
+    "8"	, # m11 octagon
+    "s"	, # m12 square
+    "p"	, # m13 pentagon
+    "P"	, # m23 plus (filled)
+    "*"	, # m14 star
+    "h"	, # m15 hexagon1
+    "H"	, # m16 hexagon2
+    "+"	, # m17 plus
+    "x"	, # m18 x
+    "X"	, # m24 x (filled)
+    "D"	, # m19 diamond
+    "d"	, # m20 thin_diamond
+]
 
 def _return_setup_vars_dict(setup, args, fun):
     
@@ -107,13 +162,11 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
      
     args_shape = {name : len(value) for name, value in all_args.items()}
     
-    res_shape = args_shape.copy()
+    res_shape = {name : value for name, value in args_shape.items()}
     res_shape['fun'] = len(all_funs)
     res_shape['repeat'] = n_repeat
     
-    return all_funs_list, args_shape, res_shape
-
-
+    return all_args, all_funs_list, args_shape, res_shape
 
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
@@ -129,46 +182,6 @@ def run_benchmark(
     StopOnExcept    : bool          = False                                 ,
     **show_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> np.typing.NDArray[np.float64] | None :
-    """
-    run_benchmark _summary_
-
-    _extended_summary_
-
-    Parameters
-    ----------
-    all_sizes : np.typing.ArrayLike
-        _description_
-    all_funs : dict | typing.Iterable
-        _description_
-    mode : str, optional
-        _description_, by default "timings"
-    setup : _type_, optional
-        _description_, by default (lambda n: [(n,'n')])
-    n_repeat : int, optional
-        _description_, by default 1
-    time_per_test : float, optional
-        _description_, by default 0.2
-    filename : str | None, optional
-        _description_, by default None
-    ForceBenchmark : bool, optional
-        _description_, by default Falsex
-    show : bool, optional
-        _description_, by default False
-    StopOnExcept : bool, optional
-        _description_, by default False
-
-    Returns
-    -------
-    np.typing.NDArray[np.float64]
-        _description_
-
-    Raises
-    ------
-    exc
-        _description_
-    ValueError
-        _description_
-    """
     
     if filename is None:
         Load_timings_file = False
@@ -178,7 +191,7 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs)
+    all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat)
 
     if Load_timings_file:
         
@@ -305,106 +318,54 @@ def run_benchmark(
 
     return all_vals
 
+all_plot_intents = [
+    'same'              ,
+    'single_value'      ,
+    'points'            ,
+    'curve_color'       ,
+    'curve_linestyle'   ,
+    'curve_pointstyle'  ,
+    'subplot_grid_x'    ,
+    'subplot_grid_y'    ,
+    'reduction_avg'     ,
+]
+
 def plot_benchmark(
     all_vals                : np.typing.ArrayLike   ,
-    all_args                : dict | typing.Iterable                                    ,
+    all_args                : dict | typing.Iterable                                        ,
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
-                              None                              = None                  ,
-    all_names               : typing.Iterable[str] | None       = None                  ,
-    mode                    : str                               = "timings"             ,
-    all_xvalues             : np.typing.ArrayLike | None        = None                  ,
-    all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
-    all_y_scalings          : np.typing.ArrayLike | None        = None                  ,
-    color_list              : list                              = default_color_list    ,
-    linestyle_list          : list                              = default_linestyle_list,
-    logx_plot               : bool | None                       = None                  ,
-    logy_plot               : bool | None                       = None                  ,
-    plot_ylim               : tuple | None                      = None                  ,
-    plot_xlim               : tuple | None                      = None                  ,
-    clip_vals               : bool                              = False                 ,
-    stop_after_first_clip   : bool                              = False                 ,
-    show                    : bool                              = False                 ,
-    fig                     : matplotlib.figure.Figure | None   = None                  ,
-    ax                      : plt.Axes | None                   = None                  ,
-    title                   : str | None                        = None                  ,
-    xlabel                  : str | None                        = None                  ,
-    ylabel                  : str | None                        = None                  ,
-    plot_legend             : bool                              = True                  ,
-    plot_grid               : bool                              = True                  ,
-    transform               : str | None                        = None                  ,
-    alpha                   : float                             = 1.                    ,
-    relative_to             : np.typing.ArrayLike | None        = None                  ,
+                              None                              = None                      ,
+    all_names               : typing.Iterable[str] | None       = None                      ,
+    val_plot_intent         : typing.Iterable[str] | None       = None                      ,        
+    mode                    : str                               = "timings"                 ,
+    all_xvalues             : np.typing.ArrayLike | None        = None                      ,
+    # all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
+    # all_y_scalings          : np.typing.ArrayLike | None        = None                  ,
+    color_list              : list                              = default_color_list        ,
+    linestyle_list          : list                              = default_linestyle_list    ,
+    pointstyle_list         : list                              = default_pointstyle_list   ,
+    logx_plot               : bool | None                       = None                      ,
+    logy_plot               : bool | None                       = None                      ,
+    plot_ylim               : tuple | None                      = None                      ,
+    plot_xlim               : tuple | None                      = None                      ,
+    clip_vals               : bool                              = False                     ,
+    stop_after_first_clip   : bool                              = False                     ,
+    show                    : bool                              = False                     ,
+    fig                     : matplotlib.figure.Figure | None   = None                      ,
+    ax                      : plt.Axes | None                   = None                      ,
+    title                   : str | None                        = None                      ,
+    xlabel                  : str | None                        = None                      ,
+    ylabel                  : str | None                        = None                      ,
+    plot_legend             : bool                              = True                      ,
+    plot_grid               : bool                              = True                      ,
+    transform               : str | None                        = None                      ,
+    alpha                   : float                             = 1.                        ,
+    relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
-    """
-    plot_benchmark _summary_
 
-    _extended_summary_
-
-    Parameters
-    ----------
-    all_vals : np.typing.ArrayLike
-        _description_
-    all_sizes : np.typing.ArrayLike
-        _description_
-    all_funs : typing.Dict[str, callable] | typing.Iterable[str] | None, optional
-        _description_, by default None
-    all_names : typing.Iterable[str] | None, optional
-        _description_, by default None
-    all_xvalues : np.typing.ArrayLike | None, optional
-        _description_, by default None
-    all_x_scalings : np.typing.ArrayLike | None, optional
-        _description_, by default None
-    all_y_scalings : np.typing.ArrayLike | None, optional
-        _description_, by default None
-    color_list : list, optional
-        _description_, by default default_color_list
-    linestyle_list : list, optional
-        _description_, by default default_linestyle_list
-    logx_plot : bool | None, optional
-        _description_, by default None
-    logy_plot : bool | None, optional
-        _description_, by default None
-    plot_ylim : tuple | None, optional
-        _description_, by default None
-    plot_xlim : tuple | None, optional
-        _description_, by default None
-    clip_vals : bool, optional
-        _description_, by default False
-    stop_after_first_clip : bool, optional
-        _description_, by default False
-    show : bool, optional
-        _description_, by default False
-    fig : matplotlib.figure.Figure | None, optional
-        _description_, by default None
-    ax : plt.Axes | None, optional
-        _description_, by default None
-    title : str | None, optional
-        _description_, by default None
-    xlabel : str | None, optional
-        _description_, by default None
-    ylabel : str | None, optional
-        _description_, by default None
-    plot_legend : bool, optional
-        _description_, by default True
-    plot_grid : bool, optional
-        _description_, by default True
-    transform : str | None, optional
-        _description_, by default None
-    relative_to : np.typing.ArrayLike | None, optional
-        _description_, by default None
-
-    Raises
-    ------
-    ValueError
-        _description_
-    ValueError
-        _description_
-    ValueError
-        _description_
-    """
     
-    _, args_shape, res_shape = _build_args_shapes(all_args, all_funs)
+    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
 
     assert all_vals.ndim == len(res_shape)
     for loaded_axis_len, expected_axis_len in zip(all_vals.shape, res_shape.values):
@@ -434,16 +395,76 @@ def plot_benchmark(
         all_names_list = [name for name in all_names]
     
     assert n_funs == len(all_names_list)
+    
+    if val_plot_intent is None:
+        
+        val_plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
+        val_plot_intent['fun'] = 'curve_color'
+        val_plot_intent['repeat'] = 'same'
 
-    if all_x_scalings is None:
-        all_x_scalings = np.ones(n_funs)
     else:
-        assert all_x_scalings.shape == (n_funs,)
-
-    if all_y_scalings is None:
-        all_y_scalings = np.ones(n_funs)
-    else:
-        assert all_y_scalings.shape == (n_funs,)
+        
+        assert isinstance(val_plot_intent, dict)
+        assert len(val_plot_intent) == all_vals.ndim
+        for name, intent in val_plot_intent.items():
+            assert name in all_args
+            assert intent in all_plot_intents
+            
+        assert 'fun' in val_plot_intent
+        assert 'repeat' in val_plot_intent
+    
+    n_points = 0
+    idx_points = -1
+    
+    'same'              ,
+    'single_value'      ,
+    'points'            ,
+    'curve_color'       ,
+    'curve_linestyle'   ,
+    'curve_pointstyle'  ,
+    'subplot_grid_x'    ,
+    'subplot_grid_y'    ,
+    'reduction_avg'     ,
+    
+    idx_same = []
+    idx_single_value = []
+    idx_curve_color = []
+    idx_curve_linestyle = []
+    idx_curve_pointstyle = []
+    idx_subplot_grid_x = []
+    idx_subplot_grid_y = []
+    idx_reduction_avg = []
+    
+    for i, name in enumerate(val_plot_intent):
+        
+        if name == 'points':
+            n_points += 1
+            idx_points = i
+            
+    if (n_points != 1):
+        raise ValueError("There should be exactly one 'points' value plot intent")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # TODO: assess whether those need to stay
+# 
+#     if all_x_scalings is None:
+#         all_x_scalings = np.ones(n_funs)
+#     else:
+#         assert all_x_scalings.shape == (n_funs,)
+# 
+#     if all_y_scalings is None:
+#         all_y_scalings = np.ones(n_funs)
+#     else:
+#         assert all_y_scalings.shape == (n_funs,)
 
     if (ax is None) or (fig is None):
 
@@ -456,10 +477,13 @@ def plot_benchmark(
         )  
         ax = fig.add_subplot(1,1,1)
         
+    
+    # TODO : Adapt this
     if (relative_to is None):
         relative_to_array = np.ones(list(args_shape.values()))
         
     else:
+        raise NotImplementedError
         if isinstance(relative_to, np.ndarray):
             relative_to_array = relative_to
             assert relative_to_array.shape == tuple(args_shape.values())
@@ -479,18 +503,20 @@ def plot_benchmark(
             
             relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
         
+        
     n_colors = len(color_list)
     n_linestyle = len(linestyle_list)
+    n_pointstyle = len(pointstyle_list)
 
     if clip_vals and (plot_ylim is None):
-        
         raise ValueError('Need a range to clip values')
 
     leg_patch = []
     for i_fun in range(n_funs):
 
-        color = color_list[i_fun % n_colors]
-        linestyle = linestyle_list[i_fun % n_linestyle]
+        color = color_list[i_color % n_colors]
+        linestyle = linestyle_list[i_linestyle % n_linestyle]
+        pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
         
         leg_patch.append(
             mpl.patches.Patch(
@@ -499,6 +525,13 @@ def plot_benchmark(
                 linestyle = linestyle           ,
             )
         )
+        
+        
+        
+        
+        
+        
+        
 
         for i_repeat in range(n_repeat):
 
@@ -506,61 +539,69 @@ def plot_benchmark(
             plot_y_val /= all_y_scalings[i_fun]
             
             if all_xvalues is None:
-                plot_x_val = all_sizes * all_x_scalings[i_fun]
+                if 'n' in all_args:
+                    plot_x_val = all_sizes * all_x_scalings[i_fun]
+                else:
+                    raise ValueError # ????
             else:   
                 plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
             
-            if transform in ["pol_growth_order", "pol_cvgence_order"]:
-                
-                transformed_plot_y_val = np.zeros_like(plot_y_val)
-                
-                for i_size in range(1,n_sizes):
-                    
-                    ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
-                    ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
-                    
-                    try:
-                        transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
-
-                    except:
-                        transformed_plot_y_val[i_size] = np.nan
-                        
-                transformed_plot_y_val[0] = np.nan
-                                
-                plot_y_val = transformed_plot_y_val
-
-                if transform == "pol_cvgence_order":
-                    plot_y_val = - transformed_plot_y_val
-                else:
-                    plot_y_val = transformed_plot_y_val
-                
-            if clip_vals:
-
-                for i_size in range(n_sizes):
             
-                    if plot_y_val[i_size] < plot_ylim[0]:
-
-                        if stop_after_first_clip:
-                            for j_size in range(i_size,n_sizes):
-                                plot_y_val[j_size] = np.nan
-                            break
-                        else:
-                            plot_y_val[i_size] = np.nan
-                            
-                    elif plot_y_val[i_size] > plot_ylim[1]:
-
-                        if stop_after_first_clip:
-                            for j_size in range(i_size,n_sizes):
-                                plot_y_val[j_size] = np.nan
-                            break
-                        else:
-                            plot_y_val[i_size] = np.nan
+            # TODO : Adapt this
+#             if transform in ["pol_growth_order", "pol_cvgence_order"]:
+#                 
+#                 transformed_plot_y_val = np.zeros_like(plot_y_val)
+#                 
+#                 for i_size in range(1,n_sizes):
+#                     
+#                     ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
+#                     ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
+#                     
+#                     try:
+#                         transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
+# 
+#                     except:
+#                         transformed_plot_y_val[i_size] = np.nan
+#                         
+#                 transformed_plot_y_val[0] = np.nan
+#                                 
+#                 plot_y_val = transformed_plot_y_val
+# 
+#                 if transform == "pol_cvgence_order":
+#                     plot_y_val = - transformed_plot_y_val
+#                 else:
+#                     plot_y_val = transformed_plot_y_val
+                
+                
+            # TODO : Adapt this
+#             if clip_vals:
+# 
+#                 for i_size in range(n_sizes):
+#             
+#                     if plot_y_val[i_size] < plot_ylim[0]:
+# 
+#                         if stop_after_first_clip:
+#                             for j_size in range(i_size,n_sizes):
+#                                 plot_y_val[j_size] = np.nan
+#                             break
+#                         else:
+#                             plot_y_val[i_size] = np.nan
+#                             
+#                     elif plot_y_val[i_size] > plot_ylim[1]:
+# 
+#                         if stop_after_first_clip:
+#                             for j_size in range(i_size,n_sizes):
+#                                 plot_y_val[j_size] = np.nan
+#                             break
+#                         else:
+#                             plot_y_val[i_size] = np.nan
                     
+#             # TODO : Is this still needed ?
 #             mask = isnotfinite(plot_y_val)
 #             masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
 # 
 #             if not(np.ma.max(masked_plot_y_val) > 0):
-                
+#                 
             alpha_ = max( alpha / (n_repeat**0.8), 1./255)
 
             ax.plot(
@@ -568,6 +609,7 @@ def plot_benchmark(
                 plot_y_val              ,
                 color = color           ,
                 linestyle = linestyle   ,
+                marker = pointstyle     ,
                 alpha = alpha_          ,
             )
 
