@@ -39,7 +39,8 @@ timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
 basename = f'First_benchmark'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 
-ForceBenchmark = True
+# ForceBenchmark = True
+ForceBenchmark = False
 
 # sphinx_gallery_end_ignore
 
@@ -80,6 +81,7 @@ pyquickbench.run_benchmark(
     filename = timings_filename     ,
 # sphinx_gallery_end_ignore
     ForceBenchmark = ForceBenchmark,
+    StopOnExcept = True,
 ) 
 
 # %% 

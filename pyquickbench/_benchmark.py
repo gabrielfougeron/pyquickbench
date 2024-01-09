@@ -22,10 +22,47 @@ def _mem_shift(idx, shape):
     
     # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681
     for i in range(len(shape)-1,-1,-1):
-        res += i*prod_shapes
+        res += idx[i]*prod_shapes
         prod_shapes *= shape[i]
         
     return res
+
+def _mem_shift_restricted(idx, shape, only):
+    
+    res = 0
+    prod_shapes = 1
+    
+    for i, j in enumerate(only):
+        res += idx[i]*prod_shapes
+        prod_shapes *= shape[j]
+        
+    return res
+
+def _prod_rel_shapes(idx_rel, shape):
+    
+    prod_shapes = 1
+    for idx in idx_rel:
+        
+        prod_shapes *= shape[idx]
+    
+    return prod_shapes
+
+def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
+
+    idx_items = np.zeros(len(idx_all_items), dtype=int)
+    for i, j in enumerate(idx_all_items):
+        idx_items[i] = idx_vals[j] 
+    #     
+    # print()
+    # print(idx_items, type(idx_items), idx_items.dtype)
+    # print(idx_all_items, type(idx_all_items), idx_all_items.dtype)
+    # print(shape, type(shape))
+    # print(shape[idx_all_items])
+              
+    i_item = _mem_shift_restricted(idx_items, shape, idx_all_items)
+    
+    return i_item, idx_items
+
 
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
 default_color_list.append(mpl.colors.BASE_COLORS['b'])
@@ -35,10 +72,10 @@ default_color_list.append(mpl.colors.BASE_COLORS['m'])
 default_color_list.append(mpl.colors.BASE_COLORS['k'])
 
 default_linestyle_list = [
-     ('solid', 'solid')             ,   # Same as (0, ()) or '-'
-     ('dotted', 'dotted')           ,   # Same as (0, (1, 1)) or ':'
-     ('dashed', 'dashed')           ,   # Same as '--'
-     ('dashdot', 'dashdot')         ,   # Same as '-.'
+     'solid'                        ,   # Same as (0, ()) or '-'
+     'dotted'                       ,   # Same as (0, (1, 1)) or ':'
+     'dashed'                       ,   # Same as '--'
+     'dashdot'                      ,   # Same as '-.'
      (0, (1, 10))                   ,   # loosely dotted   
      (0, (1, 1))                    ,   # dotted
      (0, (1, 1))                    ,   # densely dotted
@@ -105,7 +142,7 @@ def _load_benchmark_file(filename, all_sizes_in, shape):
 
         BenchmarkUpToDate = True
         assert all_vals.ndim == len(shape)
-        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values):
+        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
             BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
 
         
@@ -127,6 +164,8 @@ def _load_benchmark_file(filename, all_sizes_in, shape):
 #     
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
+
+#     print(f'{BenchmarkUpToDate = }')
 
     return all_vals, BenchmarkUpToDate
 
@@ -319,9 +358,9 @@ def run_benchmark(
     return all_vals
 
 all_plot_intents = [
-    'same'              ,
     'single_value'      ,
     'points'            ,
+    'same'              ,
     'curve_color'       ,
     'curve_linestyle'   ,
     'curve_pointstyle'  ,
@@ -336,7 +375,7 @@ def plot_benchmark(
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
                               None                              = None                      ,
-    all_names               : typing.Iterable[str] | None       = None                      ,
+    all_fun_names           : typing.Iterable[str] | None       = None                      ,
     val_plot_intent         : typing.Iterable[str] | None       = None                      ,        
     mode                    : str                               = "timings"                 ,
     all_xvalues             : np.typing.ArrayLike | None        = None                      ,
@@ -354,48 +393,57 @@ def plot_benchmark(
     show                    : bool                              = False                     ,
     fig                     : matplotlib.figure.Figure | None   = None                      ,
     ax                      : plt.Axes | None                   = None                      ,
+    dpi                     : int                               = 150                       ,
+    pxl_per_plot_x          : int                               = 1600                      ,
+    pxl_per_plot_y          : int                               = 800                       ,
+    sharex                  : bool                              = True                      ,
+    sharey                  : bool                              = False                     ,
     title                   : str | None                        = None                      ,
     xlabel                  : str | None                        = None                      ,
     ylabel                  : str | None                        = None                      ,
     plot_legend             : bool                              = True                      ,
+    legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
     transform               : str | None                        = None                      ,
     alpha                   : float                             = 1.                        ,
     relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
 
+    # TODO: Change that
+    ProductLegend = True
     
     all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
 
+    assert isinstance(all_vals, np.ndarray)
     assert all_vals.ndim == len(res_shape)
-    for loaded_axis_len, expected_axis_len in zip(all_vals.shape, res_shape.values):
+    for loaded_axis_len, expected_axis_len in zip(all_vals.shape, res_shape.values()):
         assert loaded_axis_len == expected_axis_len
 
     n_funs = res_shape['fun']
     n_repeat = res_shape['repeat']
 
-    if all_names is None:
+    if all_fun_names is None:
         
         if all_funs is None:
-            all_names_list = ['Anonymous function']*n_funs
+            all_fun_names_list = ['Anonymous function']*n_funs
 
         else:
             
-            all_names_list = []
+            all_fun_names_list = []
             
             if isinstance(all_funs, dict):
                 for name, fun in all_funs.items():
-                    all_names_list.append(name)
+                    all_fun_names_list.append(name)
             
             else:    
                 for fun in all_funs:
-                    all_names_list.append(getattr(fun, '__name__', 'Anonymous function'))
+                    all_fun_names_list.append(getattr(fun, '__name__', 'Anonymous function'))
                     
     else:
-        all_names_list = [name for name in all_names]
+        all_fun_names_list = [name for name in all_fun_names]
     
-    assert n_funs == len(all_names_list)
-    
+    assert n_funs == len(all_fun_names_list)
+
     if val_plot_intent is None:
         
         val_plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
@@ -415,44 +463,78 @@ def plot_benchmark(
     
     n_points = 0
     idx_points = -1
+
+    idx_all_same = []
+    idx_all_single_value = []
+    idx_all_curve_color = []
+    idx_all_curve_linestyle = []
+    idx_all_curve_pointstyle = []
+    idx_all_subplot_grid_x = []
+    idx_all_subplot_grid_y = []
+    idx_all_reduction_avg = []
     
-    'same'              ,
-    'single_value'      ,
-    'points'            ,
-    'curve_color'       ,
-    'curve_linestyle'   ,
-    'curve_pointstyle'  ,
-    'subplot_grid_x'    ,
-    'subplot_grid_y'    ,
-    'reduction_avg'     ,
+    name_curve_color = []
+    name_curve_linestyle = []
+    name_curve_pointstyle = []
+    name_subplot_grid_x = []
+    name_subplot_grid_y = []
     
-    idx_same = []
-    idx_single_value = []
-    idx_curve_color = []
-    idx_curve_linestyle = []
-    idx_curve_pointstyle = []
-    idx_subplot_grid_x = []
-    idx_subplot_grid_y = []
-    idx_reduction_avg = []
-    
-    for i, name in enumerate(val_plot_intent):
+    for i, (name, value) in enumerate(val_plot_intent.items()):
         
-        if name == 'points':
+        if value == 'points':
             n_points += 1
             idx_points = i
+            name_points = name
+        elif value == 'same':
+            idx_all_same.append(i)
+        elif value == 'single_value':
+            raise NotImplementedError
+        elif value == 'curve_color':
+            idx_all_curve_color.append(i)
+            name_curve_color.append(name)
+        elif value == 'curve_linestyle':
+            idx_all_curve_linestyle.append(i)
+            name_curve_linestyle.append(name)
+        elif value == 'curve_pointstyle':
+            idx_all_curve_pointstyle.append(i)
+            name_curve_pointstyle.append(name)
+        elif value == 'subplot_grid_x':
+            idx_all_subplot_grid_x.append(i)
+            name_subplot_grid_x.append(name)
+        elif value == 'subplot_grid_y':
+            idx_all_subplot_grid_y.append(i)
+            name_subplot_grid_y.append(name)
+        elif value == 'reduction_avg':
+            idx_all_reduction_avg.append(i)
             
     if (n_points != 1):
         raise ValueError("There should be exactly one 'points' value plot intent")
     
+    idx_all_curves = []
+    idx_all_curves.extend(idx_all_same)
+    idx_all_curves.extend(idx_all_curve_color)
+    idx_all_curves.extend(idx_all_curve_linestyle)
+    idx_all_curves.extend(idx_all_curve_pointstyle)
+    idx_all_curves.extend(idx_all_subplot_grid_x)
+    idx_all_curves.extend(idx_all_subplot_grid_y)
     
+    idx_all_same                = np.array(idx_all_same             )
+    idx_all_single_value        = np.array(idx_all_single_value     )
+    idx_all_curve_color         = np.array(idx_all_curve_color      )
+    idx_all_curve_linestyle     = np.array(idx_all_curve_linestyle  )
+    idx_all_curve_pointstyle    = np.array(idx_all_curve_pointstyle )
+    idx_all_subplot_grid_x      = np.array(idx_all_subplot_grid_x   )
+    idx_all_subplot_grid_y      = np.array(idx_all_subplot_grid_y   )
+    idx_all_reduction_avg       = np.array(idx_all_reduction_avg    )
     
-    
-    
-    
-    
-    
-    
-    
+    n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
+    n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
+
+    if logx_plot is None:
+        logx_plot = (transform is None)
+        
+    if logy_plot is None:
+        logy_plot = (transform is None)
     
     # TODO: assess whether those need to stay
 # 
@@ -468,16 +550,35 @@ def plot_benchmark(
 
     if (ax is None) or (fig is None):
 
-        dpi = 150
-        figsize = (1600/dpi, 800/dpi)
+        figsize = (pxl_per_plot_x/dpi, pxl_per_plot_y/dpi)
 
-        fig = plt.figure(
-            figsize = figsize,
-            dpi = dpi   ,
-        )  
-        ax = fig.add_subplot(1,1,1)
+        fig, ax = plt.subplots(
+            nrows = n_subplot_grid_x    ,
+            ncols = n_subplot_grid_y    ,
+            sharex = sharex             ,
+            sharey = sharey             ,
+            figsize = figsize           ,
+            dpi = dpi                   ,
+            squeeze = False             ,
+        )
         
-    
+    else:
+        
+        if isinstance(ax, np.ndarray):
+            
+            assert ax.shape[0] == n_subplot_grid_x
+            assert ax.shape[1] == n_subplot_grid_y
+            
+        elif isinstance(ax, plt.Axes):
+            
+            assert n_subplot_grid_x == 1
+            assert n_subplot_grid_y == 1
+            
+            ax = np.array([[ax]])
+        
+        else:
+            raise TypeError(f'Non compatible type for argument "ax": {type(ax)}')
+        
     # TODO : Adapt this
     if (relative_to is None):
         relative_to_array = np.ones(list(args_shape.values()))
@@ -511,19 +612,123 @@ def plot_benchmark(
     if clip_vals and (plot_ylim is None):
         raise ValueError('Need a range to clip values')
 
-    leg_patch = []
-    for i_fun in range(n_funs):
-
+    leg_patch = [[[]*n_subplot_grid_y]*n_subplot_grid_x]
+    
+    for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
+        
+        idx_vals = [-1] * all_vals.ndim
+        for i, j in zip(idx_curve, idx_all_curves):
+            idx_vals[j] = i
+        
+        i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
+        i_linestyle, idx_curve_linestyle = _get_rel_idx_from_maze(idx_all_curve_linestyle, idx_vals, all_vals.shape)
+        i_pointstyle, idx_curve_pointstyle = _get_rel_idx_from_maze(idx_all_curve_pointstyle, idx_vals, all_vals.shape)
+        i_subplot_grid_x, idx_subplot_grid_x =  _get_rel_idx_from_maze(idx_all_subplot_grid_x, idx_vals, all_vals.shape)
+        i_subplot_grid_y, idx_subplot_grid_y =  _get_rel_idx_from_maze(idx_all_subplot_grid_y, idx_vals, all_vals.shape)
+        i_same, idx_same =  _get_rel_idx_from_maze(idx_all_same, idx_vals, all_vals.shape)
+        
         color = color_list[i_color % n_colors]
         linestyle = linestyle_list[i_linestyle % n_linestyle]
         pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
+        cur_ax = ax[i_subplot_grid_x, i_subplot_grid_y]
+        OnlyThisOnce = (i_same == 0)
+
+        if OnlyThisOnce:
+            
+            if ProductLegend: 
+                
+                ncats = len(idx_curve_color) + len(idx_curve_linestyle) + len(idx_curve_pointstyle)
+                KeyValLegend = (ncats > 1)
+            
+                label = ''
+                for i, idx in enumerate(idx_curve_color):
+
+                    cat_name = name_curve_color[i]
+                    curve_vals = all_args.get(cat_name)
+                    if curve_vals is None:
+                        if cat_name == 'fun':
+                            val_name = all_fun_names_list[idx]
+                        else:
+                            raise ValueError("Could not figure out name")
+                    else:
+                        val_name = str(curve_vals[idx])
+                    
+                    if KeyValLegend:
+                        label += f'{cat_name} : {val_name}, '
+                    else:
+                        label += f'{val_name}, '
+
+                for i, idx in enumerate(idx_curve_linestyle):
+                    
+                    cat_name = name_curve_linestyle[i]
+                    curve_vals = all_args.get(cat_name)
+                    if curve_vals is None:
+                        if cat_name == 'fun':
+                            val_name = all_fun_names_list[idx]
+                        else:
+                            raise ValueError("Could not figure out name")
+                    else:
+                        val_name = str(curve_vals[idx])
+                    
+                    if KeyValLegend:
+                        label += f'{cat_name}: {val_name}, '
+                    else:
+                        label += f'{val_name}, '        
+                    
+                for i, idx in enumerate(idx_curve_pointstyle):
+                    
+                    cat_name = name_curve_pointstyle[i]
+                    curve_vals = all_args.get(cat_name)
+                    if curve_vals is None:
+                        if cat_name == 'fun':
+                            val_name = all_fun_names_list[idx]
+                        else:
+                            raise ValueError("Could not figure out name")
+                    else:
+                        val_name = str(curve_vals[idx])
+                    
+                    if KeyValLegend:
+                        label += f'{cat_name} : {val_name}, '
+                    else:
+                        label += f'{val_name}, '   
+                
+                label = label[:-2] # Removing final comma
+                
+                leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                    mpl.lines.Line2D([], []     ,
+                        color = color           ,
+                        label = label           ,
+                        linestyle = linestyle   ,
+                        marker = pointstyle     ,
+                        markersize = 10         ,
+                    )
+                )
+
+        idx_vals[idx_points] = slice(None)
+
+        idx_vals_tuple = tuple(idx_vals)
         
-        leg_patch.append(
-            mpl.patches.Patch(
-                color = color                   ,
-                label = all_names_list[i_fun]   ,
-                linestyle = linestyle           ,
-            )
+
+        if all_xvalues is None:
+            plot_x_val = all_args[name_points]
+        else:   
+            plot_x_val = all_xvalues[idx_vals_tuple]
+            
+        plot_y_val = all_vals[idx_vals_tuple]
+        # 
+        # print()
+        # print(plot_x_val)
+        # print(plot_y_val)
+        # print(color)
+        # print(linestyle)
+        # print(pointstyle)
+        
+        cur_ax.plot(
+            plot_x_val              ,
+            plot_y_val              ,
+            color = color           ,
+            linestyle = linestyle   ,
+            marker = pointstyle     ,
         )
         
         
@@ -532,20 +737,21 @@ def plot_benchmark(
         
         
         
-
-        for i_repeat in range(n_repeat):
-
-            plot_y_val = all_vals[:, i_fun, i_repeat] / relative_to_array # Broadcast
-            plot_y_val /= all_y_scalings[i_fun]
-            
-            if all_xvalues is None:
-                if 'n' in all_args:
-                    plot_x_val = all_sizes * all_x_scalings[i_fun]
-                else:
-                    raise ValueError # ????
-            else:   
-                plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
-            
+        
+# 
+#         for i_repeat in range(n_repeat):
+# 
+#             plot_y_val = all_vals[:, i_fun, i_repeat] / relative_to_array # Broadcast
+#             plot_y_val /= all_y_scalings[i_fun]
+#             
+#             if all_xvalues is None:
+#                 if 'n' in all_args:
+#                     plot_x_val = all_sizes * all_x_scalings[i_fun]
+#                 else:
+#                     raise ValueError # ????
+#             else:   
+#                 plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
+#             
             
             # TODO : Adapt this
 #             if transform in ["pol_growth_order", "pol_cvgence_order"]:
@@ -602,63 +808,65 @@ def plot_benchmark(
 # 
 #             if not(np.ma.max(masked_plot_y_val) > 0):
 #                 
-            alpha_ = max( alpha / (n_repeat**0.8), 1./255)
+#             alpha_ = max( alpha / (n_repeat**0.8), 1./255)
+# 
+#             ax.plot(
+#                 plot_x_val              ,
+#                 plot_y_val              ,
+#                 color = color           ,
+#                 linestyle = linestyle   ,
+#                 marker = pointstyle     ,
+#                 alpha = alpha_          ,
+#             )
 
-            ax.plot(
-                plot_x_val              ,
-                plot_y_val              ,
-                color = color           ,
-                linestyle = linestyle   ,
-                marker = pointstyle     ,
-                alpha = alpha_          ,
-            )
 
-    if plot_legend:
-        ax.legend(
-            handles=leg_patch,    
-            bbox_to_anchor=(1.05, 1),
-            loc='upper left',
-            borderaxespad=0.,
-        )
+    for i_subplot_grid_x in range(n_subplot_grid_x):
+        for i_subplot_grid_y in range(n_subplot_grid_y):
 
-    if logx_plot is None:
-        logx_plot = (transform is None)
-        
-    if logy_plot is None:
-        logy_plot = (transform is None)
-        
-    if logx_plot:
-        ax.set_xscale('log')
-    if logy_plot:
-        ax.set_yscale('log')
+            cur_ax = ax[i_subplot_grid_x, i_subplot_grid_y]
 
-    if plot_grid:
-        ax.grid(True, which="major", linestyle="-")
-        ax.grid(True, which="minor", linestyle="dotted")
 
-    if plot_xlim is not None:
-        ax.set_xlim(plot_xlim)
-        
-    if plot_ylim is not None:
-        ax.set_ylim(plot_ylim)
+            if plot_legend:
+                cur_ax.legend(
+                    handles = leg_patch[i_subplot_grid_x][i_subplot_grid_y] ,    
+                    bbox_to_anchor = (1.05, 1)                              ,
+                    loc = legend_location                                   ,
+                    borderaxespad = 0.                                      ,
+                )
+                
+            if logx_plot:
+                cur_ax.set_xscale('log')
+            if logy_plot:
+                cur_ax.set_yscale('log')
 
-    if title is not None:
-        ax.set_title(title)
-        
-    if xlabel is None:
-        if (all_xvalues is None):
-            xlabel = "n"
-        else:
-            xlabel = ""
-        
-    if ylabel is None:
-        if mode == "timings":
-            ylabel = "Time (s)"
-        else:
-            ylabel = ""
+            if plot_grid:
+                cur_ax.grid(True, which="major", linestyle="-")
+                cur_ax.grid(True, which="minor", linestyle="dotted")
 
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+            if plot_xlim is not None:
+                cur_ax.set_xlim(plot_xlim)
+                
+            if plot_ylim is not None:
+                cur_ax.set_ylim(plot_ylim)
+
+            if title is not None:
+                cur_ax.set_title(title)
+                
+            if xlabel is None:
+                if (all_xvalues is None):
+                    xlabel = name_points
+                else:
+                    xlabel = ""
+                
+            if ylabel is None:
+                if mode == "timings":
+                    ylabel = "Time (s)"
+                else:
+                    ylabel = ""
+
+            cur_ax.set_xlabel(xlabel)
+            cur_ax.set_ylabel(ylabel)
+
 
     if show:
         plt.tight_layout()
