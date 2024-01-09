@@ -148,10 +148,28 @@ all_errors = pyquickbench.run_benchmark(
     setup = setup                   ,
     mode = "scalar_output"          ,
     filename = error_filename       ,
-    title = "Relative error for increasing conditionning"   ,
+    # title = "Relative error for increasing conditionning"   ,
 #     show = True                             ,
 #     StopOnExcept = True,
 )
+
+plot_intent = {
+    "alpha" : 'points' ,
+    "n" : 'subplot_grid_y'  ,
+}
+
+pyquickbench.plot_benchmark(
+    all_errors      ,
+    all_args        ,
+    all_error_funs  ,
+    plot_intent = plot_intent,
+    show = True
+)
+
+# %%
+#
+
+
 
 # %%
 # 

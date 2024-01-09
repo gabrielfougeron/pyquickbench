@@ -67,8 +67,8 @@ def scipy_ODE_cpte_error_on_test(
     def fgun(t, xy):
         
         fxy = np.empty(2*test_ndim)
-        fxy[0] =  xy[2]
-        fxy[1] =  xy[3]
+        fxy[0] = xy[2]
+        fxy[1] = xy[3]
         fxy[2] = t*xy[0]
         fxy[3] = t*xy[1]
         
@@ -108,7 +108,6 @@ method_names = [
 
 all_nint = np.array([2**i for i in range(12)])
 
-
 bench = {}
 for method in method_names:
     
@@ -124,7 +123,7 @@ def setup(nint):
 # %%
 # The following plots give the measured relative error as a function of the number of quadrature subintervals
 
-plot_ylim = [1e-17,1e1]
+plot_ylim = [1e-17, 1e1]
 
 bench_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
 
@@ -192,9 +191,5 @@ pyquickbench.plot_benchmark(
     title = f'Relative error as a function of computational cost' ,
     ylabel = "Relative error"   ,
     xlabel = "Time (s)"         ,
+    show = True                 ,
 )
-
-plt.tight_layout()
-plt.show()
-
-

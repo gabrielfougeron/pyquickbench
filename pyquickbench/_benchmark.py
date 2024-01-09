@@ -402,7 +402,7 @@ def plot_benchmark(
                               typing.Iterable[str] | 
                               None                              = None                      ,
     all_fun_names           : typing.Iterable[str] | None       = None                      ,
-    val_plot_intent         : typing.Iterable[str] | None       = None                      ,        
+    plot_intent         : typing.Iterable[str] | None       = None                      ,        
     mode                    : str                               = "timings"                 ,
     all_xvalues             : np.typing.ArrayLike | None        = None                      ,
     # all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
@@ -410,6 +410,7 @@ def plot_benchmark(
     color_list              : list                              = default_color_list        ,
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
+    single_values_idx       : dict | None                       = None                      ,         
     logx_plot               : bool | None                       = None                      ,
     logy_plot               : bool | None                       = None                      ,
     plot_ylim               : tuple | None                      = None                      ,
@@ -472,22 +473,28 @@ def plot_benchmark(
     
     assert n_funs == len(all_fun_names_list)
 
-    if val_plot_intent is None:
+    if plot_intent is None:
         
-        val_plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
-        val_plot_intent['fun'] = 'curve_color'
-        val_plot_intent['repeat'] = 'same'
+        plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
+        plot_intent['fun'] = 'curve_color'
+        plot_intent['repeat'] = 'same'
 
     else:
         
-        assert isinstance(val_plot_intent, dict)
-        assert len(val_plot_intent) == all_vals.ndim
-        for name, intent in val_plot_intent.items():
-            assert name in all_args
-            assert intent in all_plot_intents
+        assert isinstance(plot_intent, dict)
+        
+        if 'fun' not in plot_intent:
+            plot_intent['fun'] = 'curve_color'
+        if 'repeat' not in plot_intent:
+            plot_intent['repeat'] = 'same'
+        
+        assert len(plot_intent) == all_vals.ndim
+        for name, intent in plot_intent.items():
+            if not(name in res_shape):
+                raise ValueError(f'Unknown argument {name} in plot_intent')
             
-        assert 'fun' in val_plot_intent
-        assert 'repeat' in val_plot_intent
+            if not(intent in all_plot_intents):
+                raise ValueError(f'Unknown intent {intent} in plot_intent. Possible values are: {all_plot_intents}')
     
     n_points = 0
     idx_points = -1
@@ -501,13 +508,14 @@ def plot_benchmark(
     idx_all_subplot_grid_y = []
     idx_all_reduction_avg = []
     
+    idx_single_value = []
     name_curve_color = []
     name_curve_linestyle = []
     name_curve_pointstyle = []
     name_subplot_grid_x = []
     name_subplot_grid_y = []
     
-    for i, (name, value) in enumerate(val_plot_intent.items()):
+    for i, (name, value) in enumerate(plot_intent.items()):
         
         if value == 'points':
             n_points += 1
@@ -516,7 +524,12 @@ def plot_benchmark(
         elif value == 'same':
             idx_all_same.append(i)
         elif value == 'single_value':
-            raise NotImplementedError
+            if single_values_idx is None:
+                raise ValueError("Argument single_values_idx was not given. It is required to fix a value of an argument in the benchmark.")
+            
+            idx_all_single_value.append(i)
+            idx_single_value.append(single_values_idx[name])            
+            
         elif value == 'curve_color':
             idx_all_curve_color.append(i)
             name_curve_color.append(name)
@@ -536,7 +549,7 @@ def plot_benchmark(
             idx_all_reduction_avg.append(i)
             
     if (n_points != 1):
-        raise ValueError("There should be exactly one 'points' value plot intent")
+        raise ValueError(f"There should be exactly one plot_intent named 'points'. There are currently {n_points}.")
     
     idx_all_curves = []
     idx_all_curves.extend(idx_all_same)
@@ -578,11 +591,14 @@ def plot_benchmark(
 
     if (ax is None) or (fig is None):
 
-        figsize = (pxl_per_plot_x/dpi, pxl_per_plot_y/dpi)
+        figsize = (
+            n_subplot_grid_x * pxl_per_plot_x/dpi,
+            n_subplot_grid_y * pxl_per_plot_y/dpi,
+        )
 
         fig, ax = plt.subplots(
-            nrows = n_subplot_grid_x    ,
-            ncols = n_subplot_grid_y    ,
+            nrows = n_subplot_grid_y    ,
+            ncols = n_subplot_grid_x    ,
             sharex = sharex             ,
             sharey = sharey             ,
             figsize = figsize           ,
@@ -594,8 +610,8 @@ def plot_benchmark(
         
         if isinstance(ax, np.ndarray):
             
-            assert ax.shape[0] == n_subplot_grid_x
-            assert ax.shape[1] == n_subplot_grid_y
+            assert ax.shape[0] == n_subplot_grid_y
+            assert ax.shape[1] == n_subplot_grid_x
             
         elif isinstance(ax, plt.Axes):
             
@@ -608,29 +624,29 @@ def plot_benchmark(
             raise TypeError(f'Non compatible type for argument "ax": {type(ax)}')
         
     # TODO : Adapt this
-    if (relative_to is None):
-        relative_to_array = np.ones(list(args_shape.values()))
-        
-    else:
-        raise NotImplementedError
-        if isinstance(relative_to, np.ndarray):
-            relative_to_array = relative_to
-            assert relative_to_array.shape == tuple(args_shape.values())
-        
-        else:
-            
-            if isinstance(relative_to, int):
-                relative_to_idx = relative_to
-                
-            elif isinstance(relative_to, str):
-                try:
-                    relative_to_idx = all_names_list.index(relative_to)
-                except ValueError:
-                    raise ValueError(f'{relative_to} is not a known name')
-            else:
-                raise ValueError(f'Invalid relative_to argument {relative_to}')
-            
-            relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
+    # if (relative_to is None):
+    #     relative_to_array = np.ones(list(args_shape.values()))
+    #     
+    # else:
+    #     raise NotImplementedError
+    #     if isinstance(relative_to, np.ndarray):
+    #         relative_to_array = relative_to
+    #         assert relative_to_array.shape == tuple(args_shape.values())
+    #     
+    #     else:
+    #         
+    #         if isinstance(relative_to, int):
+    #             relative_to_idx = relative_to
+    #             
+    #         elif isinstance(relative_to, str):
+    #             try:
+    #                 relative_to_idx = all_names_list.index(relative_to)
+    #             except ValueError:
+    #                 raise ValueError(f'{relative_to} is not a known name')
+    #         else:
+    #             raise ValueError(f'Invalid relative_to argument {relative_to}')
+    #         
+    #         relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
         
         
     n_colors = len(color_list)
@@ -640,12 +656,15 @@ def plot_benchmark(
     if clip_vals and (plot_ylim is None):
         raise ValueError('Need a range to clip values')
 
-    leg_patch = [[[]*n_subplot_grid_y]*n_subplot_grid_x]
+    leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
     
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         
         idx_vals = [-1] * all_vals.ndim
         for i, j in zip(idx_curve, idx_all_curves):
+            idx_vals[j] = i
+            
+        for i, j in zip(idx_single_value, idx_all_single_value):
             idx_vals[j] = i
         
         i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
@@ -658,7 +677,7 @@ def plot_benchmark(
         color = color_list[i_color % n_colors]
         linestyle = linestyle_list[i_linestyle % n_linestyle]
         pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
-        cur_ax = ax[i_subplot_grid_x, i_subplot_grid_y]
+        cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
         OnlyThisOnce = (i_same == 0)
 
         if OnlyThisOnce:
@@ -849,9 +868,10 @@ def plot_benchmark(
     for i_subplot_grid_x in range(n_subplot_grid_x):
         for i_subplot_grid_y in range(n_subplot_grid_y):
 
-            cur_ax = ax[i_subplot_grid_x, i_subplot_grid_y]
+            cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
 
             if plot_legend:
+                
                 cur_ax.legend(
                     handles = leg_patch[i_subplot_grid_x][i_subplot_grid_y] ,    
                     bbox_to_anchor = (1.05, 1)                              ,
