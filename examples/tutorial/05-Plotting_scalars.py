@@ -128,7 +128,7 @@ plot_ylim = [1e-17,1e1]
 
 bench_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
 
-all_errors = pyquickbench.run_benchmark(
+pyquickbench.run_benchmark(
     all_nint                        ,
     bench                           ,
     setup = setup                   ,
@@ -146,7 +146,7 @@ all_errors = pyquickbench.run_benchmark(
 
 timings_filename = os.path.join(bench_folder,basename_bench_filename+'_timings.npz') 
 
-all_times = pyquickbench.run_benchmark(
+pyquickbench.run_benchmark(
     all_nint                        ,
     bench                           ,
     setup = setup                   ,
@@ -185,6 +185,7 @@ pyquickbench.plot_benchmark(
     all_errors                  ,
     all_nint                    ,
     bench                       ,
+    mode = "scalar_output"      ,
     all_xvalues = all_times     ,
     logx_plot = True            ,
     plot_ylim = plot_ylim       ,

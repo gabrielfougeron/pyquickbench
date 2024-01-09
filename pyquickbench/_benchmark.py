@@ -261,7 +261,8 @@ def run_benchmark(
 
     if DoBenchmark:
 
-        all_vals = np.zeros(list(res_shape.values()))
+        # all_vals = np.zeros(list(res_shape.values()))
+        all_vals = np.full(list(res_shape.values()), np.nan)
 
         if mode == "timings":
 
@@ -296,7 +297,11 @@ def run_benchmark(
                         if (n_repeat == 1) and (time_per_test == 0.2):
                             # Fast track: benchmark is not repeated and autorange results are kept as is.
 
-                            all_vals[i_args, i_fun, 0] = est_time / n_timeit_0dot2
+                            all_idx = list(i_args)
+                            all_idx.append(i_fun)
+                            all_idx.append(0)
+                            all_idx_tuple = tuple(all_idx)
+                            all_vals[all_idx_tuple] = est_time / n_timeit_0dot2
                             
                         else:
                             # Full benchmark is run
@@ -307,18 +312,24 @@ def run_benchmark(
                                 repeat = n_repeat,
                                 number = n_timeit,
                             )
-
-                            all_vals[i_args, i_fun, :] = np.array(times) / n_timeit
+                            all_idx = list(i_args)
+                            all_idx.append(i_fun)
+                            all_idx.append(slice(None))
+                            all_idx_tuple = tuple(all_idx)
+                            all_vals[all_idx_tuple] = np.array(times) / n_timeit
 
                     except Exception as exc:
                         if StopOnExcept:
                             raise exc
-
-                        all_vals[i_args, i_fun, :] = np.nan
+                        
+                        all_idx = list(i_args)
+                        all_idx.append(i_fun)
+                        all_idx.append(slice(None))
+                        all_idx_tuple = tuple(all_idx)
+                        all_vals[all_idx_tuple] = np.nan
                         
         elif mode == "scalar_output":    
             
-
             for i_args, args in zip(
                 itertools.product(*[range(i) for i in args_shape.values()])   ,
                 itertools.product(*list(all_args.values()))     ,
@@ -340,7 +351,12 @@ def run_benchmark(
 
                             out_val = np.nan
                             
-                        all_vals[i_args, i_fun, i_repeat] = out_val
+                        all_idx = list(i_args)
+                        all_idx.append(i_fun)
+                        all_idx.append(i_repeat)
+                        all_idx_tuple = tuple(all_idx)
+                        
+                        all_vals[all_idx_tuple] = out_val
                         
         else:
             
@@ -352,6 +368,8 @@ def run_benchmark(
         
         if Save_timings_file:
             _save_benchmark_file(filename, all_vals, all_args)
+            
+    # print(f'{all_vals = }')
             
     if show:
         return plot_benchmark(
@@ -715,10 +733,8 @@ def plot_benchmark(
                 )
 
         idx_vals[idx_points] = slice(None)
-
         idx_vals_tuple = tuple(idx_vals)
         
-
         if all_xvalues is None:
             plot_x_val = all_args[name_points]
         else:   
@@ -726,12 +742,12 @@ def plot_benchmark(
             
         plot_y_val = all_vals[idx_vals_tuple]
         
-        print()
-        print(plot_x_val)
-        print(plot_y_val)
-        print(color)
-        print(linestyle)
-        print(pointstyle)
+        # print()
+        # print(plot_x_val)
+        # print(plot_y_val)
+        # print(color)
+        # print(linestyle)
+        # print(pointstyle)
         
         cur_ax.plot(
             plot_x_val              ,
@@ -834,7 +850,6 @@ def plot_benchmark(
         for i_subplot_grid_y in range(n_subplot_grid_y):
 
             cur_ax = ax[i_subplot_grid_x, i_subplot_grid_y]
-
 
             if plot_legend:
                 cur_ax.legend(

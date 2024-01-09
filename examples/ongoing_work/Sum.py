@@ -109,10 +109,9 @@ def rel_upper_bound_lagrange(alpha, n):
     
     return small + abs(alpha)**(n+1) / scipy.special.factorial(n+1)
 
- 
 def compute_error_relative_to_fsum(f, x):
     
-    ex_res =  exact_sum(-x[1])
+    ex_res =  exact_sum(-x[1], x.shape[0])
     res = f(x)
     rel_err = abs(ex_res - res) / abs(ex_res)
     
@@ -121,59 +120,64 @@ def compute_error_relative_to_fsum(f, x):
 # sphinx_gallery_start_ignore
 
 basename = 'sum_bench_accuracy'
-error_filename = os.path.join(timings_folder,basename+'.npy')
+error_filename = os.path.join(timings_folder,basename+'.npz')
 
 # sphinx_gallery_end_ignore
 
-all_alphas = np.array([float(alpha) for alpha in range(500)])
+all_args = {
+    "alpha": np.array([float(alpha) for alpha in range(500)]),
+    # "n" : np.array([2**n for n in range(2,20)]),
+    "n" : np.array([2**n for n in range(2,6)]),
+}
 
 all_funs = [
-    naive_sum,
+    naive_sum   ,
     nb_naive_sum,
-    builtin_sum,
-    np_sum,
-    m_fsum,
+    builtin_sum ,
+    np_sum      ,
+    m_fsum      ,
 ]
 
 # %%
 
 all_error_funs = { f.__name__ :  functools.partial(compute_error_relative_to_fsum, f) for f in all_funs if f is not m_fsum}
 
-pyquickbench.run_benchmark(
-    all_alphas                      ,
+all_errors = pyquickbench.run_benchmark(
+    all_args                        ,
     all_error_funs                  ,
     setup = setup                   ,
     mode = "scalar_output"          ,
     filename = error_filename       ,
     title = "Relative error for increasing conditionning"   ,
-    show = True                             ,
+#     show = True                             ,
+#     StopOnExcept = True,
 )
 
 # %%
-
-def prepare_x(n):
-    x = np.random.random(n)
-    return {'x': x}
-
-basename = 'sum_bench_time'
-timings_filename = os.path.join(timings_folder,basename+'.npy')
-
-all_sizes = np.array([2**n for n in range(21)])
-
-all_funs = [
-    naive_sum,
-    nb_naive_sum,
-    builtin_sum,
-    np_sum,
-    m_fsum,
-]
-
-pyquickbench.run_benchmark(
-    all_sizes                       ,
-    all_funs                        ,
-    setup = prepare_x               ,
-    filename = timings_filename     ,
-    title = "Time (s) as a function of array size"   ,
-    show = True                             ,
-)
+# 
+# def prepare_x(n):
+#     x = np.random.random(n)
+#     return {'x': x}
+# 
+# basename = 'sum_bench_time'
+# timings_filename = os.path.join(timings_folder,basename+'.npy')
+# 
+# all_sizes = np.array([2**n for n in range(20)])
+# 
+# all_funs = [
+#     naive_sum,
+#     nb_naive_sum,
+#     builtin_sum,
+#     np_sum,
+#     m_fsum,
+# ]
+# 
+# pyquickbench.run_benchmark(
+#     all_sizes                       ,
+#     all_funs                        ,
+#     setup = prepare_x               ,
+#     filename = timings_filename     ,
+#     title = "Time (s) as a function of array size"   ,
+#     show = True                             ,
+# )
 
