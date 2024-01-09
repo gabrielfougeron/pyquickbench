@@ -92,6 +92,7 @@ default_linestyle_list = [
 ]
 
 default_pointstyle_list = [
+    None,   
     "."	, # m00 point
     ","	, # m01 pixel
     "o"	, # m02 circle
@@ -119,11 +120,16 @@ default_pointstyle_list = [
 
 def _return_setup_vars_dict(setup, args, fun):
     
-    sig = inspect.signature(fun)
-    for param in sig.parameters.values():
-        if param.kind == param.POSITIONAL_ONLY:
-            raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
-    
+    try:
+        sig = inspect.signature(fun)
+    except ValueError:
+        sig = None
+        
+    if sig is not None:
+        for param in sig.parameters.values():
+            if param.kind == param.POSITIONAL_ONLY:
+                raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
+        
     setup_vars = setup(*args)
 
     if isinstance(setup_vars, dict):
@@ -133,7 +139,7 @@ def _return_setup_vars_dict(setup, args, fun):
         
     return setup_vars_dict
 
-def _load_benchmark_file(filename, all_sizes_in, shape):
+def _load_benchmark_file(filename, all_args_in, shape):
     
     file_base, file_ext = os.path.splitext(filename)
     
@@ -145,44 +151,45 @@ def _load_benchmark_file(filename, all_sizes_in, shape):
         for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
             BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
 
+    elif file_ext == '.npz':
+        file_content = np.load(filename)
+
+        all_vals = file_content['all_vals']
         
-#     elif file_ext == '.npz':
-#         file_content = np.load(filename)
-# 
-#         all_vals = file_content['all_vals']
-# 
-#         BenchmarkUpToDate = True
-#         assert all_vals.ndim == 3
-#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[0] == shape[0])
-#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[1] == shape[1])
-#         BenchmarkUpToDate = BenchmarkUpToDate and (all_vals.shape[2] == shape[2])
-#         
-#         all_sizes = file_content['all_sizes']
-#         assert all_sizes.ndim == 1
-#         BenchmarkUpToDate = BenchmarkUpToDate and (all_sizes.shape[0] == shape[0])
-#         BenchmarkUpToDate = BenchmarkUpToDate and np.all(all_sizes == all_sizes_in)
-#     
+        BenchmarkUpToDate = True
+        assert all_vals.ndim == len(shape)
+        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
+            BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
+            
+        for name, all_args_vals in all_args_in.items():
+            assert name in file_content
+
+            for loaded_val, expected_val in zip(file_content[name], all_args_vals):
+                assert loaded_val == expected_val
+            
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
 
-#     print(f'{BenchmarkUpToDate = }')
+    # print()
+    # print(filename)
+    # print(f'{BenchmarkUpToDate = }')
 
     return all_vals, BenchmarkUpToDate
 
-def _save_benchmark_file(filename, all_vals, all_sizes):
-    
+def _save_benchmark_file(filename, all_vals, all_args):
+
     file_bas, file_ext = os.path.splitext(filename)
     
     if file_ext == '.npy':
         np.save(filename, all_vals)    
         
-    # elif file_ext == '.npz':
-    #     np.savez(
-    #         filename                ,
-    #         all_vals = all_vals     ,
-    #         all_sizes = all_sizes   ,
-    #     )
-    # 
+    elif file_ext == '.npz':
+        np.savez(
+            filename                ,
+            all_vals = all_vals     ,
+            **all_args
+        )
+    
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
     
@@ -193,6 +200,7 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
     
     assert not('fun' in all_args)
     assert not('repeats' in all_args)
+    assert not('all_vals' in all_args)
     
     if isinstance(all_funs, dict):
         all_funs_list = [fun for fun in all_funs.values()]
@@ -299,14 +307,14 @@ def run_benchmark(
                                 repeat = n_repeat,
                                 number = n_timeit,
                             )
-                            
+
                             all_vals[i_args, i_fun, :] = np.array(times) / n_timeit
 
                     except Exception as exc:
                         if StopOnExcept:
                             raise exc
-                        
-                        all_vals[i_args, i_fun, :].fill(np.nan)
+
+                        all_vals[i_args, i_fun, :] = np.nan
                         
         elif mode == "scalar_output":    
             
@@ -343,7 +351,7 @@ def run_benchmark(
         all_vals = np.take_along_axis(all_vals, idx, axis=-1)
         
         if Save_timings_file:
-            _save_benchmark_file(filename, all_vals, args_shape)
+            _save_benchmark_file(filename, all_vals, all_args)
             
     if show:
         return plot_benchmark(
@@ -411,6 +419,8 @@ def plot_benchmark(
 
     # TODO: Change that
     ProductLegend = True
+    
+    # print(f'{all_vals = }')
     
     all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
 
@@ -715,13 +725,13 @@ def plot_benchmark(
             plot_x_val = all_xvalues[idx_vals_tuple]
             
         plot_y_val = all_vals[idx_vals_tuple]
-        # 
-        # print()
-        # print(plot_x_val)
-        # print(plot_y_val)
-        # print(color)
-        # print(linestyle)
-        # print(pointstyle)
+        
+        print()
+        print(plot_x_val)
+        print(plot_y_val)
+        print(color)
+        print(linestyle)
+        print(pointstyle)
         
         cur_ax.plot(
             plot_x_val              ,

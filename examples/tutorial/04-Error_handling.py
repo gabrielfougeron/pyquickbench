@@ -31,7 +31,7 @@ if ("--no-show" in sys.argv):
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
 basename = f'Error_handling'
-timings_filename = os.path.join(timings_folder, basename+'.npz')
+timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
 

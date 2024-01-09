@@ -1,6 +1,6 @@
 """
-Convergence analysis of scipy's Runge-Kutta methods for ODE IVP
-===============================================================
+Plotting scalar values
+======================
 """
 
 # %%
