@@ -7,5 +7,6 @@ sphinx-test-reports
 sphinxcontrib.plantuml
 seed_intersphinx_mapping
 myst_parser
+sphinxext-rediraffe
 scipy
 numba

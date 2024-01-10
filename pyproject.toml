@@ -7,12 +7,12 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyquickbench"  # as it would appear on PyPI
+name = "pyquickbench"
 version = "0.1.0"
 description = "A pure Pyton tool to perform time and accuracy benchmarks"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
-keywords = ["Python","benchmark"]
+keywords = ["Python", "benchmark"]
 authors = [
   {name = "Gabriel Fougeron", email = "gabriel.fougeron@hotmail.fr"},
 ]

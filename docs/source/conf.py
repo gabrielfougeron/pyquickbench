@@ -40,6 +40,7 @@ extensions = [
     "sphinxcontrib.test_reports"    ,
     "sphinxcontrib.plantuml"        ,
     "myst_parser"                   ,
+    "sphinxext.rediraffe"           ,
 ]
 
 
@@ -69,6 +70,11 @@ intersphinx_mapping = {
 intersphinx_disabled_reftypes = ["*"]
 intersphinx_cache_limit = -1
 intersphinx_timeout = 1
+
+rediraffe_redirects = {
+    "gallery": "_build/auto_examples/index",
+    "tutorial": "_build/auto_examples/tutorial/index",
+}
 
 
 # -- Options for HTML output -------------------------------------------------
