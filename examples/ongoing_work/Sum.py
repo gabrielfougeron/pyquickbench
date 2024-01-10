@@ -148,7 +148,6 @@ all_errors = pyquickbench.run_benchmark(
     setup = setup                   ,
     mode = "scalar_output"          ,
     filename = error_filename       ,
-    # title = "Relative error for increasing conditionning"   ,
 #     show = True                             ,
 #     StopOnExcept = True,
 )
@@ -163,6 +162,8 @@ pyquickbench.plot_benchmark(
     all_args        ,
     all_error_funs  ,
     plot_intent = plot_intent,
+    title = "Relative error for increasing conditionning"   ,
+    ylabel = "error"    ,
     show = True
 )
 

@@ -1,14 +1,17 @@
 import os
-import numpy as np
-import numpy.typing
 import timeit
 import math
 import itertools
+import typing
+import inspect
+
+import numpy as np
+import numpy.typing
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.figure
-import typing
-import inspect
+import tqdm
+import tqdm.notebook
 
 def isnotfinite(arr):
     res = np.isfinite(arr)
@@ -63,7 +66,27 @@ def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
     
     return i_item, idx_items
 
-
+# def _in_ipynb():
+#     try:
+#         cfg = get_ipython().config 
+#         if cfg['IPKernelApp']['parent_appname'] == 'ipython-notebook':
+#             return True
+#         else:
+#             return False
+#     except NameError:
+#         return False
+#     
+def _in_ipynb():
+    try:
+        from IPython import get_ipython
+        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
+            return False
+    except ImportError:
+        return False
+    except AttributeError:
+        return False
+    return True
+   
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
 default_color_list.append(mpl.colors.BASE_COLORS['b'])
 default_color_list.append(mpl.colors.BASE_COLORS['g'])
@@ -227,6 +250,7 @@ def run_benchmark(
     ForceBenchmark  : bool          = False                                 ,
     show            : bool          = False                                 ,
     StopOnExcept    : bool          = False                                 ,
+    ShowProgress    : bool          = False                                 ,
     **show_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> np.typing.NDArray[np.float64] | None :
     
@@ -261,15 +285,32 @@ def run_benchmark(
 
     if DoBenchmark:
 
-        # all_vals = np.zeros(list(res_shape.values()))
         all_vals = np.full(list(res_shape.values()), np.nan)
 
         if mode == "timings":
+            
+            benchmark_iterator = zip(
+                itertools.product(*[range(i) for i in args_shape.values()]) ,
+                itertools.product(*list(all_args.values()))                 ,
+            )
 
-            for i_args, args in zip(
-                itertools.product(*[range(i) for i in args_shape.values()])   ,
-                itertools.product(*list(all_args.values()))     ,
-            ):
+            if ShowProgress:
+                
+                if (_in_ipynb()):
+                    
+                    benchmark_iterator = tqdm.notebook.tqdm(
+                        iterable = benchmark_iterator,
+                        total = math.prod(args_shape.values())
+                    )
+                    
+                else:
+                    
+                    benchmark_iterator = tqdm.tqdm(
+                        iterable = benchmark_iterator,
+                        total = math.prod(args_shape.values())
+                    )
+            
+            for i_args, args in benchmark_iterator:
 
                 for i_fun, fun in enumerate(all_funs_list):
 
@@ -911,7 +952,6 @@ def plot_benchmark(
 
             cur_ax.set_xlabel(xlabel)
             cur_ax.set_ylabel(ylabel)
-
 
     if show:
         plt.tight_layout()
