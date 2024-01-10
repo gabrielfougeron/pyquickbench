@@ -142,8 +142,8 @@ default_pointstyle_list = [
     "d"	, # m20 thin_diamond
 ]
 
-def _return_setup_vars_dict(setup, args, fun):
-    
+def _check_match_sig(fun):
+
     try:
         sig = inspect.signature(fun)
     except ValueError:
@@ -154,6 +154,8 @@ def _return_setup_vars_dict(setup, args, fun):
             if param.kind == param.POSITIONAL_ONLY:
                 raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
         
+def _return_setup_vars_dict(setup, args, fun):
+
     setup_vars = setup(*args)
 
     if isinstance(setup_vars, dict):
@@ -273,7 +275,9 @@ def run_benchmark(
             
             all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape)
 
-            DoBenchmark = not(BenchmarkUpToDate)
+            DoBenchmark = not(BenchmarkUpToDate) and not(PreventBenchmark)
+            if not(BenchmarkUpToDate) and PreventBenchmark:
+                warnings.warn("Found and returned non-matching benchmark file because PreventBenchmark is True")
 
         except Exception as exc:
             
@@ -291,36 +295,36 @@ def run_benchmark(
     if DoBenchmark:
 
         all_vals = np.full(list(res_shape.values()), np.nan)
+    
+        benchmark_iterator = zip(
+            itertools.product(*[range(i) for i in args_shape.values()]) ,
+            itertools.product(*list(all_args.values()))                 ,
+        )
 
-        if mode == "timings":
+        if ShowProgress:
             
-            benchmark_iterator = zip(
-                itertools.product(*[range(i) for i in args_shape.values()]) ,
-                itertools.product(*list(all_args.values()))                 ,
-            )
-
-            if ShowProgress:
+            if (_in_ipynb()):
                 
-                if (_in_ipynb()):
-                    
-                    benchmark_iterator = tqdm.notebook.tqdm(
-                        iterable = benchmark_iterator,
-                        total = math.prod(args_shape.values())
-                    )
-                    
-                else:
-                    
-                    benchmark_iterator = tqdm.tqdm(
-                        iterable = benchmark_iterator,
-                        total = math.prod(args_shape.values())
-                    )
-            
+                benchmark_iterator = tqdm.notebook.tqdm(
+                    iterable = benchmark_iterator,
+                    total = math.prod(args_shape.values())
+                )
+                
+            else:
+                
+                benchmark_iterator = tqdm.tqdm(
+                    iterable = benchmark_iterator,
+                    total = math.prod(args_shape.values())
+                )
+    
+        if mode == "timings":
+
             for i_args, args in benchmark_iterator:
+
+                setup_vars_dict = _return_setup_vars_dict(setup, args)    
 
                 for i_fun, fun in enumerate(all_funs_list):
 
-                    setup_vars_dict = _return_setup_vars_dict(setup, args, fun)
-                    
                     global_dict = {
                         'fun'               : fun               ,
                         'setup_vars_dict'   : setup_vars_dict   ,
@@ -376,14 +380,11 @@ def run_benchmark(
                         
         elif mode == "scalar_output":    
             
-            for i_args, args in zip(
-                itertools.product(*[range(i) for i in args_shape.values()])   ,
-                itertools.product(*list(all_args.values()))     ,
-            ):
+            for i_args, args in benchmark_iterator:
+                
+                setup_vars_dict = _return_setup_vars_dict(setup, args)
 
                 for i_fun, fun in enumerate(all_funs_list):
-                    
-                    setup_vars_dict = _return_setup_vars_dict(setup, args, fun)
                     
                     for i_repeat in range(n_repeat):
                         
@@ -492,11 +493,16 @@ def plot_benchmark(
     
     all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
 
-    assert isinstance(all_vals, np.ndarray)
-    assert all_vals.ndim == len(res_shape)
-    for loaded_axis_len, expected_axis_len in zip(all_vals.shape, res_shape.values()):
-        assert loaded_axis_len == expected_axis_len
+    if not(isinstance(all_vals, np.ndarray)):
+        raise ValueError(f'all_vals should be a np.ndarry. Provided all_vals is a {type(all_vals)} instead.')
+    
+    if not(all_vals.ndim == len(res_shape)):
+        raise ValueError(f'all_vals has the wrong number of dimensions.')
 
+    for loaded_axis_len, (axis_name, expected_axis_len) in zip(all_vals.shape, res_shape.items()):
+        if not(loaded_axis_len == expected_axis_len):
+            raise ValueError(f'Axis {axis_name} of the benchmark results has a length of {loaded_axis_len} instead of the expected {expected_axis_len}.')
+            
     n_funs = res_shape['fun']
     n_repeat = res_shape['repeat']
 

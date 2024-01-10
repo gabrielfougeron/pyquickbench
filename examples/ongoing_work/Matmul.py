@@ -117,6 +117,7 @@ all_funs = [
     # Three_loops_python                  ,
     Three_loops_numba_serial            ,
     Three_loops_numba_auto_parallel     ,
+    # Three_loops_numba_parallel          ,
     Three_loops_numba_parallel_noreduce ,
     numpy_matmul                        ,
 ]
@@ -130,16 +131,15 @@ all_errors = pyquickbench.run_benchmark(
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
-    # PreventBenchmark = True ,
+    PreventBenchmark = True ,
 )
 
 plot_intent = {
-    "P" : 'points'                  ,
-    "Q" : 'single_value'            ,
+    "P" : 'single_value'                  ,
+    "Q" : 'points'            ,
     "R" : 'single_value'            ,
-    "real_dtype": 'subplot_grid_y'  ,
+    "real_dtype": 'curve_linestyle'  ,
 }
-
 
 single_values_idx = {
     "P" : -1        ,
