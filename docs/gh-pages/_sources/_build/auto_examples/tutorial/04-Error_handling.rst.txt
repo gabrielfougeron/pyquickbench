@@ -77,7 +77,11 @@ By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-85
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
+
+This default can be overriden with the argument ``StopOnExcept`` set to ``True``. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
+
+.. GENERATED FROM PYTHON SOURCE LINES 77-86
 
 .. code-block:: Python
 
@@ -98,7 +102,7 @@ By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as 
 
  .. code-block:: none
 
-    Exception thrown: Forbidden value
+    Exception thrown: local variable 'setup_vars_dict' referenced before assignment
 
 
 
@@ -106,7 +110,7 @@ By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.201 seconds)
+   **Total running time of the script:** (0 minutes 0.229 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_04-Error_handling.py:

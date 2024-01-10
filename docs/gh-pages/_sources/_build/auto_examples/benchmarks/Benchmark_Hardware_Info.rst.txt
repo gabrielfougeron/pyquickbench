@@ -65,41 +65,24 @@ Description of the machine on which benchmarks were run.
               bus info: cpu@0
               width: 64 bits
               capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp x86-64 constant_tsc arch_perfmon rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid pni pclmulqdq ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect flush_l1d arch_capabilities
-         *-scsi:0
-              description: SCSI storage controller
-              product: Virtio filesystem
-              vendor: Red Hat, Inc.
-              physical id: 3
-              bus info: pci@0205:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe08000-9ffe08fff memory:9ffe09000-9ffe09fff memory:9ffe0a000-9ffe0afff
-            *-virtio3 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@3
-                 configuration: driver=9pnet_virtio
          *-display:0
               description: 3D controller
               product: Microsoft Corporation
               vendor: Microsoft Corporation
-              physical id: 4
-              bus info: pci@30cd:00:00.0
+              physical id: 3
+              bus info: pci@0284:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
               capabilities: bus_master cap_list
               configuration: driver=dxgkrnl latency=0
               resources: irq:0
-         *-scsi:1
+         *-scsi:0
               description: SCSI storage controller
               product: Virtio filesystem
               vendor: Red Hat, Inc.
-              physical id: 5
-              bus info: pci@33e6:00:00.0
+              physical id: 4
+              bus info: pci@1b64:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -111,12 +94,29 @@ Description of the machine on which benchmarks were run.
                  physical id: 0
                  bus info: virtio@1
                  configuration: driver=9pnet_virtio
+         *-scsi:1
+              description: SCSI storage controller
+              product: Virtio filesystem
+              vendor: Red Hat, Inc.
+              physical id: 5
+              bus info: pci@55d7:00:00.0
+              version: 01
+              width: 64 bits
+              clock: 33MHz
+              capabilities: scsi bus_master cap_list
+              configuration: driver=virtio-pci latency=64
+              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe0c000-9ffe0cfff memory:9ffe0d000-9ffe0dfff memory:9ffe0e000-9ffe0efff
+            *-virtio4 UNCLAIMED
+                 description: Virtual I/O device
+                 physical id: 0
+                 bus info: virtio@4
+                 configuration: driver=9pnet_virtio
          *-scsi:2
               description: SCSI storage controller
               product: Virtio console
               vendor: Red Hat, Inc.
               physical id: 6
-              bus info: pci@b1cc:00:00.0
+              bus info: pci@a8c7:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -133,24 +133,36 @@ Description of the machine on which benchmarks were run.
               product: Virtio filesystem
               vendor: Red Hat, Inc.
               physical id: 7
-              bus info: pci@c49d:00:00.0
+              bus info: pci@c430:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
               capabilities: scsi bus_master cap_list
               configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe0c000-9ffe0cfff memory:9ffe0d000-9ffe0dfff memory:9ffe0e000-9ffe0efff
-            *-virtio4 UNCLAIMED
+              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe08000-9ffe08fff memory:9ffe09000-9ffe09fff memory:9ffe0a000-9ffe0afff
+            *-virtio3 UNCLAIMED
                  description: Virtual I/O device
                  physical id: 0
-                 bus info: virtio@4
+                 bus info: virtio@3
                  configuration: driver=9pnet_virtio
+         *-display:1
+              description: 3D controller
+              product: Microsoft Corporation
+              vendor: Microsoft Corporation
+              physical id: 8
+              bus info: pci@d807:00:00.0
+              version: 00
+              width: 32 bits
+              clock: 33MHz
+              capabilities: bus_master cap_list
+              configuration: driver=dxgkrnl latency=0
+              resources: irq:0
          *-generic
               description: System peripheral
               product: Red Hat, Inc.
               vendor: Red Hat, Inc.
-              physical id: 8
-              bus info: pci@fb4e:00:00.0
+              physical id: 0
+              bus info: pci@fb13:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -162,18 +174,6 @@ Description of the machine on which benchmarks were run.
                  physical id: 0
                  bus info: virtio@2
                  configuration: driver=virtiofs
-         *-display:1
-              description: 3D controller
-              product: Microsoft Corporation
-              vendor: Microsoft Corporation
-              physical id: 0
-              bus info: pci@ff7b:00:00.0
-              version: 00
-              width: 32 bits
-              clock: 33MHz
-              capabilities: bus_master cap_list
-              configuration: driver=dxgkrnl latency=0
-              resources: irq:0
          *-pnp00:00
               product: PnP device PNP0b00
               physical id: 9
@@ -183,7 +183,7 @@ Description of the machine on which benchmarks were run.
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:dd:42:a0
+           serial: 00:15:5d:dc:e7:20
            size: 10Gbit/s
            capabilities: ethernet physical
            configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.90.2-microsoft-standard-WS duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
@@ -262,87 +262,72 @@ Scipy config informations
 
  .. code-block:: none
 
-    /home/gfo/anaconda3/envs/pyquickbench-dev/lib/python3.10/site-packages/scipy/__config__.py:146: UserWarning: Install `pyyaml` for better output
-      warnings.warn("Install `pyyaml` for better output", stacklevel=1)
-    {
-      "Compilers": {
-        "c": {
-          "name": "gcc",
-          "linker": "ld.bfd",
-          "version": "10.2.1",
-          "commands": "cc"
-        },
-        "cython": {
-          "name": "cython",
-          "linker": "cython",
-          "version": "0.29.36",
-          "commands": "cython"
-        },
-        "c++": {
-          "name": "gcc",
-          "linker": "ld.bfd",
-          "version": "10.2.1",
-          "commands": "c++"
-        },
-        "fortran": {
-          "name": "gcc",
-          "linker": "ld.bfd",
-          "version": "10.2.1",
-          "commands": "gfortran"
-        },
-        "pythran": {
-          "version": "0.14.0",
-          "include directory": "../../tmp/pip-build-env-c6c8ru56/overlay/lib/python3.10/site-packages/pythran"
-        }
-      },
-      "Machine Information": {
-        "host": {
-          "cpu": "x86_64",
-          "family": "x86_64",
-          "endian": "little",
-          "system": "linux"
-        },
-        "build": {
-          "cpu": "x86_64",
-          "family": "x86_64",
-          "endian": "little",
-          "system": "linux"
-        },
-        "cross-compiled": true
-      },
-      "Build Dependencies": {
-        "blas": {
-          "name": "openblas",
-          "found": true,
-          "version": "0.3.21.dev",
-          "detection method": "pkgconfig",
-          "include directory": "/usr/local/include",
-          "lib directory": "/usr/local/lib",
-          "openblas configuration": "USE_64BITINT= DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS= NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2",
-          "pc file directory": "/usr/local/lib/pkgconfig"
-        },
-        "lapack": {
-          "name": "openblas",
-          "found": true,
-          "version": "0.3.21.dev",
-          "detection method": "pkgconfig",
-          "include directory": "/usr/local/include",
-          "lib directory": "/usr/local/lib",
-          "openblas configuration": "USE_64BITINT= DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS= NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2",
-          "pc file directory": "/usr/local/lib/pkgconfig"
-        },
-        "pybind11": {
-          "name": "pybind11",
-          "version": "2.11.0",
-          "detection method": "config-tool",
-          "include directory": "unknown"
-        }
-      },
-      "Python Information": {
-        "path": "/opt/python/cp310-cp310/bin/python",
-        "version": "3.10"
-      }
-    }
+    Build Dependencies:
+      blas:
+        detection method: pkgconfig
+        found: true
+        include directory: /usr/local/include
+        lib directory: /usr/local/lib
+        name: openblas
+        openblas configuration: USE_64BITINT= DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS=
+          NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2
+        pc file directory: /usr/local/lib/pkgconfig
+        version: 0.3.21.dev
+      lapack:
+        detection method: pkgconfig
+        found: true
+        include directory: /usr/local/include
+        lib directory: /usr/local/lib
+        name: openblas
+        openblas configuration: USE_64BITINT= DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS=
+          NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2
+        pc file directory: /usr/local/lib/pkgconfig
+        version: 0.3.21.dev
+      pybind11:
+        detection method: config-tool
+        include directory: unknown
+        name: pybind11
+        version: 2.11.0
+    Compilers:
+      c:
+        commands: cc
+        linker: ld.bfd
+        name: gcc
+        version: 10.2.1
+      c++:
+        commands: c++
+        linker: ld.bfd
+        name: gcc
+        version: 10.2.1
+      cython:
+        commands: cython
+        linker: cython
+        name: cython
+        version: 0.29.36
+      fortran:
+        commands: gfortran
+        linker: ld.bfd
+        name: gcc
+        version: 10.2.1
+      pythran:
+        include directory: ../../tmp/pip-build-env-c6c8ru56/overlay/lib/python3.10/site-packages/pythran
+        version: 0.14.0
+    Machine Information:
+      build:
+        cpu: x86_64
+        endian: little
+        family: x86_64
+        system: linux
+      cross-compiled: true
+      host:
+        cpu: x86_64
+        endian: little
+        family: x86_64
+        system: linux
+    Python Information:
+      path: /opt/python/cp310-cp310/bin/python
+      version: '3.10'
+
 
 
 
@@ -350,7 +335,7 @@ Scipy config informations
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.142 seconds)
+   **Total running time of the script:** (0 minutes 0.624 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py:

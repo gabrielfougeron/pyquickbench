@@ -31,7 +31,7 @@ if ("--no-show" in sys.argv):
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
 basename = f'Error_handling'
-timings_filename = os.path.join(timings_folder, basename+'.npz')
+timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
 
@@ -72,7 +72,8 @@ pyquickbench.run_benchmark(
 # sphinx_gallery_end_ignore
 ) 
 
-# %% This default can be overriden with the argument ``StopOnExcept`` set to ``True``.
+# %%
+# This default can be overriden with the argument ``StopOnExcept`` set to ``True``. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
 
 try:
     pyquickbench.run_benchmark(

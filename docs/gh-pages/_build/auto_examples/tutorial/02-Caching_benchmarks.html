@@ -356,7 +356,7 @@ document.write(`
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Caching benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="03-Preparing_inputs.html">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Convergence analysis of scipy’s Runge-Kutta methods for ODE IVP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -437,7 +437,7 @@ to download the full example code</p>
 While obvious for complex benchmarks, this is still true for simple benchmarks.
 Indeed, by default, pyquickbench uses the standard <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.autorange" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.autorange()</span></code></a> to assess the number of times a benchmark should be run to ensure reliable timings, which comes with significant overhead as any call to this function will require a non-configurable minimum execution time of 0.2 seconds.
 Caching benchmarks results is a great way to reduce this overhead.</p>
-<p>In pyquickbench, caching results in order to avoid a full re-run is as simple as providing a file name to <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a>. If this file does not exist, it will be created. Both <code class="docutils literal notranslate"><span class="pre">*.npy</span></code> and <code class="docutils literal notranslate"><span class="pre">*.npz</span></code> extensions are accepted.</p>
+<p>In pyquickbench, caching results in order to avoid a full re-run is as simple as providing a file name to <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a>. If this file does not exist, it will be created. Both <code class="docutils literal notranslate"><span class="pre">*.npy</span></code> and <code class="docutils literal notranslate"><span class="pre">*.npz</span></code> extensions are accepted.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pyquickbench</span>
 
@@ -481,7 +481,7 @@ Caching benchmarks results is a great way to reduce this overhead.</p>
 <img src="../../../_images/sphx_glr_02-Caching_benchmarks_001.png" srcset="../../../_images/sphx_glr_02-Caching_benchmarks_001.png" alt="02 Caching benchmarks" class = "sphx-glr-single-img"/></section>
 <section id="skipping-benchmarks">
 <h2>Skipping benchmarks<a class="headerlink" href="#skipping-benchmarks" title="Link to this heading">#</a></h2>
-<p>Another call to <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> will detect that the file exists. The benchmark will not be run the a second time, and the contents of the file is used instead.</p>
+<p>Another call to <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> will detect that the file exists. The benchmark will not be run the a second time, and the contents of the file is used instead.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_times_bis</span></a> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
@@ -556,7 +556,7 @@ False
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_02-Caching_benchmarks_003.png" srcset="../../../_images/sphx_glr_02-Caching_benchmarks_003.png" alt="02 Caching benchmarks" class = "sphx-glr-single-img"/><p>Using a <code class="docutils literal notranslate"><span class="pre">*.npz</span></code> file as an output allows <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> to detect this change. For instance, both outputs here are correct.</p>
+<img src="../../../_images/sphx_glr_02-Caching_benchmarks_003.png" srcset="../../../_images/sphx_glr_02-Caching_benchmarks_003.png" alt="02 Caching benchmarks" class = "sphx-glr-single-img"/><p>Using a <code class="docutils literal notranslate"><span class="pre">*.npz</span></code> file as an output allows <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> to detect this change. For instance, both outputs here are correct.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a> <span class="o">=</span> <span class="s2">&quot;My_benchmark_file.npz&quot;</span>
 
 
@@ -576,7 +576,7 @@ False
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_02-Caching_benchmarks_005.png" srcset="../../../_images/sphx_glr_02-Caching_benchmarks_005.png" alt="02 Caching benchmarks" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.107 seconds)</p>
+<img src="../../../_images/sphx_glr_02-Caching_benchmarks_005.png" srcset="../../../_images/sphx_glr_02-Caching_benchmarks_005.png" alt="02 Caching benchmarks" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.121 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-02-caching-benchmarks-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/21dd89a1374b9bac271e1cfd7a9b5ca3/02-Caching_benchmarks.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">02-Caching_benchmarks.ipynb</span></code></a></p>
@@ -620,7 +620,7 @@ False
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/_build/auto_examples/tutorial/02-Caching_benchmarks.rst">
+    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/docs/source/_build/auto_examples/tutorial/02-Caching_benchmarks.rst">
       <i class="fa-solid fa-pencil"></i>
       
       

@@ -356,7 +356,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="02-Caching_benchmarks.html">Caching benchmarks</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Convergence analysis of scipy’s Runge-Kutta methods for ODE IVP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -431,7 +431,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="preparing-inputs">
 <span id="sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"></span><h1>Preparing inputs<a class="headerlink" href="#preparing-inputs" title="Link to this heading">#</a></h1>
-<p>By default, the functions to be benchmarked with <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> are expected to take as arguments a single integer <code class="docutils literal notranslate"><span class="pre">n</span></code> as in the following code.</p>
+<p>By default, the functions to be benchmarked with <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> are expected to take as arguments a single integer <code class="docutils literal notranslate"><span class="pre">n</span></code> as in the following code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comprehension</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
@@ -496,7 +496,7 @@ to download the full example code</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_03-Preparing_inputs_002.png" srcset="../../../_images/sphx_glr_03-Preparing_inputs_002.png" alt="03 Preparing inputs" class = "sphx-glr-single-img"/><p>This calling convention is why positional-only arguments are disallowed in <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a>. For instance, even though the following defines a legal Python function</p>
+<img src="../../../_images/sphx_glr_03-Preparing_inputs_002.png" srcset="../../../_images/sphx_glr_03-Preparing_inputs_002.png" alt="03 Preparing inputs" class = "sphx-glr-single-img"/><p>This calling convention is why positional-only arguments are disallowed in <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a>. For instance, even though the following defines a legal Python function</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="o">/</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">n</span>
 
@@ -506,7 +506,7 @@ to download the full example code</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>42
 </pre></div>
 </div>
-<p>It is not allowed in <a class="reference internal" href="../../generated/generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> since the following raises an error:</p>
+<p>It is not allowed in <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> since the following raises an error:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
 <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
@@ -528,7 +528,7 @@ to download the full example code</p>
 42
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.482 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.549 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-03-preparing-inputs-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/0dc9ac5121cfb7a79da8cdd1143c030d/03-Preparing_inputs.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">03-Preparing_inputs.ipynb</span></code></a></p>
@@ -557,7 +557,7 @@ to download the full example code</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/_build/auto_examples/tutorial/03-Preparing_inputs.rst">
+    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/docs/source/_build/auto_examples/tutorial/03-Preparing_inputs.rst">
       <i class="fa-solid fa-pencil"></i>
       
       

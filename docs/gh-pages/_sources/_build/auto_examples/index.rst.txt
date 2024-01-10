@@ -98,7 +98,7 @@ Tutorial
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Convergence analysis of scipy&#x27;s Runge-Kutta methods for ODE IVP">
+    <div class="sphx-glr-thumbcontainer" tooltip="Plotting scalar values">
 
 .. only:: html
 
@@ -109,7 +109,7 @@ Tutorial
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Convergence analysis of scipy's Runge-Kutta methods for ODE IVP</div>
+      <div class="sphx-glr-thumbnail-title">Plotting scalar values</div>
     </div>
 
 

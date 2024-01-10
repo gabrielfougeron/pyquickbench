@@ -241,11 +241,9 @@ def run_benchmark(
     StopOnExcept    : bool          = False                                 ,
     ShowProgress    : bool          = False                                 ,
     show            : bool          = False                                 ,
-    **show_kwargs   : typing.Dict[str, typing.Any]                          ,
+    **plot_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> np.typing.NDArray[np.float64] | None :
     """ Runs a full benchmark.
-
-    _extended_summary_
 
     Parameters
     ----------
@@ -271,7 +269,7 @@ def run_benchmark(
         Filename for results caching.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` for usage example.\n
         Possible file extensions : ``*.npy`` or ``*.npz``.\n
-        _description_, by default None
+        By default ``None``.
     ForceBenchmark : bool, optional
         Whether to disregard existing cache and force a full re-run, by default ``False``.
     PreventBenchmark : bool, optional
@@ -282,6 +280,8 @@ def run_benchmark(
         Whether to show a progress bar in the CLI during benchmark, by default ``False``.
     show : bool, optional
         Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.
+    **plot_kwargs :
+        Arguments to pass on to :func:`pyquickbench.plot_benchmark` after the benchmark is run.
 
     Returns
     -------
@@ -462,7 +462,7 @@ def run_benchmark(
             all_funs            ,
             mode = mode         ,
             show = show         ,
-            **show_kwargs       ,
+            **plot_kwargs       ,
         )
 
     return all_vals
@@ -486,7 +486,7 @@ def plot_benchmark(
                               typing.Iterable[str] | 
                               None                              = None                      ,
     all_fun_names           : typing.Iterable[str] | None       = None                      ,
-    plot_intent         : typing.Iterable[str] | None       = None                      ,        
+    plot_intent             : typing.Iterable[str] | None       = None                      ,        
     mode                    : str                               = "timings"                 ,
     all_xvalues             : np.typing.ArrayLike | None        = None                      ,
     # all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
@@ -497,10 +497,10 @@ def plot_benchmark(
     single_values_idx       : dict | None                       = None                      ,         
     logx_plot               : bool | None                       = None                      ,
     logy_plot               : bool | None                       = None                      ,
-    plot_ylim               : tuple | None                      = None                      ,
     plot_xlim               : tuple | None                      = None                      ,
-    clip_vals               : bool                              = False                     ,
-    stop_after_first_clip   : bool                              = False                     ,
+    plot_ylim               : tuple | None                      = None                      ,
+    # clip_vals               : bool                              = False                     ,
+    # stop_after_first_clip   : bool                              = False                     ,
     show                    : bool                              = False                     ,
     fig                     : matplotlib.figure.Figure | None   = None                      ,
     ax                      : plt.Axes | None                   = None                      ,
@@ -516,12 +516,9 @@ def plot_benchmark(
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
     transform               : str | None                        = None                      ,
-    alpha                   : float                             = 1.                        ,
-    relative_to             : np.typing.ArrayLike | None        = None                      ,
+    # relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
     """Plots benchmarks results
-
-    _extended_summary_
 
     Parameters
     ----------
@@ -530,71 +527,71 @@ def plot_benchmark(
     all_args : dict | typing.Iterable
         Describes the arguments given to the functions in the benchmark.
     all_funs : typing.Dict[str, callable] | typing.Iterable[str] | None, optional
-        Benchmarked functions, by default None.\n
+        Benchmarked functions, by default ``None``.\n
         Only the ``__name__`` attribute is used here.
     all_fun_names : typing.Iterable[str] | None, optional
-        Names of the benchmarked functions, by default None.\n
+        Names of the benchmarked functions, by default ``None``.\n
         In case the functions ``__name__`` attribute is missing or uninformative.
     plot_intent : typing.Iterable[str] | None, optional
-        _description_, by default None
+        Describes how to handle the axes of the benchmark results array ``all_vals``.\n
+        Possible values : ``"single_value"``, ``"points"``, ``"same"``, ``"curve_color"``, ``"curve_linestyle"``, ``"curve_pointstyle"``, ``"subplot_grid_x"``, ``"subplot_grid_y"`` or ``"reduction_avg"``.\n
+        By default ``None``.
     mode : str, optional
-        _description_, by default "timings"
+        Benchmark mode, i.e. target of the benchmark.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n
+        Possible values: ``"timings"`` or ``"scalar_output"``. By default ``"timings"``.
     all_xvalues : np.typing.ArrayLike | None, optional
-        _description_, by default None
+        Values to be plotted on the x-axis if those differ from argument values.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n 
+        By default ``None``.
     color_list : list, optional
-        _description_, by default default_color_list
+        List of colors for plotted curves, by default ``default_color_list``.
     linestyle_list : list, optional
-        _description_, by default default_linestyle_list
+        List of linestyles for plotted curves, by default ``default_linestyle_list``.
     pointstyle_list : list, optional
-        _description_, by default default_pointstyle_list
+        List of point markers for plotted curves, by default ``default_pointstyle_list``.
     single_values_idx : dict | None, optional
-        _description_, by default None
+        Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``, by default ``None``.
     logx_plot : bool | None, optional
-        _description_, by default None
+        How to override log scaling on the x-axis of the plots, by default ``None``.
     logy_plot : bool | None, optional
-        _description_, by default None
-    plot_ylim : tuple | None, optional
-        _description_, by default None
+        How to override log scaling on the y-axis of the plots, by default ``None``.
     plot_xlim : tuple | None, optional
-        _description_, by default None
-    clip_vals : bool, optional
-        _description_, by default False
-    stop_after_first_clip : bool, optional
-        _description_, by default False
+       How to override limits on the x-axis of the plots, by default ``None``.
+    plot_ylim : tuple | None, optional
+        How to override limits on the x-axis of the plots, by default ``None``.
     show : bool, optional
-        _description_, by default False
+        Whether to issue a ``plt.show()``, by default ``False``.
     fig : matplotlib.figure.Figure | None, optional
-        _description_, by default None
+        User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n 
+        By default ``None``.
     ax : plt.Axes | None, optional
-        _description_, by default None
+        User provided array of :class:`matplotlib:matplotlib.axes.Axes` objects as returned by :func:`matplotlib:matplotlib.pyplot.subplots`.\n
+        By default ``None``.
     dpi : int, optional
-        _description_, by default 150
+        Output image resolution, by default ``150``.
     pxl_per_plot_x : int, optional
-        _description_, by default 1600
+        Output plot width, by default ``1600``.
     pxl_per_plot_y : int, optional
-        _description_, by default 800
+        Output plot height, by default ``800``.
     sharex : bool, optional
-        _description_, by default True
+        Whether to share plot x-axis, by default ``True``.
     sharey : bool, optional
-        _description_, by default False
+        Whether to share plot y-axis, by default ``False``.
     title : str | None, optional
-        _description_, by default None
+        Image title, by default ``None``.
     xlabel : str | None, optional
-        _description_, by default None
+        Override argument value as a default for plot x label, by default ``None``.
     ylabel : str | None, optional
-        _description_, by default None
+        Override default for plot y label, by default ``None``.
     plot_legend : bool, optional
-        _description_, by default True
+        Whether to give each plots a legend, by default ``True``.
     legend_location : str, optional
-        _description_, by default 'upper left'
+        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``'upper left'``.
     plot_grid : bool, optional
-        _description_, by default True
+        Whether to plot a background grido to each plot, by default ``True``.
     transform : str | None, optional
-        _description_, by default None
-    alpha : float, optional
-        _description_, by default 1.
-    relative_to : np.typing.ArrayLike | None, optional
-        _description_, by default None
+        Data transformation before plotting, by default ``None``.
 
     """
 
@@ -830,8 +827,8 @@ def plot_benchmark(
     n_linestyle = len(linestyle_list)
     n_pointstyle = len(pointstyle_list)
 
-    if clip_vals and (plot_ylim is None):
-        raise ValueError('Need a range to clip values')
+    # if clip_vals and (plot_ylim is None):
+    #     raise ValueError('Need a range to clip values')
 
     leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
     
