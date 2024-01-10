@@ -1,10 +1,9 @@
 API
 ===
 
-.. autosummary::
-   :toctree: _build/generated
+.. automodule:: pyquickbench
 
-   pyquickbench
+   
 
 
 

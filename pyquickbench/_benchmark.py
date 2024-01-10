@@ -19,17 +19,17 @@ def isnotfinite(arr):
     np.bitwise_not(res, out=res)  # in-place
     return res
 
-def _mem_shift(idx, shape):
-    
-    res = 0
-    prod_shapes = 1
-    
-    # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681
-    for i in range(len(shape)-1,-1,-1):
-        res += idx[i]*prod_shapes
-        prod_shapes *= shape[i]
-        
-    return res
+# def _mem_shift(idx, shape):
+#     
+#     res = 0
+#     prod_shapes = 1
+#     
+#     # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681
+#     for i in range(len(shape)-1,-1,-1):
+#         res += idx[i]*prod_shapes
+#         prod_shapes *= shape[i]
+#         
+#     return res
 
 def _mem_shift_restricted(idx, shape, only):
     
@@ -56,27 +56,11 @@ def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
     idx_items = np.zeros(len(idx_all_items), dtype=int)
     for i, j in enumerate(idx_all_items):
         idx_items[i] = idx_vals[j] 
-    #     
-    # print()
-    # print(idx_items, type(idx_items), idx_items.dtype)
-    # print(idx_all_items, type(idx_all_items), idx_all_items.dtype)
-    # print(shape, type(shape))
-    # print(shape[idx_all_items])
-              
+
     i_item = _mem_shift_restricted(idx_items, shape, idx_all_items)
     
     return i_item, idx_items
 
-# def _in_ipynb():
-#     try:
-#         cfg = get_ipython().config 
-#         if cfg['IPKernelApp']['parent_appname'] == 'ipython-notebook':
-#             return True
-#         else:
-#             return False
-#     except NameError:
-#         return False
-#     
 def _in_ipynb():
     try:
         from IPython import get_ipython
@@ -142,7 +126,7 @@ default_pointstyle_list = [
     "d"	, # m20 thin_diamond
 ]
 
-def _check_match_sig(fun):
+def _check_sig_no_pos_only(fun):
 
     try:
         sig = inspect.signature(fun)
@@ -153,8 +137,9 @@ def _check_match_sig(fun):
         for param in sig.parameters.values():
             if param.kind == param.POSITIONAL_ONLY:
                 raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
+
         
-def _return_setup_vars_dict(setup, args, fun):
+def _return_setup_vars_dict(setup, args):
 
     setup_vars = setup(*args)
 
@@ -253,12 +238,57 @@ def run_benchmark(
     filename        : str | None    = None                                  ,
     ForceBenchmark  : bool          = False                                 ,
     PreventBenchmark: bool          = False                                 ,
-    show            : bool          = False                                 ,
     StopOnExcept    : bool          = False                                 ,
     ShowProgress    : bool          = False                                 ,
+    show            : bool          = False                                 ,
     **show_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> np.typing.NDArray[np.float64] | None :
-    
+    """ Runs a full benchmark.
+
+    _extended_summary_
+
+    Parameters
+    ----------
+    all_args : dict | typing.Iterable
+        Describes the arguments to be given to the functions in the benchmark.
+    all_funs : dict | typing.Iterable
+        Functions to be benchmarked.
+    mode : str, optional
+        Benchmark mode, i.e. target of the benchmark.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n
+        Possible values: ``"timings"`` or ``"scalar_output"``. By default ``"timings"``.
+    setup : callable, optional
+        Function that prepares the inputs for the functions to be benchmarked.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
+        By default ``lambda n: {'n': n}``.
+    n_repeat : int, optional
+        Number of times to repeat the benchmark for variability studies.\n
+        By default ``1``.
+    time_per_test : float, optional
+        Minimum time in seconds for benchmark in ``"timings"`` mode.\n
+        By default ``0.2``.
+    filename : str | None, optional
+        Filename for results caching.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` for usage example.\n
+        Possible file extensions : ``*.npy`` or ``*.npz``.\n
+        _description_, by default None
+    ForceBenchmark : bool, optional
+        Whether to disregard existing cache and force a full re-run, by default ``False``.
+    PreventBenchmark : bool, optional
+        Whether to prevent a possibly lengthy full re-run, by default ``False``.
+    StopOnExcept : bool, optional
+        Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.
+    ShowProgress : bool, optional
+        Whether to show a progress bar in the CLI during benchmark, by default ``False``.
+    show : bool, optional
+        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.
+
+    Returns
+    -------
+    np.typing.NDArray[np.float64] | None
+        Benchmark results.
+
+    """
     if filename is None:
         Load_timings_file = False
         Save_timings_file = False
@@ -294,6 +324,9 @@ def run_benchmark(
 
     if DoBenchmark:
 
+        for fun in all_funs_list:
+            _check_sig_no_pos_only(fun, setup_vars_dict)
+        
         all_vals = np.full(list(res_shape.values()), np.nan)
     
         benchmark_iterator = zip(
@@ -385,6 +418,7 @@ def run_benchmark(
                 setup_vars_dict = _return_setup_vars_dict(setup, args)
 
                 for i_fun, fun in enumerate(all_funs_list):
+                    
                     
                     for i_repeat in range(n_repeat):
                         
@@ -485,6 +519,85 @@ def plot_benchmark(
     alpha                   : float                             = 1.                        ,
     relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
+    """Plots benchmarks results
+
+    _extended_summary_
+
+    Parameters
+    ----------
+    all_vals : np.typing.ArrayLike
+        Benchmark results as returned by :func:`pyquickbench.run_benchmark`.
+    all_args : dict | typing.Iterable
+        Describes the arguments given to the functions in the benchmark.
+    all_funs : typing.Dict[str, callable] | typing.Iterable[str] | None, optional
+        Benchmarked functions, by default None.\n
+        Only the ``__name__`` attribute is used here.
+    all_fun_names : typing.Iterable[str] | None, optional
+        Names of the benchmarked functions, by default None.\n
+        In case the functions ``__name__`` attribute is missing or uninformative.
+    plot_intent : typing.Iterable[str] | None, optional
+        _description_, by default None
+    mode : str, optional
+        _description_, by default "timings"
+    all_xvalues : np.typing.ArrayLike | None, optional
+        _description_, by default None
+    color_list : list, optional
+        _description_, by default default_color_list
+    linestyle_list : list, optional
+        _description_, by default default_linestyle_list
+    pointstyle_list : list, optional
+        _description_, by default default_pointstyle_list
+    single_values_idx : dict | None, optional
+        _description_, by default None
+    logx_plot : bool | None, optional
+        _description_, by default None
+    logy_plot : bool | None, optional
+        _description_, by default None
+    plot_ylim : tuple | None, optional
+        _description_, by default None
+    plot_xlim : tuple | None, optional
+        _description_, by default None
+    clip_vals : bool, optional
+        _description_, by default False
+    stop_after_first_clip : bool, optional
+        _description_, by default False
+    show : bool, optional
+        _description_, by default False
+    fig : matplotlib.figure.Figure | None, optional
+        _description_, by default None
+    ax : plt.Axes | None, optional
+        _description_, by default None
+    dpi : int, optional
+        _description_, by default 150
+    pxl_per_plot_x : int, optional
+        _description_, by default 1600
+    pxl_per_plot_y : int, optional
+        _description_, by default 800
+    sharex : bool, optional
+        _description_, by default True
+    sharey : bool, optional
+        _description_, by default False
+    title : str | None, optional
+        _description_, by default None
+    xlabel : str | None, optional
+        _description_, by default None
+    ylabel : str | None, optional
+        _description_, by default None
+    plot_legend : bool, optional
+        _description_, by default True
+    legend_location : str, optional
+        _description_, by default 'upper left'
+    plot_grid : bool, optional
+        _description_, by default True
+    transform : str | None, optional
+        _description_, by default None
+    alpha : float, optional
+        _description_, by default 1.
+    relative_to : np.typing.ArrayLike | None, optional
+        _description_, by default None
+
+    """
+
 
     # TODO: Change that
     ProductLegend = True

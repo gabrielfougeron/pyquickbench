@@ -25,21 +25,22 @@ version = '0.1.0'
 language = "en"
 
 extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
-    "sphinx.ext.viewcode",
-    "sphinx.ext.todo",
-    'sphinx.ext.autosummary',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.autosectionlabel',
-    'sphinx.ext.githubpages',
-    'sphinx_gallery.gen_gallery',
-    'sphinx_needs',
-    'sphinxcontrib.test_reports',
-    'sphinxcontrib.plantuml',
+    'sphinx.ext.duration'           ,
+    'sphinx.ext.doctest'            ,
+    'sphinx.ext.autodoc'            ,
+    "sphinx.ext.viewcode"           ,
+    "sphinx.ext.todo"               ,
+    'sphinx.ext.autosummary'        ,
+    'sphinx.ext.mathjax'            ,
+    'sphinx.ext.napoleon'           ,
+    'sphinx.ext.intersphinx'        ,
+    # 'sphinx.ext.autosectionlabel'   ,
+    'sphinx.ext.githubpages'        ,
+    'sphinx_gallery.gen_gallery'    ,
+    'sphinx_needs'                  ,
+    'sphinxcontrib.test_reports'    ,
+    'sphinxcontrib.plantuml'        ,
+    'myst_parser'                   ,
 ]
 
 
@@ -62,6 +63,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
     'numpy': ('http://docs.scipy.org/doc/numpy', None),
+    'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
 }
 
 intersphinx_disabled_reftypes = ["*"]
@@ -121,6 +123,7 @@ html_context = {
     "github_version": "main", # Version
     "version": "main", # Version
     "conf_py_path": "docs/source/", # Path in the checkout to the docs root
+    "doc_path": "docs/source/",
     "default_mode": "light",
 }
 
