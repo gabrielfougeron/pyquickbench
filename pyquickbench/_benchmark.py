@@ -4,6 +4,7 @@ import math
 import itertools
 import typing
 import inspect
+import warnings
 
 import numpy as np
 import numpy.typing
@@ -207,6 +208,7 @@ def _save_benchmark_file(filename, all_vals, all_args):
         np.save(filename, all_vals)    
         
     elif file_ext == '.npz':
+
         np.savez(
             filename                ,
             all_vals = all_vals     ,
@@ -248,6 +250,7 @@ def run_benchmark(
     time_per_test   : float         = 0.2                                   ,
     filename        : str | None    = None                                  ,
     ForceBenchmark  : bool          = False                                 ,
+    PreventBenchmark: bool          = False                                 ,
     show            : bool          = False                                 ,
     StopOnExcept    : bool          = False                                 ,
     ShowProgress    : bool          = False                                 ,
@@ -277,11 +280,13 @@ def run_benchmark(
             if StopOnExcept:
                 raise exc
             
-            DoBenchmark = True
+            all_vals = None
+            DoBenchmark = not(PreventBenchmark)
             
     else:
-
-        DoBenchmark = True
+        
+        all_vals = None
+        DoBenchmark = not(PreventBenchmark)
 
     if DoBenchmark:
 
@@ -411,6 +416,9 @@ def run_benchmark(
             _save_benchmark_file(filename, all_vals, all_args)
             
     # print(f'{all_vals = }')
+    
+    if all_vals is None:
+        warnings.warn("Benchmark was neither loaded not run")
             
     if show:
         return plot_benchmark(
@@ -565,11 +573,20 @@ def plot_benchmark(
         elif value == 'same':
             idx_all_same.append(i)
         elif value == 'single_value':
-            if single_values_idx is None:
-                raise ValueError("Argument single_values_idx was not given. It is required to fix a value of an argument in the benchmark.")
+            
+            if isinstance(single_values_idx, dict):
+                fixed_idx = single_values_idx.get(name)
+            else:
+                fixed_idx = None
+
+            if fixed_idx is None:
+                warnings.warn("Argument single_values_idx was not properly set. A sensible default was provided, but please beware.")
+                fixed_idx = 0
+                
+            assert isinstance(fixed_idx, int)
             
             idx_all_single_value.append(i)
-            idx_single_value.append(single_values_idx[name])            
+            idx_single_value.append(fixed_idx)            
             
         elif value == 'curve_color':
             idx_all_curve_color.append(i)
@@ -809,13 +826,18 @@ def plot_benchmark(
         # print(linestyle)
         # print(pointstyle)
         
-        cur_ax.plot(
-            plot_x_val              ,
-            plot_y_val              ,
-            color = color           ,
-            linestyle = linestyle   ,
-            marker = pointstyle     ,
-        )
+        if isinstance(plot_x_val[0], str):
+            raise NotImplementedError
+        
+        else:    
+            
+            cur_ax.plot(
+                plot_x_val              ,
+                plot_y_val              ,
+                color = color           ,
+                linestyle = linestyle   ,
+                marker = pointstyle     ,
+            )
         
         
         

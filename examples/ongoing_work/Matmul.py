@@ -63,7 +63,9 @@ def Three_loops_python(a, b, c):
                 c[i,j] += a[i,k]*b[k,j]
 
 Three_loops_numba_serial = nb.jit(Three_loops_python,**numba_opt_dict)
+Three_loops_numba_serial.__name__ = "Three_loops_numba_serial"
 Three_loops_numba_auto_parallel = nb.jit(Three_loops_python,parallel=True,**numba_opt_dict)
+Three_loops_numba_auto_parallel.__name__ = "Three_loops_numba_auto_parallel"
 
 @nb.jit(parallel=True,**numba_opt_dict)
 def Three_loops_numba_parallel(a, b, c):
@@ -86,10 +88,15 @@ def Three_loops_numba_parallel_noreduce(a, b, c):
 def numpy_matmul(a, b, c):
     np.matmul(a, b, out=c)
 
+dtypes_dict = {
+    "float32" : np.float32,
+    "float64" : np.float64,
+}
+
 def setup_abc(P, R, Q, real_dtype):
-    a = np.random.random((P,R)).astype(dtype=real_dtype)
-    b = np.random.random((R,Q)).astype(dtype=real_dtype)
-    c = np.zeros((P,Q),dtype=real_dtype)
+    a = np.random.random((P,R)).astype(dtype=dtypes_dict[real_dtype])
+    b = np.random.random((R,Q)).astype(dtype=dtypes_dict[real_dtype])
+    c = np.zeros((P,Q),dtype=dtypes_dict[real_dtype])
     return {'a':a, 'b':b, 'c':c}
 
 # sphinx_gallery_start_ignore
@@ -100,14 +107,14 @@ filename = os.path.join(timings_folder,basename+'.npz')
 # sphinx_gallery_end_ignore
 
 all_args = {
-    "P" : [32 * (2 ** k) for k in range(2)]     ,
-    "Q" : [32 * (2 ** k) for k in range(2)]     ,
-    "R" : [32 * (2 ** k) for k in range(2)]     ,
-    "real_dtype": [np.float32, np.float64]     ,
+    "P" : [32 * (2 ** k) for k in range(7)]     ,
+    "Q" : [32 * (2 ** k) for k in range(7)]     ,
+    "R" : [32 * (2 ** k) for k in range(7)]     ,
+    "real_dtype": ["float32", "float64"]        ,
 }
 
 all_funs = [
-    Three_loops_python                  ,
+    # Three_loops_python                  ,
     Three_loops_numba_serial            ,
     Three_loops_numba_auto_parallel     ,
     Three_loops_numba_parallel_noreduce ,
@@ -123,19 +130,29 @@ all_errors = pyquickbench.run_benchmark(
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
+    # PreventBenchmark = True ,
 )
 
-# plot_intent = {
-#     "alpha" : 'points' ,
-#     "n" : 'subplot_grid_y'  ,
-# }
-# 
-# pyquickbench.plot_benchmark(
-#     all_errors      ,
-#     all_args        ,
-#     all_error_funs  ,
-#     plot_intent = plot_intent,
-#     title = "Relative error for increasing conditionning"   ,
-#     ylabel = "error"    ,
-#     show = True
-# )
+plot_intent = {
+    "P" : 'points'                  ,
+    "Q" : 'single_value'            ,
+    "R" : 'single_value'            ,
+    "real_dtype": 'subplot_grid_y'  ,
+}
+
+
+single_values_idx = {
+    "P" : -1        ,
+    "Q" : -1        ,
+    "R" : -1        ,
+    "real_dtype": 0 ,
+}
+
+pyquickbench.plot_benchmark(
+    all_errors                              ,
+    all_args                                ,
+    all_funs                                ,
+    plot_intent = plot_intent               ,
+    single_values_idx = single_values_idx   ,
+    show = True                             ,
+)
