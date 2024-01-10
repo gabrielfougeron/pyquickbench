@@ -325,7 +325,7 @@ def run_benchmark(
     if DoBenchmark:
 
         for fun in all_funs_list:
-            _check_sig_no_pos_only(fun, setup_vars_dict)
+            _check_sig_no_pos_only(fun)
         
         all_vals = np.full(list(res_shape.values()), np.nan)
     
@@ -489,8 +489,6 @@ def plot_benchmark(
     plot_intent             : typing.Iterable[str] | None       = None                      ,        
     mode                    : str                               = "timings"                 ,
     all_xvalues             : np.typing.ArrayLike | None        = None                      ,
-    # all_x_scalings          : np.typing.ArrayLike | None        = None                  ,
-    # all_y_scalings          : np.typing.ArrayLike | None        = None                  ,
     color_list              : list                              = default_color_list        ,
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
@@ -499,8 +497,6 @@ def plot_benchmark(
     logy_plot               : bool | None                       = None                      ,
     plot_xlim               : tuple | None                      = None                      ,
     plot_ylim               : tuple | None                      = None                      ,
-    # clip_vals               : bool                              = False                     ,
-    # stop_after_first_clip   : bool                              = False                     ,
     show                    : bool                              = False                     ,
     fig                     : matplotlib.figure.Figure | None   = None                      ,
     ax                      : plt.Axes | None                   = None                      ,
@@ -516,6 +512,8 @@ def plot_benchmark(
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
     transform               : str | None                        = None                      ,
+    clip_vals               : bool                              = False                     ,
+    stop_after_first_clip   : bool                              = False                     ,
     # relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
     """Plots benchmarks results
@@ -559,7 +557,7 @@ def plot_benchmark(
     plot_xlim : tuple | None, optional
        How to override limits on the x-axis of the plots, by default ``None``.
     plot_ylim : tuple | None, optional
-        How to override limits on the x-axis of the plots, by default ``None``.
+        How to override limits on the y-axis of the plots, by default ``None``.
     show : bool, optional
         Whether to issue a ``plt.show()``, by default ``False``.
     fig : matplotlib.figure.Figure | None, optional
@@ -591,8 +589,14 @@ def plot_benchmark(
     plot_grid : bool, optional
         Whether to plot a background grido to each plot, by default ``True``.
     transform : str | None, optional
-        Data transformation before plotting, by default ``None``.
-
+        Data transformation before plotting, by default ``None``.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
+    clip_vals : bool, optional
+        Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.
+        By default``None``.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
+    stop_after_first_clip : bool, optional
+        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False
     """
 
 
@@ -745,29 +749,20 @@ def plot_benchmark(
     n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
     n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
 
+    if clip_vals and (plot_ylim is None):
+        raise ValueError('Need a range to clip values')
+
     if logx_plot is None:
         logx_plot = (transform is None)
         
     if logy_plot is None:
         logy_plot = (transform is None)
-    
-    # TODO: assess whether those need to stay
-# 
-#     if all_x_scalings is None:
-#         all_x_scalings = np.ones(n_funs)
-#     else:
-#         assert all_x_scalings.shape == (n_funs,)
-# 
-#     if all_y_scalings is None:
-#         all_y_scalings = np.ones(n_funs)
-#     else:
-#         assert all_y_scalings.shape == (n_funs,)
 
     if (ax is None) or (fig is None):
 
         figsize = (
-            n_subplot_grid_x * pxl_per_plot_x/dpi,
-            n_subplot_grid_y * pxl_per_plot_y/dpi,
+            n_subplot_grid_x * pxl_per_plot_x / dpi,
+            n_subplot_grid_y * pxl_per_plot_y / dpi,
         )
 
         fig, ax = plt.subplots(
@@ -826,9 +821,6 @@ def plot_benchmark(
     n_colors = len(color_list)
     n_linestyle = len(linestyle_list)
     n_pointstyle = len(pointstyle_list)
-
-    # if clip_vals and (plot_ylim is None):
-    #     raise ValueError('Need a range to clip values')
 
     leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
     
@@ -942,6 +934,55 @@ def plot_benchmark(
         # print(linestyle)
         # print(pointstyle)
         
+        npts = len(plot_x_val)
+        assert npts == len(plot_y_val)
+        
+        if transform in ["pol_growth_order", "pol_cvgence_order"]:
+
+            transformed_plot_y_val = np.zeros_like(plot_y_val)
+            
+            for i_size in range(1,npts):
+                
+                ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
+                ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
+                
+                try:
+                    transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
+
+                except:
+                    transformed_plot_y_val[i_size] = np.nan
+                    
+            transformed_plot_y_val[0] = np.nan
+                            
+            plot_y_val = transformed_plot_y_val
+
+            if transform == "pol_cvgence_order":
+                plot_y_val = - transformed_plot_y_val
+            else:
+                plot_y_val = transformed_plot_y_val
+            
+        if clip_vals:
+
+            for i_size in range(npts):
+        
+                if plot_y_val[i_size] < plot_ylim[0]:
+
+                    if stop_after_first_clip:
+                        for j_size in range(i_size,npts):
+                            plot_y_val[j_size] = np.nan
+                        break
+                    else:
+                        plot_y_val[i_size] = np.nan
+                        
+                elif plot_y_val[i_size] > plot_ylim[1]:
+
+                    if stop_after_first_clip:
+                        for j_size in range(i_size,npts):
+                            plot_y_val[j_size] = np.nan
+                        break
+                    else:
+                        plot_y_val[i_size] = np.nan
+        
         if isinstance(plot_x_val[0], str):
             raise NotImplementedError
         
@@ -955,95 +996,6 @@ def plot_benchmark(
                 marker = pointstyle     ,
             )
         
-        
-        
-        
-        
-        
-        
-        
-# 
-#         for i_repeat in range(n_repeat):
-# 
-#             plot_y_val = all_vals[:, i_fun, i_repeat] / relative_to_array # Broadcast
-#             plot_y_val /= all_y_scalings[i_fun]
-#             
-#             if all_xvalues is None:
-#                 if 'n' in all_args:
-#                     plot_x_val = all_sizes * all_x_scalings[i_fun]
-#                 else:
-#                     raise ValueError # ????
-#             else:   
-#                 plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]
-#             
-            
-            # TODO : Adapt this
-#             if transform in ["pol_growth_order", "pol_cvgence_order"]:
-#                 
-#                 transformed_plot_y_val = np.zeros_like(plot_y_val)
-#                 
-#                 for i_size in range(1,n_sizes):
-#                     
-#                     ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
-#                     ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
-#                     
-#                     try:
-#                         transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
-# 
-#                     except:
-#                         transformed_plot_y_val[i_size] = np.nan
-#                         
-#                 transformed_plot_y_val[0] = np.nan
-#                                 
-#                 plot_y_val = transformed_plot_y_val
-# 
-#                 if transform == "pol_cvgence_order":
-#                     plot_y_val = - transformed_plot_y_val
-#                 else:
-#                     plot_y_val = transformed_plot_y_val
-                
-                
-            # TODO : Adapt this
-#             if clip_vals:
-# 
-#                 for i_size in range(n_sizes):
-#             
-#                     if plot_y_val[i_size] < plot_ylim[0]:
-# 
-#                         if stop_after_first_clip:
-#                             for j_size in range(i_size,n_sizes):
-#                                 plot_y_val[j_size] = np.nan
-#                             break
-#                         else:
-#                             plot_y_val[i_size] = np.nan
-#                             
-#                     elif plot_y_val[i_size] > plot_ylim[1]:
-# 
-#                         if stop_after_first_clip:
-#                             for j_size in range(i_size,n_sizes):
-#                                 plot_y_val[j_size] = np.nan
-#                             break
-#                         else:
-#                             plot_y_val[i_size] = np.nan
-                    
-#             # TODO : Is this still needed ?
-#             mask = isnotfinite(plot_y_val)
-#             masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)
-# 
-#             if not(np.ma.max(masked_plot_y_val) > 0):
-#                 
-#             alpha_ = max( alpha / (n_repeat**0.8), 1./255)
-# 
-#             ax.plot(
-#                 plot_x_val              ,
-#                 plot_y_val              ,
-#                 color = color           ,
-#                 linestyle = linestyle   ,
-#                 marker = pointstyle     ,
-#                 alpha = alpha_          ,
-#             )
-
-
     for i_subplot_grid_x in range(n_subplot_grid_x):
         for i_subplot_grid_y in range(n_subplot_grid_y):
 

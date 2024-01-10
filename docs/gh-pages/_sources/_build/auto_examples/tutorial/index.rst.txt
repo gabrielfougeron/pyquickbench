@@ -99,6 +99,23 @@ Tutorial
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Transforming values">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_06-Transforming_values_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Transforming values</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -110,4 +127,5 @@ Tutorial
    /_build/auto_examples/tutorial/03-Preparing_inputs
    /_build/auto_examples/tutorial/04-Error_handling
    /_build/auto_examples/tutorial/05-Plotting_scalars
+   /_build/auto_examples/tutorial/06-Transforming_values
 

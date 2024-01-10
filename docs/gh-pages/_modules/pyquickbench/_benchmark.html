@@ -720,7 +720,7 @@ document.write(`
     <span class="k">if</span> <span class="n">DoBenchmark</span><span class="p">:</span>
 
         <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs_list</span><span class="p">:</span>
-            <span class="n">_check_sig_no_pos_only</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">setup_vars_dict</span><span class="p">)</span>
+            <span class="n">_check_sig_no_pos_only</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
         
         <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">res_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     
@@ -887,8 +887,6 @@ document.write(`
     <span class="n">plot_intent</span>             <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>       <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>        
     <span class="n">mode</span>                    <span class="p">:</span> <span class="nb">str</span>                               <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                 <span class="p">,</span>
     <span class="n">all_xvalues</span>             <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span>        <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="c1"># all_x_scalings          : np.typing.ArrayLike | None        = None                  ,</span>
-    <span class="c1"># all_y_scalings          : np.typing.ArrayLike | None        = None                  ,</span>
     <span class="n">color_list</span>              <span class="p">:</span> <span class="nb">list</span>                              <span class="o">=</span> <span class="n">default_color_list</span>        <span class="p">,</span>
     <span class="n">linestyle_list</span>          <span class="p">:</span> <span class="nb">list</span>                              <span class="o">=</span> <span class="n">default_linestyle_list</span>    <span class="p">,</span>
     <span class="n">pointstyle_list</span>         <span class="p">:</span> <span class="nb">list</span>                              <span class="o">=</span> <span class="n">default_pointstyle_list</span>   <span class="p">,</span>
@@ -897,8 +895,6 @@ document.write(`
     <span class="n">logy_plot</span>               <span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>                       <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">plot_xlim</span>               <span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="kc">None</span>                      <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">plot_ylim</span>               <span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="kc">None</span>                      <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="c1"># clip_vals               : bool                              = False                     ,</span>
-    <span class="c1"># stop_after_first_clip   : bool                              = False                     ,</span>
     <span class="n">show</span>                    <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">fig</span>                     <span class="p">:</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="kc">None</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">ax</span>                      <span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span>                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
@@ -914,6 +910,8 @@ document.write(`
     <span class="n">legend_location</span>         <span class="p">:</span> <span class="nb">str</span>                               <span class="o">=</span> <span class="s1">&#39;upper left&#39;</span>              <span class="p">,</span>
     <span class="n">plot_grid</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">True</span>                      <span class="p">,</span>
     <span class="n">transform</span>               <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>                        <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">clip_vals</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">stop_after_first_clip</span>   <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="c1"># relative_to             : np.typing.ArrayLike | None        = None                      ,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots benchmarks results</span>
@@ -957,7 +955,7 @@ document.write(`
 <span class="sd">    plot_xlim : tuple | None, optional</span>
 <span class="sd">       How to override limits on the x-axis of the plots, by default ``None``.</span>
 <span class="sd">    plot_ylim : tuple | None, optional</span>
-<span class="sd">        How to override limits on the x-axis of the plots, by default ``None``.</span>
+<span class="sd">        How to override limits on the y-axis of the plots, by default ``None``.</span>
 <span class="sd">    show : bool, optional</span>
 <span class="sd">        Whether to issue a ``plt.show()``, by default ``False``.</span>
 <span class="sd">    fig : matplotlib.figure.Figure | None, optional</span>
@@ -989,8 +987,14 @@ document.write(`
 <span class="sd">    plot_grid : bool, optional</span>
 <span class="sd">        Whether to plot a background grido to each plot, by default ``True``.</span>
 <span class="sd">    transform : str | None, optional</span>
-<span class="sd">        Data transformation before plotting, by default ``None``.</span>
-
+<span class="sd">        Data transformation before plotting, by default ``None``.\n</span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
+<span class="sd">    clip_vals : bool, optional</span>
+<span class="sd">        Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.</span>
+<span class="sd">        By default``None``.\n</span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
+<span class="sd">    stop_after_first_clip : bool, optional</span>
+<span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
@@ -1143,29 +1147,20 @@ document.write(`
     <span class="n">n_subplot_grid_x</span> <span class="o">=</span> <span class="n">_prod_rel_shapes</span><span class="p">(</span><span class="n">idx_all_subplot_grid_x</span><span class="p">,</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">n_subplot_grid_y</span> <span class="o">=</span> <span class="n">_prod_rel_shapes</span><span class="p">(</span><span class="n">idx_all_subplot_grid_y</span><span class="p">,</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">clip_vals</span> <span class="ow">and</span> <span class="p">(</span><span class="n">plot_ylim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need a range to clip values&#39;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">logx_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logx_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
         
     <span class="k">if</span> <span class="n">logy_plot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logy_plot</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
-    
-    <span class="c1"># TODO: assess whether those need to stay</span>
-<span class="c1"># </span>
-<span class="c1">#     if all_x_scalings is None:</span>
-<span class="c1">#         all_x_scalings = np.ones(n_funs)</span>
-<span class="c1">#     else:</span>
-<span class="c1">#         assert all_x_scalings.shape == (n_funs,)</span>
-<span class="c1"># </span>
-<span class="c1">#     if all_y_scalings is None:</span>
-<span class="c1">#         all_y_scalings = np.ones(n_funs)</span>
-<span class="c1">#     else:</span>
-<span class="c1">#         assert all_y_scalings.shape == (n_funs,)</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">n_subplot_grid_x</span> <span class="o">*</span> <span class="n">pxl_per_plot_x</span><span class="o">/</span><span class="n">dpi</span><span class="p">,</span>
-            <span class="n">n_subplot_grid_y</span> <span class="o">*</span> <span class="n">pxl_per_plot_y</span><span class="o">/</span><span class="n">dpi</span><span class="p">,</span>
+            <span class="n">n_subplot_grid_x</span> <span class="o">*</span> <span class="n">pxl_per_plot_x</span> <span class="o">/</span> <span class="n">dpi</span><span class="p">,</span>
+            <span class="n">n_subplot_grid_y</span> <span class="o">*</span> <span class="n">pxl_per_plot_y</span> <span class="o">/</span> <span class="n">dpi</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
@@ -1224,9 +1219,6 @@ document.write(`
     <span class="n">n_colors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_list</span><span class="p">)</span>
     <span class="n">n_linestyle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">linestyle_list</span><span class="p">)</span>
     <span class="n">n_pointstyle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pointstyle_list</span><span class="p">)</span>
-
-    <span class="c1"># if clip_vals and (plot_ylim is None):</span>
-    <span class="c1">#     raise ValueError(&#39;Need a range to clip values&#39;)</span>
 
     <span class="n">leg_patch</span> <span class="o">=</span> <span class="p">[[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_y</span><span class="p">)]</span> <span class="k">for</span> <span class="n">__</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="p">)]</span>
     
@@ -1340,6 +1332,55 @@ document.write(`
         <span class="c1"># print(linestyle)</span>
         <span class="c1"># print(pointstyle)</span>
         
+        <span class="n">npts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">plot_x_val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">npts</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">plot_y_val</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pol_growth_order&quot;</span><span class="p">,</span> <span class="s2">&quot;pol_cvgence_order&quot;</span><span class="p">]:</span>
+
+            <span class="n">transformed_plot_y_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">plot_y_val</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">i_size</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">npts</span><span class="p">):</span>
+                
+                <span class="n">ratio_y</span> <span class="o">=</span> <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">/</span> <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">ratio_x</span> <span class="o">=</span> <span class="n">plot_x_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">/</span> <span class="n">plot_x_val</span><span class="p">[</span><span class="n">i_size</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">transformed_plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ratio_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ratio_x</span><span class="p">)</span>
+
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">transformed_plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    
+            <span class="n">transformed_plot_y_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                            
+            <span class="n">plot_y_val</span> <span class="o">=</span> <span class="n">transformed_plot_y_val</span>
+
+            <span class="k">if</span> <span class="n">transform</span> <span class="o">==</span> <span class="s2">&quot;pol_cvgence_order&quot;</span><span class="p">:</span>
+                <span class="n">plot_y_val</span> <span class="o">=</span> <span class="o">-</span> <span class="n">transformed_plot_y_val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plot_y_val</span> <span class="o">=</span> <span class="n">transformed_plot_y_val</span>
+            
+        <span class="k">if</span> <span class="n">clip_vals</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">i_size</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+        
+                <span class="k">if</span> <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">plot_ylim</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+
+                    <span class="k">if</span> <span class="n">stop_after_first_clip</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">j_size</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i_size</span><span class="p">,</span><span class="n">npts</span><span class="p">):</span>
+                            <span class="n">plot_y_val</span><span class="p">[</span><span class="n">j_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        
+                <span class="k">elif</span> <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">plot_ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+
+                    <span class="k">if</span> <span class="n">stop_after_first_clip</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">j_size</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i_size</span><span class="p">,</span><span class="n">npts</span><span class="p">):</span>
+                            <span class="n">plot_y_val</span><span class="p">[</span><span class="n">j_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">plot_y_val</span><span class="p">[</span><span class="n">i_size</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_x_val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span>
         
@@ -1353,95 +1394,6 @@ document.write(`
                 <span class="n">marker</span> <span class="o">=</span> <span class="n">pointstyle</span>     <span class="p">,</span>
             <span class="p">)</span>
         
-        
-        
-        
-        
-        
-        
-        
-<span class="c1"># </span>
-<span class="c1">#         for i_repeat in range(n_repeat):</span>
-<span class="c1"># </span>
-<span class="c1">#             plot_y_val = all_vals[:, i_fun, i_repeat] / relative_to_array # Broadcast</span>
-<span class="c1">#             plot_y_val /= all_y_scalings[i_fun]</span>
-<span class="c1">#             </span>
-<span class="c1">#             if all_xvalues is None:</span>
-<span class="c1">#                 if &#39;n&#39; in all_args:</span>
-<span class="c1">#                     plot_x_val = all_sizes * all_x_scalings[i_fun]</span>
-<span class="c1">#                 else:</span>
-<span class="c1">#                     raise ValueError # ????</span>
-<span class="c1">#             else:   </span>
-<span class="c1">#                 plot_x_val = all_xvalues[:, i_fun, i_repeat] / all_x_scalings[i_fun]</span>
-<span class="c1">#             </span>
-            
-            <span class="c1"># TODO : Adapt this</span>
-<span class="c1">#             if transform in [&quot;pol_growth_order&quot;, &quot;pol_cvgence_order&quot;]:</span>
-<span class="c1">#                 </span>
-<span class="c1">#                 transformed_plot_y_val = np.zeros_like(plot_y_val)</span>
-<span class="c1">#                 </span>
-<span class="c1">#                 for i_size in range(1,n_sizes):</span>
-<span class="c1">#                     </span>
-<span class="c1">#                     ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]</span>
-<span class="c1">#                     ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]</span>
-<span class="c1">#                     </span>
-<span class="c1">#                     try:</span>
-<span class="c1">#                         transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)</span>
-<span class="c1"># </span>
-<span class="c1">#                     except:</span>
-<span class="c1">#                         transformed_plot_y_val[i_size] = np.nan</span>
-<span class="c1">#                         </span>
-<span class="c1">#                 transformed_plot_y_val[0] = np.nan</span>
-<span class="c1">#                                 </span>
-<span class="c1">#                 plot_y_val = transformed_plot_y_val</span>
-<span class="c1"># </span>
-<span class="c1">#                 if transform == &quot;pol_cvgence_order&quot;:</span>
-<span class="c1">#                     plot_y_val = - transformed_plot_y_val</span>
-<span class="c1">#                 else:</span>
-<span class="c1">#                     plot_y_val = transformed_plot_y_val</span>
-                
-                
-            <span class="c1"># TODO : Adapt this</span>
-<span class="c1">#             if clip_vals:</span>
-<span class="c1"># </span>
-<span class="c1">#                 for i_size in range(n_sizes):</span>
-<span class="c1">#             </span>
-<span class="c1">#                     if plot_y_val[i_size] &lt; plot_ylim[0]:</span>
-<span class="c1"># </span>
-<span class="c1">#                         if stop_after_first_clip:</span>
-<span class="c1">#                             for j_size in range(i_size,n_sizes):</span>
-<span class="c1">#                                 plot_y_val[j_size] = np.nan</span>
-<span class="c1">#                             break</span>
-<span class="c1">#                         else:</span>
-<span class="c1">#                             plot_y_val[i_size] = np.nan</span>
-<span class="c1">#                             </span>
-<span class="c1">#                     elif plot_y_val[i_size] &gt; plot_ylim[1]:</span>
-<span class="c1"># </span>
-<span class="c1">#                         if stop_after_first_clip:</span>
-<span class="c1">#                             for j_size in range(i_size,n_sizes):</span>
-<span class="c1">#                                 plot_y_val[j_size] = np.nan</span>
-<span class="c1">#                             break</span>
-<span class="c1">#                         else:</span>
-<span class="c1">#                             plot_y_val[i_size] = np.nan</span>
-                    
-<span class="c1">#             # TODO : Is this still needed ?</span>
-<span class="c1">#             mask = isnotfinite(plot_y_val)</span>
-<span class="c1">#             masked_plot_y_val = np.ma.array(plot_y_val, mask = mask)</span>
-<span class="c1"># </span>
-<span class="c1">#             if not(np.ma.max(masked_plot_y_val) &gt; 0):</span>
-<span class="c1">#                 </span>
-<span class="c1">#             alpha_ = max( alpha / (n_repeat**0.8), 1./255)</span>
-<span class="c1"># </span>
-<span class="c1">#             ax.plot(</span>
-<span class="c1">#                 plot_x_val              ,</span>
-<span class="c1">#                 plot_y_val              ,</span>
-<span class="c1">#                 color = color           ,</span>
-<span class="c1">#                 linestyle = linestyle   ,</span>
-<span class="c1">#                 marker = pointstyle     ,</span>
-<span class="c1">#                 alpha = alpha_          ,</span>
-<span class="c1">#             )</span>
-
-
     <span class="k">for</span> <span class="n">i_subplot_grid_x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i_subplot_grid_y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_y</span><span class="p">):</span>
 

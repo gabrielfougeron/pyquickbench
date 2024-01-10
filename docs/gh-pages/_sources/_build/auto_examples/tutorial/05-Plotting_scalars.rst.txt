@@ -25,7 +25,7 @@ Plotting scalar values
 
 :mod:`pyquickbench` is not only designed to measure the execution time of your Python routines, but also their output. Suppose you want to understand the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy.integrate`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-19
+.. GENERATED FROM PYTHON SOURCE LINES 8-17
 
 .. code-block:: Python
 
@@ -35,8 +35,6 @@ Plotting scalar values
         "RK23"  ,  
         "DOP853",  
         "Radau" ,  
-        "BDF"   ,  
-        "LSODA" ,  
     ]
 
 
@@ -47,11 +45,11 @@ Plotting scalar values
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 59-60
 
 Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the return value of the error function is as simple as passing ``mode = "scalar_output"``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-134
+.. GENERATED FROM PYTHON SOURCE LINES 60-132
 
 .. code-block:: Python
 
@@ -139,11 +137,11 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-136
+.. GENERATED FROM PYTHON SOURCE LINES 133-134
 
 As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, the different integrations methods can be timed using :mod:`pyquickbench` with the following code, where we explicitely pass the default ``mode = "timings"``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-149
+.. GENERATED FROM PYTHON SOURCE LINES 134-147
 
 .. code-block:: Python
 
@@ -172,11 +170,11 @@ As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 148-149
 
 The best method for a given use case is a compromise between speed and accuracy. These two can be plotted against each other with the following code. Note that the benchmarks are not re-run thanks to the caching mechanism explained in :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-183
+.. GENERATED FROM PYTHON SOURCE LINES 149-181
 
 .. code-block:: Python
 
@@ -223,11 +221,6 @@ The best method for a given use case is a compromise between speed and accuracy.
 
 
 
-
-
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.791 seconds)
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_05-Plotting_scalars.py:

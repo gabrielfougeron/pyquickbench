@@ -34,7 +34,6 @@ extensions = [
     "sphinx.ext.mathjax"            ,
     "sphinx.ext.napoleon"           ,
     "sphinx.ext.intersphinx"        ,
-    # "sphinx.ext.autosectionlabel"   ,
     "sphinx.ext.githubpages"        ,
     "sphinx_gallery.gen_gallery"    ,
     "sphinx_needs"                  ,
@@ -118,14 +117,14 @@ html_sidebars = {
 }
 
 html_context = {
-    "display_github": True, # Integrate GitHub
-    "github_user": "gabrielfougeron", # Username
-    "github_repo": "pyquickbench", # Repo name
-    "github_version": "main", # Version
-    "version": "main", # Version
-    "conf_py_path": "docs/source/", # Path in the checkout to the docs root
-    "doc_path": "docs/source/",
-    "default_mode": "light",
+    "display_github"    : True              , # Integrate GitHub
+    "github_user"       : "gabrielfougeron" , # Username
+    "github_repo"       : "pyquickbench"    , # Repo name
+    "github_version"    : "main"            , # Version
+    "version"           : "main"            , # Version
+    "conf_py_path"      : "docs/source/"    , # Path in the checkout to the docs root
+    "doc_path"          : "docs/source/"    ,
+    "default_mode"      : "light"           ,
 }
 
 html_static_path = ["_static"]
@@ -139,22 +138,23 @@ tr_report_template = "./test-report/test_report_template.txt"
 
 sphinx_gallery_conf = {
     # path to your examples scripts
-    "filename_pattern": "/",
-    "ignore_pattern": r"NOTREADY",
-    "examples_dirs": "../../examples/",
-    "gallery_dirs": "_build/auto_examples/",
-    "subsection_order": ExplicitOrder([
+    "filename_pattern"          : "/"                       ,
+    "ignore_pattern"            : r"NOTREADY"               ,
+    "examples_dirs"             : "../../examples/"         ,
+    "gallery_dirs"              : "_build/auto_examples/"   ,
+    "subsection_order"          : ExplicitOrder([
         "../../examples/tutorial"  ,
         "../../examples/benchmarks",
-    ]),
-    "within_subsection_order": FileNameSortKey,
-    "backreferences_dir": "_build/generated",
-    "image_scrapers": ("matplotlib",),
-    "default_thumb_file": html_logo_abs,
-    "plot_gallery": True,
-    "matplotlib_animations": True,
-    "nested_sections":True,
-    "reference_url": {"sphinx_gallery": None,},
+    ])                                                      ,
+    "within_subsection_order"   : FileNameSortKey           ,
+    "backreferences_dir"        : "_build/generated"        ,
+    "image_scrapers"            : ("matplotlib",)           ,
+    "default_thumb_file"        : html_logo_abs             ,
+    "plot_gallery"              : True                      ,
+    "matplotlib_animations"     : True                      ,
+    "nested_sections"           : True                      ,
+    "reference_url"             : {"sphinx_gallery": None,} ,
+    "min_reported_time"         : 10000                     ,
 }
 
 

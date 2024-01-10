@@ -11,8 +11,6 @@ method_names = [
     "RK23"  ,  
     "DOP853",  
     "Radau" ,  
-    "BDF"   ,  
-    "LSODA" ,  
 ]
 
 # sphinx_gallery_start_ignore

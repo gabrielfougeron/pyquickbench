@@ -115,11 +115,6 @@ Now, let's import pyquickbench, run and plot the benchmark
 From this benchmark, it is easy to see that initializing a list to a given length filled with a single value is quickest using the star operator.
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.382 seconds)
-
-
 .. _sphx_glr_download__build_auto_examples_tutorial_01-First_benchmark.py:
 
 .. only:: html
