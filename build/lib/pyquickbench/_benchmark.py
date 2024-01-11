@@ -1,7 +1,6 @@
 import os
 import timeit
 import math
-import functools
 import itertools
 import typing
 import inspect
@@ -14,12 +13,23 @@ import matplotlib as mpl
 import matplotlib.figure
 import tqdm
 import tqdm.notebook
-import concurrent.futures
 
 def isnotfinite(arr):
     res = np.isfinite(arr)
     np.bitwise_not(res, out=res)  # in-place
     return res
+
+# def _mem_shift(idx, shape):
+#     
+#     res = 0
+#     prod_shapes = 1
+#     
+#     # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681
+#     for i in range(len(shape)-1,-1,-1):
+#         res += idx[i]*prod_shapes
+#         prod_shapes *= shape[i]
+#         
+#     return res
 
 def _mem_shift_restricted(idx, shape, only):
     
@@ -217,69 +227,6 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
     
     return all_args, all_funs_list, args_shape, res_shape
 
-class FakeProgressBar(object):
-    def __init__(self, *args, **kwargs):
-        pass
-     
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, *args):
-        pass
-    
-    def update(self, *args):
-        pass
-               
-def _measure_output(setup, args, all_funs_list, n_repeat, StopOnExcept):
-
-    setup_vars_dict = _return_setup_vars_dict(setup, args)
-    
-    all_out_vals = np.full((len(all_funs_list), n_repeat), np.nan)
-
-    for i_fun, fun in enumerate(all_funs_list):
-        
-        for i_repeat in range(n_repeat):
-            
-            try:
-                all_out_vals[i_fun, i_repeat] = fun(**setup_vars_dict)
-            except Exception as exc:
-                all_out_vals[i_fun, i_repeat] = np.nan
-                if StopOnExcept:
-                    raise exc
-
-    return all_out_vals
-
-class FakeFuture(object):
-
-    def __init__(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self, key, val)
-            
-    def add_done_callback(self, callback):
-        callback(0)
-        
-    def result(self):
-        return self.res
-        
-class PhonyProcessPoolExecutor(object):
-    def __init__(self, *args, **kwargs):
-        pass
-     
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, *args):
-        pass
-    
-    def submit(self, fn, /, *args):
-        return FakeFuture(res = fn(*args))
-    
-AllPoolExecutors = {
-    "phony"         :   PhonyProcessPoolExecutor                ,
-    "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
-    "process"       :   concurrent.futures.ProcessPoolExecutor  ,
-}
-
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
     all_funs        : dict | typing.Iterable                                ,
@@ -287,8 +234,6 @@ def run_benchmark(
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                     = (lambda n: {'n': n})                  ,
     n_repeat        : int           = 1                                     ,
-    nproc           : int           = 1                                     ,
-    pooltype        : str | None    = "phony"                               ,
     time_per_test   : float         = 0.2                                   ,
     filename        : str | None    = None                                  ,
     ForceBenchmark  : bool          = False                                 ,
@@ -316,10 +261,6 @@ def run_benchmark(
         By default ``lambda n: {'n': n}``.
     n_repeat : int, optional
         Number of times to repeat the benchmark for variability studies.\n
-        By default ``1``.
-    nproc : int, optional
-        Number of parallel processes.\n
-        Only used in ``scalar_output`` mode.\n
         By default ``1``.
     time_per_test : float, optional
         Minimum time in seconds for benchmark in ``"timings"`` mode.\n
@@ -392,128 +333,115 @@ def run_benchmark(
             itertools.product(*[range(i) for i in args_shape.values()]) ,
             itertools.product(*list(all_args.values()))                 ,
         )
-        
-        total_iterations = math.prod(args_shape.values())
-        
+
         if ShowProgress:
             
             if (_in_ipynb()):
-                progress_bar = tqdm.notebook.tqdm
+                
+                benchmark_iterator = tqdm.notebook.tqdm(
+                    iterable = benchmark_iterator,
+                    total = math.prod(args_shape.values())
+                )
                 
             else:
-                progress_bar = tqdm.tqdm
-        else:
-            
-            progress_bar = FakeProgressBar
-        
-        if pooltype is None:
-            
-            if (nproc > 1):
-                pooltype = "process"
-            else:
-                pooltype = "phony"
-            
-        PoolExecutor = AllPoolExecutors[pooltype]
-        
-        with progress_bar(total = total_iterations) as progress:
-
-            if mode == "timings":
                 
-                if (nproc > 1):
-                    warnings.warn("Concurrent execution is disabled in timings mode")
+                benchmark_iterator = tqdm.tqdm(
+                    iterable = benchmark_iterator,
+                    total = math.prod(args_shape.values())
+                )
+    
+        if mode == "timings":
 
-                for i_args, args in benchmark_iterator:
+            for i_args, args in benchmark_iterator:
 
-                    setup_vars_dict = _return_setup_vars_dict(setup, args)    
+                setup_vars_dict = _return_setup_vars_dict(setup, args)    
 
-                    for i_fun, fun in enumerate(all_funs_list):
+                for i_fun, fun in enumerate(all_funs_list):
 
-                        global_dict = {
-                            'fun'               : fun               ,
-                            'setup_vars_dict'   : setup_vars_dict   ,
-                        }
+                    global_dict = {
+                        'fun'               : fun               ,
+                        'setup_vars_dict'   : setup_vars_dict   ,
+                    }
 
-                        code = f'fun(**setup_vars_dict)'
+                    code = f'fun(**setup_vars_dict)'
 
-                        Timer = timeit.Timer(
-                            code,
-                            globals = global_dict,
-                        )
+                    Timer = timeit.Timer(
+                        code,
+                        globals = global_dict,
+                    )
 
-                        try:
-                            # For functions that require caching
-                            Timer.timeit(number = 1)
+                    try:
+                        # For functions that require caching
+                        Timer.timeit(number = 1)
 
-                            # Estimate time of everything
-                            n_timeit_0dot2, est_time = Timer.autorange()
+                        # Estimate time of everything
+                        n_timeit_0dot2, est_time = Timer.autorange()
+                        
+                        if (n_repeat == 1) and (time_per_test == 0.2):
+                            # Fast track: benchmark is not repeated and autorange results are kept as is.
+
+                            all_idx = list(i_args)
+                            all_idx.append(i_fun)
+                            all_idx.append(0)
+                            all_idx_tuple = tuple(all_idx)
+                            all_vals[all_idx_tuple] = est_time / n_timeit_0dot2
                             
-                            if (n_repeat == 1) and (time_per_test == 0.2):
-                                # Fast track: benchmark is not repeated and autorange results are kept as is.
+                        else:
+                            # Full benchmark is run
 
-                                all_idx = list(i_args)
-                                all_idx.append(i_fun)
-                                all_idx.append(0)
-                                all_idx_tuple = tuple(all_idx)
-                                all_vals[all_idx_tuple] = est_time / n_timeit_0dot2
-                                
-                            else:
-                                # Full benchmark is run
+                            n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
 
-                                n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
-
-                                times = Timer.repeat(
-                                    repeat = n_repeat,
-                                    number = n_timeit,
-                                )
-                                all_idx = list(i_args)
-                                all_idx.append(i_fun)
-                                all_idx.append(slice(None))
-                                all_idx_tuple = tuple(all_idx)
-                                all_vals[all_idx_tuple] = np.array(times) / n_timeit
-
-                        except Exception as exc:
-                            if StopOnExcept:
-                                raise exc
-                            
+                            times = Timer.repeat(
+                                repeat = n_repeat,
+                                number = n_timeit,
+                            )
                             all_idx = list(i_args)
                             all_idx.append(i_fun)
                             all_idx.append(slice(None))
                             all_idx_tuple = tuple(all_idx)
-                            all_vals[all_idx_tuple] = np.nan
-                            
-                    progress.update(1)
-                            
-            elif mode == "scalar_output":    
+                            all_vals[all_idx_tuple] = np.array(times) / n_timeit
 
-                with PoolExecutor(max_workers = nproc) as executor:
-                    
-                    for i_args, args in benchmark_iterator:
-
-                        future = executor.submit(
-                            _measure_output,
-                            setup, args, all_funs_list, n_repeat, StopOnExcept
-                        )
+                    except Exception as exc:
+                        if StopOnExcept:
+                            raise exc
                         
-                        future.add_done_callback(lambda p: progress.update(1))
+                        all_idx = list(i_args)
+                        all_idx.append(i_fun)
+                        all_idx.append(slice(None))
+                        all_idx_tuple = tuple(all_idx)
+                        all_vals[all_idx_tuple] = np.nan
+                        
+        elif mode == "scalar_output":    
+            
+            for i_args, args in benchmark_iterator:
+                
+                setup_vars_dict = _return_setup_vars_dict(setup, args)
+
+                for i_fun, fun in enumerate(all_funs_list):
+                    
+                    
+                    for i_repeat in range(n_repeat):
                         
                         try:
-                            
-                            vals = future.result()
-                                
-                            all_idx = list(i_args)
-                            all_idx.append(slice(None))
-                            all_idx.append(slice(None))
-                            all_idx_tuple = tuple(all_idx)
-                            
-                            all_vals[all_idx_tuple] = vals
-                            
+
+                            out_val = fun(**setup_vars_dict)
+                        
                         except Exception as exc:
                             if StopOnExcept:
                                 raise exc
 
-            else:
-                
-                raise ValueError(f'Unknown mode {mode}')
+                            out_val = np.nan
+                            
+                        all_idx = list(i_args)
+                        all_idx.append(i_fun)
+                        all_idx.append(i_repeat)
+                        all_idx_tuple = tuple(all_idx)
+                        
+                        all_vals[all_idx_tuple] = out_val
+                        
+        else:
+            
+            raise ValueError(f'Unknown mode {mode}')
 
         # Sort values along "repeat" axis, taking care of nans.
         idx = np.argsort(all_vals, axis=-1)

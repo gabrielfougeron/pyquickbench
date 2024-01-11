@@ -23,10 +23,10 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-os.environ['NUMEXPR_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['OMP_NUM_THREADS'] = '1'
+# os.environ['OPENBLAS_NUM_THREADS'] = '1'
+# os.environ['NUMEXPR_NUM_THREADS'] = '1'
+# os.environ['MKL_NUM_THREADS'] = '1'
+# os.environ['OMP_NUM_THREADS'] = '1'
 
 import functools
 import matplotlib.pyplot as plt
@@ -61,6 +61,8 @@ def Three_loops_python(a, b, c):
             for k in range(a.shape[1]):
 
                 c[i,j] += a[i,k]*b[k,j]
+                
+    return 0.
 
 Three_loops_numba_serial = nb.jit(Three_loops_python,**numba_opt_dict)
 Three_loops_numba_serial.__name__ = "Three_loops_numba_serial"
@@ -102,7 +104,7 @@ def setup_abc(P, R, Q, real_dtype):
 # sphinx_gallery_start_ignore
 
 basename = 'matmul_timings'
-filename = os.path.join(timings_folder,basename+'.npz')
+filename = os.path.join(timings_folder,basename+'_new_________.npz')
 
 # sphinx_gallery_end_ignore
 
@@ -116,10 +118,10 @@ all_args = {
 all_funs = [
     # Three_loops_python                  ,
     Three_loops_numba_serial            ,
-    Three_loops_numba_auto_parallel     ,
+    # Three_loops_numba_auto_parallel     ,
     # Three_loops_numba_parallel          ,
-    Three_loops_numba_parallel_noreduce ,
-    numpy_matmul                        ,
+    # Three_loops_numba_parallel_noreduce ,
+    # numpy_matmul                        ,
 ]
 
 # %%
@@ -131,7 +133,12 @@ all_errors = pyquickbench.run_benchmark(
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
-    PreventBenchmark = True ,
+    mode = "scalar_output"          ,
+    # PreventBenchmark = True ,
+    nproc = 2   ,
+    # pooltype = "phony"   ,
+    pooltype = "thread"   ,
+    # pooltype = "process"   ,
 )
 
 plot_intent = {

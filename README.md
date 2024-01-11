@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/gabrielfougeron/pyquickbench"><img alt="pyquickbench" src="https://gabrielfougeron.github.io/pyquickbench/_static/plot_icon.png" width="20%"></a>
+  <a href="https://github.com/gabrielfougeron/pyquickbench"><img alt="pyquickbench" src="https://gabrielfougeron.github.io/pyquickbench/_static/plot_icon.png" width="30%"></a>
 </p>
 
 # Pyquickbench
@@ -12,13 +12,40 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 - **Bug reports:** https://github.com/gabrielfougeron/pyquickbench/issues
 - **Changelog:** https://github.com/gabrielfougeron/pyquickbench/releases/
 
-
 ## Installation
 
 To install pyquickbench, simply checkout the repository and type:
 
 ```
 pip install .
+```
+
+### Coming Soon
+
+Pyquickbench is available on the [Python Package Index](https://pypi.org/). To install using pip, simply type:
+
+```
+pip install pyquickbench
+```
+
+Pyquickbench is available on [conda-forge](https://conda-forge.org/). To install using conda, simply type:
+
+```
+conda install pyquickbench -c conda-forge
+```
+
+## Installation
+
+To run tests, chechout this reposity and install dependencies using pip:
+
+```
+pip install .[tests]
+```
+
+Then, run tests using [pytest](https://docs.pytest.org/en/latest/):
+
+```
+pytest
 ```
 
 ## License

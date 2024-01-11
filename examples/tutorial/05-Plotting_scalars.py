@@ -70,7 +70,8 @@ def scipy_ODE_cpte_error_on_test(
     
     w = 10
 
-    ex_sol = lambda t : np.array( [ np.cos(w*t) , np.sin(w*t),-np.sin(w*t), np.cos(w*t) ]  )
+    def ex_sol(t) : 
+        return np.array( [ np.cos(w*t) , np.sin(w*t),-np.sin(w*t), np.cos(w*t) ]  )
 
     def fgun(t, xy):
         
@@ -105,7 +106,7 @@ def scipy_ODE_cpte_error_on_test(
 
     return error
 
-all_nint = np.array([2**i for i in range(12)])
+all_nint = np.array([2**i for i in range(16)])
 
 bench = {
     method: functools.partial(
@@ -119,15 +120,20 @@ plot_ylim = [1e-17, 1e1]
 bench_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
 
 pyquickbench.run_benchmark(
-    all_nint                        ,
-    bench                           ,
-    mode = "scalar_output"          ,
-    filename = bench_filename       ,
+    all_nint                                    ,
+    bench                                       ,
+    mode = "scalar_output"                      ,
+    # filename = bench_filename                   ,
     plot_ylim = plot_ylim                       ,
     title = f'Relative error on integrand'      ,
-    ylabel = "Relative error"   ,
+    ylabel = "Relative error"                   ,
     show = True                                 ,
+    StopOnExcept = True,
+        nproc=1             ,
+        ShowProgress=True   ,
 )
+
+# exit()
 
 # %%
 # As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, the different integrations methods can be timed using :mod:`pyquickbench` with the following code, where we explicitely pass the default ``mode = "timings"``.

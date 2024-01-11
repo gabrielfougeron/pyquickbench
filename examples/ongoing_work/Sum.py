@@ -127,15 +127,15 @@ error_filename = os.path.join(timings_folder,basename+'.npz')
 all_args = {
     "alpha": np.array([float(alpha) for alpha in range(500)]),
     # "n" : np.array([2**n for n in range(2,20)]),
-    "n" : np.array([2**n for n in range(2,6)]),
+    "n" : np.array([2**n for n in range(2,20)]),
 }
 
 all_funs = [
-    naive_sum   ,
+    # naive_sum   ,
     nb_naive_sum,
-    builtin_sum ,
-    np_sum      ,
-    m_fsum      ,
+    # builtin_sum ,
+    # np_sum      ,
+    # m_fsum      ,
 ]
 
 # %%
@@ -147,9 +147,14 @@ all_errors = pyquickbench.run_benchmark(
     all_error_funs                  ,
     setup = setup                   ,
     mode = "scalar_output"          ,
-    filename = error_filename       ,
+    # filename = error_filename       ,
 #     show = True                             ,
-#     StopOnExcept = True,
+    StopOnExcept = True,
+    ShowProgress = True,
+    nproc = 8   ,
+    pooltype = "phony"   ,
+    # pooltype = "thread"   ,
+    # pooltype = "process"   ,
 )
 
 plot_intent = {

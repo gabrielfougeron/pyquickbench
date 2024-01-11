@@ -4,9 +4,9 @@ sphinx-gallery
 sphinx-pyproject
 sphinx-needs
 sphinx-test-reports
-sphinxcontrib.plantuml
-seed_intersphinx_mapping
-myst_parser
+sphinxcontrib-plantuml
+seed-intersphinx-mapping
+myst-parser
 sphinxext-rediraffe
 scipy
 numba

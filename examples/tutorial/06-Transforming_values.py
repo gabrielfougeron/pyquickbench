@@ -201,13 +201,14 @@ pyquickbench.plot_benchmark(
     clip_vals = True                        ,
 )
 
+
+xlim = ax[0,0].get_xlim()
 for name in bench:
         
     th_order = th_cvg_rate[name]
-    xlim = ax[0,0].get_xlim()
-
     ax[0,0].plot(xlim, [th_order, th_order], linestyle='dotted')
 
+ax[0,0].set_xlim(xlim)
 plt.tight_layout()
 plt.show()
 
@@ -222,7 +223,7 @@ pyquickbench.run_benchmark(
     bench                                       ,
     filename = timings_filename                 ,
     logx_plot = True                            ,
-    title = f'Computational cost growth order'  ,
+    title = "Computational cost growth order"   ,
     transform = "pol_growth_order"              ,
     show = True                                 ,
 )
