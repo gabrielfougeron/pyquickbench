@@ -6,6 +6,7 @@ import itertools
 import typing
 import inspect
 import warnings
+import concurrent.futures
 
 import numpy as np
 import numpy.typing
@@ -14,7 +15,6 @@ import matplotlib as mpl
 import matplotlib.figure
 import tqdm
 import tqdm.notebook
-import concurrent.futures
 
 def isnotfinite(arr):
     res = np.isfinite(arr)
@@ -127,7 +127,6 @@ def _check_sig_no_pos_only(fun):
         for param in sig.parameters.values():
             if param.kind == param.POSITIONAL_ONLY:
                 raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
-
         
 def _return_setup_vars_dict(setup, args):
 
@@ -246,7 +245,7 @@ def _measure_output(setup, args, all_funs_list, n_repeat, StopOnExcept):
                 all_out_vals[i_fun, i_repeat] = np.nan
                 if StopOnExcept:
                     raise exc
-
+    
     return all_out_vals
 
 class FakeFuture(object):
@@ -280,12 +279,15 @@ AllPoolExecutors = {
     "process"       :   concurrent.futures.ProcessPoolExecutor  ,
 }
 
+def default_setup(n):
+    return {'n': n}
+
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
     all_funs        : dict | typing.Iterable                                ,
     mode            : str           = "timings"                             ,
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
-                                    = (lambda n: {'n': n})                  ,
+                                    = default_setup                         ,
     n_repeat        : int           = 1                                     ,
     nproc           : int           = 1                                     ,
     pooltype        : str | None    = "phony"                               ,
@@ -483,18 +485,23 @@ def run_benchmark(
                             
                     progress.update(1)
                             
-            elif mode == "scalar_output":    
-
-                with PoolExecutor(max_workers = nproc) as executor:
+            elif mode == "scalar_output": 
+             
+                with PoolExecutor(nproc) as executor:
                     
+                    futures = []
                     for i_args, args in benchmark_iterator:
 
                         future = executor.submit(
                             _measure_output,
                             setup, args, all_funs_list, n_repeat, StopOnExcept
                         )
-                        
+                                       
                         future.add_done_callback(lambda p: progress.update(1))
+
+                        futures.append(futures)
+
+                    for future in futures:
                         
                         try:
                             
@@ -510,7 +517,7 @@ def run_benchmark(
                         except Exception as exc:
                             if StopOnExcept:
                                 raise exc
-
+                            
             else:
                 
                 raise ValueError(f'Unknown mode {mode}')

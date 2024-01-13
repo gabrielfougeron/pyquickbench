@@ -135,31 +135,32 @@ all_errors = pyquickbench.run_benchmark(
     ShowProgress = True     ,
     mode = "scalar_output"          ,
     # PreventBenchmark = True ,
-    nproc = 2   ,
+    ForceBenchmark= True    ,
+    nproc = 8   ,
     # pooltype = "phony"   ,
-    pooltype = "thread"   ,
-    # pooltype = "process"   ,
+    # pooltype = "thread"   ,
+    pooltype = "process"   ,
 )
 
-plot_intent = {
-    "P" : 'single_value'                  ,
-    "Q" : 'points'            ,
-    "R" : 'single_value'            ,
-    "real_dtype": 'curve_linestyle'  ,
-}
-
-single_values_idx = {
-    "P" : -1        ,
-    "Q" : -1        ,
-    "R" : -1        ,
-    "real_dtype": 0 ,
-}
-
-pyquickbench.plot_benchmark(
-    all_errors                              ,
-    all_args                                ,
-    all_funs                                ,
-    plot_intent = plot_intent               ,
-    single_values_idx = single_values_idx   ,
-    show = True                             ,
-)
+# plot_intent = {
+#     "P" : 'single_value'                  ,
+#     "Q" : 'points'            ,
+#     "R" : 'single_value'            ,
+#     "real_dtype": 'curve_linestyle'  ,
+# }
+# 
+# single_values_idx = {
+#     "P" : -1        ,
+#     "Q" : -1        ,
+#     "R" : -1        ,
+#     "real_dtype": 0 ,
+# }
+# 
+# pyquickbench.plot_benchmark(
+#     all_errors                              ,
+#     all_args                                ,
+#     all_funs                                ,
+#     plot_intent = plot_intent               ,
+#     single_values_idx = single_values_idx   ,
+#     show = True                             ,
+# )
