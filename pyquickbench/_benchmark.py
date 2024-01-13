@@ -499,7 +499,7 @@ def run_benchmark(
                                        
                         future.add_done_callback(lambda p: progress.update(1))
 
-                        futures.append(futures)
+                        futures.append(future)
 
                     for future in futures:
                         
