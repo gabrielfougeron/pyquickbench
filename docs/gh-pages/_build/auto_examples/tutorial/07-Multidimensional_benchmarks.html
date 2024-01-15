@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Preparing inputs &#8212; pyquickbench  documentation</title>
+    <title>Multidimensional_benchmarks &#8212; pyquickbench  documentation</title>
   
   
   
@@ -57,13 +57,13 @@
     <script src="../../../_static/sphinx-needs/libs/html/datatables.min.js?v=8a4aee21"></script>
     <script src="../../../_static/sphinx-needs/libs/html/datatables_loader.js?v=a2cae175"></script>
     <script src="../../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=f783d6a5"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_build/auto_examples/tutorial/03-Preparing_inputs';</script>
-    <link rel="canonical" href="https://github.com/gabrielfougeron/pyquickbench/_build/auto_examples/tutorial/03-Preparing_inputs.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = '_build/auto_examples/tutorial/07-Multidimensional_benchmarks';</script>
+    <link rel="canonical" href="https://github.com/gabrielfougeron/pyquickbench/_build/auto_examples/tutorial/07-Multidimensional_benchmarks.html" />
     <link rel="icon" href="../../../_static/plot_icon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Handling errors" href="04-Error_handling.html" />
-    <link rel="prev" title="Caching benchmarks" href="02-Caching_benchmarks.html" />
+    <link rel="next" title="Plot intents and reductions" href="08-Reductions.html" />
+    <link rel="prev" title="Transforming values" href="06-Transforming_values.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -340,11 +340,11 @@ document.write(`
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tutorial</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="01-First_benchmark.html">A first benchmark</a></li>
 <li class="toctree-l2"><a class="reference internal" href="02-Caching_benchmarks.html">Caching benchmarks</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Preparing inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03-Preparing_inputs.html">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Transforming values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="07-Multidimensional_benchmarks.html">Multidimensional_benchmarks</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multidimensional_benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08-Reductions.html">Plot intents and reductions</a></li>
 </ul>
 </li>
@@ -396,7 +396,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tutorial</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Preparing inputs</li>
+    <li class="breadcrumb-item active" aria-current="page">Multidimensi...</li>
   </ul>
 </nav>
 </div>
@@ -415,12 +415,16 @@ document.write(`
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#sphx-glr-download-build-auto-examples-tutorial-03-preparing-inputs-py"><span class="std std-ref">Go to the end</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-build-auto-examples-tutorial-07-multidimensional-benchmarks-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="preparing-inputs">
-<span id="sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"></span><h1>Preparing inputs<a class="headerlink" href="#preparing-inputs" title="Link to this heading">#</a></h1>
-<p>By default, the functions to be benchmarked with <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> are expected to take as arguments a single integer <code class="docutils literal notranslate"><span class="pre">n</span></code> as in the following code.</p>
+<section class="sphx-glr-example-title" id="multidimensional-benchmarks">
+<span id="sphx-glr-build-auto-examples-tutorial-07-multidimensional-benchmarks-py"></span><h1>Multidimensional_benchmarks<a class="headerlink" href="#multidimensional-benchmarks" title="Link to this heading">#</a></h1>
+<p>Let’s run and plot a first simple benchmark in Python.</p>
+<p>Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.</p>
+<p>Let’s define a separate python function for three different list pre-allocation strategies.
+These functions all take an integer called “n” as an input, which stands for the length of the list to be pre-allocated.
+The argument name “n” is the default in pyquickbench and can be changed in as described in <a class="reference internal" href="03-Preparing_inputs.html#sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"><span class="std std-ref">Preparing inputs</span></a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comprehension</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
@@ -437,92 +441,78 @@ to download the full example code</p>
     <span class="n">star_operator</span>   <span class="p">,</span>
     <span class="n">for_loop_append</span> <span class="p">,</span>
 <span class="p">]</span>
+</pre></div>
+</div>
+<p>Let’s define relevant sizes of lists to be timed.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a> <span class="o">=</span> <span class="mi">12</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Now, let’s import pyquickbench, run and plot the benchmark</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyquickbench</span>
 
-<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a> <span class="o">=</span> <span class="mi">12</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a><span class="p">)]</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <span class="mi">1000</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <span class="mf">0.2</span>
 
 <span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>   <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>    <span class="p">,</span>
-    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a>             <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a>   <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
+    <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a>     <span class="p">,</span>
+    <span class="n">pooltype</span> <span class="o">=</span> <span class="s1">&#39;process&#39;</span>            <span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_03-Preparing_inputs_001.png" srcset="../../../_images/sphx_glr_03-Preparing_inputs_001.png" alt="03 Preparing inputs" class = "sphx-glr-single-img"/><p>Most often however, the functions to be benchmarked take data as input that is more complex than a simple integer and a setup phase is needed. In the following example, we want to compare different implementations of array summation algorithms.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>By default : minimum as in <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.repeat()</span></code></a></p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a>             <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a>   <span class="p">,</span>
+    <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a>     <span class="p">,</span>
+<span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">builtin_sum</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
+    <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
+    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;same&quot;</span>   <span class="p">,</span>
+<span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">np_sum</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                      <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>     <span class="p">,</span>
+<span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">m_fsum</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <a href="https://docs.python.org/3/library/math.html#math.fsum" title="math.fsum" class="sphx-glr-backref-module-math sphx-glr-backref-type-py-function"><span class="n">math</span><span class="o">.</span><span class="n">fsum</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
+    <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
+    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;reduction_min&quot;</span>   <span class="p">,</span>
+<span class="p">}</span>
 
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">builtin_sum</span> <span class="p">,</span>
-    <span class="n">np_sum</span>      <span class="p">,</span>
-    <span class="n">m_fsum</span>      <span class="p">,</span>
-<span class="p">]</span>
-
-
-<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a> <span class="o">=</span> <span class="mi">12</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a><span class="p">)])</span>
-</pre></div>
-</div>
-<p>Here, we want the benchmark to measure the time taken by the different implementations as a function of the size of the input. The <code class="docutils literal notranslate"><span class="pre">setup</span></code> argument expects a callable that provides arguments for our different implementations to be timed. For instance, <code class="docutils literal notranslate"><span class="pre">setup</span></code> can return a dictionnnary <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>, so that each function to be benchmarked will be called as <code class="docutils literal notranslate"><span class="pre">fun(**kwargs)</span></code>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="n">x</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span> <span class="p">:</span> <span class="n">x</span><span class="p">}</span>
-
-<span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>       <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>        <span class="p">,</span>
-    <span class="n">setup</span> <span class="o">=</span> <span class="n">setup</span>   <span class="p">,</span>
-    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>     <span class="p">,</span>
+<span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                      <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>     <span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_03-Preparing_inputs_002.png" srcset="../../../_images/sphx_glr_03-Preparing_inputs_002.png" alt="03 Preparing inputs" class = "sphx-glr-single-img"/><p>This calling convention is why positional-only arguments are disallowed in <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a>. For instance, even though the following defines a legal Python function</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="o">/</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">n</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">pos_only_fun</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>42
-</pre></div>
-</div>
-<p>It is not allowed in <a class="reference internal" href="../../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyquickbench.run_benchmark()</span></code></a> since the following raises an error:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
-<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;TypeError: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TypeError: pos_only_fun() got some positional-only arguments passed as keyword arguments: &#39;n&#39;
-</pre></div>
-</div>
-<p>This comes with hardly any loss of generality since it is possible to wrap these positional-only arguments functions.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">wrap_fun</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">pos_only_fun</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">wrap_fun</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">wrap_fun</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>42
-42
-</pre></div>
-</div>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-03-preparing-inputs-py">
+<ul class="sphx-glr-horizontal">
+<li><img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-multi-img"/></li>
+</ul>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-07-multidimensional-benchmarks-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/0dc9ac5121cfb7a79da8cdd1143c030d/03-Preparing_inputs.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">03-Preparing_inputs.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/855b64b906a1aa48825a31e15973572e/07-Multidimensional_benchmarks.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">07-Multidimensional_benchmarks.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../../_downloads/3430d2b05d2d95feee728f0d9012814a/03-Preparing_inputs.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">03-Preparing_inputs.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../../_downloads/c1a312c6a6e28653ead14785edb79a38/07-Multidimensional_benchmarks.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">07-Multidimensional_benchmarks.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -545,7 +535,7 @@ to download the full example code</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/docs/source/_build/auto_examples/tutorial/03-Preparing_inputs.rst">
+    <a href="https://github.com/gabrielfougeron/pyquickbench/edit/main/docs/source/_build/auto_examples/tutorial/07-Multidimensional_benchmarks.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -560,7 +550,7 @@ to download the full example code</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../../_sources/_build/auto_examples/tutorial/03-Preparing_inputs.rst.txt">
+    <a href="../../../_sources/_build/auto_examples/tutorial/07-Multidimensional_benchmarks.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

@@ -249,7 +249,7 @@ This mechanism can easily be tricked as it only checks for array dimensions and 
 
 .. GENERATED FROM PYTHON SOURCE LINES 164-165
 
-Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the ``*.npy`` benchmark file. The following plot is inaccurate.
+Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the ``*.npy`` benchmark file. **The following plot is inaccurate**.
 
 .. GENERATED FROM PYTHON SOURCE LINES 165-173
 

@@ -310,7 +310,7 @@ def plot_benchmark(
         In case the functions ``__name__`` attribute is missing or uninformative.
     plot_intent : typing.Iterable[str] | None, optional
         Describes how to handle the axes of the benchmark results array ``all_vals``.\n
-        Possible values : ``"single_value"``, ``"points"``, ``"same"``, ``"curve_color"``, ``"curve_linestyle"``, ``"curve_pointstyle"``, ``"subplot_grid_x"``, ``"subplot_grid_y"`` or ``"reduction_avg"``.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n
         By default ``None``.
     mode : str, optional
         Benchmark mode, i.e. target of the benchmark.\n
@@ -426,7 +426,7 @@ def plot_benchmark(
         
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
         plot_intent['fun'] = 'curve_color'
-        plot_intent['repeat'] = 'reduction_avg'
+        plot_intent['repeat'] = 'reduction_min'
 
     else:
         
@@ -435,7 +435,7 @@ def plot_benchmark(
         if 'fun' not in plot_intent:
             plot_intent['fun'] = 'curve_color'
         if 'repeat' not in plot_intent:
-            plot_intent['repeat'] = 'reduction_avg'
+            plot_intent['repeat'] = 'reduction_min'
         
         assert len(plot_intent) == all_vals.ndim
         for name, intent in plot_intent.items():

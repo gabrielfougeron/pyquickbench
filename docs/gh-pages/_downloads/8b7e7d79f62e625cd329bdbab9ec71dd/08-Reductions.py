@@ -1,5 +1,5 @@
 """
-Multidimensional_benchmarks
+Plot intents and reductions
 ===========================
 """
 
@@ -36,7 +36,7 @@ if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Muldidim_bench'
+basename = f'Reductions'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
@@ -70,57 +70,18 @@ all_sizes = [2**n for n in range(n_bench)]
 
 import pyquickbench
 
-n_repeat = 1000
-time_per_test = 0.2
+# plot_intent = {
+#     "P" : 'single_value'                  ,
+#     "Q" : 'points'            ,
+#     "R" : 'single_value'            ,
+#     "real_dtype": 'curve_linestyle'  ,
+# }
 
 pyquickbench.run_benchmark(
     all_sizes                       ,
     all_funs                        ,
-    n_repeat = n_repeat             ,
-    time_per_test = time_per_test   ,
+    n_repeat = 100                  ,
     show = True                     ,
-    filename = timings_filename     ,
-    pooltype = 'process'            ,
-) 
-
-
-
-# %% 
-# By default : minimum as in :meth:`python:timeit.Timer.repeat`
-#
-
-all_values = pyquickbench.run_benchmark(
-    all_sizes                       ,
-    all_funs                        ,
-    n_repeat = n_repeat             ,
-    time_per_test = time_per_test   ,
+    # plot_intent = plot_intent       ,
     filename = timings_filename     ,
 ) 
-
-plot_intent = {
-    "n"         : "points"          ,
-    "fun"       : "curve_color"     ,
-    "repeat"    : "same"   ,
-}
-
-pyquickbench.plot_benchmark(
-    all_values                      ,
-    all_sizes                       ,
-    all_funs                        ,
-    show = True                     ,
-    plot_intent =   plot_intent     ,
-)
-
-plot_intent = {
-    "n"         : "points"          ,
-    "fun"       : "curve_color"     ,
-    "repeat"    : "reduction_min"   ,
-}
-
-pyquickbench.plot_benchmark(
-    all_values                      ,
-    all_sizes                       ,
-    all_funs                        ,
-    show = True                     ,
-    plot_intent =   plot_intent     ,
-)
