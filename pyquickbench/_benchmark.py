@@ -28,14 +28,16 @@ from pyquickbench._utils import (
     FakeProgressBar         ,
     _measure_output         ,
     _measure_timings        ,
+)
+
+from pyquickbench._defaults import (
     AllPoolExecutors        ,
     default_setup           ,
     default_color_list      ,
     default_linestyle_list  ,
     default_pointstyle_list ,
+    all_plot_intents        ,
 )
-    
-
 
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
@@ -251,20 +253,6 @@ def run_benchmark(
         )
 
     return all_vals
-
-all_plot_intents = [
-    'single_value'      ,
-    'points'            ,
-    'same'              ,
-    'curve_color'       ,
-    'curve_linestyle'   ,
-    'curve_pointstyle'  ,
-    'subplot_grid_x'    ,
-    'subplot_grid_y'    ,
-    'reduction_avg'     ,
-    'reduction_min'     ,
-    'reduction_max'     ,
-]
 
 def plot_benchmark(
     all_vals                : np.typing.ArrayLike   ,
