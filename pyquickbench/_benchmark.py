@@ -26,19 +26,19 @@ from pyquickbench._utils import (
     _save_benchmark_file    ,
     _build_args_shapes      ,
     FakeProgressBar         ,
+    AllPoolExecutors        ,
     _measure_output         ,
     _measure_timings        ,
     _values_reduction       ,
+    all_reductions          ,
+    all_plot_intents        ,
 )
 
 from pyquickbench._defaults import (
-    AllPoolExecutors        ,
     default_setup           ,
     default_color_list      ,
     default_linestyle_list  ,
     default_pointstyle_list ,
-    all_reductions          ,
-    all_plot_intents        ,
 )
 
 def run_benchmark(
@@ -382,6 +382,8 @@ def plot_benchmark(
     
     # print(f'{all_vals = }')
     
+    all_vals = np.ma.array(all_vals, mask=np.isnan(all_vals))
+    
     all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
 
     if not(isinstance(all_vals, np.ndarray)):
@@ -452,6 +454,8 @@ def plot_benchmark(
     idx_all_curve_pointstyle = []
     idx_all_subplot_grid_x = []
     idx_all_subplot_grid_y = []
+    
+    n_reductions = 0
     idx_all_reduction = {}
     for name in all_reductions: # Valitity of reduction key was checked before
         idx_all_reduction[name] = []
@@ -503,6 +507,7 @@ def plot_benchmark(
             idx_all_subplot_grid_y.append(i)
             name_subplot_grid_y.append(name)
         elif value.startswith("reduction_"):
+            n_reductions += 1
             name = value[10:]
             idx_all_reduction[name].append(i)
         else:
@@ -510,6 +515,9 @@ def plot_benchmark(
             
     if (n_points != 1):
         raise ValueError(f"There should be exactly one plot_intent named 'points'. There are currently {n_points}.")
+    
+    if (n_reductions > 1):
+        warnings.warn("Several reductions were requested. These reductions will be applied in the order of the axes of the benchmark. Watch out for surprizing results as the reductions do not commute in general")
     
     idx_all_curves = []
     idx_all_curves.extend(idx_all_same)
@@ -534,10 +542,10 @@ def plot_benchmark(
     n_linestyle = len(linestyle_list)
     n_pointstyle = len(pointstyle_list)
 
-    leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
-    
     n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
     n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
+
+    leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
 
     if clip_vals and (plot_ylim is None):
         raise ValueError('Need a range to clip values')
@@ -609,7 +617,7 @@ def plot_benchmark(
         
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         
-        idx_vals = [-1] * all_vals.ndim
+        idx_vals = [None] * all_vals.ndim
         for i, j in zip(idx_curve, idx_all_curves):
             idx_vals[j] = i
             
@@ -700,18 +708,17 @@ def plot_benchmark(
                     )
                 )
 
-        plot_y_val = _values_reduction(all_vals, idx_vals, idx_points)
+        plot_y_val = _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction)
 
         if all_xvalues is None:
             plot_x_val = all_args[name_points]
         else:  
-            plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points) 
+            plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points, idx_all_reduction) 
+
 
         
         
-        
-        
-        
+        # 
         # print()
         # print(plot_x_val)
         # print(plot_y_val)

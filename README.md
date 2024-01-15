@@ -12,6 +12,16 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 - **Bug reports:** https://github.com/gabrielfougeron/pyquickbench/issues
 - **Changelog:** https://github.com/gabrielfougeron/pyquickbench/releases/
 
+## Features
+
+- Timings / repeatability / output benchmarks
+- Error handling
+- Benchmark results caching
+- Multithreaded / multiprocessed benchmarks
+- Multidimensional benchmarks 
+- Intelligent plots
+- Sensible defaults
+
 ## Installation
 
 To install pyquickbench, simply checkout the repository and type:

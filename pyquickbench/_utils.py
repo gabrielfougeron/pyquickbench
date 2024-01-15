@@ -2,6 +2,7 @@ import os
 import timeit
 import math
 import inspect
+import concurrent.futures
 
 import numpy as np
 
@@ -255,15 +256,49 @@ class PhonyProcessPoolExecutor(object):
     def submit(self, fn, /, *args):
         return FakeFuture(fn=fn, args=args)
 
-# 
-# idx_all_reduction_avg       = np.array(idx_all_reduction_avg    )
-# idx_all_reduction_min       = np.array(idx_all_reduction_min    )
-# idx_all_reduction_max       = np.array(idx_all_reduction_max    )
+AllPoolExecutors = {
+    "phony"         :   PhonyProcessPoolExecutor                ,
+    "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
+    "process"       :   concurrent.futures.ProcessPoolExecutor  ,
+}
+
+all_reductions = {
+    "avg" : np.mean ,
+    "min" : np.min  , 
+    "max" : np.max  ,
+}
+
+all_plot_intents = [
+    'single_value'      ,
+    'points'            ,
+    'same'              ,
+    'curve_color'       ,
+    'curve_linestyle'   ,
+    'curve_pointstyle'  ,
+    'subplot_grid_x'    ,
+    'subplot_grid_y'    ,
+]
+
+all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
 
     idx_vals[idx_points] = slice(None)
-    idx_vals_tuple = tuple(idx_vals)
-    reducted_val = all_vals[idx_vals_tuple]
+
+    idx_to_reduction = {}
     
-    return reducted_val
+    for key, idx in idx_all_reduction.items():
+        for i in idx:
+            idx_vals[i] = slice(None)
+            idx_to_reduction[i] = key
+    
+    idx_to_reduction = dict(sorted(idx_to_reduction.items()))
+
+    idx_vals_tuple = tuple(idx_vals)
+    reduced_val = all_vals[idx_vals_tuple]
+    
+    for red_idx_abs, red_name in idx_to_reduction.items():
+        
+        reduced_val = all_reductions[red_name](reduced_val, axis=0)
+    
+    return reduced_val

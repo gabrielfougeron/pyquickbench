@@ -1,8 +1,3 @@
-from pyquickbench._utils import (
-    PhonyProcessPoolExecutor    ,
-)
-
-import concurrent.futures
 import matplotlib as mpl
 
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
@@ -58,26 +53,6 @@ default_pointstyle_list = [
     "D"	, # m19 diamond
     "d"	, # m20 thin_diamond
 ]
-
-all_plot_intents = [
-    'single_value'      ,
-    'points'            ,
-    'same'              ,
-    'curve_color'       ,
-    'curve_linestyle'   ,
-    'curve_pointstyle'  ,
-    'subplot_grid_x'    ,
-    'subplot_grid_y'    ,
-    'reduction_avg'     ,
-    'reduction_min'     ,
-    'reduction_max'     ,
-]
-
-AllPoolExecutors = {
-    "phony"         :   PhonyProcessPoolExecutor                ,
-    "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
-    "process"       :   concurrent.futures.ProcessPoolExecutor  ,
-}
 
 def default_setup(n):
     return {'n': n}
