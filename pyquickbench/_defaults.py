@@ -30,7 +30,6 @@ default_linestyle_list = [
 default_pointstyle_list = [
     None,   
     "."	, # m00 point
-    ","	, # m01 pixel
     "o"	, # m02 circle
     "v"	, # m03 triangle_down
     "^"	, # m04 triangle_up

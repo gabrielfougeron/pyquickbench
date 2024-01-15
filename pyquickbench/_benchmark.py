@@ -32,6 +32,7 @@ from pyquickbench._utils import (
     _values_reduction       ,
     all_reductions          ,
     all_plot_intents        ,
+    _build_product_legend   ,
 )
 
 from pyquickbench._defaults import (
@@ -425,7 +426,7 @@ def plot_benchmark(
         
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
         plot_intent['fun'] = 'curve_color'
-        plot_intent['repeat'] = 'same'
+        plot_intent['repeat'] = 'reduction_avg'
 
     else:
         
@@ -434,7 +435,7 @@ def plot_benchmark(
         if 'fun' not in plot_intent:
             plot_intent['fun'] = 'curve_color'
         if 'repeat' not in plot_intent:
-            plot_intent['repeat'] = 'same'
+            plot_intent['repeat'] = 'reduction_avg'
         
         assert len(plot_intent) == all_vals.ndim
         for name, intent in plot_intent.items():
@@ -645,57 +646,9 @@ def plot_benchmark(
                 KeyValLegend = (ncats > 1)
             
                 label = ''
-                for i, idx in enumerate(idx_curve_color):
-
-                    cat_name = name_curve_color[i]
-                    curve_vals = all_args.get(cat_name)
-                    if curve_vals is None:
-                        if cat_name == 'fun':
-                            val_name = all_fun_names_list[idx]
-                        else:
-                            raise ValueError("Could not figure out name")
-                    else:
-                        val_name = str(curve_vals[idx])
-                    
-                    if KeyValLegend:
-                        label += f'{cat_name} : {val_name}, '
-                    else:
-                        label += f'{val_name}, '
-
-                for i, idx in enumerate(idx_curve_linestyle):
-                    
-                    cat_name = name_curve_linestyle[i]
-                    curve_vals = all_args.get(cat_name)
-                    if curve_vals is None:
-                        if cat_name == 'fun':
-                            val_name = all_fun_names_list[idx]
-                        else:
-                            raise ValueError("Could not figure out name")
-                    else:
-                        val_name = str(curve_vals[idx])
-                    
-                    if KeyValLegend:
-                        label += f'{cat_name}: {val_name}, '
-                    else:
-                        label += f'{val_name}, '        
-                    
-                for i, idx in enumerate(idx_curve_pointstyle):
-                    
-                    cat_name = name_curve_pointstyle[i]
-                    curve_vals = all_args.get(cat_name)
-                    if curve_vals is None:
-                        if cat_name == 'fun':
-                            val_name = all_fun_names_list[idx]
-                        else:
-                            raise ValueError("Could not figure out name")
-                    else:
-                        val_name = str(curve_vals[idx])
-                    
-                    if KeyValLegend:
-                        label += f'{cat_name} : {val_name}, '
-                    else:
-                        label += f'{val_name}, '   
-                
+                label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, KeyValLegend, label)
                 label = label[:-2] # Removing final comma
                 
                 leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(

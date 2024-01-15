@@ -281,11 +281,33 @@ all_plot_intents = [
 
 all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
+# def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
+# 
+#     idx_vals[idx_points] = slice(None)
+# 
+#     idx_to_reduction = {}
+#     
+#     for key, idx in idx_all_reduction.items():
+#         for i in idx:
+#             idx_vals[i] = slice(None)
+#             idx_to_reduction[i] = key
+#     
+#     idx_to_reduction = dict(sorted(idx_to_reduction.items()))
+# 
+#     idx_vals_tuple = tuple(idx_vals)
+#     reduced_val = all_vals[idx_vals_tuple]
+#     
+#     for red_idx_abs, red_name in idx_to_reduction.items():
+#         
+#         reduced_val = all_reductions[red_name](reduced_val, axis=0)
+#     
+#     return reduced_val
+
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
 
     idx_vals[idx_points] = slice(None)
 
-    idx_to_reduction = {}
+    idx_to_reduction = {idx_points:"points"}
     
     for key, idx in idx_all_reduction.items():
         for i in idx:
@@ -297,8 +319,39 @@ def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
     idx_vals_tuple = tuple(idx_vals)
     reduced_val = all_vals[idx_vals_tuple]
     
-    for red_idx_abs, red_name in idx_to_reduction.items():
+    n_reductions = len(idx_to_reduction)-1
+
+    for i_reduction in range(n_reductions):
+
+        for red_idx_rel, (red_idx_abs, red_name) in enumerate(idx_to_reduction.items()):
+            if red_name != "points":
+                break
+        else:
+            raise ValueError("This error should never be raised")
         
-        reduced_val = all_reductions[red_name](reduced_val, axis=0)
+        reduced_val = all_reductions[red_name](reduced_val, axis=red_idx_rel)
     
     return reduced_val
+
+def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, KeyValLegend, label):
+
+    for i, idx in enumerate(idx_curve):
+
+        cat_name = name_curve[i]
+        curve_vals = all_args.get(cat_name)
+        if curve_vals is None:
+            if cat_name == 'fun':
+                val_name = all_fun_names_list[idx]
+            elif cat_name == 'repeat':
+                val_name = str(idx+1)
+            else:
+                raise ValueError("Could not figure out name")
+        else:
+            val_name = str(curve_vals[idx])
+        
+        if KeyValLegend:
+            label += f'{cat_name} : {val_name}, '
+        else:
+            label += f'{val_name}, '
+            
+    return label
