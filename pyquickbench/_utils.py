@@ -167,10 +167,6 @@ def _load_benchmark_file(filename, all_args_in, shape):
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
 
-    # print()
-    # print(filename)
-    # print(f'{BenchmarkUpToDate = }')
-
     return all_vals, BenchmarkUpToDate
 
 def _save_benchmark_file(filename, all_vals, all_args):

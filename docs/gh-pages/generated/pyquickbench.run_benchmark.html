@@ -164,13 +164,6 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../_build/auto_examples/index.html">
                         Gallery
                       </a>
@@ -284,13 +277,6 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item">
                       <a class="nav-link nav-internal" href="../_build/auto_examples/index.html">
                         Gallery
@@ -414,7 +400,7 @@ document.write(`
 <h1>pyquickbench.run_benchmark<a class="headerlink" href="#pyquickbench-run-benchmark" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyquickbench.run_benchmark">
-<span class="sig-name descname"><span class="pre">run_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_funs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode='timings'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup=&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeat=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_per_test=0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ForceBenchmark=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PreventBenchmark=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StopOnExcept=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ShowProgress=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**plot_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyquickbench/_benchmark.html#run_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyquickbench.run_benchmark" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_funs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode='timings'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup=&lt;function</span> <span class="pre">default_setup&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repeat=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pooltype=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_per_test=0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ForceBenchmark=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PreventBenchmark=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StopOnExcept=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ShowProgress=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**plot_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyquickbench/_benchmark.html#run_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyquickbench.run_benchmark" title="Link to this definition">#</a></dt>
 <dd><p>Runs a full benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -431,6 +417,13 @@ document.write(`
 </p></li>
 <li><p><strong>n_repeat</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – <p>Number of times to repeat the benchmark for variability studies.</p>
 <p>By default <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</p></li>
+<li><p><strong>nproc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <em>optional</em>) – <p>Number of workers in PoolExecutor.</p>
+<p>By default <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.cpu_count" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">multiprocessing.cpu_count()</span></code></a>.</p>
+</p></li>
+<li><p><strong>pooltype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – <p>Type of PoolExecutor.</p>
+<p>Possible values: <code class="docutils literal notranslate"><span class="pre">&quot;phony&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;thread&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;process&quot;</span></code>.</p>
+<p>By default <code class="docutils literal notranslate"><span class="pre">&quot;phony&quot;</span></code>.</p>
 </p></li>
 <li><p><strong>time_per_test</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – <p>Minimum time in seconds for benchmark in <code class="docutils literal notranslate"><span class="pre">&quot;timings&quot;</span></code> mode.</p>
 <p>By default <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p>

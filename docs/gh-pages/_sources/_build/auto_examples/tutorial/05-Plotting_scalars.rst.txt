@@ -49,7 +49,7 @@ Plotting scalar values
 
 Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the return value of the error function is as simple as passing ``mode = "scalar_output"``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-132
+.. GENERATED FROM PYTHON SOURCE LINES 60-133
 
 .. code-block:: Python
 
@@ -66,7 +66,8 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
     
         w = 10
 
-        ex_sol = lambda t : np.array( [ np.cos(w*t) , np.sin(w*t),-np.sin(w*t), np.cos(w*t) ]  )
+        def ex_sol(t) : 
+            return np.array( [ np.cos(w*t) , np.sin(w*t),-np.sin(w*t), np.cos(w*t) ]  )
 
         def fgun(t, xy):
         
@@ -101,7 +102,7 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
 
         return error
 
-    all_nint = np.array([2**i for i in range(12)])
+    all_nint = np.array([2**i for i in range(16)])
 
     bench = {
         method: functools.partial(
@@ -115,13 +116,13 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
     bench_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
 
     pyquickbench.run_benchmark(
-        all_nint                        ,
-        bench                           ,
-        mode = "scalar_output"          ,
-        filename = bench_filename       ,
+        all_nint                                    ,
+        bench                                       ,
+        mode = "scalar_output"                      ,
+        filename = bench_filename                   ,
         plot_ylim = plot_ylim                       ,
         title = f'Relative error on integrand'      ,
-        ylabel = "Relative error"   ,
+        ylabel = "Relative error"                   ,
         show = True                                 ,
     )
 
@@ -137,11 +138,11 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-134
+.. GENERATED FROM PYTHON SOURCE LINES 134-135
 
 As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, the different integrations methods can be timed using :mod:`pyquickbench` with the following code, where we explicitely pass the default ``mode = "timings"``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-147
+.. GENERATED FROM PYTHON SOURCE LINES 135-148
 
 .. code-block:: Python
 
@@ -170,11 +171,11 @@ As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-149
+.. GENERATED FROM PYTHON SOURCE LINES 149-150
 
 The best method for a given use case is a compromise between speed and accuracy. These two can be plotted against each other with the following code. Note that the benchmarks are not re-run thanks to the caching mechanism explained in :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-181
+.. GENERATED FROM PYTHON SOURCE LINES 150-182
 
 .. code-block:: Python
 

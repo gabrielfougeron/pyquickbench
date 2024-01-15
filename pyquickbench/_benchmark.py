@@ -45,7 +45,7 @@ def run_benchmark(
                                     = default_setup                         ,
     n_repeat        : int           = 1                                     ,
     nproc           : int           = None                                  ,
-    pooltype        : str | None    = "phony"                               ,
+    pooltype        : str | None    = None                                  ,
     time_per_test   : float         = 0.2                                   ,
     filename        : str | None    = None                                  ,
     ForceBenchmark  : bool          = False                                 ,
@@ -75,9 +75,12 @@ def run_benchmark(
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
     nproc : int, optional
-        Number of parallel processes.\n
-        Only used in ``scalar_output`` mode.\n
-        By default ``1``.
+        Number of workers in PoolExecutor.\n
+        By default :func:`python:multiprocessing.cpu_count()`.
+    pooltype : str, optional
+        Type of PoolExecutor.\n
+        Possible values: ``"phony"``, ``"thread"`` or ``"process"``.\n  
+        By default ``"phony"``.
     time_per_test : float, optional
         Minimum time in seconds for benchmark in ``"timings"`` mode.\n
         By default ``0.2``.
@@ -158,7 +161,7 @@ def run_benchmark(
             
             progress_bar = FakeProgressBar
 
-        if pooltype is None:
+        if pooltype ==  None:
             if nproc is None:
                 pooltype = "phony"
             else:
@@ -259,6 +262,8 @@ all_plot_intents = [
     'subplot_grid_x'    ,
     'subplot_grid_y'    ,
     'reduction_avg'     ,
+    'reduction_min'     ,
+    'reduction_max'     ,
 ]
 
 def plot_benchmark(

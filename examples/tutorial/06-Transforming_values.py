@@ -101,7 +101,7 @@ def scipy_ODE_cpte_error_on_test(
 
     return error
 
-all_nint = np.array([2**i for i in range(12)])
+all_nint = np.array([2**i for i in range(16)])
 
 bench = {
     method: functools.partial(

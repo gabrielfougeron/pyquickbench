@@ -141,7 +141,7 @@ The pre and post convergence behavior of the numerical algorithms really clutter
 
 The measured values can now be compared to the theoretical convergence rates of the different methods. In order to plot your own data to the figure, you can handle the :class:`matplotlib:matplotlib.figure.Figure` and :class:`matplotlib:matplotlib.axes.Axes` objects yourself, And decoupe the calls to :func:`pyquickbench.run_benchmark` and :func:`pyquickbench.plot_benchmark` as shown here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-215
+.. GENERATED FROM PYTHON SOURCE LINES 167-216
 
 .. code-block:: Python
 
@@ -182,13 +182,14 @@ The measured values can now be compared to the theoretical convergence rates of 
         clip_vals = True                        ,
     )
 
+
+    xlim = ax[0,0].get_xlim()
     for name in bench:
         
         th_order = th_cvg_rate[name]
-        xlim = ax[0,0].get_xlim()
-
         ax[0,0].plot(xlim, [th_order, th_order], linestyle='dotted')
 
+    ax[0,0].set_xlim(xlim)
     plt.tight_layout()
     plt.show()
 
@@ -205,11 +206,11 @@ The measured values can now be compared to the theoretical convergence rates of 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-217
+.. GENERATED FROM PYTHON SOURCE LINES 217-218
 
 Similarly we can check that the integrations algorithms provided by :mod:`scipy:scipy` scale linearly with respect to the number of integrations steps with the ``transform`` argument set to ``"pol_growth_order"``:
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-228
+.. GENERATED FROM PYTHON SOURCE LINES 218-229
 
 .. code-block:: Python
 
@@ -221,7 +222,7 @@ Similarly we can check that the integrations algorithms provided by :mod:`scipy:
         bench                                       ,
         filename = timings_filename                 ,
         logx_plot = True                            ,
-        title = f'Computational cost growth order'  ,
+        title = "Computational cost growth order"   ,
         transform = "pol_growth_order"              ,
         show = True                                 ,
     )

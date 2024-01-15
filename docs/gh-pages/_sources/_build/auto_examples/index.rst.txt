@@ -6,6 +6,13 @@
 Gallery
 =======
 
+| This gallery gathers a few example, demonstrating the capabilities of :mod:`pyquickbench`.
+| The dependencies needed to run the examples can be downloaded directly with pip:
+
+.. code-block:: sh
+
+    pip install pyquickbench[docs]
+
 
 
 
@@ -21,6 +28,7 @@ Gallery
 Tutorial
 ========
 
+This is the best place to learn how to use :mod:`pyquickbench`.
 
 
 .. raw:: html
@@ -137,6 +145,7 @@ Tutorial
 Benchmarks
 ==========
 
+This is a collection of actual benchmarks performed on the author's laptop computer.
 
 
 .. raw:: html

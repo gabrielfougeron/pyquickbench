@@ -25,16 +25,14 @@ Description of the benchmark machine
 
 Description of the machine on which benchmarks were run.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-18
+.. GENERATED FROM PYTHON SOURCE LINES 8-16
 
 .. code-block:: Python
 
 
     import subprocess
- 
-    # traverse the info
-    Id = subprocess.check_output(['lshw']).decode('utf-8').split('\n')
 
+    Id = subprocess.check_output(['lshw']).decode('utf-8').split('\n')
     for line in Id:
         print(line)
     
@@ -192,11 +190,11 @@ Description of the machine on which benchmarks were run.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-20
+.. GENERATED FROM PYTHON SOURCE LINES 17-18
 
-Numpy config informations
+Numpy configuration informations
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-24
+.. GENERATED FROM PYTHON SOURCE LINES 18-22
 
 .. code-block:: Python
 
@@ -244,11 +242,11 @@ Numpy config informations
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-26
+.. GENERATED FROM PYTHON SOURCE LINES 23-24
 
-Scipy config informations
+Scipy configuration informations
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-28
+.. GENERATED FROM PYTHON SOURCE LINES 24-26
 
 .. code-block:: Python
 

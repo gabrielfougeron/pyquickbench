@@ -163,13 +163,6 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../index.html">
                         Gallery
@@ -284,13 +277,6 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
                     <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../index.html">
                         Gallery
@@ -435,9 +421,7 @@ to download the full example code</p>
 <p>Description of the machine on which benchmarks were run.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
 
-<span class="c1"># traverse the info</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Id</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/subprocess.html#subprocess.check_output" title="subprocess.check_output" class="sphx-glr-backref-module-subprocess sphx-glr-backref-type-py-function"><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span></a><span class="p">([</span><span class="s1">&#39;lshw&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Id</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
@@ -584,7 +568,7 @@ to download the full example code</p>
        configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.90.2-microsoft-standard-WS duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
 </pre></div>
 </div>
-<p>Numpy config informations</p>
+<p>Numpy configuration informations</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.show_config.html#numpy.show_config" title="numpy.show_config" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">show_config</span></a><span class="p">()</span>
 </pre></div>
@@ -619,7 +603,7 @@ Supported SIMD extensions in this NumPy install:
     not found = AVX512_KNL,AVX512_KNM
 </pre></div>
 </div>
-<p>Scipy config informations</p>
+<p>Scipy configuration informations</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy</span>
 <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.show_config.html#scipy.show_config" title="scipy.show_config" class="sphx-glr-backref-module-scipy sphx-glr-backref-type-py-function"><span class="n">scipy</span><span class="o">.</span><span class="n">show_config</span></a><span class="p">()</span>
 </pre></div>

@@ -161,13 +161,6 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../_build/auto_examples/index.html">
                         Gallery
                       </a>
@@ -278,13 +271,6 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../usage.html">
-                        Usage
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../../_build/auto_examples/index.html">
                         Gallery
                       </a>
@@ -394,10 +380,13 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">timeit</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.typing</span>
@@ -407,218 +396,25 @@ document.write(`
 <span class="kn">import</span> <span class="nn">tqdm</span>
 <span class="kn">import</span> <span class="nn">tqdm.notebook</span>
 
-<span class="k">def</span> <span class="nf">isnotfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># in-place</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-<span class="c1"># def _mem_shift(idx, shape):</span>
-<span class="c1">#     </span>
-<span class="c1">#     res = 0</span>
-<span class="c1">#     prod_shapes = 1</span>
-<span class="c1">#     </span>
-<span class="c1">#     # for i in reversed(range(len(shape))): # less efficient : https://stackoverflow.com/questions/7286365/print-a-list-in-reverse-order-with-range/44519681#44519681</span>
-<span class="c1">#     for i in range(len(shape)-1,-1,-1):</span>
-<span class="c1">#         res += idx[i]*prod_shapes</span>
-<span class="c1">#         prod_shapes *= shape[i]</span>
-<span class="c1">#         </span>
-<span class="c1">#     return res</span>
-
-<span class="k">def</span> <span class="nf">_mem_shift_restricted</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">only</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">pyquickbench._utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_prod_rel_shapes</span>        <span class="p">,</span>
+    <span class="n">_check_sig_no_pos_only</span>  <span class="p">,</span>
+    <span class="n">_get_rel_idx_from_maze</span>  <span class="p">,</span>
+    <span class="n">_in_ipynb</span>               <span class="p">,</span>
+    <span class="n">_load_benchmark_file</span>    <span class="p">,</span>
+    <span class="n">_save_benchmark_file</span>    <span class="p">,</span>
+    <span class="n">_build_args_shapes</span>      <span class="p">,</span>
+    <span class="n">FakeProgressBar</span>         <span class="p">,</span>
+    <span class="n">_measure_output</span>         <span class="p">,</span>
+    <span class="n">_measure_timings</span>        <span class="p">,</span>
+    <span class="n">AllPoolExecutors</span>        <span class="p">,</span>
+    <span class="n">default_setup</span>           <span class="p">,</span>
+    <span class="n">default_color_list</span>      <span class="p">,</span>
+    <span class="n">default_linestyle_list</span>  <span class="p">,</span>
+    <span class="n">default_pointstyle_list</span> <span class="p">,</span>
+<span class="p">)</span>
     
-    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">prod_shapes</span> <span class="o">=</span> <span class="mi">1</span>
-    
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">only</span><span class="p">):</span>
-        <span class="n">res</span> <span class="o">+=</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">prod_shapes</span>
-        <span class="n">prod_shapes</span> <span class="o">*=</span> <span class="n">shape</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-        
-    <span class="k">return</span> <span class="n">res</span>
 
-<span class="k">def</span> <span class="nf">_prod_rel_shapes</span><span class="p">(</span><span class="n">idx_rel</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
-    
-    <span class="n">prod_shapes</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idx_rel</span><span class="p">:</span>
-        
-        <span class="n">prod_shapes</span> <span class="o">*=</span> <span class="n">shape</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-    
-    <span class="k">return</span> <span class="n">prod_shapes</span>
-
-<span class="k">def</span> <span class="nf">_get_rel_idx_from_maze</span><span class="p">(</span><span class="n">idx_all_items</span><span class="p">,</span> <span class="n">idx_vals</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
-
-    <span class="n">idx_items</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_all_items</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">idx_all_items</span><span class="p">):</span>
-        <span class="n">idx_items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_vals</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> 
-
-    <span class="n">i_item</span> <span class="o">=</span> <span class="n">_mem_shift_restricted</span><span class="p">(</span><span class="n">idx_items</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">idx_all_items</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">i_item</span><span class="p">,</span> <span class="n">idx_items</span>
-
-<span class="k">def</span> <span class="nf">_in_ipynb</span><span class="p">():</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
-        <span class="k">if</span> <span class="s1">&#39;IPKernelApp&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">return</span> <span class="kc">True</span>
-   
-<span class="n">default_color_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">TABLEAU_COLORS</span><span class="p">)</span>
-<span class="n">default_color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
-<span class="n">default_color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">])</span>
-<span class="n">default_color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
-<span class="n">default_color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">])</span>
-<span class="n">default_color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BASE_COLORS</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">])</span>
-
-<span class="n">default_linestyle_list</span> <span class="o">=</span> <span class="p">[</span>
-     <span class="s1">&#39;solid&#39;</span>                        <span class="p">,</span>   <span class="c1"># Same as (0, ()) or &#39;-&#39;</span>
-     <span class="s1">&#39;dotted&#39;</span>                       <span class="p">,</span>   <span class="c1"># Same as (0, (1, 1)) or &#39;:&#39;</span>
-     <span class="s1">&#39;dashed&#39;</span>                       <span class="p">,</span>   <span class="c1"># Same as &#39;--&#39;</span>
-     <span class="s1">&#39;dashdot&#39;</span>                      <span class="p">,</span>   <span class="c1"># Same as &#39;-.&#39;</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>                   <span class="p">,</span>   <span class="c1"># loosely dotted   </span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>                    <span class="p">,</span>   <span class="c1"># dotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>                    <span class="p">,</span>   <span class="c1"># densely dotted</span>
-     <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>                   <span class="p">,</span>   <span class="c1"># long dash with offset</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>                   <span class="p">,</span>   <span class="c1"># loosely dashed</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>                    <span class="p">,</span>   <span class="c1"># dashed</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>                    <span class="p">,</span>   <span class="c1"># densely dashed</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>            <span class="p">,</span>   <span class="c1"># loosely dashdotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>              <span class="p">,</span>   <span class="c1"># dashdotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>              <span class="p">,</span>   <span class="c1"># densely dashdotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>        <span class="p">,</span>   <span class="c1"># dashdotdotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>     <span class="p">,</span>   <span class="c1"># loosely dashdotdotted</span>
-     <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>        <span class="p">,</span>   <span class="c1"># densely dashdotdotted                    </span>
-<span class="p">]</span>
-
-<span class="n">default_pointstyle_list</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="kc">None</span><span class="p">,</span>   
-    <span class="s2">&quot;.&quot;</span>	<span class="p">,</span> <span class="c1"># m00 point</span>
-    <span class="s2">&quot;,&quot;</span>	<span class="p">,</span> <span class="c1"># m01 pixel</span>
-    <span class="s2">&quot;o&quot;</span>	<span class="p">,</span> <span class="c1"># m02 circle</span>
-    <span class="s2">&quot;v&quot;</span>	<span class="p">,</span> <span class="c1"># m03 triangle_down</span>
-    <span class="s2">&quot;^&quot;</span>	<span class="p">,</span> <span class="c1"># m04 triangle_up</span>
-    <span class="s2">&quot;&lt;&quot;</span>	<span class="p">,</span> <span class="c1"># m05 triangle_left</span>
-    <span class="s2">&quot;&gt;&quot;</span>	<span class="p">,</span> <span class="c1"># m06 triangle_right</span>
-    <span class="s2">&quot;1&quot;</span>	<span class="p">,</span> <span class="c1"># m07 tri_down</span>
-    <span class="s2">&quot;2&quot;</span>	<span class="p">,</span> <span class="c1"># m08 tri_up</span>
-    <span class="s2">&quot;3&quot;</span>	<span class="p">,</span> <span class="c1"># m09 tri_left</span>
-    <span class="s2">&quot;4&quot;</span>	<span class="p">,</span> <span class="c1"># m10 tri_right</span>
-    <span class="s2">&quot;8&quot;</span>	<span class="p">,</span> <span class="c1"># m11 octagon</span>
-    <span class="s2">&quot;s&quot;</span>	<span class="p">,</span> <span class="c1"># m12 square</span>
-    <span class="s2">&quot;p&quot;</span>	<span class="p">,</span> <span class="c1"># m13 pentagon</span>
-    <span class="s2">&quot;P&quot;</span>	<span class="p">,</span> <span class="c1"># m23 plus (filled)</span>
-    <span class="s2">&quot;*&quot;</span>	<span class="p">,</span> <span class="c1"># m14 star</span>
-    <span class="s2">&quot;h&quot;</span>	<span class="p">,</span> <span class="c1"># m15 hexagon1</span>
-    <span class="s2">&quot;H&quot;</span>	<span class="p">,</span> <span class="c1"># m16 hexagon2</span>
-    <span class="s2">&quot;+&quot;</span>	<span class="p">,</span> <span class="c1"># m17 plus</span>
-    <span class="s2">&quot;x&quot;</span>	<span class="p">,</span> <span class="c1"># m18 x</span>
-    <span class="s2">&quot;X&quot;</span>	<span class="p">,</span> <span class="c1"># m24 x (filled)</span>
-    <span class="s2">&quot;D&quot;</span>	<span class="p">,</span> <span class="c1"># m19 diamond</span>
-    <span class="s2">&quot;d&quot;</span>	<span class="p">,</span> <span class="c1"># m20 thin_diamond</span>
-<span class="p">]</span>
-
-<span class="k">def</span> <span class="nf">_check_sig_no_pos_only</span><span class="p">(</span><span class="n">fun</span><span class="p">):</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">sig</span> <span class="o">=</span> <span class="kc">None</span>
-        
-    <span class="k">if</span> <span class="n">sig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">param</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Input argument </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s1"> to provided function </span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> is positional only. Positional-only arguments are unsupported&#39;</span><span class="p">)</span>
-
-        
-<span class="k">def</span> <span class="nf">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-
-    <span class="n">setup_vars</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setup_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">setup_vars</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">setup_vars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">setup_vars</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">setup_vars</span><span class="p">))}</span>
-        
-    <span class="k">return</span> <span class="n">setup_vars_dict</span>
-
-<span class="k">def</span> <span class="nf">_load_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_args_in</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
-    
-    <span class="n">file_base</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npy&#39;</span><span class="p">:</span>
-        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>    
-
-        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">assert</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">loaded_axis_len</span><span class="p">,</span> <span class="n">expected_axis_len</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">shape</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">loaded_axis_len</span> <span class="o">==</span> <span class="n">expected_axis_len</span><span class="p">)</span>
-
-    <span class="k">elif</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npz&#39;</span><span class="p">:</span>
-        <span class="n">file_content</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-
-        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">file_content</span><span class="p">[</span><span class="s1">&#39;all_vals&#39;</span><span class="p">]</span>
-        
-        <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">assert</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">loaded_axis_len</span><span class="p">,</span> <span class="n">expected_axis_len</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">shape</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-            <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">BenchmarkUpToDate</span> <span class="ow">and</span> <span class="p">(</span><span class="n">loaded_axis_len</span> <span class="o">==</span> <span class="n">expected_axis_len</span><span class="p">)</span>
-            
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">all_args_vals</span> <span class="ow">in</span> <span class="n">all_args_in</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">file_content</span>
-
-            <span class="k">for</span> <span class="n">loaded_val</span><span class="p">,</span> <span class="n">expected_val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">file_content</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">all_args_vals</span><span class="p">):</span>
-                <span class="k">assert</span> <span class="n">loaded_val</span> <span class="o">==</span> <span class="n">expected_val</span>
-            
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown file extension </span><span class="si">{</span><span class="n">file_ext</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="c1"># print()</span>
-    <span class="c1"># print(filename)</span>
-    <span class="c1"># print(f&#39;{BenchmarkUpToDate = }&#39;)</span>
-
-    <span class="k">return</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">BenchmarkUpToDate</span>
-
-<span class="k">def</span> <span class="nf">_save_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">all_args</span><span class="p">):</span>
-
-    <span class="n">file_bas</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npy&#39;</span><span class="p">:</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">)</span>    
-        
-    <span class="k">elif</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;.npz&#39;</span><span class="p">:</span>
-
-        <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span>
-            <span class="n">filename</span>                <span class="p">,</span>
-            <span class="n">all_vals</span> <span class="o">=</span> <span class="n">all_vals</span>     <span class="p">,</span>
-            <span class="o">**</span><span class="n">all_args</span>
-        <span class="p">)</span>
-    
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown file extension </span><span class="si">{</span><span class="n">file_ext</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    
-<span class="k">def</span> <span class="nf">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">):</span>
-    
-    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
-        <span class="n">all_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">all_args</span><span class="p">}</span>
-    
-    <span class="k">assert</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;fun&#39;</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;repeats&#39;</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;all_vals&#39;</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">all_funs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
-    <span class="k">else</span><span class="p">:</span>    
-        <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="p">]</span>
-     
-    <span class="n">args_shape</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">all_args</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-    
-    <span class="n">res_shape</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span> <span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">args_shape</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-    <span class="n">res_shape</span><span class="p">[</span><span class="s1">&#39;fun&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_funs</span><span class="p">)</span>
-    <span class="n">res_shape</span><span class="p">[</span><span class="s1">&#39;repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_repeat</span>
-    
-    <span class="k">return</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span>
 
 <div class="viewcode-block" id="run_benchmark">
 <a class="viewcode-back" href="../../generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark">[docs]</a>
@@ -627,8 +423,10 @@ document.write(`
     <span class="n">all_funs</span>        <span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span>                                <span class="p">,</span>
     <span class="n">mode</span>            <span class="p">:</span> <span class="nb">str</span>           <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                             <span class="p">,</span>
     <span class="n">setup</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
-                                    <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">})</span>                  <span class="p">,</span>
+                                    <span class="o">=</span> <span class="n">default_setup</span>                         <span class="p">,</span>
     <span class="n">n_repeat</span>        <span class="p">:</span> <span class="nb">int</span>           <span class="o">=</span> <span class="mi">1</span>                                     <span class="p">,</span>
+    <span class="n">nproc</span>           <span class="p">:</span> <span class="nb">int</span>           <span class="o">=</span> <span class="kc">None</span>                                  <span class="p">,</span>
+    <span class="n">pooltype</span>        <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>    <span class="o">=</span> <span class="kc">None</span>                                  <span class="p">,</span>
     <span class="n">time_per_test</span>   <span class="p">:</span> <span class="nb">float</span>         <span class="o">=</span> <span class="mf">0.2</span>                                   <span class="p">,</span>
     <span class="n">filename</span>        <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>    <span class="o">=</span> <span class="kc">None</span>                                  <span class="p">,</span>
     <span class="n">ForceBenchmark</span>  <span class="p">:</span> <span class="nb">bool</span>          <span class="o">=</span> <span class="kc">False</span>                                 <span class="p">,</span>
@@ -657,6 +455,13 @@ document.write(`
 <span class="sd">    n_repeat : int, optional</span>
 <span class="sd">        Number of times to repeat the benchmark for variability studies.\n</span>
 <span class="sd">        By default ``1``.</span>
+<span class="sd">    nproc : int, optional</span>
+<span class="sd">        Number of workers in PoolExecutor.\n</span>
+<span class="sd">        By default :func:`python:multiprocessing.cpu_count()`.</span>
+<span class="sd">    pooltype : str, optional</span>
+<span class="sd">        Type of PoolExecutor.\n</span>
+<span class="sd">        Possible values: ``&quot;phony&quot;``, ``&quot;thread&quot;`` or ``&quot;process&quot;``.\n  </span>
+<span class="sd">        By default ``&quot;phony&quot;``.</span>
 <span class="sd">    time_per_test : float, optional</span>
 <span class="sd">        Minimum time in seconds for benchmark in ``&quot;timings&quot;`` mode.\n</span>
 <span class="sd">        By default ``0.2``.</span>
@@ -723,120 +528,86 @@ document.write(`
             <span class="n">_check_sig_no_pos_only</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
         
         <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">res_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-    
-        <span class="n">benchmark_iterator</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
-            <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="p">,</span>
-            <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">all_args</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>                 <span class="p">,</span>
-        <span class="p">)</span>
 
+        <span class="n">total_iterations</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        
         <span class="k">if</span> <span class="n">ShowProgress</span><span class="p">:</span>
-            
+
             <span class="k">if</span> <span class="p">(</span><span class="n">_in_ipynb</span><span class="p">()):</span>
-                
-                <span class="n">benchmark_iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">notebook</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
-                    <span class="n">iterable</span> <span class="o">=</span> <span class="n">benchmark_iterator</span><span class="p">,</span>
-                    <span class="n">total</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-                <span class="p">)</span>
+                <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">notebook</span><span class="o">.</span><span class="n">tqdm</span>
                 
             <span class="k">else</span><span class="p">:</span>
-                
-                <span class="n">benchmark_iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
-                    <span class="n">iterable</span> <span class="o">=</span> <span class="n">benchmark_iterator</span><span class="p">,</span>
-                    <span class="n">total</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-                <span class="p">)</span>
-    
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;timings&quot;</span><span class="p">:</span>
-
-            <span class="k">for</span> <span class="n">i_args</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">benchmark_iterator</span><span class="p">:</span>
-
-                <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>    
-
-                <span class="k">for</span> <span class="n">i_fun</span><span class="p">,</span> <span class="n">fun</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_funs_list</span><span class="p">):</span>
-
-                    <span class="n">global_dict</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="s1">&#39;fun&#39;</span>               <span class="p">:</span> <span class="n">fun</span>               <span class="p">,</span>
-                        <span class="s1">&#39;setup_vars_dict&#39;</span>   <span class="p">:</span> <span class="n">setup_vars_dict</span>   <span class="p">,</span>
-                    <span class="p">}</span>
-
-                    <span class="n">code</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;fun(**setup_vars_dict)&#39;</span>
-
-                    <span class="n">Timer</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span>
-                        <span class="n">code</span><span class="p">,</span>
-                        <span class="nb">globals</span> <span class="o">=</span> <span class="n">global_dict</span><span class="p">,</span>
-                    <span class="p">)</span>
-
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="c1"># For functions that require caching</span>
-                        <span class="n">Timer</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="n">number</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
-
-                        <span class="c1"># Estimate time of everything</span>
-                        <span class="n">n_timeit_0dot2</span><span class="p">,</span> <span class="n">est_time</span> <span class="o">=</span> <span class="n">Timer</span><span class="o">.</span><span class="n">autorange</span><span class="p">()</span>
-                        
-                        <span class="k">if</span> <span class="p">(</span><span class="n">n_repeat</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time_per_test</span> <span class="o">==</span> <span class="mf">0.2</span><span class="p">):</span>
-                            <span class="c1"># Fast track: benchmark is not repeated and autorange results are kept as is.</span>
-
-                            <span class="n">all_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i_args</span><span class="p">)</span>
-                            <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_fun</span><span class="p">)</span>
-                            <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                            <span class="n">all_idx_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">all_idx</span><span class="p">)</span>
-                            <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx_tuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">est_time</span> <span class="o">/</span> <span class="n">n_timeit_0dot2</span>
-                            
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="c1"># Full benchmark is run</span>
-
-                            <span class="n">n_timeit</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_timeit_0dot2</span> <span class="o">*</span> <span class="n">time_per_test</span> <span class="o">/</span> <span class="n">est_time</span> <span class="o">/</span> <span class="n">n_repeat</span><span class="p">)</span>
-
-                            <span class="n">times</span> <span class="o">=</span> <span class="n">Timer</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-                                <span class="n">repeat</span> <span class="o">=</span> <span class="n">n_repeat</span><span class="p">,</span>
-                                <span class="n">number</span> <span class="o">=</span> <span class="n">n_timeit</span><span class="p">,</span>
-                            <span class="p">)</span>
-                            <span class="n">all_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i_args</span><span class="p">)</span>
-                            <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_fun</span><span class="p">)</span>
-                            <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
-                            <span class="n">all_idx_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">all_idx</span><span class="p">)</span>
-                            <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx_tuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_timeit</span>
-
-                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">StopOnExcept</span><span class="p">:</span>
-                            <span class="k">raise</span> <span class="n">exc</span>
-                        
-                        <span class="n">all_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i_args</span><span class="p">)</span>
-                        <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_fun</span><span class="p">)</span>
-                        <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
-                        <span class="n">all_idx_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">all_idx</span><span class="p">)</span>
-                        <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx_tuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                        
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;scalar_output&quot;</span><span class="p">:</span>    
-            
-            <span class="k">for</span> <span class="n">i_args</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">benchmark_iterator</span><span class="p">:</span>
-                
-                <span class="n">setup_vars_dict</span> <span class="o">=</span> <span class="n">_return_setup_vars_dict</span><span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-
-                <span class="k">for</span> <span class="n">i_fun</span><span class="p">,</span> <span class="n">fun</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_funs_list</span><span class="p">):</span>
-                    
-                    
-                    <span class="k">for</span> <span class="n">i_repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_repeat</span><span class="p">):</span>
-                        
-                        <span class="k">try</span><span class="p">:</span>
-
-                            <span class="n">out_val</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">**</span><span class="n">setup_vars_dict</span><span class="p">)</span>
-                        
-                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">StopOnExcept</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="n">exc</span>
-
-                            <span class="n">out_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                            
-                        <span class="n">all_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i_args</span><span class="p">)</span>
-                        <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_fun</span><span class="p">)</span>
-                        <span class="n">all_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_repeat</span><span class="p">)</span>
-                        <span class="n">all_idx_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">all_idx</span><span class="p">)</span>
-                        
-                        <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx_tuple</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_val</span>
-                        
+                <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">else</span><span class="p">:</span>
             
+            <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">FakeProgressBar</span>
+
+        <span class="k">if</span> <span class="n">pooltype</span> <span class="o">==</span>  <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nproc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">pooltype</span> <span class="o">=</span> <span class="s2">&quot;phony&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pooltype</span> <span class="o">=</span> <span class="s2">&quot;process&quot;</span>                
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nproc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">nproc</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+                    
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">PoolExecutor</span> <span class="o">=</span> <span class="n">AllPoolExecutors</span><span class="p">[</span><span class="n">pooltype</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown pooltype </span><span class="si">{</span><span class="n">pooltype</span><span class="si">}</span><span class="s2">. Available pootypes: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">AllPoolExecutors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;timings&quot;</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="p">(</span><span class="n">pooltype</span> <span class="o">!=</span> <span class="s2">&quot;phony&quot;</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Concurrent execution is unwise in timings mode as it will mess up the timings.&quot;</span><span class="p">)</span>
+                
+            <span class="n">measure_fun</span> <span class="o">=</span> <span class="n">_measure_timings</span>
+            <span class="n">extra_submit_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">time_per_test</span><span class="p">,</span> <span class="n">StopOnExcept</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;scalar_output&quot;</span><span class="p">:</span> 
+        
+            <span class="n">measure_fun</span> <span class="o">=</span> <span class="n">_measure_output</span>
+            <span class="n">extra_submit_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">StopOnExcept</span><span class="p">)</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+                
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            
+        <span class="k">with</span> <span class="p">(</span>
+            <span class="n">progress_bar</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="n">total_iterations</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">,</span>
+            <span class="n">PoolExecutor</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">,</span>
+        <span class="p">):</span>
+            
+            <span class="n">futures</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">i_args</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="p">,</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">all_args</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>                 <span class="p">,</span>
+            <span class="p">):</span>
+                
+                <span class="n">future</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
+                    <span class="n">measure_fun</span><span class="p">,</span>
+                    <span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="n">extra_submit_args</span>
+                <span class="p">)</span>
+                
+                <span class="n">future</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">future</span><span class="p">,</span> <span class="s2">&quot;i_args&quot;</span><span class="p">,</span> <span class="n">i_args</span><span class="p">)</span>
+                <span class="n">futures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
+                        
+            <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
+                
+                <span class="n">all_idx_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">future</span><span class="o">.</span><span class="n">i_args</span><span class="p">)</span>
+                <span class="n">all_idx_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+                <span class="n">all_idx_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+                <span class="n">all_idx</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">all_idx_list</span><span class="p">)</span>
+                
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                    
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">all_vals</span><span class="p">[</span><span class="n">all_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="k">if</span> <span class="n">StopOnExcept</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">exc</span>
 
         <span class="c1"># Sort values along &quot;repeat&quot; axis, taking care of nans.</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -873,6 +644,8 @@ document.write(`
     <span class="s1">&#39;subplot_grid_x&#39;</span>    <span class="p">,</span>
     <span class="s1">&#39;subplot_grid_y&#39;</span>    <span class="p">,</span>
     <span class="s1">&#39;reduction_avg&#39;</span>     <span class="p">,</span>
+    <span class="s1">&#39;reduction_min&#39;</span>     <span class="p">,</span>
+    <span class="s1">&#39;reduction_max&#39;</span>     <span class="p">,</span>
 <span class="p">]</span>
 
 <div class="viewcode-block" id="plot_benchmark">

@@ -123,17 +123,12 @@ pyquickbench.run_benchmark(
     all_nint                                    ,
     bench                                       ,
     mode = "scalar_output"                      ,
-    # filename = bench_filename                   ,
+    filename = bench_filename                   ,
     plot_ylim = plot_ylim                       ,
     title = f'Relative error on integrand'      ,
     ylabel = "Relative error"                   ,
     show = True                                 ,
-    StopOnExcept = True,
-        nproc=1             ,
-        ShowProgress=True   ,
 )
-
-# exit()
 
 # %%
 # As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, the different integrations methods can be timed using :mod:`pyquickbench` with the following code, where we explicitely pass the default ``mode = "timings"``.
