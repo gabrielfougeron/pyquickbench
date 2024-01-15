@@ -232,10 +232,6 @@ def _measure_output(args, setup, all_funs_list, n_repeat, StopOnExcept):
     n_funs = len(all_funs_list)
     vals = np.full((n_funs, n_repeat), np.nan)
     
-    # all_idx = list(i_args)
-    # all_idx.append(0)
-    # all_idx.append(0)
-
     for i_fun, fun in enumerate(all_funs_list):
         
         for i_repeat in range(n_repeat):

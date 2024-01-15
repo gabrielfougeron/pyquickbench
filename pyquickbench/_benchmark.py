@@ -148,7 +148,7 @@ def run_benchmark(
         total_iterations = math.prod(args_shape.values())
         
         if ShowProgress:
-            
+
             if (_in_ipynb()):
                 progress_bar = tqdm.notebook.tqdm
                 
@@ -183,7 +183,7 @@ def run_benchmark(
         elif mode == "scalar_output": 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, args, all_funs_list, n_repeat, StopOnExcept)
+            extra_submit_args = (setup, all_funs_list, n_repeat, StopOnExcept)
         
         else:
                 
