@@ -152,9 +152,9 @@ all_errors = pyquickbench.run_benchmark(
     StopOnExcept = True,
     ShowProgress = True,
     nproc = 8   ,
-    pooltype = "phony"   ,
+    # pooltype = "phony"   ,
     # pooltype = "thread"   ,
-    # pooltype = "process"   ,
+    pooltype = "process"   ,
 )
 
 plot_intent = {

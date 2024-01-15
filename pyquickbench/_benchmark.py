@@ -7,6 +7,7 @@ import typing
 import inspect
 import warnings
 import concurrent.futures
+import multiprocessing
 
 import numpy as np
 import numpy.typing
@@ -16,271 +17,25 @@ import matplotlib.figure
 import tqdm
 import tqdm.notebook
 
-def isnotfinite(arr):
-    res = np.isfinite(arr)
-    np.bitwise_not(res, out=res)  # in-place
-    return res
-
-def _mem_shift_restricted(idx, shape, only):
+from pyquickbench._utils import (
+    _prod_rel_shapes        ,
+    _check_sig_no_pos_only  ,
+    _get_rel_idx_from_maze  ,
+    _in_ipynb               ,
+    _load_benchmark_file    ,
+    _save_benchmark_file    ,
+    _build_args_shapes      ,
+    FakeProgressBar         ,
+    _measure_output         ,
+    _measure_timings        ,
+    AllPoolExecutors        ,
+    default_setup           ,
+    default_color_list      ,
+    default_linestyle_list  ,
+    default_pointstyle_list ,
+)
     
-    res = 0
-    prod_shapes = 1
-    
-    for i, j in enumerate(only):
-        res += idx[i]*prod_shapes
-        prod_shapes *= shape[j]
-        
-    return res
 
-def _prod_rel_shapes(idx_rel, shape):
-    
-    prod_shapes = 1
-    for idx in idx_rel:
-        
-        prod_shapes *= shape[idx]
-    
-    return prod_shapes
-
-def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
-
-    idx_items = np.zeros(len(idx_all_items), dtype=int)
-    for i, j in enumerate(idx_all_items):
-        idx_items[i] = idx_vals[j] 
-
-    i_item = _mem_shift_restricted(idx_items, shape, idx_all_items)
-    
-    return i_item, idx_items
-
-def _in_ipynb():
-    try:
-        from IPython import get_ipython
-        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
-            return False
-    except ImportError:
-        return False
-    except AttributeError:
-        return False
-    return True
-   
-default_color_list = list(mpl.colors.TABLEAU_COLORS)
-default_color_list.append(mpl.colors.BASE_COLORS['b'])
-default_color_list.append(mpl.colors.BASE_COLORS['g'])
-default_color_list.append(mpl.colors.BASE_COLORS['r'])
-default_color_list.append(mpl.colors.BASE_COLORS['m'])
-default_color_list.append(mpl.colors.BASE_COLORS['k'])
-
-default_linestyle_list = [
-     'solid'                        ,   # Same as (0, ()) or '-'
-     'dotted'                       ,   # Same as (0, (1, 1)) or ':'
-     'dashed'                       ,   # Same as '--'
-     'dashdot'                      ,   # Same as '-.'
-     (0, (1, 10))                   ,   # loosely dotted   
-     (0, (1, 1))                    ,   # dotted
-     (0, (1, 1))                    ,   # densely dotted
-     (5, (10, 3))                   ,   # long dash with offset
-     (0, (5, 10))                   ,   # loosely dashed
-     (0, (5, 5))                    ,   # dashed
-     (0, (5, 1))                    ,   # densely dashed
-     (0, (3, 10, 1, 10))            ,   # loosely dashdotted
-     (0, (3, 5, 1, 5))              ,   # dashdotted
-     (0, (3, 1, 1, 1))              ,   # densely dashdotted
-     (0, (3, 5, 1, 5, 1, 5))        ,   # dashdotdotted
-     (0, (3, 10, 1, 10, 1, 10))     ,   # loosely dashdotdotted
-     (0, (3, 1, 1, 1, 1, 1))        ,   # densely dashdotdotted                    
-]
-
-default_pointstyle_list = [
-    None,   
-    "."	, # m00 point
-    ","	, # m01 pixel
-    "o"	, # m02 circle
-    "v"	, # m03 triangle_down
-    "^"	, # m04 triangle_up
-    "<"	, # m05 triangle_left
-    ">"	, # m06 triangle_right
-    "1"	, # m07 tri_down
-    "2"	, # m08 tri_up
-    "3"	, # m09 tri_left
-    "4"	, # m10 tri_right
-    "8"	, # m11 octagon
-    "s"	, # m12 square
-    "p"	, # m13 pentagon
-    "P"	, # m23 plus (filled)
-    "*"	, # m14 star
-    "h"	, # m15 hexagon1
-    "H"	, # m16 hexagon2
-    "+"	, # m17 plus
-    "x"	, # m18 x
-    "X"	, # m24 x (filled)
-    "D"	, # m19 diamond
-    "d"	, # m20 thin_diamond
-]
-
-def _check_sig_no_pos_only(fun):
-
-    try:
-        sig = inspect.signature(fun)
-    except ValueError:
-        sig = None
-        
-    if sig is not None:
-        for param in sig.parameters.values():
-            if param.kind == param.POSITIONAL_ONLY:
-                raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
-        
-def _return_setup_vars_dict(setup, args):
-
-    setup_vars = setup(*args)
-
-    if isinstance(setup_vars, dict):
-        setup_vars_dict = setup_vars
-    else:
-        setup_vars_dict = {setup_vars[i][0] : setup_vars[i][1] for i in range(len(setup_vars))}
-        
-    return setup_vars_dict
-
-def _load_benchmark_file(filename, all_args_in, shape):
-    
-    file_base, file_ext = os.path.splitext(filename)
-    
-    if file_ext == '.npy':
-        all_vals = np.load(filename)    
-
-        BenchmarkUpToDate = True
-        assert all_vals.ndim == len(shape)
-        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
-            BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
-
-    elif file_ext == '.npz':
-        file_content = np.load(filename)
-
-        all_vals = file_content['all_vals']
-        
-        BenchmarkUpToDate = True
-        assert all_vals.ndim == len(shape)
-        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
-            BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
-            
-        for name, all_args_vals in all_args_in.items():
-            assert name in file_content
-
-            for loaded_val, expected_val in zip(file_content[name], all_args_vals):
-                assert loaded_val == expected_val
-            
-    else:
-        raise ValueError(f'Unknown file extension {file_ext}')
-
-    # print()
-    # print(filename)
-    # print(f'{BenchmarkUpToDate = }')
-
-    return all_vals, BenchmarkUpToDate
-
-def _save_benchmark_file(filename, all_vals, all_args):
-
-    file_bas, file_ext = os.path.splitext(filename)
-    
-    if file_ext == '.npy':
-        np.save(filename, all_vals)    
-        
-    elif file_ext == '.npz':
-
-        np.savez(
-            filename                ,
-            all_vals = all_vals     ,
-            **all_args
-        )
-    
-    else:
-        raise ValueError(f'Unknown file extension {file_ext}')
-    
-def _build_args_shapes(all_args, all_funs, n_repeat):
-    
-    if not(isinstance(all_args, dict)):
-        all_args = {'n': all_args}
-    
-    assert not('fun' in all_args)
-    assert not('repeats' in all_args)
-    assert not('all_vals' in all_args)
-    
-    if isinstance(all_funs, dict):
-        all_funs_list = [fun for fun in all_funs.values()]
-    else:    
-        all_funs_list = [fun for fun in all_funs]
-     
-    args_shape = {name : len(value) for name, value in all_args.items()}
-    
-    res_shape = {name : value for name, value in args_shape.items()}
-    res_shape['fun'] = len(all_funs)
-    res_shape['repeat'] = n_repeat
-    
-    return all_args, all_funs_list, args_shape, res_shape
-
-class FakeProgressBar(object):
-    def __init__(self, *args, **kwargs):
-        pass
-     
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, *args):
-        pass
-    
-    def update(self, *args):
-        pass
-               
-def _measure_output(setup, args, all_funs_list, n_repeat, StopOnExcept):
-
-    setup_vars_dict = _return_setup_vars_dict(setup, args)
-    
-    all_out_vals = np.full((len(all_funs_list), n_repeat), np.nan)
-
-    for i_fun, fun in enumerate(all_funs_list):
-        
-        for i_repeat in range(n_repeat):
-            
-            try:
-                all_out_vals[i_fun, i_repeat] = fun(**setup_vars_dict)
-            except Exception as exc:
-                all_out_vals[i_fun, i_repeat] = np.nan
-                if StopOnExcept:
-                    raise exc
-    
-    return all_out_vals
-
-class FakeFuture(object):
-
-    def __init__(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self, key, val)
-            
-    def add_done_callback(self, callback):
-        callback(0)
-        
-    def result(self):
-        return self.res
-        
-class PhonyProcessPoolExecutor(object):
-    def __init__(self, *args, **kwargs):
-        pass
-     
-    def __enter__(self):
-        return self
- 
-    def __exit__(self, *args):
-        pass
-    
-    def submit(self, fn, /, *args):
-        return FakeFuture(res = fn(*args))
-    
-AllPoolExecutors = {
-    "phony"         :   PhonyProcessPoolExecutor                ,
-    "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
-    "process"       :   concurrent.futures.ProcessPoolExecutor  ,
-}
-
-def default_setup(n):
-    return {'n': n}
 
 def run_benchmark(
     all_args        : dict | typing.Iterable                                ,
@@ -289,7 +44,7 @@ def run_benchmark(
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                     = default_setup                         ,
     n_repeat        : int           = 1                                     ,
-    nproc           : int           = 1                                     ,
+    nproc           : int           = None                                  ,
     pooltype        : str | None    = "phony"                               ,
     time_per_test   : float         = 0.2                                   ,
     filename        : str | None    = None                                  ,
@@ -389,12 +144,7 @@ def run_benchmark(
             _check_sig_no_pos_only(fun)
         
         all_vals = np.full(list(res_shape.values()), np.nan)
-    
-        benchmark_iterator = zip(
-            itertools.product(*[range(i) for i in args_shape.values()]) ,
-            itertools.product(*list(all_args.values()))                 ,
-        )
-        
+
         total_iterations = math.prod(args_shape.values())
         
         if ShowProgress:
@@ -407,120 +157,73 @@ def run_benchmark(
         else:
             
             progress_bar = FakeProgressBar
-        
+
         if pooltype is None:
-            
-            if (nproc > 1):
-                pooltype = "process"
-            else:
+            if nproc is None:
                 pooltype = "phony"
-            
-        PoolExecutor = AllPoolExecutors[pooltype]
-        
-        with progress_bar(total = total_iterations) as progress:
-
-            if mode == "timings":
-                
-                if (nproc > 1):
-                    warnings.warn("Concurrent execution is disabled in timings mode")
-
-                for i_args, args in benchmark_iterator:
-
-                    setup_vars_dict = _return_setup_vars_dict(setup, args)    
-
-                    for i_fun, fun in enumerate(all_funs_list):
-
-                        global_dict = {
-                            'fun'               : fun               ,
-                            'setup_vars_dict'   : setup_vars_dict   ,
-                        }
-
-                        code = f'fun(**setup_vars_dict)'
-
-                        Timer = timeit.Timer(
-                            code,
-                            globals = global_dict,
-                        )
-
-                        try:
-                            # For functions that require caching
-                            Timer.timeit(number = 1)
-
-                            # Estimate time of everything
-                            n_timeit_0dot2, est_time = Timer.autorange()
-                            
-                            if (n_repeat == 1) and (time_per_test == 0.2):
-                                # Fast track: benchmark is not repeated and autorange results are kept as is.
-
-                                all_idx = list(i_args)
-                                all_idx.append(i_fun)
-                                all_idx.append(0)
-                                all_idx_tuple = tuple(all_idx)
-                                all_vals[all_idx_tuple] = est_time / n_timeit_0dot2
-                                
-                            else:
-                                # Full benchmark is run
-
-                                n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
-
-                                times = Timer.repeat(
-                                    repeat = n_repeat,
-                                    number = n_timeit,
-                                )
-                                all_idx = list(i_args)
-                                all_idx.append(i_fun)
-                                all_idx.append(slice(None))
-                                all_idx_tuple = tuple(all_idx)
-                                all_vals[all_idx_tuple] = np.array(times) / n_timeit
-
-                        except Exception as exc:
-                            if StopOnExcept:
-                                raise exc
-                            
-                            all_idx = list(i_args)
-                            all_idx.append(i_fun)
-                            all_idx.append(slice(None))
-                            all_idx_tuple = tuple(all_idx)
-                            all_vals[all_idx_tuple] = np.nan
-                            
-                    progress.update(1)
-                            
-            elif mode == "scalar_output": 
-             
-                with PoolExecutor(nproc) as executor:
-                    
-                    futures = []
-                    for i_args, args in benchmark_iterator:
-
-                        future = executor.submit(
-                            _measure_output,
-                            setup, args, all_funs_list, n_repeat, StopOnExcept
-                        )
-                                       
-                        future.add_done_callback(lambda p: progress.update(1))
-
-                        futures.append(future)
-
-                    for future in futures:
-                        
-                        try:
-                            
-                            vals = future.result()
-                                
-                            all_idx = list(i_args)
-                            all_idx.append(slice(None))
-                            all_idx.append(slice(None))
-                            all_idx_tuple = tuple(all_idx)
-                            
-                            all_vals[all_idx_tuple] = vals
-                            
-                        except Exception as exc:
-                            if StopOnExcept:
-                                raise exc
-                            
             else:
+                pooltype = "process"                
+        else:
+            if nproc is None:
+                nproc = multiprocessing.cpu_count()
+                    
+        try:
+            PoolExecutor = AllPoolExecutors[pooltype]
+        except KeyError:
+            raise ValueError(f"Unknown pooltype {pooltype}. Available pootypes: {list(AllPoolExecutors.keys())}")
+                    
+        if mode == "timings":
+            
+            if (pooltype != "phony"):
+                warnings.warn("Concurrent execution is unwise in timings mode as it will mess up the timings.")
                 
-                raise ValueError(f'Unknown mode {mode}')
+            measure_fun = _measure_timings
+            extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept)
+            
+        elif mode == "scalar_output": 
+        
+            measure_fun = _measure_output
+            extra_submit_args = (setup, args, all_funs_list, n_repeat, StopOnExcept)
+        
+        else:
+                
+            raise ValueError(f'Unknown mode {mode}')
+            
+        with (
+            progress_bar(total = total_iterations) as progress,
+            PoolExecutor(nproc) as executor,
+        ):
+            
+            futures = []
+
+            for i_args, args in zip(
+                itertools.product(*[range(i) for i in args_shape.values()]) ,
+                itertools.product(*list(all_args.values()))                 ,
+            ):
+                
+                future = executor.submit(
+                    measure_fun,
+                    args, *extra_submit_args
+                )
+                
+                future.add_done_callback(lambda p: progress.update(1))
+                setattr(future, "i_args", i_args)
+                futures.append(future)
+                        
+            for future in futures:
+                
+                all_idx_list = list(future.i_args)
+                all_idx_list.append(slice(None))
+                all_idx_list.append(slice(None))
+                all_idx = tuple(all_idx_list)
+                
+                try:
+                    all_vals[all_idx] = future.result()
+                    
+                except Exception as exc:
+                    all_vals[all_idx] = np.nan
+                    if StopOnExcept:
+                        raise exc
 
         # Sort values along "repeat" axis, taking care of nans.
         idx = np.argsort(all_vals, axis=-1)
