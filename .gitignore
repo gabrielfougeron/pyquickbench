@@ -27,6 +27,7 @@
 .pytest_cache
 *__pycache__*
 dist/
+build/
 docs/build/
 /docs/source/_build/
 /docs/pytest_out/

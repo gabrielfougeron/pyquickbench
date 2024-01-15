@@ -28,6 +28,7 @@ from pyquickbench._utils import (
     FakeProgressBar         ,
     _measure_output         ,
     _measure_timings        ,
+    _values_reduction       ,
 )
 
 from pyquickbench._defaults import (
@@ -36,6 +37,7 @@ from pyquickbench._defaults import (
     default_color_list      ,
     default_linestyle_list  ,
     default_pointstyle_list ,
+    all_reductions          ,
     all_plot_intents        ,
 )
 
@@ -450,7 +452,9 @@ def plot_benchmark(
     idx_all_curve_pointstyle = []
     idx_all_subplot_grid_x = []
     idx_all_subplot_grid_y = []
-    idx_all_reduction_avg = []
+    idx_all_reduction = {}
+    for name in all_reductions: # Valitity of reduction key was checked before
+        idx_all_reduction[name] = []
     
     idx_single_value = []
     name_curve_color = []
@@ -498,8 +502,11 @@ def plot_benchmark(
         elif value == 'subplot_grid_y':
             idx_all_subplot_grid_y.append(i)
             name_subplot_grid_y.append(name)
-        elif value == 'reduction_avg':
-            idx_all_reduction_avg.append(i)
+        elif value.startswith("reduction_"):
+            name = value[10:]
+            idx_all_reduction[name].append(i)
+        else:
+            raise ValueError("This error should never be raised")
             
     if (n_points != 1):
         raise ValueError(f"There should be exactly one plot_intent named 'points'. There are currently {n_points}.")
@@ -519,7 +526,15 @@ def plot_benchmark(
     idx_all_curve_pointstyle    = np.array(idx_all_curve_pointstyle )
     idx_all_subplot_grid_x      = np.array(idx_all_subplot_grid_x   )
     idx_all_subplot_grid_y      = np.array(idx_all_subplot_grid_y   )
-    idx_all_reduction_avg       = np.array(idx_all_reduction_avg    )
+    
+    for name in all_reductions:
+        idx_all_reduction[name] = np.array(idx_all_reduction[name]  )
+    
+    n_colors = len(color_list)
+    n_linestyle = len(linestyle_list)
+    n_pointstyle = len(pointstyle_list)
+
+    leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
     
     n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
     n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
@@ -565,7 +580,7 @@ def plot_benchmark(
             ax = np.array([[ax]])
         
         else:
-            raise TypeError(f'Non compatible type for argument "ax": {type(ax)}')
+            raise TypeError(f'Non compatible type for argument "ax": {type(ax)}.')
         
     # TODO : Adapt this
     # if (relative_to is None):
@@ -592,13 +607,6 @@ def plot_benchmark(
     #         
     #         relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
         
-        
-    n_colors = len(color_list)
-    n_linestyle = len(linestyle_list)
-    n_pointstyle = len(pointstyle_list)
-
-    leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
-    
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         
         idx_vals = [-1] * all_vals.ndim
@@ -692,15 +700,17 @@ def plot_benchmark(
                     )
                 )
 
-        idx_vals[idx_points] = slice(None)
-        idx_vals_tuple = tuple(idx_vals)
-        
+        plot_y_val = _values_reduction(all_vals, idx_vals, idx_points)
+
         if all_xvalues is None:
             plot_x_val = all_args[name_points]
-        else:   
-            plot_x_val = all_xvalues[idx_vals_tuple]
-            
-        plot_y_val = all_vals[idx_vals_tuple]
+        else:  
+            plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points) 
+
+        
+        
+        
+        
         
         # print()
         # print(plot_x_val)

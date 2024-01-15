@@ -254,3 +254,16 @@ class PhonyProcessPoolExecutor(object):
     
     def submit(self, fn, /, *args):
         return FakeFuture(fn=fn, args=args)
+
+# 
+# idx_all_reduction_avg       = np.array(idx_all_reduction_avg    )
+# idx_all_reduction_min       = np.array(idx_all_reduction_min    )
+# idx_all_reduction_max       = np.array(idx_all_reduction_max    )
+
+def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
+
+    idx_vals[idx_points] = slice(None)
+    idx_vals_tuple = tuple(idx_vals)
+    reducted_val = all_vals[idx_vals_tuple]
+    
+    return reducted_val
