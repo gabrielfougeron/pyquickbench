@@ -62,8 +62,8 @@
     <link rel="icon" href="../../../_static/plot_icon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Plot intents and reductions" href="08-Reductions.html" />
-    <link rel="prev" title="Transforming values" href="06-Transforming_values.html" />
+    <link rel="next" title="Benchmarks" href="../benchmarks/index.html" />
+    <link rel="prev" title="Plotting transformed values" href="06-Transforming_values.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -357,9 +357,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="03-Preparing_inputs.html">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Transforming values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Plotting transformed values</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Multidimensional benchmarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08-Reductions.html">Plot intents and reductions</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -477,7 +476,7 @@ to download the full example code</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>By default, only the minminum timing is reported on the plot as recommended by <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.repeat()</span></code></a>. This being said, the array <code class="docutils literal notranslate"><span class="pre">all_values</span></code> does contain <a href="#id1"><span class="problematic" id="id2">``</span></a>n_repeat `` timings.</p>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>By default, only the minminum timing is reported on the plot as recommended by <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.repeat()</span></code></a>. This being said, the array <code class="docutils literal notranslate"><span class="pre">all_values</span></code> does contain <code class="docutils literal notranslate"><span class="pre">n_repeat</span></code> timings.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a><span class="p">)</span>

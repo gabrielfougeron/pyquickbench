@@ -24,7 +24,7 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 
 ## Installation
 
-To install pyquickbench, simply checkout the repository and type:
+To install the very latest version of pyquickbench, simply checkout the repository and type:
 
 ```
 pip install .
@@ -64,4 +64,4 @@ This software is published under the [BSD 2-Clause License](https://github.com/g
 
 ## Other open source alternatives
 
-You might like [perfplot](https://github.com/nschloe/perfplot), the more fleshed-out inspiration for this work.
+You might like [perfplot](https://github.com/nschloe/perfplot), one of the inspirations for this work.

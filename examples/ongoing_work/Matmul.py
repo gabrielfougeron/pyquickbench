@@ -101,12 +101,8 @@ def setup_abc(P, R, Q, real_dtype):
     c = np.zeros((P,Q),dtype=dtypes_dict[real_dtype])
     return {'a':a, 'b':b, 'c':c}
 
-# sphinx_gallery_start_ignore
-
 basename = 'matmul_timings'
-filename = os.path.join(timings_folder,basename+'_new_________.npz')
-
-# sphinx_gallery_end_ignore
+filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
     "P" : [32 * (2 ** k) for k in range(7)]     ,
@@ -116,30 +112,26 @@ all_args = {
 }
 
 all_funs = [
-    # Three_loops_python                  ,
+    Three_loops_python                  ,
     Three_loops_numba_serial            ,
-    # Three_loops_numba_auto_parallel     ,
-    # Three_loops_numba_parallel          ,
-    # Three_loops_numba_parallel_noreduce ,
-    # numpy_matmul                        ,
+    Three_loops_numba_auto_parallel     ,
+    Three_loops_numba_parallel          ,
+    Three_loops_numba_parallel_noreduce ,
+    numpy_matmul                        ,
 ]
 
 # %%
 
-all_errors = pyquickbench.run_benchmark(
+all_timings = pyquickbench.run_benchmark(
     all_args                ,
     all_funs                ,
     setup = setup_abc       ,
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
-    mode = "scalar_output"          ,
-    # PreventBenchmark = True ,
-    ForceBenchmark= True    ,
-    nproc = 8   ,
-    # pooltype = "phony"   ,
-    # pooltype = "thread"   ,
-    pooltype = "process"   ,
+    mode = "scalar_output"  ,
+    PreventBenchmark = True ,
+    # ForceBenchmark= True    ,
 )
 
 # plot_intent = {

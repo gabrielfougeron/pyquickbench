@@ -88,10 +88,10 @@ For instance, let's run the following benchmark a thousand times.
 
 .. GENERATED FROM PYTHON SOURCE LINES 81-83
 
-By default, only the minminum timing is reported on the plot as recommended by :meth:`python:timeit.Timer.repeat`. This being said, the array ``all_values`` does contain ``n_repeat `` timings.
+By default, only the minminum timing is reported on the plot as recommended by :meth:`python:timeit.Timer.repeat`. This being said, the array ``all_values`` does contain ``n_repeat`` timings.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-89
+.. GENERATED FROM PYTHON SOURCE LINES 83-88
 
 .. code-block:: Python
 
@@ -99,7 +99,6 @@ By default, only the minminum timing is reported on the plot as recommended by :
     print(all_values.shape[0] == len(all_sizes))
     print(all_values.shape[1] == len(all_funs))
     print(all_values.shape[2] == n_repeat)
-
 
 
 
@@ -116,11 +115,11 @@ By default, only the minminum timing is reported on the plot as recommended by :
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-91
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 All the different timings can be superimposed on the same plot with the following ``plot_intent`` argument:
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-107
+.. GENERATED FROM PYTHON SOURCE LINES 90-106
 
 .. code-block:: Python
 
@@ -152,11 +151,11 @@ All the different timings can be superimposed on the same plot with the followin
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 107-108
 
 The above plot is quite cluttered. For more concise information, let's use curve transparency:
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-119
+.. GENERATED FROM PYTHON SOURCE LINES 108-118
 
 .. code-block:: Python
 
@@ -182,12 +181,12 @@ The above plot is quite cluttered. For more concise information, let's use curve
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-122
+.. GENERATED FROM PYTHON SOURCE LINES 119-121
 
 The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can choose to plot minimal, median and maximal values:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-165
+.. GENERATED FROM PYTHON SOURCE LINES 121-164
 
 .. code-block:: Python
 
@@ -246,11 +245,11 @@ The above plot gives a good idea of the concentration of data, but bounds on tim
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-167
+.. GENERATED FROM PYTHON SOURCE LINES 165-166
 
 More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-185
+.. GENERATED FROM PYTHON SOURCE LINES 166-184
 
 .. code-block:: Python
 
@@ -284,11 +283,11 @@ More generally, the ``plot_intent`` argument controls what dimension of the arra
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-187
+.. GENERATED FROM PYTHON SOURCE LINES 185-186
 
 Or for all functions, but a single value of input size.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-203
+.. GENERATED FROM PYTHON SOURCE LINES 186-202
 
 .. code-block:: Python
 
@@ -320,7 +319,7 @@ Or for all functions, but a single value of input size.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-204
+.. GENERATED FROM PYTHON SOURCE LINES 203-203
 
 As can be seen in the above plots, the timings are automatically sorted along the "repeat" axis.
 

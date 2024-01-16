@@ -121,7 +121,7 @@ Letting :func:`pyquickbench.run_benchmark` know that the benchmark target is the
         mode = "scalar_output"                      ,
         filename = bench_filename                   ,
         plot_ylim = plot_ylim                       ,
-        title = f'Relative error on integrand'      ,
+        title = 'Relative error on integrand'       ,
         ylabel = "Relative error"                   ,
         show = True                                 ,
     )
@@ -155,7 +155,7 @@ As seen in :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py`, 
         mode = "timings"                ,
         filename = timings_filename     ,
         logx_plot = True                ,
-        title = f'Computational cost'   ,
+        title = 'Computational cost'    ,
         show = True                     ,
     )
 
@@ -206,7 +206,7 @@ The best method for a given use case is a compromise between speed and accuracy.
         all_xvalues = all_times     ,
         logx_plot = True            ,
         plot_ylim = plot_ylim       ,
-        title = f'Relative error as a function of computational cost' ,
+        title = 'Relative error as a function of computational cost' ,
         ylabel = "Relative error"   ,
         xlabel = "Time (s)"         ,
         show = True                 ,

@@ -62,7 +62,7 @@
     <link rel="icon" href="../../../_static/plot_icon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Transforming values" href="06-Transforming_values.html" />
+    <link rel="next" title="Plotting transformed values" href="06-Transforming_values.html" />
     <link rel="prev" title="Handling errors" href="04-Error_handling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -357,9 +357,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="03-Preparing_inputs.html">Preparing inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Plotting scalar values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Transforming values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Plotting transformed values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="07-Multidimensional_benchmarks.html">Multidimensional benchmarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="08-Reductions.html">Plot intents and reductions</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -511,7 +510,7 @@ to download the full example code</p>
     <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;scalar_output&quot;</span>                      <span class="p">,</span>
     <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bench_filename</span></a>                   <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_ylim</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_ylim</span></a>                       <span class="p">,</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Relative error on integrand&#39;</span>      <span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Relative error on integrand&#39;</span>       <span class="p">,</span>
     <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Relative error&quot;</span>                   <span class="p">,</span>
     <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                                 <span class="p">,</span>
 <span class="p">)</span>
@@ -526,7 +525,7 @@ to download the full example code</p>
     <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                <span class="p">,</span>
     <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a>     <span class="p">,</span>
     <span class="n">logx_plot</span> <span class="o">=</span> <span class="kc">True</span>                <span class="p">,</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Computational cost&#39;</span>   <span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Computational cost&#39;</span>    <span class="p">,</span>
     <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -558,7 +557,7 @@ to download the full example code</p>
     <span class="n">all_xvalues</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_times</span></a>     <span class="p">,</span>
     <span class="n">logx_plot</span> <span class="o">=</span> <span class="kc">True</span>            <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_ylim</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_ylim</span></a>       <span class="p">,</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Relative error as a function of computational cost&#39;</span> <span class="p">,</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Relative error as a function of computational cost&#39;</span> <span class="p">,</span>
     <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Relative error&quot;</span>   <span class="p">,</span>
     <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Time (s)&quot;</span>         <span class="p">,</span>
     <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                 <span class="p">,</span>

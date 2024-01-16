@@ -290,25 +290,19 @@ def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
     
     for key, idx in idx_all_reduction.items():
         for i in idx:
-            idx_vals[i] = slice(None)
-            idx_to_reduction[i] = key
-    
+            if idx_vals[i] is None:
+                idx_vals[i] = slice(None)
+                idx_to_reduction[i] = key
+                
     idx_to_reduction = dict(sorted(idx_to_reduction.items()))
-
+    
     idx_vals_tuple = tuple(idx_vals)
     reduced_val = all_vals[idx_vals_tuple]
-    
-    n_reductions = len(idx_to_reduction)-1
 
-    for i_reduction in range(n_reductions):
+    for red_idx_rel, (red_idx_abs, red_name) in enumerate(idx_to_reduction.items()):
 
-        for red_idx_rel, (red_idx_abs, red_name) in enumerate(idx_to_reduction.items()):
-            if red_name != "points":
-                break
-        else:
-            raise ValueError("This error should never be raised")
-        
-        reduced_val = all_reductions[red_name](reduced_val, axis=red_idx_rel)
+        if red_name != "points":
+            reduced_val = all_reductions[red_name](reduced_val, axis=red_idx_rel, keepdims=True)
     
     return reduced_val
 
@@ -334,3 +328,31 @@ def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, K
             label += f'{val_name}, '
             
     return label
+
+def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
+    
+    if isinstance(all_idx, dict):
+        idx = all_idx.get(name)
+    elif isinstance(all_val, dict):
+        val = all_val.get(name)
+        
+        if val is None:
+            idx = None
+        else:
+        
+            if name == "fun":
+                idx = all_fun_names_list.index(val)
+            elif name == "repeat":
+                idx = int(val)
+            else:
+                search_in = all_args[name]
+                if isinstance(search_in, list):
+                    idx = search_in.index(val)
+                elif isinstance(search_in, np.ndarray):
+                    idx = np.nonzero(search_in == val)[0]
+                else:
+                    raise NotImplementedError(f"Searching in {type(all_args[name]) =} not yet supported.")
+    else:
+        idx = None
+        
+    return idx

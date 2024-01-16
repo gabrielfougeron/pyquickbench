@@ -18,15 +18,15 @@
 .. _sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py:
 
 
-Transforming values
-===================
+Plotting transformed values
+===========================
 
 .. GENERATED FROM PYTHON SOURCE LINES 7-9
 
-Let's expand on the benchmark exposed in :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py`.
+Let's expand on the benchmark exposed in :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py`.
 The benchmark consists in understanding the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-34
+.. GENERATED FROM PYTHON SOURCE LINES 9-18
 
 .. code-block:: Python
 
@@ -39,27 +39,41 @@ The benchmark consists in understanding the convergence behavior of the followin
     ]
 
 
-    plot_ylim = [1e-17, 1e1]
 
-    bench_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
 
-    pyquickbench.run_benchmark(
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 116-117
+
+Let's focus on timings first.
+
+.. GENERATED FROM PYTHON SOURCE LINES 117-132
+
+.. code-block:: Python
+
+    timings_filename = os.path.join(bench_folder,basename_bench_filename+'_timings.npz') 
+    timings_results = pyquickbench.run_benchmark(
+        all_nint                                    ,
+        bench                                       ,
+        filename = timings_filename                 ,
+    )
+
+    pyquickbench.plot_benchmark(
+        timings_results                 ,
         all_nint                        ,
         bench                           ,
-        mode = "scalar_output"          ,
-        filename = bench_filename       ,
-        plot_ylim = plot_ylim                       ,
-        title = f'Relative error on integrand'      ,
-        ylabel = "Relative error"   ,
-        show = True                                 ,
+        show = True                     ,
+        title = 'Computational cost'    , 
     )
 
 
 
 
-
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_001.png
-   :alt: Relative error on integrand
+   :alt: Computational cost
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_001.png
    :class: sphx-glr-single-img
 
@@ -67,35 +81,30 @@ The benchmark consists in understanding the convergence behavior of the followin
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-133
+.. GENERATED FROM PYTHON SOURCE LINES 133-134
 
-A natural question in this case is to ask whether the measured convergence rates of the numerical methods match their theoretical convergence rates. This post-processing can be performed automatically by :func:`pyquickbench.run_benchmark` if the argument ``transform`` is set to ``"pol_cvgence_order"``.
+We can check that the integrations algorithms provided by :mod:`scipy:scipy` scale linearly with respect to the number of integrations steps with the ``transform`` argument set to ``"pol_growth_order"``:
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-149
+.. GENERATED FROM PYTHON SOURCE LINES 134-145
 
 .. code-block:: Python
 
 
-    plot_ylim = [0, 10]
-
-    pyquickbench.run_benchmark(
-        all_nint                                ,
-        bench                                   ,
-        mode = "scalar_output"                  ,
-        filename = bench_filename               ,
-        plot_ylim = plot_ylim                   ,
-        ylabel = "Measured convergence rate"    ,
-        show = True                             ,
-        logx_plot = True                        ,
-        transform = "pol_cvgence_order"         ,
+    pyquickbench.plot_benchmark(
+        timings_results                             ,
+        all_nint                                    ,
+        bench                                       ,
+        logx_plot = True                            ,
+        title = "Computational cost growth order"   ,
+        transform = "pol_growth_order"              ,
+        show = True                                 ,
     )
 
 
 
 
-
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_002.png
-   :alt: 06 Transforming values
+   :alt: Computational cost growth order
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_002.png
    :class: sphx-glr-single-img
 
@@ -103,33 +112,32 @@ A natural question in this case is to ask whether the measured convergence rates
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 146-147
 
-The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to ``True``.
+Since all the functions in the benchmark have the same asymptotic behavior, it makes sense to compare then against each other. Let's pick a reference method, for instance "DOP853" and plot all timings relative to this reference. This is achieved with the ``relative_to_val`` argument.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-165
+.. GENERATED FROM PYTHON SOURCE LINES 147-160
 
 .. code-block:: Python
 
 
-    pyquickbench.run_benchmark(
+    relative_to_val = {"fun": "DOP853"}
+
+    pyquickbench.plot_benchmark(
+        timings_results                         ,
         all_nint                                ,
         bench                                   ,
-        mode = "scalar_output"                  ,
-        filename = bench_filename               ,
-        plot_ylim = plot_ylim                   ,
-        ylabel = "Measured convergence rate"    ,
-        show = True                             ,
         logx_plot = True                        ,
-        transform = "pol_cvgence_order"         ,
-        clip_vals = True                        ,
+        title = "Relative computational cost"   ,
+        relative_to_val = relative_to_val       ,
+        show = True                             ,
     )
 
 
 
 
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_003.png
-   :alt: 06 Transforming values
+   :alt: Relative computational cost
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_003.png
    :class: sphx-glr-single-img
 
@@ -137,21 +145,125 @@ The pre and post convergence behavior of the numerical algorithms really clutter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-167
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
-The measured values can now be compared to the theoretical convergence rates of the different methods. In order to plot your own data to the figure, you can handle the :class:`matplotlib:matplotlib.figure.Figure` and :class:`matplotlib:matplotlib.axes.Axes` objects yourself, And decoupe the calls to :func:`pyquickbench.run_benchmark` and :func:`pyquickbench.plot_benchmark` as shown here.
+Let's focus on accuracy measurements now.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-216
+.. GENERATED FROM PYTHON SOURCE LINES 162-183
 
 .. code-block:: Python
 
 
+    plot_ylim = [1e-17, 1e1]
+    scalar_filename = os.path.join(bench_folder,basename_bench_filename+'_error.npz')
     bench_results = pyquickbench.run_benchmark(
         all_nint                                ,
         bench                                   ,
         mode = "scalar_output"                  ,
-        filename = bench_filename               ,
+        filename = scalar_filename               ,
     )
+
+    pyquickbench.plot_benchmark(
+        bench_results                           ,
+        all_nint                                ,
+        bench                                   ,
+        mode = "scalar_output"                  ,
+        plot_ylim = plot_ylim                   ,
+        title = f'Relative error on integrand'  ,
+        ylabel = "Relative error"               ,
+        show = True                             ,
+    )
+
+
+
+
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_004.png
+   :alt: Relative error on integrand
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_004.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 184-185
+
+A natural question when assessing accuracy is to ask whether the measured convergence rates of the numerical methods match their theoretical convergence rates. This post-processing can be performed automatically by :func:`pyquickbench.run_benchmark` if the argument ``transform`` is set to ``"pol_cvgence_order"``.
+
+.. GENERATED FROM PYTHON SOURCE LINES 185-201
+
+.. code-block:: Python
+
+
+    plot_ylim = [0, 10]
+
+    pyquickbench.plot_benchmark(
+        bench_results                           ,
+        all_nint                                ,
+        bench                                   ,
+        mode = "scalar_output"                  ,
+        plot_ylim = plot_ylim                   ,
+        ylabel = "Measured convergence rate"    ,
+        logx_plot = True                        ,
+        transform = "pol_cvgence_order"         ,
+        show = True                             ,
+    )
+
+
+
+
+
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_005.png
+   :alt: 06 Transforming values
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_005.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 202-203
+
+The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to ``True``.
+
+.. GENERATED FROM PYTHON SOURCE LINES 203-217
+
+.. code-block:: Python
+
+
+    pyquickbench.plot_benchmark(
+        bench_results                           ,
+        all_nint                                ,
+        bench                                   ,
+        mode = "scalar_output"                  ,
+        plot_ylim = plot_ylim                   ,
+        ylabel = "Measured convergence rate"    ,
+        logx_plot = True                        ,
+        transform = "pol_cvgence_order"         ,
+        clip_vals = True                        ,
+        show = True                             ,
+    )
+
+
+
+
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_006.png
+   :alt: 06 Transforming values
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_006.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 218-219
+
+The measured values can now be compared to the theoretical convergence rates of the different methods. In order to plot your own data to the figure, you can handle the :class:`matplotlib:matplotlib.figure.Figure` and :class:`matplotlib:matplotlib.axes.Axes` objects yourself, And decoupe the calls to :func:`pyquickbench.run_benchmark` and :func:`pyquickbench.plot_benchmark` as shown here.
+
+.. GENERATED FROM PYTHON SOURCE LINES 219-259
+
+.. code-block:: Python
+
 
     th_cvg_rate = {
         "RK45"  : 5,  
@@ -182,7 +294,6 @@ The measured values can now be compared to the theoretical convergence rates of 
         clip_vals = True                        ,
     )
 
-
     xlim = ax[0,0].get_xlim()
     for name in bench:
         
@@ -196,41 +307,9 @@ The measured values can now be compared to the theoretical convergence rates of 
 
 
 
-
-.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_004.png
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_007.png
    :alt: 06 Transforming values
-   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_004.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 217-218
-
-Similarly we can check that the integrations algorithms provided by :mod:`scipy:scipy` scale linearly with respect to the number of integrations steps with the ``transform`` argument set to ``"pol_growth_order"``:
-
-.. GENERATED FROM PYTHON SOURCE LINES 218-229
-
-.. code-block:: Python
-
-
-    timings_filename = os.path.join(bench_folder,basename_bench_filename+'_timings.npz') 
-
-    pyquickbench.run_benchmark(
-        all_nint                                    ,
-        bench                                       ,
-        filename = timings_filename                 ,
-        logx_plot = True                            ,
-        title = "Computational cost growth order"   ,
-        transform = "pol_growth_order"              ,
-        show = True                                 ,
-    )
-
-
-.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_005.png
-   :alt: Computational cost growth order
-   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_005.png
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_06-Transforming_values_007.png
    :class: sphx-glr-single-img
 
 

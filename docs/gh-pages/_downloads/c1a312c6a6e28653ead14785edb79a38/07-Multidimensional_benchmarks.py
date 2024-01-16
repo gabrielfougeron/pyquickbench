@@ -78,13 +78,12 @@ pyquickbench.plot_benchmark(
 )
 
 # %% 
-# By default, only the minminum timing is reported on the plot as recommended by :meth:`python:timeit.Timer.repeat`. This being said, the array ``all_values`` does contain ``n_repeat `` timings.
+# By default, only the minminum timing is reported on the plot as recommended by :meth:`python:timeit.Timer.repeat`. This being said, the array ``all_values`` does contain ``n_repeat`` timings.
 #
 
 print(all_values.shape[0] == len(all_sizes))
 print(all_values.shape[1] == len(all_funs))
 print(all_values.shape[2] == n_repeat)
-
 
 # %% 
 # All the different timings can be superimposed on the same plot with the following ``plot_intent`` argument:

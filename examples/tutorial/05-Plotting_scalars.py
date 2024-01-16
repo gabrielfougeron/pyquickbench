@@ -125,7 +125,7 @@ pyquickbench.run_benchmark(
     mode = "scalar_output"                      ,
     filename = bench_filename                   ,
     plot_ylim = plot_ylim                       ,
-    title = f'Relative error on integrand'      ,
+    title = 'Relative error on integrand'       ,
     ylabel = "Relative error"                   ,
     show = True                                 ,
 )
@@ -141,7 +141,7 @@ pyquickbench.run_benchmark(
     mode = "timings"                ,
     filename = timings_filename     ,
     logx_plot = True                ,
-    title = f'Computational cost'   ,
+    title = 'Computational cost'    ,
     show = True                     ,
 )
 
@@ -174,7 +174,7 @@ pyquickbench.plot_benchmark(
     all_xvalues = all_times     ,
     logx_plot = True            ,
     plot_ylim = plot_ylim       ,
-    title = f'Relative error as a function of computational cost' ,
+    title = 'Relative error as a function of computational cost' ,
     ylabel = "Relative error"   ,
     xlabel = "Time (s)"         ,
     show = True                 ,

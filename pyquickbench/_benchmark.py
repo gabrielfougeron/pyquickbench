@@ -33,6 +33,7 @@ from pyquickbench._utils import (
     all_reductions          ,
     all_plot_intents        ,
     _build_product_legend   ,
+    _choose_idx_val         ,
 )
 
 from pyquickbench._defaults import (
@@ -45,6 +46,7 @@ from pyquickbench._defaults import (
 def run_benchmark(
     all_args        : typing.Union[dict, typing.Iterable]                   ,
     all_funs        : typing.Union[dict, typing.Iterable]                   ,
+    *                                                                       ,
     mode            : str                       = "timings"                 ,
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                 = default_setup             ,
@@ -265,6 +267,7 @@ def plot_benchmark(
                                 typing.Iterable[str]            ,
                                 None                            ,
                             ]                                   = None                      ,
+    *                                                                                       ,
     all_fun_names           : typing.Union[
                                 typing.Iterable[str]            ,
                                 None                            ,
@@ -305,10 +308,11 @@ def plot_benchmark(
     plot_legend             : bool                              = True                      ,
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
+    relative_to_idx         : typing.Union[dict, None]          = None                      ,         
+    relative_to_val         : typing.Union[dict, None]          = None                      , 
     transform               : typing.Union[str, None]           = None                      ,
     clip_vals               : bool                              = False                     ,
     stop_after_first_clip   : bool                              = False                     ,
-    # relative_to             : np.typing.ArrayLike | None        = None                      ,
 ) -> None :
     """Plots benchmarks results
 
@@ -346,7 +350,13 @@ def plot_benchmark(
         Alpha value for transparency of curves in plot.\n
         By default, ``1.`` meaning curves are fully opaque            
     single_values_idx : dict | None, optional
-        Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``, by default ``None``.
+        Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
+        By default ``None``.
+    single_values_val : dict | None, optional
+        Values of benchmark to be fixed by a ``plot_intent`` of ``"single_value"``.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
+        By default ``None``.
     logx_plot : bool | None, optional
         How to override log scaling on the x-axis of the plots, by default ``None``.
     logy_plot : bool | None, optional
@@ -385,6 +395,14 @@ def plot_benchmark(
         Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``'upper left'``.
     plot_grid : bool, optional
         Whether to plot a background grido to each plot, by default ``True``.
+    relative_to_idx : dict | None, optional
+        Indices of benchmarked values against which curves will be plotted.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n
+        By default ``None``.
+    relative_to_val : dict | None, optional
+        Values of benchmark against which curves will be plotted.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n
+        By default ``None``.
     transform : str | None, optional
         Data transformation before plotting, by default ``None``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
@@ -395,7 +413,6 @@ def plot_benchmark(
     stop_after_first_clip : bool, optional
         Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False
     """
-
 
     # TODO: Change that
     ProductLegend = True
@@ -441,6 +458,17 @@ def plot_benchmark(
     
     assert n_funs == len(all_fun_names_list)
 
+    if not(isinstance(color_list, list)):
+        color_list = [color_list]    
+    if not(isinstance(linestyle_list, list)):
+        linestyle_list = [linestyle_list]    
+    if not(isinstance(pointstyle_list, list)):
+        pointstyle_list = [pointstyle_list]
+    
+    n_colors = len(color_list)
+    n_linestyle = len(linestyle_list)
+    n_pointstyle = len(pointstyle_list)
+
     if plot_intent is None:
         
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
@@ -466,6 +494,8 @@ def plot_benchmark(
 
     if not((single_values_idx is None) or (single_values_val is None)):
         raise ValueError("Both single_values_idx and single_values_val were set. only one of them should be")
+    if not((relative_to_idx is None) or (relative_to_val is None)):
+        raise ValueError("Both relative_to_idx and relative_to_val were set. only one of them should be")
 
     n_points = 0
     idx_points = -1
@@ -477,6 +507,7 @@ def plot_benchmark(
     idx_all_curve_pointstyle = []
     idx_all_subplot_grid_x = []
     idx_all_subplot_grid_y = []
+    idx_all_relative = []
     
     n_reductions = 0
     idx_all_reduction = {}
@@ -489,17 +520,7 @@ def plot_benchmark(
     name_curve_pointstyle = []
     name_subplot_grid_x = []
     name_subplot_grid_y = []
-    
-    if not(isinstance(color_list, list)):
-        color_list = [color_list]    
-    if not(isinstance(linestyle_list, list)):
-        linestyle_list = [linestyle_list]    
-    if not(isinstance(pointstyle_list, list)):
-        pointstyle_list = [pointstyle_list]
-    
-    n_colors = len(color_list)
-    n_linestyle = len(linestyle_list)
-    n_pointstyle = len(pointstyle_list)
+    idx_relative = []
     
     for i, (name, value) in enumerate(plot_intent.items()):
         
@@ -510,33 +531,11 @@ def plot_benchmark(
         elif value == 'same':
             idx_all_same.append(i)
         elif value == 'single_value':
-            
-            if isinstance(single_values_idx, dict):
-                fixed_idx = single_values_idx.get(name)
-            elif isinstance(single_values_val, dict):
-                fixed_val = single_values_val.get(name)
-                
-                if fixed_val is None:
-                    fixed_idx = None
-                else:
-                
-                    if name == "fun":
-                        fixed_idx = all_fun_names_list.index(fixed_val)
-                    elif name == "repeat":
-                        fixed_idx = int(fixed_val)
-                    else:
-                        search_in = all_args[name]
-                        if isinstance(search_in, list):
-                            fixed_idx = search_in.index(fixed_val)
-                        elif isinstance(search_in, np.ndarray):
-                            fixed_idx = np.nonzero(search_in == fixed_val)[0]
-                        else:
-                            raise NotImplementedError(f"Searching in {all_args[name] =} not yet supported.")
-            else:
-                fixed_idx = None
 
+            fixed_idx = _choose_idx_val(name, single_values_idx, single_values_val, all_args, all_fun_names_list)
+            
             if fixed_idx is None:
-                warnings.warn("Argument single_values_idx was not properly set. A sensible default was provided, but please beware.")
+                warnings.warn("Arguments single_values_idx / single_values_val were not properly set. A sensible default was provided, but please beware.")
                 fixed_idx = 0
                 
             assert isinstance(fixed_idx, int)
@@ -566,11 +565,16 @@ def plot_benchmark(
         else:
             raise ValueError("This error should never be raised")
             
+        relative_idx = _choose_idx_val(name, relative_to_idx, relative_to_val, all_args, all_fun_names_list)
+        if isinstance(relative_idx, int):
+            idx_all_relative.append(i)
+            idx_relative.append(relative_idx)   
+            
     if (n_points != 1):
         raise ValueError(f"There should be exactly one plot_intent named 'points'. There are currently {n_points}.")
     
     if (n_reductions > 1):
-        warnings.warn("Several reductions were requested. These reductions will be applied in the order of the axes of the benchmark. Watch out for surprizing results as the reductions do not commute in general")
+        warnings.warn("Several reductions were requested. These reductions will be applied in the order of the axes of the benchmark. Watch out for surprizing results as reductions might not commute in general")
     
     idx_all_curves = []
     idx_all_curves.extend(idx_all_same)
@@ -581,7 +585,6 @@ def plot_benchmark(
     idx_all_curves.extend(idx_all_subplot_grid_y)
     
     idx_all_same                = np.array(idx_all_same             )
-    idx_all_single_value        = np.array(idx_all_single_value     )
     idx_all_curve_color         = np.array(idx_all_curve_color      )
     idx_all_curve_linestyle     = np.array(idx_all_curve_linestyle  )
     idx_all_curve_pointstyle    = np.array(idx_all_curve_pointstyle )
@@ -639,31 +642,6 @@ def plot_benchmark(
         else:
             raise TypeError(f'Non compatible type for argument "ax": {type(ax)}.')
         
-    # TODO : Adapt this
-    # if (relative_to is None):
-    #     relative_to_array = np.ones(list(args_shape.values()))
-    #     
-    # else:
-    #     raise NotImplementedError
-    #     if isinstance(relative_to, np.ndarray):
-    #         relative_to_array = relative_to
-    #         assert relative_to_array.shape == tuple(args_shape.values())
-    #     
-    #     else:
-    #         
-    #         if isinstance(relative_to, int):
-    #             relative_to_idx = relative_to
-    #             
-    #         elif isinstance(relative_to, str):
-    #             try:
-    #                 relative_to_idx = all_names_list.index(relative_to)
-    #             except ValueError:
-    #                 raise ValueError(f'{relative_to} is not a known name')
-    #         else:
-    #             raise ValueError(f'Invalid relative_to argument {relative_to}')
-    #         
-    #         relative_to_array = (np.sum(all_vals[:, relative_to_idx, :], axis=1) / n_repeat)
-        
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         
         idx_vals = [None] * all_vals.ndim
@@ -720,6 +698,18 @@ def plot_benchmark(
                 plot_x_val = all_args[name_points]
         else:  
             plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points, idx_all_reduction) 
+            plot_x_val = plot_x_val.reshape(-1)
+
+        if len(idx_all_relative) > 0:
+            
+            for i, j in zip(idx_relative, idx_all_relative):
+                idx_vals[j] = i
+
+            relative_plot_y_val = _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction)
+            
+            plot_y_val /= relative_plot_y_val
+
+        plot_y_val = plot_y_val.reshape(-1)
 
         npts = len(plot_x_val)
         assert npts == len(plot_y_val)
@@ -771,7 +761,15 @@ def plot_benchmark(
                         plot_y_val[i_size] = np.nan
         
         if isinstance(plot_x_val[0], str):
-            raise NotImplementedError
+
+            cur_ax.bar(
+                plot_x_val                  ,
+                plot_y_val                  ,
+                color       = color         ,
+                linestyle   = linestyle     ,
+                marker      = pointstyle    ,
+                alpha       = alpha         ,
+            )
         
         else:    
             
@@ -823,7 +821,11 @@ def plot_benchmark(
                     xlabel = ""
                 
             if ylabel is None:
-                if mode == "timings":
+                if transform in ["pol_growth_order", "pol_cvgence_order"]:
+                    ylabel = "order"
+                elif not((relative_to_val is None) and (relative_to_idx is None)):
+                    ylabel = ""
+                elif mode == "timings":
                     ylabel = "Time (s)"
                 else:
                     ylabel = ""
