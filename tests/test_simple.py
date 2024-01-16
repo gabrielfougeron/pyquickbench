@@ -34,7 +34,7 @@ def test_all_options_timings(SimpleScalarBenchmark):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         
-        for i,(
+        for (
             n_repeat                ,
             nproc                   ,
             pooltype                ,
@@ -42,7 +42,7 @@ def test_all_options_timings(SimpleScalarBenchmark):
             PreventBenchmark        ,
             StopOnExcept            ,
             ShowProgress            ,
-        ) in enumerate(itertools.product(
+        ) in itertools.product(
             all_n_repeat            ,
             all_nproc               ,
             all_pooltype            ,
@@ -50,10 +50,8 @@ def test_all_options_timings(SimpleScalarBenchmark):
             all_PreventBenchmark    ,
             all_StopOnExcept        ,
             all_ShowProgress        ,
-        )):
-            
-            print(i)
-            
+        ):
+
             all_vals = pyquickbench.run_benchmark(
                 SimpleScalarBenchmark.all_args          ,
                 SimpleScalarBenchmark.all_funs          ,
@@ -67,6 +65,16 @@ def test_all_options_timings(SimpleScalarBenchmark):
                 StopOnExcept        = StopOnExcept      ,
                 ShowProgress        = ShowProgress      ,
             ) 
+            
+            if PreventBenchmark:
+                assert all_vals is None
+            else:
+                assert isinstance(all_vals, np.ndarray)
+                assert all_vals.ndim == 3
+                assert all_vals.shape[0] == len(SimpleScalarBenchmark.all_args['n'])
+                assert all_vals.shape[1] == len(SimpleScalarBenchmark.all_funs)
+                assert all_vals.shape[2] == n_repeat
+                
 
 
 

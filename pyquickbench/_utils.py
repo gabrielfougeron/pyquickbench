@@ -263,9 +263,10 @@ AllPoolExecutors = {
 }
 
 all_reductions = {
-    "avg" : np.mean ,
-    "min" : np.min  , 
-    "max" : np.max  ,
+    "avg"       : np.ma.mean    ,
+    "min"       : np.ma.min     , 
+    "max"       : np.ma.max     ,
+    "median"    : np.ma.median  ,
 }
 
 all_plot_intents = [

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Multidimensional_benchmarks &#8212; pyquickbench  documentation</title>
+    <title>Multidimensional benchmarks &#8212; pyquickbench  documentation</title>
   
   
   
@@ -176,6 +176,13 @@
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../test-report/test-report.html">
+                        Tests report
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
       
@@ -290,6 +297,13 @@ document.write(`
                       </a>
                     </li>
                 
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../test-report/test-report.html">
+                        Tests report
+                      </a>
+                    </li>
+                
   </ul>
 </nav></div>
         
@@ -344,7 +358,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Transforming values</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multidimensional_benchmarks</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multidimensional benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08-Reductions.html">Plot intents and reductions</a></li>
 </ul>
 </li>
@@ -419,13 +433,12 @@ document.write(`
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="multidimensional-benchmarks">
-<span id="sphx-glr-build-auto-examples-tutorial-07-multidimensional-benchmarks-py"></span><h1>Multidimensional_benchmarks<a class="headerlink" href="#multidimensional-benchmarks" title="Link to this heading">#</a></h1>
-<p>Let’s run and plot a first simple benchmark in Python.</p>
-<p>Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.</p>
-<p>Let’s define a separate python function for three different list pre-allocation strategies.
-These functions all take an integer called “n” as an input, which stands for the length of the list to be pre-allocated.
-The argument name “n” is the default in pyquickbench and can be changed in as described in <a class="reference internal" href="03-Preparing_inputs.html#sphx-glr-build-auto-examples-tutorial-03-preparing-inputs-py"><span class="std std-ref">Preparing inputs</span></a>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">comprehension</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span id="sphx-glr-build-auto-examples-tutorial-07-multidimensional-benchmarks-py"></span><h1>Multidimensional benchmarks<a class="headerlink" href="#multidimensional-benchmarks" title="Link to this heading">#</a></h1>
+<p>One of pyquickbench’s strengths is its ability to run multidimensional benchmarks to test function behavior changes with respect to several different arguments, or to assess repeatability of a benchmark.</p>
+<p>For instance, let’s run the following benchmark a thousand times.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyquickbench</span>
+
+<span class="k">def</span> <span class="nf">comprehension</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
 
 <span class="k">def</span> <span class="nf">star_operator</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
@@ -441,57 +454,45 @@ The argument name “n” is the default in pyquickbench and can be changed in a
     <span class="n">star_operator</span>   <span class="p">,</span>
     <span class="n">for_loop_append</span> <span class="p">,</span>
 <span class="p">]</span>
-</pre></div>
-</div>
-<p>Let’s define relevant sizes of lists to be timed.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a> <span class="o">=</span> <span class="mi">12</span>
+
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a> <span class="o">=</span> <span class="mi">12</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_bench</span></a><span class="p">)]</span>
-</pre></div>
-</div>
-<p>Now, let’s import pyquickbench, run and plot the benchmark</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyquickbench</span>
 
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <span class="mi">1000</span>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <span class="mf">0.2</span>
 
-<span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a>             <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a>   <span class="p">,</span>
-    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
-    <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a>     <span class="p">,</span>
-    <span class="n">pooltype</span> <span class="o">=</span> <span class="s1">&#39;process&#39;</span>            <span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>By default : minimum as in <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.repeat()</span></code></a></p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
     <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a>             <span class="p">,</span>
     <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">time_per_test</span></a>   <span class="p">,</span>
     <span class="n">filename</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_filename</span></a>     <span class="p">,</span>
 <span class="p">)</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
-    <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
-    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;same&quot;</span>   <span class="p">,</span>
-<span class="p">}</span>
 
 <span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                      <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
     <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>     <span class="p">,</span>
 <span class="p">)</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_001.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>By default, only the minminum timing is reported on the plot as recommended by <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">timeit.Timer.repeat()</span></code></a>. This being said, the array <code class="docutils literal notranslate"><span class="pre">all_values</span></code> does contain <a href="#id1"><span class="problematic" id="id2">``</span></a>n_repeat `` timings.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_repeat</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
+True
+True
+</pre></div>
+</div>
+<p>All the different timings can be superimposed on the same plot with the following <code class="docutils literal notranslate"><span class="pre">plot_intent</span></code> argument:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
     <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
-    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;reduction_min&quot;</span>   <span class="p">,</span>
+    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;same&quot;</span>            <span class="p">,</span>
 <span class="p">}</span>
 
 <span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
@@ -503,10 +504,96 @@ The argument name “n” is the default in pyquickbench and can be changed in a
 <span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-multi-img"/></li>
-</ul>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_002.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>The above plot is quite cluttered. For more concise information, let’s use curve transparency:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                      <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>     <span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="mi">255</span>                  <span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_003.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in <code class="docutils literal notranslate"><span class="pre">plot_intent</span></code>, we can choose to plot minimal, median and maximal values:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpi</span></a> <span class="o">=</span> <span class="mi">150</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">figsize</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">1600</span><span class="o">/</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpi</span></a><span class="p">,</span> <span class="mi">800</span><span class="o">/</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpi</span></a><span class="p">)</span>
+
+<a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span>
+    <span class="n">nrows</span>   <span class="o">=</span> <span class="mi">1</span>         <span class="p">,</span>
+    <span class="n">ncols</span>   <span class="o">=</span> <span class="mi">1</span>         <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">figsize</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">figsize</span></a>   <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpi</span></a>     <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpi</span></a>       <span class="p">,</span>
+    <span class="n">squeeze</span> <span class="o">=</span> <span class="kc">False</span>     <span class="p">,</span>
+<span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_repeat_intents</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;reduction_min&quot;</span><span class="p">,</span> <span class="s2">&quot;reduction_max&quot;</span><span class="p">,</span> <span class="s2">&quot;reduction_median&quot;</span><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_linestyles</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dotted&quot;</span><span class="p">,</span> <span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="s2">&quot;solid&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="p">(</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">repeat_intent</span></a>       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">linestyle</span></a>           <span class="p">,</span>
+<span class="p">)</span><span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_repeat_intents</span></a>  <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_linestyles</span></a>      <span class="p">,</span>
+<span class="p">):</span>
+
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
+        <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
+        <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">repeat_intent</span></a>     <span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                  <span class="p">,</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                   <span class="p">,</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                    <span class="p">,</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>   <span class="p">,</span>
+        <span class="n">linestyle_list</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">linestyle</span></a>  <span class="p">,</span>
+        <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a>                   <span class="p">,</span>
+        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a>                     <span class="p">,</span>
+    <span class="p">)</span>
+
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">()</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_004.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_004.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>More generally, the <code class="docutils literal notranslate"><span class="pre">plot_intent</span></code> argument controls what dimension of the array <code class="docutils literal notranslate"><span class="pre">all_values</span></code> is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
+    <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;single_value&quot;</span>    <span class="p">,</span>
+    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
+<span class="p">}</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">single_values_val</span></a> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fun&quot;</span><span class="p">:</span> <span class="s2">&quot;star_operator&quot;</span><span class="p">}</span>
+
+<span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                              <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                               <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                                <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                             <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>             <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">single_values_val</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">single_values_val</span></a>   <span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_005.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_005.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>Or for all functions, but a single value of input size.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n&quot;</span>         <span class="p">:</span> <span class="s2">&quot;reduction_max&quot;</span>   <span class="p">,</span>
+    <span class="s2">&quot;fun&quot;</span>       <span class="p">:</span> <span class="s2">&quot;curve_color&quot;</span>     <span class="p">,</span>
+    <span class="s2">&quot;repeat&quot;</span>    <span class="p">:</span> <span class="s2">&quot;points&quot;</span>          <span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_values</span></a>                      <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes</span></a>                       <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>
+    <span class="n">show</span> <span class="o">=</span> <span class="kc">True</span>                     <span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a> <span class="o">=</span>   <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plot_intent</span></a>     <span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../../_images/sphx_glr_07-Multidimensional_benchmarks_006.png" srcset="../../../_images/sphx_glr_07-Multidimensional_benchmarks_006.png" alt="07 Multidimensional benchmarks" class = "sphx-glr-single-img"/><p>As can be seen in the above plots, the timings are automatically sorted along the “repeat” axis.</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-tutorial-07-multidimensional-benchmarks-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/855b64b906a1aa48825a31e15973572e/07-Multidimensional_benchmarks.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">07-Multidimensional_benchmarks.ipynb</span></code></a></p>

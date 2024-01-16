@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:06.797** total execution time for 8 files **from _build/auto_examples/tutorial**:
+**00:04.940** total execution time for 8 files **from _build/auto_examples/tutorial**:
 
 .. container::
 
@@ -33,26 +33,26 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` (``07-Multidimensional_benchmarks.py``)
-     - 00:02.423
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` (``06-Transforming_values.py``)
-     - 00:01.135
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``02-Caching_benchmarks.py``)
-     - 00:01.116
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``05-Plotting_scalars.py``)
-     - 00:00.826
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``03-Preparing_inputs.py``)
-     - 00:00.493
+     - 00:04.940
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``01-First_benchmark.py``)
-     - 00:00.341
+     - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Reductions.py` (``08-Reductions.py``)
-     - 00:00.252
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``02-Caching_benchmarks.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``03-Preparing_inputs.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_04-Error_handling.py` (``04-Error_handling.py``)
-     - 00:00.210
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``05-Plotting_scalars.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` (``06-Transforming_values.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Reductions.py` (``08-Reductions.py``)
+     - 00:00.000
      - 0.0

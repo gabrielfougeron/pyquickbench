@@ -281,7 +281,9 @@ def plot_benchmark(
     color_list              : list                              = default_color_list        ,
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
+    alpha                   : float                             = 1.                        ,
     single_values_idx       : typing.Union[dict, None]          = None                      ,         
+    single_values_val       : typing.Union[dict, None]          = None                      ,         
     logx_plot               : typing.Union[bool, None]          = None                      ,
     logy_plot               : typing.Union[bool, None]          = None                      ,
     plot_xlim               : typing.Union[tuple, None]         = None                      ,
@@ -340,6 +342,9 @@ def plot_benchmark(
         List of linestyles for plotted curves, by default ``default_linestyle_list``.
     pointstyle_list : list, optional
         List of point markers for plotted curves, by default ``default_pointstyle_list``.
+    alpha : float, optional
+        Alpha value for transparency of curves in plot.\n
+        By default, ``1.`` meaning curves are fully opaque            
     single_values_idx : dict | None, optional
         Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``, by default ``None``.
     logx_plot : bool | None, optional
@@ -458,7 +463,10 @@ def plot_benchmark(
             
             if not(intent in all_plot_intents):
                 raise ValueError(f'Unknown intent {intent} in plot_intent. Possible values are: {all_plot_intents}')
-    
+
+    if not((single_values_idx is None) or (single_values_val is None)):
+        raise ValueError("Both single_values_idx and single_values_val were set. only one of them should be")
+
     n_points = 0
     idx_points = -1
 
@@ -482,6 +490,17 @@ def plot_benchmark(
     name_subplot_grid_x = []
     name_subplot_grid_y = []
     
+    if not(isinstance(color_list, list)):
+        color_list = [color_list]    
+    if not(isinstance(linestyle_list, list)):
+        linestyle_list = [linestyle_list]    
+    if not(isinstance(pointstyle_list, list)):
+        pointstyle_list = [pointstyle_list]
+    
+    n_colors = len(color_list)
+    n_linestyle = len(linestyle_list)
+    n_pointstyle = len(pointstyle_list)
+    
     for i, (name, value) in enumerate(plot_intent.items()):
         
         if value == 'points':
@@ -494,6 +513,25 @@ def plot_benchmark(
             
             if isinstance(single_values_idx, dict):
                 fixed_idx = single_values_idx.get(name)
+            elif isinstance(single_values_val, dict):
+                fixed_val = single_values_val.get(name)
+                
+                if fixed_val is None:
+                    fixed_idx = None
+                else:
+                
+                    if name == "fun":
+                        fixed_idx = all_fun_names_list.index(fixed_val)
+                    elif name == "repeat":
+                        fixed_idx = int(fixed_val)
+                    else:
+                        search_in = all_args[name]
+                        if isinstance(search_in, list):
+                            fixed_idx = search_in.index(fixed_val)
+                        elif isinstance(search_in, np.ndarray):
+                            fixed_idx = np.nonzero(search_in == fixed_val)[0]
+                        else:
+                            raise NotImplementedError(f"Searching in {all_args[name] =} not yet supported.")
             else:
                 fixed_idx = None
 
@@ -552,10 +590,6 @@ def plot_benchmark(
     
     for name in all_reductions:
         idx_all_reduction[name] = np.array(idx_all_reduction[name]  )
-    
-    n_colors = len(color_list)
-    n_linestyle = len(linestyle_list)
-    n_pointstyle = len(pointstyle_list)
 
     n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
     n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
@@ -676,23 +710,17 @@ def plot_benchmark(
                 )
 
         plot_y_val = _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction)
-
+        
         if all_xvalues is None:
-            plot_x_val = all_args[name_points]
+            if name_points == "fun":
+                plot_x_val = all_fun_names
+            elif name_points == "repeat":
+                plot_x_val = np.array(range(n_repeat))
+            else:
+                plot_x_val = all_args[name_points]
         else:  
             plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points, idx_all_reduction) 
 
-
-        
-        
-        # 
-        # print()
-        # print(plot_x_val)
-        # print(plot_y_val)
-        # print(color)
-        # print(linestyle)
-        # print(pointstyle)
-        
         npts = len(plot_x_val)
         assert npts == len(plot_y_val)
         
@@ -748,11 +776,12 @@ def plot_benchmark(
         else:    
             
             cur_ax.plot(
-                plot_x_val              ,
-                plot_y_val              ,
-                color = color           ,
-                linestyle = linestyle   ,
-                marker = pointstyle     ,
+                plot_x_val                  ,
+                plot_y_val                  ,
+                color       = color         ,
+                linestyle   = linestyle     ,
+                marker      = pointstyle    ,
+                alpha       = alpha         ,
             )
         
     for i_subplot_grid_x in range(n_subplot_grid_x):

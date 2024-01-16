@@ -31,10 +31,11 @@ Pyquickbench is available on `conda-forge <https://conda-forge.org/>`_. To insta
     conda install pyquickbench -c conda-forge
 
 .. toctree::
-   :hidden:
-   :includehidden:
-   :maxdepth: 1
+    :hidden:
+    :includehidden:
+    :maxdepth: 1
 
-   _build/auto_examples/index
-   api
+    _build/auto_examples/index
+    api
+    test-report/test-report 
    
