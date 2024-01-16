@@ -43,8 +43,8 @@ from pyquickbench._defaults import (
 )
 
 def run_benchmark(
-    all_args        : dict | typing.Iterable                                ,
-    all_funs        : dict | typing.Iterable                                ,
+    all_args        : typing.Dict | typing.Iterable                         ,
+    all_funs        : typing.Dict | typing.Iterable                         ,
     mode            : str           = "timings"                             ,
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                     = default_setup                         ,
@@ -259,7 +259,7 @@ def run_benchmark(
 
 def plot_benchmark(
     all_vals                : np.typing.ArrayLike   ,
-    all_args                : dict | typing.Iterable                                        ,
+    all_args                : typing.Dict | typing.Iterable                                 ,
     all_funs                : typing.Dict[str, callable] |
                               typing.Iterable[str] | 
                               None                              = None                      ,
@@ -270,7 +270,7 @@ def plot_benchmark(
     color_list              : list                              = default_color_list        ,
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
-    single_values_idx       : dict | None                       = None                      ,         
+    single_values_idx       : typing.Dict | None                = None                      ,         
     logx_plot               : bool | None                       = None                      ,
     logy_plot               : bool | None                       = None                      ,
     plot_xlim               : tuple | None                      = None                      ,
