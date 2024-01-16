@@ -5,43 +5,68 @@ __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.par
 sys.path.append(__PROJECT_ROOT__)
 
 import pytest
+import warnings
 from test_config import *
 
 import numpy as np
-import scipy
+import itertools
 import pyquickbench
 
 
+def test_basic_benchmark(SimpleTimingsBenchmark):
 
-@ProbabilisticTest()
-def simple_test():
-
-    def comprehension(n):
-        return ['' for _ in range(n)]
-
-    def star_operator(n):
-        return ['']*n
-
-    def for_loop_append(n):
-        l = []
-        for _ in range(n):
-            l.append('')
-        
-    all_funs = [
-        comprehension   ,
-        star_operator   ,
-        for_loop_append ,
-    ]
-        
-    n_bench = 3
-    all_sizes = [2**n for n in range(n_bench)]
-
-    pyquickbench.run_benchmark(
-        all_sizes   ,
-        all_funs    ,
-        show = True ,
+    all_vals = pyquickbench.run_benchmark(
+        SimpleTimingsBenchmark.all_args         ,
+        SimpleTimingsBenchmark.all_funs         ,
+        setup = SimpleTimingsBenchmark.setup    ,
     ) 
 
+def test_all_options_timings(SimpleScalarBenchmark):
+    
+    all_n_repeat = [1, 2, 3]
+    all_nproc = [1, 2]
+    all_pooltype = ["phony", "thread", "process"]
+    all_ForceBenchmark = [True, False]
+    all_PreventBenchmark = [True, False]
+    all_StopOnExcept = [True, False]
+    all_ShowProgress = [True, False]
+        
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        
+        for i,(
+            n_repeat                ,
+            nproc                   ,
+            pooltype                ,
+            ForceBenchmark          ,
+            PreventBenchmark        ,
+            StopOnExcept            ,
+            ShowProgress            ,
+        ) in enumerate(itertools.product(
+            all_n_repeat            ,
+            all_nproc               ,
+            all_pooltype            ,
+            all_ForceBenchmark      ,
+            all_PreventBenchmark    ,
+            all_StopOnExcept        ,
+            all_ShowProgress        ,
+        )):
+            
+            print(i)
+            
+            all_vals = pyquickbench.run_benchmark(
+                SimpleScalarBenchmark.all_args          ,
+                SimpleScalarBenchmark.all_funs          ,
+                setup = SimpleScalarBenchmark.setup     ,
+                mode                = "scalar_output"   ,
+                n_repeat            = n_repeat          ,
+                nproc               = nproc             ,
+                pooltype            = pooltype          ,
+                ForceBenchmark      = ForceBenchmark    ,
+                PreventBenchmark    = PreventBenchmark  ,
+                StopOnExcept        = StopOnExcept      ,
+                ShowProgress        = ShowProgress      ,
+            ) 
 
 
 

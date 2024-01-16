@@ -5,6 +5,7 @@ import typing
 import warnings
 import functools
 import numpy as np
+import math
 
 @attrs.define
 class float_tol:
@@ -13,13 +14,12 @@ class float_tol:
 
 @attrs.define
 class likelyhood():
-    probable:       float
-    not_unlikely:   float
-    uncommon:       float
-    unlikely:       float
-    unbelievable:   float
-    impossible:     float
-
+    probable        :   float
+    not_unlikely    :   float
+    uncommon        :   float
+    unlikely        :   float
+    unbelievable    :   float
+    impossible      :   float
 
 def ProbabilisticTest(RepeatOnFail = 10):
 
@@ -66,3 +66,63 @@ def RepeatTest(n = 10):
         return wrapper
     
     return decorator
+
+@attrs.define
+class AllFunBenchmark:
+    all_args    :   dict[str]    
+    all_funs    :   dict[str, callable]   
+    setup       :   callable
+
+def comprehension(n):
+    return [0 for _ in range(n)]
+def star_operator(n):
+    return [0]*n
+def for_loop_append(n):
+    l = []
+    for _ in range(n):
+        l.append(0)
+def default_setup(n):
+    return {'n': n}
+    
+@pytest.fixture
+def SimpleTimingsBenchmark():
+    
+    n_bench = 3
+    all_sizes = [2**n for n in range(n_bench)]
+    
+    return AllFunBenchmark(
+        all_args = {
+            "n" : all_sizes
+        },
+        all_funs = {
+            "comprehension"     : comprehension     ,
+            "star_operator"     : star_operator     ,
+            "for_loop_append"   : for_loop_append   ,
+        },
+        setup = default_setup,  
+    )   
+    
+def random_setup(n):
+    return {'x': np.random.random((n))}
+def numpy_sum(x):
+    return np.sum(x)
+def math_fsum(x):
+    return math.fsum(x)
+    
+@pytest.fixture
+def SimpleScalarBenchmark():
+    
+    n_bench = 3
+    all_sizes = [2**n for n in range(n_bench)]
+    
+    return AllFunBenchmark(
+        all_args = {
+            "n" : all_sizes
+        },
+        all_funs = {
+            "numpy_sum"     : numpy_sum ,
+            "math_fsum"     : math_fsum ,
+        },
+        setup = random_setup,  
+    )   
+    

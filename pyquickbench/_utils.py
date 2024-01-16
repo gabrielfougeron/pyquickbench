@@ -281,28 +281,6 @@ all_plot_intents = [
 
 all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
-# def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
-# 
-#     idx_vals[idx_points] = slice(None)
-# 
-#     idx_to_reduction = {}
-#     
-#     for key, idx in idx_all_reduction.items():
-#         for i in idx:
-#             idx_vals[i] = slice(None)
-#             idx_to_reduction[i] = key
-#     
-#     idx_to_reduction = dict(sorted(idx_to_reduction.items()))
-# 
-#     idx_vals_tuple = tuple(idx_vals)
-#     reduced_val = all_vals[idx_vals_tuple]
-#     
-#     for red_idx_abs, red_name in idx_to_reduction.items():
-#         
-#         reduced_val = all_reductions[red_name](reduced_val, axis=0)
-#     
-#     return reduced_val
-
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
 
     idx_vals[idx_points] = slice(None)

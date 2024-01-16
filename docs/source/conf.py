@@ -43,7 +43,6 @@ extensions = [
     "sphinxext.rediraffe"           ,
 ]
 
-
 # The suffix of source filenames.
 source_suffix = ".rst"
 
@@ -72,10 +71,9 @@ intersphinx_cache_limit = -1
 intersphinx_timeout = 1
 
 rediraffe_redirects = {
-    "gallery": "_build/auto_examples/index",
-    "tutorial": "_build/auto_examples/tutorial/index",
+    "gallery": "_build/auto_examples/index"             ,
+    "tutorial": "_build/auto_examples/tutorial/index"   ,
 }
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
