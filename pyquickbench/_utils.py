@@ -282,7 +282,8 @@ all_plot_intents = [
 all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
-
+    
+    idx_vals = idx_vals.copy()
     idx_vals[idx_points] = slice(None)
 
     idx_to_reduction = {idx_points:"points"}

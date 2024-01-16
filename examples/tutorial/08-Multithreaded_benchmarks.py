@@ -1,6 +1,6 @@
 """
-Multidimensional benchmarks
-===========================
+Multithreaded benchmarks
+========================
 """
 
 # %% 

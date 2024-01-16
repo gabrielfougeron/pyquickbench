@@ -47,7 +47,7 @@ import pyquickbench
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
 
-timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
+timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files_time_consuming')
 
 if not(os.path.isdir(timings_folder)):
     os.makedirs(timings_folder)
@@ -105,10 +105,10 @@ basename = 'matmul_timings'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "P" : [32 * (2 ** k) for k in range(7)]     ,
-    "Q" : [32 * (2 ** k) for k in range(7)]     ,
-    "R" : [32 * (2 ** k) for k in range(7)]     ,
-    "real_dtype": ["float32", "float64"]        ,
+    "P" : [(2 ** k) for k in range(10)]     ,
+    "Q" : [(2 ** k) for k in range(10)]     ,
+    "R" : [(2 ** k) for k in range(10)]     ,
+    "real_dtype": ["float32", "float64"]    ,
 }
 
 all_funs = [
@@ -120,6 +120,8 @@ all_funs = [
     numpy_matmul                        ,
 ]
 
+n_repeat = 10
+
 # %%
 
 all_timings = pyquickbench.run_benchmark(
@@ -129,29 +131,47 @@ all_timings = pyquickbench.run_benchmark(
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
-    # PreventBenchmark = True ,
-    # ForceBenchmark= True    ,
+    n_repeat = n_repeat     ,
+    PreventBenchmark = True ,
 )
 
-# plot_intent = {
-#     "P" : 'single_value'                  ,
-#     "Q" : 'points'            ,
-#     "R" : 'single_value'            ,
-#     "real_dtype": 'curve_linestyle'  ,
-# }
-# 
-# single_values_idx = {
-#     "P" : -1        ,
-#     "Q" : -1        ,
-#     "R" : -1        ,
-#     "real_dtype": 0 ,
-# }
-# 
-# pyquickbench.plot_benchmark(
-#     all_errors                              ,
-#     all_args                                ,
-#     all_funs                                ,
-#     plot_intent = plot_intent               ,
-#     single_values_idx = single_values_idx   ,
-#     show = True                             ,
-# )
+plot_intent = {
+    "P" : 'single_value'            ,
+    "Q" : 'points'                  ,
+    "R" : 'single_value'            ,
+    "real_dtype": 'curve_linestyle' ,
+}
+
+single_values_idx = {
+    "P" : -1        ,
+    # "Q" : -1        ,
+    "R" : -1        ,
+    # "real_dtype": 0 ,
+}
+
+pyquickbench.plot_benchmark(
+    all_timings                              ,
+    all_args                                ,
+    all_funs                                ,
+    plot_intent = plot_intent               ,
+    single_values_idx = single_values_idx   ,
+    show = True                             ,
+)
+
+
+# %%
+
+relative_to_val = {
+    "real_dtype": "float32" ,
+    "fun": "numpy_matmul"   ,
+}
+
+pyquickbench.plot_benchmark(
+    all_timings                             ,
+    all_args                                ,
+    all_funs                                ,
+    plot_intent = plot_intent               ,
+    single_values_idx = single_values_idx   ,
+    relative_to_val = relative_to_val       ,
+    show = True                             ,
+)
