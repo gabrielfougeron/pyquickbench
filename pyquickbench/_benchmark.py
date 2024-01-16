@@ -43,23 +43,23 @@ from pyquickbench._defaults import (
 )
 
 def run_benchmark(
-    all_args        : typing.Dict | typing.Iterable                         ,
-    all_funs        : typing.Dict | typing.Iterable                         ,
-    mode            : str           = "timings"                             ,
+    all_args        : typing.Union[dict, typing.Iterable]                   ,
+    all_funs        : typing.Union[dict, typing.Iterable]                   ,
+    mode            : str                       = "timings"                 ,
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
-                                    = default_setup                         ,
-    n_repeat        : int           = 1                                     ,
-    nproc           : int           = None                                  ,
-    pooltype        : str | None    = None                                  ,
-    time_per_test   : float         = 0.2                                   ,
-    filename        : str | None    = None                                  ,
-    ForceBenchmark  : bool          = False                                 ,
-    PreventBenchmark: bool          = False                                 ,
-    StopOnExcept    : bool          = False                                 ,
-    ShowProgress    : bool          = False                                 ,
-    show            : bool          = False                                 ,
+                                                = default_setup             ,
+    n_repeat        : int                       = 1                         ,
+    nproc           : int                       = None                      ,
+    pooltype        : typing.Union[str, None]   = None                      ,
+    time_per_test   : float                     = 0.2                       ,
+    filename        : typing.Union[str, None]   = None                      ,
+    ForceBenchmark  : bool                      = False                     ,
+    PreventBenchmark: bool                      = False                     ,
+    StopOnExcept    : bool                      = False                     ,
+    ShowProgress    : bool                      = False                     ,
+    show            : bool                      = False                     ,
     **plot_kwargs   : typing.Dict[str, typing.Any]                          ,
-) -> np.typing.NDArray[np.float64] | None :
+) -> typing.Union[np.typing.NDArray[np.float64], None] :
     """ Runs a full benchmark.
 
     Parameters
@@ -259,22 +259,30 @@ def run_benchmark(
 
 def plot_benchmark(
     all_vals                : np.typing.ArrayLike   ,
-    all_args                : typing.Dict | typing.Iterable                                 ,
-    all_funs                : typing.Dict[str, callable] |
-                              typing.Iterable[str] | 
-                              None                              = None                      ,
-    all_fun_names           : typing.Iterable[str] | None       = None                      ,
-    plot_intent             : typing.Iterable[str] | None       = None                      ,        
+    all_args                : typing.Union[dict, typing.Iterable]                           ,
+    all_funs                : typing.Union[
+                                typing.Dict[str, callable]      ,
+                                typing.Iterable[str]            ,
+                                None                            ,
+                            ]                                   = None                      ,
+    all_fun_names           : typing.Union[
+                                typing.Iterable[str]            ,
+                                None                            ,
+                            ]                                   = None                      ,
+    plot_intent             : typing.Union[
+                                typing.Iterable[str]            ,
+                                None                            ,
+                            ]                                   = None                      ,        
     mode                    : str                               = "timings"                 ,
     all_xvalues             : np.typing.ArrayLike | None        = None                      ,
     color_list              : list                              = default_color_list        ,
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
-    single_values_idx       : typing.Dict | None                = None                      ,         
-    logx_plot               : bool | None                       = None                      ,
-    logy_plot               : bool | None                       = None                      ,
-    plot_xlim               : tuple | None                      = None                      ,
-    plot_ylim               : tuple | None                      = None                      ,
+    single_values_idx       : typing.Union[dict, None]          = None                      ,         
+    logx_plot               : typing.Union[bool, None]          = None                      ,
+    logy_plot               : typing.Union[bool, None]          = None                      ,
+    plot_xlim               : typing.Union[tuple, None]         = None                      ,
+    plot_ylim               : typing.Union[tuple, None]         = None                      ,
     show                    : bool                              = False                     ,
     fig                     : matplotlib.figure.Figure | None   = None                      ,
     ax                      : plt.Axes | None                   = None                      ,
@@ -283,13 +291,13 @@ def plot_benchmark(
     pxl_per_plot_y          : int                               = 800                       ,
     sharex                  : bool                              = True                      ,
     sharey                  : bool                              = False                     ,
-    title                   : str | None                        = None                      ,
-    xlabel                  : str | None                        = None                      ,
-    ylabel                  : str | None                        = None                      ,
+    title                   : typing.Union[str, None]           = None                      ,
+    xlabel                  : typing.Union[str, None]           = None                      ,
+    ylabel                  : typing.Union[str, None]           = None                      ,
     plot_legend             : bool                              = True                      ,
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
-    transform               : str | None                        = None                      ,
+    transform               : typing.Union[str, None]           = None                      ,
     clip_vals               : bool                              = False                     ,
     stop_after_first_clip   : bool                              = False                     ,
     # relative_to             : np.typing.ArrayLike | None        = None                      ,
