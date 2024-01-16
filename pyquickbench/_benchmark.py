@@ -200,8 +200,8 @@ def run_benchmark(
             raise ValueError(f'Unknown mode {mode}')
             
         with (
-            progress_bar(total = total_iterations) as progress,
-            PoolExecutor(nproc) as executor,
+            progress_bar(total = total_iterations) as progress  ,
+            PoolExecutor(nproc) as executor                     ,
         ):
             
             futures = []

@@ -233,15 +233,14 @@ def _measure_timings(args, setup, all_funs_list, n_repeat, time_per_test, StopOn
     return vals
             
 class FakeFuture(object):
-    def __init__(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self, key, val)
+    def __init__(self, fn, *args):
+        self.res = fn(*args)
             
     def add_done_callback(self, callback):
         callback(0)
         
     def result(self):
-        return self.fn(*self.args)
+        return self.res
         
 class PhonyProcessPoolExecutor(object):
     def __init__(self, *args, **kwargs):
@@ -254,7 +253,7 @@ class PhonyProcessPoolExecutor(object):
         pass
     
     def submit(self, fn, /, *args):
-        return FakeFuture(fn=fn, args=args)
+        return FakeFuture(fn, *args)
 
 AllPoolExecutors = {
     "phony"         :   PhonyProcessPoolExecutor                ,

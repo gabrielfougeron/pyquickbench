@@ -129,8 +129,7 @@ all_timings = pyquickbench.run_benchmark(
     filename = filename     ,
     StopOnExcept = True     ,
     ShowProgress = True     ,
-    mode = "scalar_output"  ,
-    PreventBenchmark = True ,
+    # PreventBenchmark = True ,
     # ForceBenchmark= True    ,
 )
 
