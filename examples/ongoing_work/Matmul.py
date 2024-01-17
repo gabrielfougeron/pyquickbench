@@ -23,11 +23,6 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-# os.environ['OPENBLAS_NUM_THREADS'] = '1'
-# os.environ['NUMEXPR_NUM_THREADS'] = '1'
-# os.environ['MKL_NUM_THREADS'] = '1'
-# os.environ['OMP_NUM_THREADS'] = '1'
-
 import functools
 import matplotlib.pyplot as plt
 import numpy as np
@@ -54,7 +49,7 @@ if not(os.path.isdir(timings_folder)):
 
 # sphinx_gallery_end_ignore
 
-def Three_loops_python(a, b, c):
+def python(a, b, c):
 
     for i in range(a.shape[0]):
         for j in range(b.shape[1]):
@@ -64,13 +59,13 @@ def Three_loops_python(a, b, c):
                 
     return 0.
 
-Three_loops_numba_serial = nb.jit(Three_loops_python,**numba_opt_dict)
-Three_loops_numba_serial.__name__ = "Three_loops_numba_serial"
-Three_loops_numba_auto_parallel = nb.jit(Three_loops_python,parallel=True,**numba_opt_dict)
-Three_loops_numba_auto_parallel.__name__ = "Three_loops_numba_auto_parallel"
+numba_serial = nb.jit(python,**numba_opt_dict)
+numba_serial.__name__ = "numba_serial"
+numba_auto_parallel = nb.jit(python,parallel=True,**numba_opt_dict)
+numba_auto_parallel.__name__ = "numba_auto_parallel"
 
 @nb.jit(parallel=True,**numba_opt_dict)
-def Three_loops_numba_parallel(a, b, c):
+def numba_parallel(a, b, c):
 
     for i in nb.prange(a.shape[0]):
         for j in range(b.shape[1]):
@@ -79,7 +74,7 @@ def Three_loops_numba_parallel(a, b, c):
                 c[i,j] += a[i,k]*b[k,j]
 
 @nb.jit(parallel=True,**numba_opt_dict)
-def Three_loops_numba_parallel_noreduce(a, b, c):
+def numba_parallel_noreduce(a, b, c):
 
     for i in nb.prange(a.shape[0]):
         for j in range(b.shape[1]):
@@ -112,11 +107,11 @@ all_args = {
 }
 
 all_funs = [
-    Three_loops_python                  ,
-    Three_loops_numba_serial            ,
-    Three_loops_numba_auto_parallel     ,
-    Three_loops_numba_parallel          ,
-    Three_loops_numba_parallel_noreduce ,
+    python                  ,
+    numba_serial            ,
+    numba_auto_parallel     ,
+    numba_parallel          ,
+    numba_parallel_noreduce ,
     numpy_matmul                        ,
 ]
 
@@ -135,21 +130,23 @@ all_timings = pyquickbench.run_benchmark(
     ShowProgress = True     ,
     n_repeat = n_repeat     ,
     MonotonicAxes = MonotonicAxes,
-    # PreventBenchmark = True ,
+    PreventBenchmark = True ,
 )
 
 plot_intent = {
-    "P" : 'single_value'            ,
-    "Q" : 'points'                  ,
-    "R" : 'single_value'            ,
-    "real_dtype": 'curve_linestyle' ,
+    "P" :  'single_value'           ,
+    "Q" : 'single_value'               ,
+    "R" :  'single_value'             ,
+    "real_dtype": 'points'  ,
+    "fun" :  'single_value'             ,
 }
 
-single_values_idx = {
-    "P" : -1        ,
-    # "Q" : -1        ,
-    "R" : -1        ,
-    # "real_dtype": 0 ,
+single_values_val = {
+    "P" : 2**5        ,
+    "Q" : 2**5        ,
+    "R" : 2**5        ,
+    "real_dtype": "float64" ,
+    "fun" : "numpy_matmul"        ,
 }
 
 pyquickbench.plot_benchmark(
@@ -157,27 +154,44 @@ pyquickbench.plot_benchmark(
     all_args                                ,
     all_funs                                ,
     plot_intent = plot_intent               ,
-    single_values_idx = single_values_idx   ,
+    single_values_val = single_values_val   ,
     show = True                             ,
 )
 
 
 # %%
+# 
+# relative_to_val = {
+#     "real_dtype": "float64" ,
+#     "fun": "numpy_matmul"   ,
+# }
+# 
+# pyquickbench.plot_benchmark(
+#     all_timings                             ,
+#     all_args                                ,
+#     all_funs                                ,
+#     plot_intent = plot_intent               ,
+#     single_values_val = single_values_val   ,
+#     relative_to_val = relative_to_val       ,
+#     show = True                             ,
+# )
 
-relative_to_val = {
-    "real_dtype": "float32" ,
-    "fun": "numpy_matmul"   ,
-}
 
-pyquickbench.plot_benchmark(
-    all_timings                             ,
-    all_args                                ,
-    all_funs                                ,
-    plot_intent = plot_intent               ,
-    single_values_idx = single_values_idx   ,
-    relative_to_val = relative_to_val       ,
-    show = True                             ,
-)
+# %%
+# 
+
+# pyquickbench.plot_benchmark(
+#     all_timings                             ,
+#     all_args                                ,
+#     all_funs                                ,
+#     plot_intent = plot_intent               ,
+#     single_values_val = single_values_val   ,
+#     ylabel = "Measured convergence rate"    ,
+#     logx_plot = True                        ,
+#     transform = "pol_growth_order"          ,
+#     # clip_vals = True                        ,
+#     show = True                             ,
+# )
 
 # %%
 # 

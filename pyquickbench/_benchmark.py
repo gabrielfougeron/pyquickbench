@@ -109,9 +109,12 @@ def run_benchmark(
     ShowProgress : bool, optional
         Whether to show a progress bar in the CLI during benchmark, by default ``False``.
     MonotonicAxes : list, optional
-        TODO, by default []
+        List of argument names for which timings are expected to get longer and longer.\n
+        By default ``[]``.
     timeout : float, optional
-        TODO, by default 1.
+        Time in seconds after which a timing is considered too long.\n
+        When a timing reaches this value, all longer timings (as detected by ``MonotonicAxes``) are cancelled.\n
+        By default ``1.``.
     show : bool, optional
         Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.
     **plot_kwargs :
@@ -489,7 +492,11 @@ def plot_benchmark(
             
             if not(intent in all_plot_intents):
                 raise ValueError(f'Unknown intent {intent} in plot_intent. Possible values are: {all_plot_intents}')
-
+    
+    for name_res, name_intent in zip(res_shape, plot_intent):
+        if (name_intent != name_res):
+            raise ValueError
+    
     if not((single_values_idx is None) or (single_values_val is None)):
         raise ValueError("Both single_values_idx and single_values_val were set. only one of them should be")
     if not((relative_to_idx is None) or (relative_to_val is None)):
@@ -648,7 +655,7 @@ def plot_benchmark(
             
         for i, j in zip(idx_single_value, idx_all_single_value):
             idx_vals[j] = i
-        
+
         i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
         i_linestyle, idx_curve_linestyle = _get_rel_idx_from_maze(idx_all_curve_linestyle, idx_vals, all_vals.shape)
         i_pointstyle, idx_curve_pointstyle = _get_rel_idx_from_maze(idx_all_curve_pointstyle, idx_vals, all_vals.shape)
@@ -759,13 +766,14 @@ def plot_benchmark(
                         plot_y_val[i_size] = np.nan
         
         if isinstance(plot_x_val[0], str):
+            
+            logx_plot = False
 
             cur_ax.bar(
                 plot_x_val                  ,
                 plot_y_val                  ,
                 color       = color         ,
                 linestyle   = linestyle     ,
-                marker      = pointstyle    ,
                 alpha       = alpha         ,
             )
         
