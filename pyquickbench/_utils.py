@@ -3,6 +3,7 @@ import timeit
 import math
 import inspect
 import concurrent.futures
+import copy
 
 import numpy as np
 
@@ -161,7 +162,7 @@ class FakeProgressBar(object):
     def update(self, *args):
         pass
                
-def _measure_output(args, setup, all_funs_list, n_repeat, StopOnExcept):
+def _measure_output(i_args, args, setup, all_funs_list, n_repeat, StopOnExcept):
 
     setup_vars_dict = _return_setup_vars_dict(setup, args)
     n_funs = len(all_funs_list)
@@ -172,14 +173,15 @@ def _measure_output(args, setup, all_funs_list, n_repeat, StopOnExcept):
         for i_repeat in range(n_repeat):
             
             try:
-                vals[i_fun, i_repeat] = fun(**setup_vars_dict)
+                setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+                vals[i_fun, i_repeat] = fun(**setup_vars_dict_cp)
             except Exception as exc:
                 vals[i_fun, i_repeat] = np.nan
                 if StopOnExcept:
                     raise exc
     return vals
 
-def _measure_timings(args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept):
+def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, all_vals):
     
     setup_vars_dict = _return_setup_vars_dict(setup, args)  
     n_funs = len(all_funs_list)
@@ -187,48 +189,58 @@ def _measure_timings(args, setup, all_funs_list, n_repeat, time_per_test, StopOn
     
     for i_fun, fun in enumerate(all_funs_list):
         
-        global_dict = {
-            'fun'               : fun               ,
-            'setup_vars_dict'   : setup_vars_dict   ,
-        }
-
-        code = f'fun(**setup_vars_dict)'
-
-        Timer = timeit.Timer(
-            code,
-            globals = global_dict,
-        )
-
-        try:
-            # For functions that require caching
-            Timer.timeit(number = 1)
-
-            # Estimate time of everything
-            n_timeit_0dot2, est_time = Timer.autorange()
+        all_idx_list = list(i_args)
+        all_idx_list.append(i_fun)
+        all_idx_list.append(0)
+        all_idx = tuple(all_idx_list)
+        
+        DoTimings = not(np.isnan(all_vals[all_idx]))
+        
+        if DoTimings:
             
-            if (n_repeat == 1) and (time_per_test == 0.2):
-                # Fast track: benchmark is not repeated and autorange results are kept as is.
+            setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+            global_dict = {
+                'fun'               : fun               ,
+                'setup_vars_dict'   : setup_vars_dict_cp,
+            }
 
-                vals[i_fun, 0] = est_time / n_timeit_0dot2
+            code = 'fun(**setup_vars_dict)'
+
+            Timer = timeit.Timer(
+                code,
+                globals = global_dict,
+            )
+
+            try:
+                # For functions that require caching
+                Timer.timeit(number = 1)
+
+                # Estimate time of everything
+                n_timeit_0dot2, est_time = Timer.autorange()
                 
-            else:
-                # Full benchmark is run
+                if (n_repeat == 1) and (time_per_test == 0.2):
+                    # Fast track: benchmark is not repeated and autorange results are kept as is.
 
-                n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
+                    vals[i_fun, 0] = est_time / n_timeit_0dot2
+                    
+                else:
+                    # Full benchmark is run
 
-                times = Timer.repeat(
-                    repeat = n_repeat,
-                    number = n_timeit,
-                )
+                    n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
 
-                vals[i_fun, :] = np.array(times) / n_timeit
+                    times = Timer.repeat(
+                        repeat = n_repeat,
+                        number = n_timeit,
+                    )
 
-        except Exception as exc:
+                    vals[i_fun, :] = np.array(times) / n_timeit
 
-            vals[i_fun, :] = np.nan
-            
-            if StopOnExcept:
-                raise exc
+            except Exception as exc:
+
+                vals[i_fun, :] = np.nan
+                
+                if StopOnExcept:
+                    raise exc
     
     return vals
             
@@ -237,7 +249,7 @@ class FakeFuture(object):
         self.res = fn(*args)
             
     def add_done_callback(self, callback):
-        callback(0)
+        callback(self)
         
     def result(self):
         return self.res
@@ -356,3 +368,61 @@ def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
         idx = None
         
     return idx
+
+def _arg_names_list_to_idx(name_list, all_args):
+    
+    idx_list = []
+    
+    for name in name_list:
+        
+        found = False
+        for idx, arg_name in enumerate(all_args):
+            if (name == arg_name):
+                found = True
+                break
+            
+        if found:
+            idx_list.append(idx)
+        else:
+            raise ValueError(f"Declared monotonic axis {name} is not the name of an argument.")
+    
+    return idx_list
+
+def _treat_future_result(future):
+    
+    all_idx_list = list(future.i_args)
+    all_idx_list.append(slice(None))
+    all_idx_list.append(slice(None))
+    all_idx = tuple(all_idx_list)
+    
+    try:
+        
+        res = future.result()
+        
+        for i_fun in range(res.shape[0]):
+            
+            all_idx_list = list(future.i_args)
+            
+            tot_time = np.sum(res[i_fun,:])
+            if (tot_time > future.timeout):
+                
+                for idx in future.MonotonicAxes_idx:
+                    
+                    all_idx_list[idx] = slice(future.i_args[idx], None, None)
+        
+            all_idx_list.append(i_fun)
+            all_idx_list.append(slice(None))
+            all_idx = tuple(all_idx_list)
+            
+            future.all_vals[all_idx] = np.nan
+        
+        all_idx_list = list(future.i_args)
+        all_idx_list.append(slice(None))
+        all_idx_list.append(slice(None))
+        all_idx = tuple(all_idx_list)
+        future.all_vals[all_idx] = res
+
+    except Exception as exc:
+        future.all_vals[all_idx] = np.nan
+        if future.StopOnExcept:
+            raise exc

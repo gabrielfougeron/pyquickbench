@@ -46,7 +46,7 @@ for i, script_name in enumerate(all_scripts):
     small_name = os.path.split(script_name)[-1]
     
     print()
-    print(f"Running script {i} of {nscripts} : {small_name}")
+    print(f"Running script {i+1} of {nscripts} : {small_name}")
     
     tbeg = time.perf_counter()
     subprocess.run(

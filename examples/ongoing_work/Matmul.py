@@ -101,13 +101,13 @@ def setup_abc(P, R, Q, real_dtype):
     c = np.zeros((P,Q),dtype=dtypes_dict[real_dtype])
     return {'a':a, 'b':b, 'c':c}
 
-basename = 'matmul_timings'
+basename = 'matmul_timings_full'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "P" : [(2 ** k) for k in range(10)]     ,
-    "Q" : [(2 ** k) for k in range(10)]     ,
-    "R" : [(2 ** k) for k in range(10)]     ,
+    "P" : [(2 ** k) for k in range(15)]     ,
+    "Q" : [(2 ** k) for k in range(15)]     ,
+    "R" : [(2 ** k) for k in range(15)]     ,
     "real_dtype": ["float32", "float64"]    ,
 }
 
@@ -122,6 +122,8 @@ all_funs = [
 
 n_repeat = 10
 
+MonotonicAxes = ["P", "Q", "R"]
+
 # %%
 
 all_timings = pyquickbench.run_benchmark(
@@ -132,7 +134,8 @@ all_timings = pyquickbench.run_benchmark(
     StopOnExcept = True     ,
     ShowProgress = True     ,
     n_repeat = n_repeat     ,
-    PreventBenchmark = True ,
+    MonotonicAxes = MonotonicAxes,
+    # PreventBenchmark = True ,
 )
 
 plot_intent = {
@@ -150,7 +153,7 @@ single_values_idx = {
 }
 
 pyquickbench.plot_benchmark(
-    all_timings                              ,
+    all_timings                             ,
     all_args                                ,
     all_funs                                ,
     plot_intent = plot_intent               ,
@@ -175,3 +178,39 @@ pyquickbench.plot_benchmark(
     relative_to_val = relative_to_val       ,
     show = True                             ,
 )
+
+# %%
+# 
+# 
+# basename = 'matmul_timings_nopython'
+# filename = os.path.join(timings_folder,basename+'.npz')
+# 
+# ame = os.path.join(timings_folder,basename+'.npz')
+# 
+# all_args = {
+#     "P" : [(2 ** k) for k in range(13)]     ,
+#     "Q" : [(2 ** k) for k in range(13)]     ,
+#     "R" : [(2 ** k) for k in range(13)]     ,
+#     "real_dtype": ["float32", "float64"]    ,
+# }
+# 
+# all_funs = [
+#     Three_loops_python                  ,
+#     Three_loops_numba_serial            ,
+#     Three_loops_numba_auto_parallel     ,
+#     Three_loops_numba_parallel          ,
+#     Three_loops_numba_parallel_noreduce ,
+#     numpy_matmul                        ,
+# ]
+# 
+# all_timings = pyquickbench.run_benchmark(
+#     all_args                ,
+#     all_funs                ,
+#     setup = setup_abc       ,
+#     filename = filename     ,
+#     StopOnExcept = True     ,
+#     ShowProgress = True     ,
+#     n_repeat = n_repeat     ,
+#     MonotonicAxes = MonotonicAxes,
+#     # PreventBenchmark = True ,
+# )

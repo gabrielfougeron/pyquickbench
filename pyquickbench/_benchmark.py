@@ -34,6 +34,8 @@ from pyquickbench._utils import (
     all_plot_intents        ,
     _build_product_legend   ,
     _choose_idx_val         ,
+    _treat_future_result    ,
+    _arg_names_list_to_idx  ,
 )
 
 from pyquickbench._defaults import (
@@ -59,6 +61,8 @@ def run_benchmark(
     PreventBenchmark: bool                      = False                     ,
     StopOnExcept    : bool                      = False                     ,
     ShowProgress    : bool                      = False                     ,
+    MonotonicAxes   : list                      = []                        ,
+    timeout         : float                     = 1.                        ,
     show            : bool                      = False                     ,
     **plot_kwargs   : typing.Dict[str, typing.Any]                          ,
 ) -> typing.Union[np.typing.NDArray[np.float64], None] :
@@ -104,6 +108,10 @@ def run_benchmark(
         Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.
     ShowProgress : bool, optional
         Whether to show a progress bar in the CLI during benchmark, by default ``False``.
+    MonotonicAxes : list, optional
+        TODO, by default []
+    timeout : float, optional
+        TODO, by default 1.
     show : bool, optional
         Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.
     **plot_kwargs :
@@ -124,6 +132,8 @@ def run_benchmark(
         Save_timings_file = True
 
     all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat)
+
+    MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
 
     if Load_timings_file:
         
@@ -153,7 +163,7 @@ def run_benchmark(
         for fun in all_funs_list:
             _check_sig_no_pos_only(fun)
         
-        all_vals = np.full(list(res_shape.values()), np.nan)
+        all_vals = np.full(list(res_shape.values()), -1.) # Negative values
 
         total_iterations = math.prod(args_shape.values())
         
@@ -188,7 +198,7 @@ def run_benchmark(
                 warnings.warn("Concurrent execution is unwise in timings mode as it will mess up the timings.")
                 
             measure_fun = _measure_timings
-            extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept)
+            extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, all_vals)
             
         elif mode == "scalar_output": 
         
@@ -203,8 +213,6 @@ def run_benchmark(
             progress_bar(total = total_iterations) as progress  ,
             PoolExecutor(nproc) as executor                     ,
         ):
-            
-            futures = []
 
             for i_args, args in zip(
                 itertools.product(*[range(i) for i in args_shape.values()]) ,
@@ -213,27 +221,17 @@ def run_benchmark(
                 
                 future = executor.submit(
                     measure_fun,
-                    args, *extra_submit_args
+                    i_args, args, *extra_submit_args
                 )
                 
-                future.add_done_callback(lambda p: progress.update(1))
                 setattr(future, "i_args", i_args)
-                futures.append(future)
-                        
-            for future in futures:
-                
-                all_idx_list = list(future.i_args)
-                all_idx_list.append(slice(None))
-                all_idx_list.append(slice(None))
-                all_idx = tuple(all_idx_list)
-                
-                try:
-                    all_vals[all_idx] = future.result()
-                    
-                except Exception as exc:
-                    all_vals[all_idx] = np.nan
-                    if StopOnExcept:
-                        raise exc
+                setattr(future, "StopOnExcept", StopOnExcept)
+                setattr(future, "all_vals", all_vals)
+                setattr(future, "timeout", timeout)
+                setattr(future, "MonotonicAxes_idx", MonotonicAxes_idx)
+
+                future.add_done_callback(_treat_future_result)
+                future.add_done_callback(lambda _: progress.update(1))
 
         # Sort values along "repeat" axis, taking care of nans.
         idx = np.argsort(all_vals, axis=-1)

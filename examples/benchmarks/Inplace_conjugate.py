@@ -42,7 +42,7 @@ import pyquickbench
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
 
-timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
+timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files_time_consuming')
 
 if not(os.path.isdir(timings_folder)):
     os.makedirs(timings_folder)
@@ -113,7 +113,7 @@ def prepare_x(n):
     return [('x', x)]
     
 basename = f'Inplace_conjugation_bench'
-timings_filename = os.path.join(timings_folder, basename+'.npy')
+timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 _ = pyquickbench.run_benchmark(
     all_sizes                       ,
