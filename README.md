@@ -12,7 +12,7 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 - **Bug reports:** https://github.com/gabrielfougeron/pyquickbench/issues
 - **Changelog:** https://github.com/gabrielfougeron/pyquickbench/releases/
 
-## Features
+## Main features
 
 - Timings / repeatability / output benchmarks
 - Error handling
@@ -46,7 +46,7 @@ pip install git+ssh://git@github.com/gabrielfougeron/pyquickbench.git
 
 ## Tests
 
-To run tests, checkout this reposity and install dependencies using pip:
+To run tests locally on your machine, first checkout this reposity and install dependencies using pip:
 
 ```
 git clone git@github.com:gabrielfougeron/pyquickbench.git

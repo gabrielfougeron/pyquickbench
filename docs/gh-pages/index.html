@@ -369,26 +369,51 @@ document.write(`
                   
   <section id="welcome-to-pyquickbench-s-documentation">
 <h1>Welcome to pyquickbench’s documentation!<a class="headerlink" href="#welcome-to-pyquickbench-s-documentation" title="Link to this heading">#</a></h1>
+<p>Pyquickbench is an open source, easy to use benchmarking tool written in pure Python.</p>
+</section>
+<section id="main-features">
+<h1>Main features<a class="headerlink" href="#main-features" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p>Timings / repeatability / output benchmarks</p></li>
+<li><p>Error handling</p></li>
+<li><p>Benchmark results caching</p></li>
+<li><p>Multithreaded / multiprocessed benchmarks</p></li>
+<li><p>Benchmark timeout</p></li>
+<li><p>Multidimensional benchmarks</p></li>
+<li><p>Transformed data plotting (relative values, convergence order, …)</p></li>
+<li><p>Intelligent plots</p></li>
+<li><p>Sensible defaults</p></li>
+</ul>
 </section>
 <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h1>
-<p>Pyquickbench is an open source, easy to use benchmarking tool written in pure Python. Checkout the <a class="reference internal" href="_build/auto_examples/index.html#examples-index"><span class="std std-ref">Gallery</span></a> to get an idea of what pyquickbench is capable.</p>
+<p>Checkout the <a class="reference internal" href="_build/auto_examples/index.html#examples-index"><span class="std std-ref">Gallery</span></a> to get an idea of what pyquickbench is capable.</p>
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<p>To install pyquickbench, simply checkout the repository and type:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.
-</pre></div>
-</div>
-</section>
-<section id="coming-soon">
-<h1>Coming Soon<a class="headerlink" href="#coming-soon" title="Link to this heading">#</a></h1>
 <p>Pyquickbench is available on the <a class="reference external" href="https://pypi.org/">Python Package Index</a>. To install using pip, simply type:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyquickbench
 </pre></div>
 </div>
 <p>Pyquickbench is available on <a class="reference external" href="https://conda-forge.org/">conda-forge</a>. To install using conda, simply type:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pyquickbench<span class="w"> </span>-c<span class="w"> </span>conda-forge
+</pre></div>
+</div>
+<p>To install the current development version of pyquickbench from the <a class="reference external" href="https://github.com/gabrielfougeron/pyquickbench">github repository</a>, you can type:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+ssh://git@github.com/gabrielfougeron/pyquickbench.git
+</pre></div>
+</div>
+</section>
+<section id="tests">
+<h1>Tests<a class="headerlink" href="#tests" title="Link to this heading">#</a></h1>
+<p>To run tests locally on your machine, first checkout this reposity and install dependencies using pip:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:gabrielfougeron/pyquickbench.git
+<span class="nb">cd</span><span class="w"> </span>pyquickbench
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>tests<span class="o">]</span>
+</pre></div>
+</div>
+<p>Then, run tests using  <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest</a></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pytest
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
@@ -416,9 +441,10 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Welcome to pyquickbench’s documentation!</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#main-features">Main features</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#coming-soon">Coming Soon</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#tests">Tests</a></li>
 </ul>
 
   </nav></div>

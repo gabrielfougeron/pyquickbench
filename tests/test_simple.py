@@ -19,6 +19,7 @@ def test_basic_benchmark(SimpleTimingsBenchmark):
         SimpleTimingsBenchmark.all_args         ,
         SimpleTimingsBenchmark.all_funs         ,
         setup = SimpleTimingsBenchmark.setup    ,
+        StopOnExcept = True                     ,
     ) 
 
 def test_all_options_timings(SimpleScalarBenchmark):
