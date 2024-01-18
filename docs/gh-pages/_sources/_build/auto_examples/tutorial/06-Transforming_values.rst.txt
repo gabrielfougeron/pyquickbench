@@ -121,7 +121,7 @@ Since all the functions in the benchmark have the same asymptotic behavior, it m
 .. code-block:: Python
 
 
-    relative_to_val = {"fun": "DOP853"}
+    relative_to_val = {pyquickbench.fun_ax_name: "DOP853"}
 
     pyquickbench.plot_benchmark(
         timings_results                         ,

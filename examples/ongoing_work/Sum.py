@@ -99,8 +99,9 @@ def exact_sum(alpha, n):
     
 def compute_error_relative_to_exp(f, x):
     
-    ex_res =  m.exp(-x[1])
+    ex_res =  m.exp(x[1])
     res = f(x)
+    
     rel_err = abs(ex_res - res) / abs(ex_res)
     
     return rel_err + small
@@ -124,8 +125,11 @@ error_filename = os.path.join(timings_folder,basename+'.npz')
 
 # sphinx_gallery_end_ignore
 
+alpha_max = 20.
+n_alpha = 100
+
 all_args = {
-    "alpha": np.array([float(alpha) for alpha in range(500)]),
+    "alpha": np.array([float(i_alpha/n_alpha * alpha_max) for i_alpha in range(n_alpha)]),
     # "n" : np.array([2**n for n in range(2,20)]),
     "n" : np.array([2**n for n in range(2,20)]),
 }
@@ -134,26 +138,26 @@ all_funs = [
     # naive_sum   ,
     nb_naive_sum,
     # builtin_sum ,
-    # np_sum      ,
-    # m_fsum      ,
+    np_sum      ,
+    m_fsum      ,
 ]
 
 # %%
 
-all_error_funs = { f.__name__ :  functools.partial(compute_error_relative_to_fsum, f) for f in all_funs if f is not m_fsum}
+# all_error_funs = { f.__name__ :  functools.partial(compute_error_relative_to_fsum, f) for f in all_funs if f is not m_fsum}
+all_error_funs = { f.__name__ :  functools.partial(compute_error_relative_to_exp, f) for f in all_funs }
+
+
 
 all_errors = pyquickbench.run_benchmark(
     all_args                        ,
     all_error_funs                  ,
     setup = setup                   ,
     mode = "scalar_output"          ,
-    # filename = error_filename       ,
-#     show = True                             ,
+    filename = error_filename       ,
     StopOnExcept = True,
     ShowProgress = True,
-    nproc = 8   ,
-    # pooltype = "phony"   ,
-    # pooltype = "thread"   ,
+    # PreventBenchmark=True,
     pooltype = "process"   ,
 )
 
@@ -161,6 +165,7 @@ plot_intent = {
     "alpha" : 'points' ,
     "n" : 'subplot_grid_y'  ,
 }
+
 
 pyquickbench.plot_benchmark(
     all_errors      ,

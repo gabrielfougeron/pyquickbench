@@ -347,28 +347,25 @@ document.write(`
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorial/index.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/01-First_benchmark.html">A first benchmark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/02-Caching_benchmarks.html">Caching benchmarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/03-Preparing_inputs.html">Preparing inputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/04-Error_handling.html">Handling errors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/05-Plotting_scalars.html">Plotting scalar values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/06-Transforming_values.html">Plotting transformed values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorial/07-Multidimensional_benchmarks.html">Multidimensional benchmarks</a></li>
-</ul>
-</li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Benchmarks</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Description of the benchmark machine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Inplace_conjugate.html">Benchmark of inplace conjugation of arrays</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</nav></div>
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/plot_icon.png" class="logo__image only-light" alt="pyquickbench"/>
+    <script>document.write(`<img src="../../../_static/plot_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
+  
+  
+    <p class="title logo__title">pyquickbench</p>
+  
+</a></div>
     </div>
   
   
@@ -588,34 +585,79 @@ to download the full example code</p>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.show_config.html#numpy.show_config" title="numpy.show_config" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">show_config</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>openblas64__info:
-    libraries = [&#39;openblas64_&#39;, &#39;openblas64_&#39;]
-    library_dirs = [&#39;/usr/local/lib&#39;]
-    language = c
-    define_macros = [(&#39;HAVE_CBLAS&#39;, None), (&#39;BLAS_SYMBOL_SUFFIX&#39;, &#39;64_&#39;), (&#39;HAVE_BLAS_ILP64&#39;, None)]
-    runtime_library_dirs = [&#39;/usr/local/lib&#39;]
-blas_ilp64_opt_info:
-    libraries = [&#39;openblas64_&#39;, &#39;openblas64_&#39;]
-    library_dirs = [&#39;/usr/local/lib&#39;]
-    language = c
-    define_macros = [(&#39;HAVE_CBLAS&#39;, None), (&#39;BLAS_SYMBOL_SUFFIX&#39;, &#39;64_&#39;), (&#39;HAVE_BLAS_ILP64&#39;, None)]
-    runtime_library_dirs = [&#39;/usr/local/lib&#39;]
-openblas64__lapack_info:
-    libraries = [&#39;openblas64_&#39;, &#39;openblas64_&#39;]
-    library_dirs = [&#39;/usr/local/lib&#39;]
-    language = c
-    define_macros = [(&#39;HAVE_CBLAS&#39;, None), (&#39;BLAS_SYMBOL_SUFFIX&#39;, &#39;64_&#39;), (&#39;HAVE_BLAS_ILP64&#39;, None), (&#39;HAVE_LAPACKE&#39;, None)]
-    runtime_library_dirs = [&#39;/usr/local/lib&#39;]
-lapack_ilp64_opt_info:
-    libraries = [&#39;openblas64_&#39;, &#39;openblas64_&#39;]
-    library_dirs = [&#39;/usr/local/lib&#39;]
-    language = c
-    define_macros = [(&#39;HAVE_CBLAS&#39;, None), (&#39;BLAS_SYMBOL_SUFFIX&#39;, &#39;64_&#39;), (&#39;HAVE_BLAS_ILP64&#39;, None), (&#39;HAVE_LAPACKE&#39;, None)]
-    runtime_library_dirs = [&#39;/usr/local/lib&#39;]
-Supported SIMD extensions in this NumPy install:
-    baseline = SSE,SSE2,SSE3
-    found = SSSE3,SSE41,POPCNT,SSE42,AVX,F16C,FMA3,AVX2,AVX512F,AVX512CD,AVX512_SKX,AVX512_CLX,AVX512_CNL,AVX512_ICL
-    not found = AVX512_KNL,AVX512_KNM
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Build Dependencies:
+  blas:
+    detection method: pkgconfig
+    found: true
+    include directory: /usr/local/include
+    lib directory: /usr/local/lib
+    name: openblas64
+    openblas configuration: USE_64BITINT=1 DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS=
+      NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2
+    pc file directory: /usr/local/lib/pkgconfig
+    version: 0.3.23.dev
+  lapack:
+    detection method: internal
+    found: true
+    include directory: unknown
+    lib directory: unknown
+    name: dep139639528180752
+    openblas configuration: unknown
+    pc file directory: unknown
+    version: 1.26.3
+Compilers:
+  c:
+    commands: cc
+    linker: ld.bfd
+    name: gcc
+    version: 10.2.1
+  c++:
+    commands: c++
+    linker: ld.bfd
+    name: gcc
+    version: 10.2.1
+  cython:
+    commands: cython
+    linker: cython
+    name: cython
+    version: 3.0.7
+Machine Information:
+  build:
+    cpu: x86_64
+    endian: little
+    family: x86_64
+    system: linux
+  host:
+    cpu: x86_64
+    endian: little
+    family: x86_64
+    system: linux
+Python Information:
+  path: /opt/python/cp311-cp311/bin/python
+  version: &#39;3.11&#39;
+SIMD Extensions:
+  baseline:
+  - SSE
+  - SSE2
+  - SSE3
+  found:
+  - SSSE3
+  - SSE41
+  - POPCNT
+  - SSE42
+  - AVX
+  - F16C
+  - FMA3
+  - AVX2
+  - AVX512F
+  - AVX512CD
+  - AVX512_SKX
+  - AVX512_CLX
+  - AVX512_CNL
+  - AVX512_ICL
+  not found:
+  - AVX512_KNL
+  - AVX512_KNM
 </pre></div>
 </div>
 <p>Scipy configuration informations</p>
@@ -671,7 +713,7 @@ Compilers:
     name: gcc
     version: 10.2.1
   pythran:
-    include directory: ../../tmp/pip-build-env-c6c8ru56/overlay/lib/python3.10/site-packages/pythran
+    include directory: ../../tmp/pip-build-env-lzd6dam0/overlay/lib/python3.11/site-packages/pythran
     version: 0.14.0
 Machine Information:
   build:
@@ -686,8 +728,8 @@ Machine Information:
     family: x86_64
     system: linux
 Python Information:
-  path: /opt/python/cp310-cp310/bin/python
-  version: &#39;3.10&#39;
+  path: /opt/python/cp311-cp311/bin/python
+  version: &#39;3.11&#39;
 </pre></div>
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-benchmarks-benchmark-hardware-info-py">

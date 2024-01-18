@@ -1,5 +1,9 @@
 import matplotlib as mpl
 
+default_ax_name = "n"
+fun_ax_name = "function"
+repeat_ax_name = "repeat"
+
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
 default_color_list.append(mpl.colors.BASE_COLORS['b'])
 default_color_list.append(mpl.colors.BASE_COLORS['g'])
@@ -54,4 +58,10 @@ default_pointstyle_list = [
 ]
 
 def default_setup(n):
-    return {'n': n}
+    return {default_ax_name: n}
+
+Legend_markersize = 10
+
+Legend_bland_color = 'k'
+Legend_bland_linestyle = 'solid'
+Legend_bland_pointstyle = None

@@ -18,20 +18,13 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 - Error handling
 - Benchmark results caching
 - Multithreaded / multiprocessed benchmarks
+- Benchmark timeout
 - Multidimensional benchmarks 
-- Transformed data (relative values, convergence order, ...)
+- Transformed data plotting (relative values, convergence order, ...)
 - Intelligent plots
 - Sensible defaults
 
 ## Installation
-
-To install the very latest version of pyquickbench, simply checkout the repository and type:
-
-```
-pip install .
-```
-
-### Coming Soon
 
 Pyquickbench is available on the [Python Package Index](https://pypi.org/). To install using pip, simply type:
 
@@ -45,11 +38,19 @@ Pyquickbench is available on [conda-forge](https://conda-forge.org/). To install
 conda install pyquickbench -c conda-forge
 ```
 
-## Installation
-
-To run tests, chechout this reposity and install dependencies using pip:
+To install the current development version of pyquickbench from the [github repository](https://github.com/gabrielfougeron/pyquickbench), you can type:
 
 ```
+pip install git+ssh://git@github.com/gabrielfougeron/pyquickbench.git 
+```
+
+## Tests
+
+To run tests, checkout this reposity and install dependencies using pip:
+
+```
+git clone git@github.com:gabrielfougeron/pyquickbench.git
+cd pyquickbench
 pip install .[tests]
 ```
 

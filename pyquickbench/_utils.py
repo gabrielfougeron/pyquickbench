@@ -7,6 +7,8 @@ import copy
 
 import numpy as np
 
+from pyquickbench._defaults import *
+
 def isnotfinite(arr):
     res = np.isfinite(arr)
     np.bitwise_not(res, out=res)  # in-place
@@ -99,10 +101,10 @@ def _load_benchmark_file(filename, all_args_in, shape):
             BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
             
         for name, all_args_vals in all_args_in.items():
-            assert name in file_content
+            BenchmarkUpToDate = BenchmarkUpToDate and (name in file_content)
 
             for loaded_val, expected_val in zip(file_content[name], all_args_vals):
-                assert loaded_val == expected_val
+                BenchmarkUpToDate = BenchmarkUpToDate and (loaded_val == expected_val)
             
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
@@ -130,10 +132,10 @@ def _save_benchmark_file(filename, all_vals, all_args):
 def _build_args_shapes(all_args, all_funs, n_repeat):
     
     if not(isinstance(all_args, dict)):
-        all_args = {'n': all_args}
+        all_args = {default_ax_name: all_args}
     
-    assert not('fun' in all_args)
-    assert not('repeats' in all_args)
+    assert not(fun_ax_name in all_args)
+    assert not(repeat_ax_name in all_args)
     assert not('all_vals' in all_args)
     
     if isinstance(all_funs, dict):
@@ -144,8 +146,8 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
     args_shape = {name : len(value) for name, value in all_args.items()}
     
     res_shape = {name : value for name, value in args_shape.items()}
-    res_shape['fun'] = len(all_funs)
-    res_shape['repeat'] = n_repeat
+    res_shape[fun_ax_name] = len(all_funs)
+    res_shape[repeat_ax_name] = n_repeat
     
     return all_args, all_funs_list, args_shape, res_shape
 
@@ -181,7 +183,7 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, StopOnExcept):
                     raise exc
     return vals
 
-def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, all_vals):
+def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, WarmUp, all_vals):
     
     setup_vars_dict = _return_setup_vars_dict(setup, args)  
     n_funs = len(all_funs_list)
@@ -200,11 +202,11 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
             
             setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
             global_dict = {
-                'fun'               : fun               ,
+                fun_ax_name         : fun               ,
                 'setup_vars_dict'   : setup_vars_dict_cp,
             }
 
-            code = 'fun(**setup_vars_dict)'
+            code = f'{fun_ax_name}(**setup_vars_dict)'
 
             Timer = timeit.Timer(
                 code,
@@ -212,8 +214,9 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
             )
 
             try:
-                # For functions that require caching
-                Timer.timeit(number = 1)
+                
+                if WarmUp:
+                    Timer.timeit(number = 1)
 
                 # Estimate time of everything
                 n_timeit_0dot2, est_time = Timer.autorange()
@@ -326,9 +329,9 @@ def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, K
         cat_name = name_curve[i]
         curve_vals = all_args.get(cat_name)
         if curve_vals is None:
-            if cat_name == 'fun':
+            if cat_name == fun_ax_name:
                 val_name = all_fun_names_list[idx]
-            elif cat_name == 'repeat':
+            elif cat_name == repeat_ax_name:
                 val_name = str(idx+1)
             else:
                 raise ValueError("Could not figure out name")
@@ -353,9 +356,9 @@ def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
             idx = None
         else:
         
-            if name == "fun":
+            if name == fun_ax_name:
                 idx = all_fun_names_list.index(val)
-            elif name == "repeat":
+            elif name == repeat_ax_name:
                 idx = int(val)
             else:
                 search_in = all_args[name]

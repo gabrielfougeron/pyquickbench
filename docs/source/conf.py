@@ -88,14 +88,15 @@ html_baseurl = "https://github.com/gabrielfougeron/pyquickbench"
 html_show_sourcelink = True
 
 html_theme_options = {
-    # "navigation_depth": -1,
+    "collapse_navigation": True,
+    # "navigation_depth": 3,
     # "sidebar_includehidden" : True,
     # "search_bar_text" : "Search the docs ...",
     # "search_bar_position" : "sidebar",
-    # "show_nav_level" : 0 ,
+    # "show_nav_level" : 2,
     # "show_toc_level" : 0 ,
     "show_prev_next": False,
-    "header_links_before_dropdown": 7,
+    "header_links_before_dropdown": 20,
     "use_edit_page_button": True,
     "pygment_light_style": "tango",
     "pygment_dark_style":  "monokai",
@@ -116,9 +117,64 @@ html_theme_options = {
 
 # Add / remove things from left sidebar
 html_sidebars = {
-    "**": ["sidebar-nav-bs"],
-    # "**": [],
+    "api": [
+        "navbar-logo"       ,
+        # "prev-next"       ,
+        "sidebar-nav-bs"    ,
+        # "page-toc"    ,
+    ],
+    "_build/auto_examples/**": [
+        "navbar-logo"       ,
+        # "prev-next"       ,
+        # "sidebar-nav-bs"    ,
+        # "sidebar-nav"    ,
+        # "page-toc"    ,
+    ],
 }
+
+# breadcrumbs: Displays (and links to) the parent section(s) of the currently viewed page.
+# 
+# copyright: Displays the copyright information (which is defined in conf.py).
+# 
+# edit-this-page: Displays a link to the edit interface of the page source in the specified Version Control System.
+# 
+# icon-links: Displays icon-links as list items.
+# 
+# indices: Displays links to the Sphinx-generated indices (genindex, modindex, py-modindex).
+# 
+# last-updated: Displays the date and time that the documentation was last built.
+# 
+# navbar-icon-links: Displays icon-links in the header navbar.
+# 
+# navbar-logo: Displays the logo of your documentation site, in the header navbar.
+# 
+# navbar-nav: Displays links to the top-level TOCtree elements, in the header navbar.
+# 
+# page-toc: Displays the current page’s Table of Contents.
+# 
+# prev-next: Displays links to the previous and next page in the TOCtree order.
+# 
+# search-button-field: Displays a search field image that opens a search overlay when clicked.
+# 
+# search-button: Displays a magnifying glass icon that opens a search overlay when clicked.
+# 
+# search-field: Displays an interactive search field directly on the page.
+# 
+# searchbox: An empty container that holds the “Hide Search Matches” button when it’s needed.
+# 
+# sidebar-ethical-ads: For sites hosted on ReadTheDocs, displays “ethical ads”.
+# 
+# sidebar-nav-bs: Displays the TOC-subtree for pages nested under the currently active top-level TOCtree element.
+# 
+# sourcelink: Displays a link to the .rst source of the current page.
+# 
+# sphinx-version: Display the version of Sphinx used to build your documentation.
+# 
+# theme-switcher: Displays an icon to switch between light mode, dark mode, and auto (use browser’s setting).
+# 
+# theme-version: Displays the version of pydata-sphinx-theme used to build the documentation.
+# 
+# version-switcher: Displays a dropdown box for switching among different versions of your documentation.
 
 html_context = {
     "display_github"    : True              , # Integrate GitHub
@@ -151,7 +207,7 @@ sphinx_gallery_conf = {
         "../../examples/benchmarks",
     ])                                                      ,
     "within_subsection_order"   : FileNameSortKey           ,
-    "backreferences_dir"        : "_build/generated"        ,
+    # "backreferences_dir"        : "_build/generated"        ,
     "image_scrapers"            : ("matplotlib",)           ,
     "default_thumb_file"        : html_logo_abs             ,
     "plot_gallery"              : True                      ,

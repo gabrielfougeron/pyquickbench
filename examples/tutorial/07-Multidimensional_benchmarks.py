@@ -89,9 +89,9 @@ print(all_values.shape[2] == n_repeat)
 # All the different timings can be superimposed on the same plot with the following ``plot_intent`` argument:
 
 plot_intent = {
-    "n"         : "points"          ,
-    "fun"       : "curve_color"     ,
-    "repeat"    : "same"            ,
+    pyquickbench.default_ax_name   : "points"      ,
+    pyquickbench.fun_ax_name       : "curve_color"  ,
+    pyquickbench.repeat_ax_name    : "same"         ,
 }
 
 pyquickbench.plot_benchmark(
@@ -142,9 +142,9 @@ for (
 ):
 
     plot_intent = {
-        "n"         : "points"          ,
-        "fun"       : "curve_color"     ,
-        "repeat"    : repeat_intent     ,
+        pyquickbench.default_ax_name    : "points"      ,
+        pyquickbench.fun_ax_name        : "curve_color" ,
+        pyquickbench.repeat_ax_name     : repeat_intent ,
     }
 
     pyquickbench.plot_benchmark(
@@ -165,12 +165,12 @@ plt.show()
 # More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.
 
 plot_intent = {
-    "n"         : "curve_color"     , 
-    "fun"       : "single_value"    ,
-    "repeat"    : "points"          ,
+    pyquickbench.default_ax_name    : "curve_color"     , 
+    pyquickbench.fun_ax_name        : "single_value"    ,
+    pyquickbench.repeat_ax_name     : "points"          ,
 }
 
-single_values_val = {"fun": "star_operator"}
+single_values_val = {pyquickbench.fun_ax_name: "star_operator"}
 
 pyquickbench.plot_benchmark(
     all_values                              ,
@@ -185,9 +185,9 @@ pyquickbench.plot_benchmark(
 # Or for all functions, but a single value of input size.
 
 plot_intent = {
-    "n"         : "reduction_max"   , 
-    "fun"       : "curve_color"     ,
-    "repeat"    : "points"          ,
+    pyquickbench.default_ax_name    : "reduction_max"   , 
+    pyquickbench.fun_ax_name        : "curve_color"     ,
+    pyquickbench.repeat_ax_name     : "points"          ,
 }
 
 pyquickbench.plot_benchmark(
@@ -200,4 +200,4 @@ pyquickbench.plot_benchmark(
 
 
 # %% 
-# As can be seen in the above plots, the timings are automatically sorted along the "repeat" axis.
+# As can be seen in the above plots, the timings are automatically sorted along the pyquickbench.repeat_ax_name axis.

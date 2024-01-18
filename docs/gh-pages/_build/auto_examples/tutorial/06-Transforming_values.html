@@ -347,28 +347,25 @@ document.write(`
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tutorial</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="01-First_benchmark.html">A first benchmark</a></li>
-<li class="toctree-l2"><a class="reference internal" href="02-Caching_benchmarks.html">Caching benchmarks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="03-Preparing_inputs.html">Preparing inputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="04-Error_handling.html">Handling errors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="05-Plotting_scalars.html">Plotting scalar values</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Plotting transformed values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="07-Multidimensional_benchmarks.html">Multidimensional benchmarks</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../benchmarks/Benchmark_Hardware_Info.html">Description of the benchmark machine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../benchmarks/Inplace_conjugate.html">Benchmark of inplace conjugation of arrays</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</nav></div>
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/plot_icon.png" class="logo__image only-light" alt="pyquickbench"/>
+    <script>document.write(`<img src="../../../_static/plot_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
+  
+  
+    <p class="title logo__title">pyquickbench</p>
+  
+</a></div>
     </div>
   
   
@@ -473,7 +470,7 @@ The benchmark consists in understanding the convergence behavior of the followin
 </pre></div>
 </div>
 <img src="../../../_images/sphx_glr_06-Transforming_values_002.png" srcset="../../../_images/sphx_glr_06-Transforming_values_002.png" alt="Computational cost growth order" class = "sphx-glr-single-img"/><p>Since all the functions in the benchmark have the same asymptotic behavior, it makes sense to compare then against each other. Let’s pick a reference method, for instance “DOP853” and plot all timings relative to this reference. This is achieved with the <code class="docutils literal notranslate"><span class="pre">relative_to_val</span></code> argument.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">relative_to_val</span></a> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fun&quot;</span><span class="p">:</span> <span class="s2">&quot;DOP853&quot;</span><span class="p">}</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">relative_to_val</span></a> <span class="o">=</span> <span class="p">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pyquickbench</span><span class="o">.</span><span class="n">fun_ax_name</span></a><span class="p">:</span> <span class="s2">&quot;DOP853&quot;</span><span class="p">}</span>
 
 <span class="n">pyquickbench</span><span class="o">.</span><span class="n">plot_benchmark</span><span class="p">(</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timings_results</span></a>                         <span class="p">,</span>

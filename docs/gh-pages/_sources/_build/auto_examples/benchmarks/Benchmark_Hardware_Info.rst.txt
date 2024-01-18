@@ -210,34 +210,80 @@ Numpy configuration informations
 
  .. code-block:: none
 
-    openblas64__info:
-        libraries = ['openblas64_', 'openblas64_']
-        library_dirs = ['/usr/local/lib']
-        language = c
-        define_macros = [('HAVE_CBLAS', None), ('BLAS_SYMBOL_SUFFIX', '64_'), ('HAVE_BLAS_ILP64', None)]
-        runtime_library_dirs = ['/usr/local/lib']
-    blas_ilp64_opt_info:
-        libraries = ['openblas64_', 'openblas64_']
-        library_dirs = ['/usr/local/lib']
-        language = c
-        define_macros = [('HAVE_CBLAS', None), ('BLAS_SYMBOL_SUFFIX', '64_'), ('HAVE_BLAS_ILP64', None)]
-        runtime_library_dirs = ['/usr/local/lib']
-    openblas64__lapack_info:
-        libraries = ['openblas64_', 'openblas64_']
-        library_dirs = ['/usr/local/lib']
-        language = c
-        define_macros = [('HAVE_CBLAS', None), ('BLAS_SYMBOL_SUFFIX', '64_'), ('HAVE_BLAS_ILP64', None), ('HAVE_LAPACKE', None)]
-        runtime_library_dirs = ['/usr/local/lib']
-    lapack_ilp64_opt_info:
-        libraries = ['openblas64_', 'openblas64_']
-        library_dirs = ['/usr/local/lib']
-        language = c
-        define_macros = [('HAVE_CBLAS', None), ('BLAS_SYMBOL_SUFFIX', '64_'), ('HAVE_BLAS_ILP64', None), ('HAVE_LAPACKE', None)]
-        runtime_library_dirs = ['/usr/local/lib']
-    Supported SIMD extensions in this NumPy install:
-        baseline = SSE,SSE2,SSE3
-        found = SSSE3,SSE41,POPCNT,SSE42,AVX,F16C,FMA3,AVX2,AVX512F,AVX512CD,AVX512_SKX,AVX512_CLX,AVX512_CNL,AVX512_ICL
-        not found = AVX512_KNL,AVX512_KNM
+    Build Dependencies:
+      blas:
+        detection method: pkgconfig
+        found: true
+        include directory: /usr/local/include
+        lib directory: /usr/local/lib
+        name: openblas64
+        openblas configuration: USE_64BITINT=1 DYNAMIC_ARCH=1 DYNAMIC_OLDER= NO_CBLAS=
+          NO_LAPACK= NO_LAPACKE= NO_AFFINITY=1 USE_OPENMP= HASWELL MAX_THREADS=2
+        pc file directory: /usr/local/lib/pkgconfig
+        version: 0.3.23.dev
+      lapack:
+        detection method: internal
+        found: true
+        include directory: unknown
+        lib directory: unknown
+        name: dep139639528180752
+        openblas configuration: unknown
+        pc file directory: unknown
+        version: 1.26.3
+    Compilers:
+      c:
+        commands: cc
+        linker: ld.bfd
+        name: gcc
+        version: 10.2.1
+      c++:
+        commands: c++
+        linker: ld.bfd
+        name: gcc
+        version: 10.2.1
+      cython:
+        commands: cython
+        linker: cython
+        name: cython
+        version: 3.0.7
+    Machine Information:
+      build:
+        cpu: x86_64
+        endian: little
+        family: x86_64
+        system: linux
+      host:
+        cpu: x86_64
+        endian: little
+        family: x86_64
+        system: linux
+    Python Information:
+      path: /opt/python/cp311-cp311/bin/python
+      version: '3.11'
+    SIMD Extensions:
+      baseline:
+      - SSE
+      - SSE2
+      - SSE3
+      found:
+      - SSSE3
+      - SSE41
+      - POPCNT
+      - SSE42
+      - AVX
+      - F16C
+      - FMA3
+      - AVX2
+      - AVX512F
+      - AVX512CD
+      - AVX512_SKX
+      - AVX512_CLX
+      - AVX512_CNL
+      - AVX512_ICL
+      not found:
+      - AVX512_KNL
+      - AVX512_KNM
+
 
 
 
@@ -308,7 +354,7 @@ Scipy configuration informations
         name: gcc
         version: 10.2.1
       pythran:
-        include directory: ../../tmp/pip-build-env-c6c8ru56/overlay/lib/python3.10/site-packages/pythran
+        include directory: ../../tmp/pip-build-env-lzd6dam0/overlay/lib/python3.11/site-packages/pythran
         version: 0.14.0
     Machine Information:
       build:
@@ -323,8 +369,8 @@ Scipy configuration informations
         family: x86_64
         system: linux
     Python Information:
-      path: /opt/python/cp310-cp310/bin/python
-      version: '3.10'
+      path: /opt/python/cp311-cp311/bin/python
+      version: '3.11'
 
 
 

@@ -38,12 +38,7 @@ from pyquickbench._utils import (
     _arg_names_list_to_idx  ,
 )
 
-from pyquickbench._defaults import (
-    default_setup           ,
-    default_color_list      ,
-    default_linestyle_list  ,
-    default_pointstyle_list ,
-)
+from pyquickbench._defaults import *
 
 def run_benchmark(
     all_args        : typing.Union[dict, typing.Iterable]                   ,
@@ -61,6 +56,7 @@ def run_benchmark(
     PreventBenchmark: bool                      = False                     ,
     StopOnExcept    : bool                      = False                     ,
     ShowProgress    : bool                      = False                     ,
+    WarmUp          : bool                      = True                      ,
     MonotonicAxes   : list                      = []                        ,
     timeout         : float                     = 1.                        ,
     show            : bool                      = False                     ,
@@ -81,7 +77,7 @@ def run_benchmark(
     setup : callable, optional
         Function that prepares the inputs for the functions to be benchmarked.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
-        By default ``lambda n: {'n': n}``.
+        By default ``lambda n: {pyquickbench.default_ax_name: n}``.
     n_repeat : int, optional
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
@@ -108,6 +104,9 @@ def run_benchmark(
         Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.
     ShowProgress : bool, optional
         Whether to show a progress bar in the CLI during benchmark, by default ``False``.
+    WarmUp : bool, optional
+        Whether to run the function once without measurement. Can help with jit compilation caching for instance.\n
+        By default ``False``.
     MonotonicAxes : list, optional
         List of argument names for which timings are expected to get longer and longer.\n
         By default ``[]``.
@@ -201,7 +200,7 @@ def run_benchmark(
                 warnings.warn("Concurrent execution is unwise in timings mode as it will mess up the timings.")
                 
             measure_fun = _measure_timings
-            extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, all_vals)
+            extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, WarmUp, all_vals)
             
         elif mode == "scalar_output": 
         
@@ -236,7 +235,7 @@ def run_benchmark(
                 future.add_done_callback(_treat_future_result)
                 future.add_done_callback(lambda _: progress.update(1))
 
-        # Sort values along "repeat" axis, taking care of nans.
+        # Sort values along repeat_ax_name axis, taking care of nans.
         idx = np.argsort(all_vals, axis=-1)
         all_vals = np.take_along_axis(all_vals, idx, axis=-1)
         
@@ -307,6 +306,7 @@ def plot_benchmark(
     xlabel                  : typing.Union[str, None]           = None                      ,
     ylabel                  : typing.Union[str, None]           = None                      ,
     plot_legend             : bool                              = True                      ,
+    ProductLegend           : bool                              = False                     ,
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
     relative_to_idx         : typing.Union[dict, None]          = None                      ,         
@@ -395,7 +395,10 @@ def plot_benchmark(
     legend_location : str, optional
         Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``'upper left'``.
     plot_grid : bool, optional
-        Whether to plot a background grido to each plot, by default ``True``.
+        Whether to plot a background grid to each plot, by default ``True``.
+    ProductLegend : bool, optional
+        Whether to detail every curve in the legend, or aggregate benchmark axes, leading to more concise legends.\n
+        By default ``False``.
     relative_to_idx : dict | None, optional
         Indices of benchmarked values against which curves will be plotted.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n
@@ -415,9 +418,6 @@ def plot_benchmark(
         Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False
     """
 
-    # TODO: Change that
-    ProductLegend = True
-    
     # print(f'{all_vals = }')
     
     all_vals = np.ma.array(all_vals, mask=np.isnan(all_vals))
@@ -434,8 +434,8 @@ def plot_benchmark(
         if not(loaded_axis_len == expected_axis_len):
             raise ValueError(f'Axis {axis_name} of the benchmark results has a length of {loaded_axis_len} instead of the expected {expected_axis_len}.')
             
-    n_funs = res_shape['fun']
-    n_repeat = res_shape['repeat']
+    n_funs = res_shape[fun_ax_name]
+    n_repeat = res_shape[repeat_ax_name]
 
     if all_fun_names is None:
         
@@ -473,17 +473,17 @@ def plot_benchmark(
     if plot_intent is None:
         
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
-        plot_intent['fun'] = 'curve_color'
-        plot_intent['repeat'] = 'reduction_min'
+        plot_intent[fun_ax_name] = 'curve_color'
+        plot_intent[repeat_ax_name] = 'reduction_min'
 
     else:
         
         assert isinstance(plot_intent, dict)
         
-        if 'fun' not in plot_intent:
-            plot_intent['fun'] = 'curve_color'
-        if 'repeat' not in plot_intent:
-            plot_intent['repeat'] = 'reduction_min'
+        if fun_ax_name not in plot_intent:
+            plot_intent[fun_ax_name] = 'curve_color'
+        if repeat_ax_name not in plot_intent:
+            plot_intent[repeat_ax_name] = 'reduction_min'
         
         assert len(plot_intent) == all_vals.ndim
         for name, intent in plot_intent.items():
@@ -608,7 +608,7 @@ def plot_benchmark(
         raise ValueError('Need a range to clip values')
 
     if logx_plot is None:
-        logx_plot = (transform is None)
+        logx_plot = True
         
     if logy_plot is None:
         logy_plot = (transform is None)
@@ -688,16 +688,16 @@ def plot_benchmark(
                         label = label           ,
                         linestyle = linestyle   ,
                         marker = pointstyle     ,
-                        markersize = 10         ,
+                        markersize = Legend_markersize         ,
                     )
                 )
 
         plot_y_val = _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction)
         
         if all_xvalues is None:
-            if name_points == "fun":
+            if name_points == fun_ax_name:
                 plot_x_val = all_fun_names
-            elif name_points == "repeat":
+            elif name_points == repeat_ax_name:
                 plot_x_val = np.array(range(n_repeat))
             else:
                 plot_x_val = all_args[name_points]
@@ -728,11 +728,13 @@ def plot_benchmark(
                 ratio_y = plot_y_val[i_size] / plot_y_val[i_size-1]
                 ratio_x = plot_x_val[i_size] / plot_x_val[i_size-1]
                 
-                try:
-                    transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
+                with warnings.catch_warnings(): # Super annoying warning here
+                    warnings.simplefilter("ignore")
+                    try:
+                        transformed_plot_y_val[i_size] = math.log(ratio_y) / math.log(ratio_x)
 
-                except:
-                    transformed_plot_y_val[i_size] = np.nan
+                    except:
+                        transformed_plot_y_val[i_size] = np.nan
                     
             transformed_plot_y_val[0] = np.nan
                             
@@ -788,6 +790,128 @@ def plot_benchmark(
                 alpha       = alpha         ,
             )
         
+    if not(ProductLegend): 
+        
+        ncats = len(idx_all_curve_color) + len(idx_all_curve_linestyle) + len(idx_all_curve_pointstyle)
+        HeaderLegend = (ncats > 1)
+             
+        for i_subplot_grid_x in range(n_subplot_grid_x):
+            for i_subplot_grid_y in range(n_subplot_grid_y):
+
+                cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
+
+                HeaderLegend = (len(idx_all_curve_color) == 1)
+                KeyValLegend = not(HeaderLegend)
+                
+                if len(idx_all_curve_color) > 0:
+                    
+                    if HeaderLegend:
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.patches.Patch(
+                                color = "white"                     ,
+                                label = f'{name_curve_color[0]}:'   ,
+                                alpha = 0.                          ,
+                            )
+                        )
+                    
+                    for i_color, idx_curve_color in enumerate(itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curve_color])):
+
+                        color = color_list[i_color % n_colors]
+
+                        label = ''
+                        label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = label[:-2] # Removing final comma
+
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.lines.Line2D([], []                 ,
+                                color = color                       ,
+                                label = label                       ,
+                                linestyle = Legend_bland_linestyle  ,
+                                marker = Legend_bland_pointstyle    ,
+                                markersize = Legend_markersize      ,
+                            )
+                        )
+                        
+                    
+                    if HeaderLegend:
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.patches.Patch(
+                                color = "white"                     ,
+                                label = ''   ,
+                                alpha = 0.                          ,
+                            )
+                        )
+                
+                HeaderLegend = (len(idx_curve_linestyle) == 1)
+                KeyValLegend = not(HeaderLegend)
+                
+                if len(idx_all_curve_linestyle) > 0:
+                    
+                    if HeaderLegend:
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.patches.Patch(
+                                color = "white"                     ,
+                                label = f'{name_curve_linestyle[0]}:'   ,
+                                alpha = 0.                          ,
+                            )
+                        )
+                    
+                    for i_linestyle, idx_curve_linestyle in enumerate(itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curve_linestyle])):
+
+                        linestyle = linestyle_list[i_linestyle % n_linestyle]
+                        label = ''
+                        label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = label[:-2] # Removing final comma
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.lines.Line2D([], []                 ,
+                                color = Legend_bland_color          ,
+                                label = label                       ,
+                                linestyle = linestyle               ,
+                                marker = Legend_bland_pointstyle    ,
+                                markersize = Legend_markersize      ,
+                            )
+                        )
+                    
+                    if HeaderLegend:
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.patches.Patch(
+                                color = "white"                     ,
+                                label = ''   ,
+                                alpha = 0.                          ,
+                            )
+                        )
+                
+                HeaderLegend = (len(idx_curve_pointstyle) == 1)
+                KeyValLegend = not(HeaderLegend)
+                        
+                if len(idx_all_curve_pointstyle) > 0:
+                    
+                    if HeaderLegend:
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.patches.Patch(
+                                color = "white"                     ,
+                                label = f'{name_curve_pointstyle[0]}:'   ,
+                                alpha = 0.                          ,
+                            )
+                        )
+                    
+                    for i_pointstyle, idx_curve_pointstyle in enumerate(itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curve_pointstyle])):
+
+                        pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
+                        label = ''
+                        label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = label[:-2] # Removing final comma
+
+                        leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
+                            mpl.lines.Line2D([], []                 ,
+                                color = Legend_bland_color          ,
+                                label = label                       ,
+                                linestyle = Legend_bland_linestyle  ,
+                                marker = pointstyle                 ,
+                                markersize = Legend_markersize      ,
+                            )
+                        )
+                
     for i_subplot_grid_x in range(n_subplot_grid_x):
         for i_subplot_grid_y in range(n_subplot_grid_y):
 

@@ -56,8 +56,6 @@ def python(a, b, c):
             for k in range(a.shape[1]):
 
                 c[i,j] += a[i,k]*b[k,j]
-                
-    return 0.
 
 numba_serial = nb.jit(python,**numba_opt_dict)
 numba_serial.__name__ = "numba_serial"
@@ -138,7 +136,7 @@ plot_intent = {
     "Q" : 'single_value'               ,
     "R" :  'single_value'             ,
     "real_dtype": 'points'  ,
-    "fun" :  'single_value'             ,
+    pyquickbench.fun_ax_name :  'single_value'             ,
 }
 
 single_values_val = {
@@ -146,7 +144,7 @@ single_values_val = {
     "Q" : 2**5        ,
     "R" : 2**5        ,
     "real_dtype": "float64" ,
-    "fun" : "numpy_matmul"        ,
+    pyquickbench.fun_ax_name : "numpy_matmul"        ,
 }
 
 pyquickbench.plot_benchmark(
@@ -163,7 +161,7 @@ pyquickbench.plot_benchmark(
 # 
 # relative_to_val = {
 #     "real_dtype": "float64" ,
-#     "fun": "numpy_matmul"   ,
+#     pyquickbench.fun_ax_name: "numpy_matmul"   ,
 # }
 # 
 # pyquickbench.plot_benchmark(

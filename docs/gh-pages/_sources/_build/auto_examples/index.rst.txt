@@ -157,6 +157,23 @@ This is the best place to learn how to use :mod:`pyquickbench`.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Time-consuming benchmarks">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_08-Lengthy_benchmarks_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_08-Lengthy_benchmarks.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Time-consuming benchmarks</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 Benchmarks

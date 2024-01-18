@@ -145,7 +145,7 @@ pyquickbench.plot_benchmark(
 # %%
 # Since all the functions in the benchmark have the same asymptotic behavior, it makes sense to compare then against each other. Let's pick a reference method, for instance "DOP853" and plot all timings relative to this reference. This is achieved with the ``relative_to_val`` argument.
 
-relative_to_val = {"fun": "DOP853"}
+relative_to_val = {pyquickbench.fun_ax_name: "DOP853"}
 
 pyquickbench.plot_benchmark(
     timings_results                         ,
