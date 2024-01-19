@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.438** total execution time for 2 files **from _build/auto_examples/benchmarks**:
+**00:00.964** total execution time for 2 files **from _build/auto_examples/benchmarks**:
 
 .. container::
 
@@ -33,8 +33,8 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``Inplace_conjugate.py``)
-     - 00:00.789
+     - 00:00.822
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``Benchmark_Hardware_Info.py``)
-     - 00:00.649
+     - 00:00.142
      - 0.0

@@ -25,14 +25,14 @@ Benchmark of inplace conjugation of arrays
 
 This is a benchmark of different ways to perform inplace conjugation of a complex numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-55
+.. GENERATED FROM PYTHON SOURCE LINES 9-43
 
 .. code-block:: Python
 
 
 
     def numpy_ufunc_outofplace(x):
-        y = np.conjugate(x)
+        x = np.conjugate(x)
     
     def numpy_ufunc_inplace(x):
         np.conjugate(x, out=x)
@@ -61,27 +61,27 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         for i in nb.prange(x.shape[0]):
             x.imag[i] = -x.imag[i]
     
-    @nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='cpu')
-    def numba_vectorize(x):
-        return x.real - 1j*x.imag
-
-    @nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='cpu')
-    def numba_vectorize_conj(x):
-        return x.conjugate()
-
-    @nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='parallel')
-    def numba_vectorize_conj_parallel(x):
-        return x.conjugate()
-    
 
     plt.show()
 
 
 
-.. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
-   :alt: Inplace conjugation
-   :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
-   :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
+         :alt: Inplace conjugation
+         :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
+         :alt: Inplace conjugation
+         :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
+         :class: sphx-glr-multi-img
 
 
 

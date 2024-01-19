@@ -485,18 +485,18 @@ def plot_benchmark(
         if repeat_ax_name not in plot_intent:
             plot_intent[repeat_ax_name] = 'reduction_min'
         
-        assert len(plot_intent) == all_vals.ndim
+        if not(len(plot_intent) == all_vals.ndim):  
+            raise ValueError(f"Foud {len(plot_intent)} plot_intents. Expecting {all_vals.ndim}")
+        
         for name, intent in plot_intent.items():
             if not(name in res_shape):
                 raise ValueError(f'Unknown argument {name} in plot_intent')
             
             if not(intent in all_plot_intents):
                 raise ValueError(f'Unknown intent {intent} in plot_intent. Possible values are: {all_plot_intents}')
-    
-    for name_res, name_intent in zip(res_shape, plot_intent):
-        if (name_intent != name_res):
-            raise ValueError
-    
+
+        plot_intent = {name:plot_intent[name] for name in res_shape} 
+
     if not((single_values_idx is None) or (single_values_val is None)):
         raise ValueError("Both single_values_idx and single_values_val were set. only one of them should be")
     if not((relative_to_idx is None) or (relative_to_val is None)):

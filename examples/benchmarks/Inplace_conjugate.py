@@ -26,6 +26,12 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['TBB_NUM_THREADS'] = '1'
+
 import matplotlib.pyplot as plt
 import numpy as np
 import numba as nb
@@ -52,7 +58,7 @@ all_sizes = np.array([2**n for n in range(25)])
 # sphinx_gallery_end_ignore
 
 def numpy_ufunc_outofplace(x):
-    y = np.conjugate(x)
+    x = np.conjugate(x)
     
 def numpy_ufunc_inplace(x):
     np.conjugate(x, out=x)
@@ -81,18 +87,6 @@ def numba_loop_parallel(x):
     for i in nb.prange(x.shape[0]):
         x.imag[i] = -x.imag[i]
     
-@nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='cpu')
-def numba_vectorize(x):
-    return x.real - 1j*x.imag
-
-@nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='cpu')
-def numba_vectorize_conj(x):
-    return x.conjugate()
-
-@nb.vectorize(['complex128(complex128)'], nopython=True, cache=True, target='parallel')
-def numba_vectorize_conj_parallel(x):
-    return x.conjugate()
-    
 # sphinx_gallery_start_ignore
     
 all_funs = [
@@ -103,9 +97,6 @@ all_funs = [
     numba_loop_typedef ,
     numba_loop ,
     numba_loop_parallel ,
-    numba_vectorize ,
-    numba_vectorize_conj ,
-    numba_vectorize_conj_parallel ,
 ]
 
 def prepare_x(n):
@@ -115,13 +106,33 @@ def prepare_x(n):
 basename = f'Inplace_conjugation_bench'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
-_ = pyquickbench.run_benchmark(
+n_repeat = 10
+
+all_values = pyquickbench.run_benchmark(
     all_sizes                       ,
     all_funs                        ,
     setup = prepare_x               ,
+    n_repeat = n_repeat             ,
     filename = timings_filename     ,
+)
+
+pyquickbench.plot_benchmark(
+    all_values                      ,
+    all_sizes                       ,
+    all_funs                        ,
     show = True                     ,
     title = f'Inplace conjugation'  ,
+)
+
+relative_to_val = {pyquickbench.fun_ax_name:"numpy_ufunc_inplace"}
+
+pyquickbench.plot_benchmark(
+    all_values                          ,
+    all_sizes                           ,
+    all_funs                            ,
+    relative_to_val = relative_to_val   ,
+    show = True                         ,
+    title = f'Inplace conjugation'      ,
 )
 
 # sphinx_gallery_end_ignore

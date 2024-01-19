@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 project = "pyquickbench"
 author = "Gabriel Fougeron"
 project_copyright = "2024, Gabriel Fougeron"
-version = "0.1.0"
+version = "0.1.1"
 
 # sys.path.append(os.path.abspath("./_pygments"))
 # from style import PythonVSMintedStyle

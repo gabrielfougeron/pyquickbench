@@ -456,7 +456,7 @@ to download the full example code</p>
 <span id="sphx-glr-build-auto-examples-benchmarks-inplace-conjugate-py"></span><h1>Benchmark of inplace conjugation of arrays<a class="headerlink" href="#benchmark-of-inplace-conjugation-of-arrays" title="Link to this heading">#</a></h1>
 <p>This is a benchmark of different ways to perform inplace conjugation of a complex numpy array.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">numpy_ufunc_outofplace</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">y</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span></a><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">numpy_ufunc_inplace</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span></a><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
@@ -485,23 +485,15 @@ to download the full example code</p>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nb</span><span class="o">.</span><span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">x</span><span class="o">.</span><span class="n">imag</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span><span class="o">.</span><span class="n">imag</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-<span class="nd">@nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">([</span><span class="s1">&#39;complex128(complex128)&#39;</span><span class="p">],</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">numba_vectorize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">real</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">imag</span>
-
-<span class="nd">@nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">([</span><span class="s1">&#39;complex128(complex128)&#39;</span><span class="p">],</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">numba_vectorize_conj</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
-
-<span class="nd">@nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">([</span><span class="s1">&#39;complex128(complex128)&#39;</span><span class="p">],</span> <span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">numba_vectorize_conj_parallel</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span>
-
 
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../../_images/sphx_glr_Inplace_conjugate_001.png" srcset="../../../_images/sphx_glr_Inplace_conjugate_001.png" alt="Inplace conjugation" class = "sphx-glr-single-img"/><div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-benchmarks-inplace-conjugate-py">
+<ul class="sphx-glr-horizontal">
+<li><img src="../../../_images/sphx_glr_Inplace_conjugate_001.png" srcset="../../../_images/sphx_glr_Inplace_conjugate_001.png" alt="Inplace conjugation" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../../_images/sphx_glr_Inplace_conjugate_002.png" srcset="../../../_images/sphx_glr_Inplace_conjugate_002.png" alt="Inplace conjugation" class = "sphx-glr-multi-img"/></li>
+</ul>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-build-auto-examples-benchmarks-inplace-conjugate-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../../_downloads/8ba4f1016763acdfcee0b4a679e32afa/Inplace_conjugate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Inplace_conjugate.ipynb</span></code></a></p>
 </div>
