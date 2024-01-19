@@ -60,7 +60,7 @@ def hybrid(a, b, c):
     for i in range(a.shape[0]):
         for j in range(b.shape[1]):
 
-                c[i,j] = np.dot(a[i,:],b[:,j])
+            c[i,j] = np.dot(a[i,:],b[:,j])
 
 def numpy(a, b, c):
     np.matmul(a, b, out=c)

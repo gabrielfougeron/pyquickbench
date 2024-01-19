@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.215** total execution time for 10 files **from all galleries**:
+**00:01.469** total execution time for 10 files **from all galleries**:
 
 .. container::
 
@@ -32,10 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``../../examples/benchmarks/Inplace_conjugate.py``)
-     - 00:01.215
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Lengthy_benchmarks.py` (``../../examples/tutorial/08-Lengthy_benchmarks.py``)
+     - 00:01.469
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``../../examples/benchmarks/Benchmark_Hardware_Info.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``../../examples/benchmarks/Inplace_conjugate.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``../../examples/tutorial/01-First_benchmark.py``)
@@ -57,8 +60,5 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` (``../../examples/tutorial/07-Multidimensional_benchmarks.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Lengthy_benchmarks.py` (``../../examples/tutorial/08-Lengthy_benchmarks.py``)
      - 00:00.000
      - 0.0

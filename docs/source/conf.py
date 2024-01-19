@@ -111,6 +111,12 @@ html_theme_options = {
             "url": "https://pypi.org/project/pyquickbench/",
             "icon": "fa-custom fa-pypi",
         },
+        {
+            "name": "Anaconda",
+            # "url": "https://anaconda.org/conda-forge/pyquickbench",
+            "url": "https://anaconda.org/conda-forge",
+            "icon": "fa-custom fa-anaconda",
+        },
     ],
     "logo": {
         "text": "pyquickbench",
