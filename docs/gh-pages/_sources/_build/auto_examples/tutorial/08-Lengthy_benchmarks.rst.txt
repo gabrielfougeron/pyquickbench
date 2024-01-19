@@ -224,7 +224,7 @@ Plotting relative values shows that there can be a 100 000 fold difference betwe
 
 .. GENERATED FROM PYTHON SOURCE LINES 181-182
 
-We can also see that different methods need different sizes of input to raech their theoretically cubic asymptotic regime.
+We can also see that different methods need different sizes of input to reach their theoretically cubic asymptotic regime.
 
 .. GENERATED FROM PYTHON SOURCE LINES 182-192
 

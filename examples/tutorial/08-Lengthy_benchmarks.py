@@ -178,7 +178,7 @@ pyquickbench.plot_benchmark(
 )
 
 # %% 
-# We can also see that different methods need different sizes of input to raech their theoretically cubic asymptotic regime.
+# We can also see that different methods need different sizes of input to reach their theoretically cubic asymptotic regime.
 
 pyquickbench.plot_benchmark(
     all_values                      ,
