@@ -26,7 +26,7 @@ Pyquickbench is an open source, easy to use benchmarking tool written in pure Py
 
 ## Installation
 
-Pyquickbench is available on the [Python Package Index](https://pypi.org/). To install using pip, simply type:
+Pyquickbench is available on the [Python Package Index](https://pypi.org/project/pyquickbench/). To install using pip, simply type:
 
 ```
 pip install pyquickbench

@@ -106,6 +106,11 @@ html_theme_options = {
             "url": "https://github.com/gabrielfougeron/pyquickbench",
             "icon": "fa-brands fa-github",
         },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/pyquickbench/",
+            "icon": "fa-custom fa-pypi",
+        },
     ],
     "logo": {
         "text": "pyquickbench",
@@ -141,6 +146,9 @@ html_context = {
 html_static_path = ["_static"]
 html_css_files = [
     "css/custom.css",
+]
+html_js_files = [
+    "js/custom-icon.js",
 ]
 
 tr_report_template = "./test-report/test_report_template.txt"

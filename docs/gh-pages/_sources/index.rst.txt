@@ -24,7 +24,7 @@ Checkout the :ref:`Gallery <examples-index>` to get an idea of what pyquickbench
 Installation
 ============
 
-Pyquickbench is available on the `Python Package Index <https://pypi.org/>`_. To install using pip, simply type:
+Pyquickbench is available on the `Python Package Index <https://pypi.org/project/pyquickbench/>`_. To install using pip, simply type:
 
 .. code-block:: sh
 
