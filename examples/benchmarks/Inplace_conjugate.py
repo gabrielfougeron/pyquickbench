@@ -43,8 +43,6 @@ numba_opt_dict = {
     'nogil':True        ,
 }
 
-import pyquickbench
-
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
 
@@ -53,9 +51,9 @@ timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files_time_
 if not(os.path.isdir(timings_folder)):
     os.makedirs(timings_folder)
 
-all_sizes = np.array([2**n for n in range(25)])
-
 # sphinx_gallery_end_ignore
+
+import pyquickbench
 
 def numpy_ufunc_outofplace(x):
     x = np.conjugate(x)
@@ -86,9 +84,7 @@ def numba_loop_parallel(x):
     
     for i in nb.prange(x.shape[0]):
         x.imag[i] = -x.imag[i]
-    
-# sphinx_gallery_start_ignore
-    
+  
 all_funs = [
     numpy_ufunc_outofplace ,
     numpy_ufunc_inplace ,
@@ -98,6 +94,8 @@ all_funs = [
     numba_loop ,
     numba_loop_parallel ,
 ]
+
+all_sizes = np.array([2**n for n in range(25)])
 
 def prepare_x(n):
     x = np.random.random(n) + 1j*np.random.random(n)
@@ -124,6 +122,9 @@ pyquickbench.plot_benchmark(
     title = f'Inplace conjugation'  ,
 )
 
+# %% 
+# 
+
 relative_to_val = {pyquickbench.fun_ax_name:"numpy_ufunc_inplace"}
 
 pyquickbench.plot_benchmark(
@@ -135,6 +136,4 @@ pyquickbench.plot_benchmark(
     title = f'Inplace conjugation'      ,
 )
 
-# sphinx_gallery_end_ignore
 
-plt.show()

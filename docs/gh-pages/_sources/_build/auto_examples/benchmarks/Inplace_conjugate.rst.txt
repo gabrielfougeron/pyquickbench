@@ -25,11 +25,13 @@ Benchmark of inplace conjugation of arrays
 
 This is a benchmark of different ways to perform inplace conjugation of a complex numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-43
+.. GENERATED FROM PYTHON SOURCE LINES 9-80
 
 .. code-block:: Python
 
 
+
+    import pyquickbench
 
     def numpy_ufunc_outofplace(x):
         x = np.conjugate(x)
@@ -60,28 +62,80 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
     
         for i in nb.prange(x.shape[0]):
             x.imag[i] = -x.imag[i]
+  
+    all_funs = [
+        numpy_ufunc_outofplace ,
+        numpy_ufunc_inplace ,
+        numpy_inplace_mul ,
+        numpy_subs ,
+        numba_loop_typedef ,
+        numba_loop ,
+        numba_loop_parallel ,
+    ]
+
+    all_sizes = np.array([2**n for n in range(25)])
+
+    def prepare_x(n):
+        x = np.random.random(n) + 1j*np.random.random(n)
+        return [('x', x)]
     
+    basename = f'Inplace_conjugation_bench'
+    timings_filename = os.path.join(timings_folder, basename+'.npz')
 
-    plt.show()
+    n_repeat = 10
+
+    all_values = pyquickbench.run_benchmark(
+        all_sizes                       ,
+        all_funs                        ,
+        setup = prepare_x               ,
+        n_repeat = n_repeat             ,
+        filename = timings_filename     ,
+    )
+
+    pyquickbench.plot_benchmark(
+        all_values                      ,
+        all_sizes                       ,
+        all_funs                        ,
+        show = True                     ,
+        title = f'Inplace conjugation'  ,
+    )
 
 
 
-.. rst-class:: sphx-glr-horizontal
+
+.. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
+   :alt: Inplace conjugation
+   :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
+   :class: sphx-glr-single-img
 
 
-    *
 
-      .. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
-         :alt: Inplace conjugation
-         :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_001.png
-         :class: sphx-glr-multi-img
 
-    *
 
-      .. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
-         :alt: Inplace conjugation
-         :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
-         :class: sphx-glr-multi-img
+.. GENERATED FROM PYTHON SOURCE LINES 127-140
+
+.. code-block:: Python
+
+
+    relative_to_val = {pyquickbench.fun_ax_name:"numpy_ufunc_inplace"}
+
+    pyquickbench.plot_benchmark(
+        all_values                          ,
+        all_sizes                           ,
+        all_funs                            ,
+        relative_to_val = relative_to_val   ,
+        show = True                         ,
+        title = f'Inplace conjugation'      ,
+    )
+
+
+
+
+
+.. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
+   :alt: Inplace conjugation
+   :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_Inplace_conjugate_002.png
+   :class: sphx-glr-single-img
 
 
 
