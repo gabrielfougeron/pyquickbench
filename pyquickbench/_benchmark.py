@@ -925,13 +925,20 @@ def plot_benchmark(
                     borderaxespad = 0.                                      ,
                 )
                 
-            KeyValLegend = True
-            ax_title = ''
-            ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, KeyValLegend, ax_title)
-            ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, KeyValLegend, ax_title)
-            ax_title = ax_title[:-2]
-            cur_ax.set_title(ax_title)
+            if (n_subplot_grid_x*n_subplot_grid_y) > 1:
+                KeyValLegend = True
+                ax_title = ''
+                ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, KeyValLegend, ax_title)
+                ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, KeyValLegend, ax_title)
+                ax_title = ax_title[:-2]
                 
+            elif title is not None:
+                ax_title = title
+            else:
+                ax_title = ''
+                    
+            cur_ax.set_title(ax_title)
+            
             if logx_plot:
                 cur_ax.set_xscale('log')
             if logy_plot:
@@ -969,9 +976,9 @@ def plot_benchmark(
     if title is not None:
         if (n_subplot_grid_x*n_subplot_grid_y) > 1:
             fig.suptitle(title, fontsize=20)
-        else:
-            fig.suptitle(title)
 
     if show:
         plt.tight_layout()
         return plt.show()
+    else:
+        return (plt, ax)
