@@ -534,133 +534,7 @@ to download the full example code</p>
           product: Virtio filesystem
           vendor: Red Hat, Inc.
           physical id: 3
-          bus info: pci@058b:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:b0-af iomemory:b0-af iomemory:b0-af irq:0 memory:bffe10000-bffe10fff memory:bffe11000-bffe11fff memory:bffe12000-bffe12fff
-        *-virtio5 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@5
-             configuration: driver=9pnet_virtio
-     *-generic
-          description: System peripheral
-          product: Red Hat, Inc.
-          vendor: Red Hat, Inc.
-          physical id: 4
-          bus info: pci@0644:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:e0-df iomemory:e0-df iomemory:c0-bf irq:0 memory:e00000000-e00000fff memory:e00001000-e00001fff memory:c00000000-dffffffff
-        *-virtio2 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@2
-             configuration: driver=virtiofs
-     *-display:0
-          description: 3D controller
-          product: Microsoft Corporation
-          vendor: Microsoft Corporation
-          physical id: 5
-          bus info: pci@180f:00:00.0
-          version: 00
-          width: 32 bits
-          clock: 33MHz
-          capabilities: bus_master cap_list
-          configuration: driver=dxgkrnl latency=0
-          resources: irq:0
-     *-scsi:1
-          description: SCSI storage controller
-          product: Virtio filesystem
-          vendor: Red Hat, Inc.
-          physical id: 6
-          bus info: pci@3bda:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:b0-af iomemory:b0-af iomemory:b0-af irq:0 memory:bffe14000-bffe14fff memory:bffe15000-bffe15fff memory:bffe16000-bffe16fff
-        *-virtio6 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@6
-             configuration: driver=9pnet_virtio
-     *-scsi:2
-          description: SCSI storage controller
-          product: Virtio filesystem
-          vendor: Red Hat, Inc.
-          physical id: 7
-          bus info: pci@83df:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe08000-9ffe08fff memory:9ffe09000-9ffe09fff memory:9ffe0a000-9ffe0afff
-        *-virtio3 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@3
-             configuration: driver=9pnet_virtio
-     *-scsi:3
-          description: SCSI storage controller
-          product: Virtio filesystem
-          vendor: Red Hat, Inc.
-          physical id: 8
-          bus info: pci@94f4:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe04000-9ffe04fff memory:9ffe05000-9ffe05fff memory:9ffe06000-9ffe06fff
-        *-virtio1 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@1
-             configuration: driver=9pnet_virtio
-     *-scsi:4
-          description: SCSI storage controller
-          product: Virtio console
-          vendor: Red Hat, Inc.
-          physical id: 9
-          bus info: pci@b429:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
-        *-virtio0 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@0
-             configuration: driver=virtio_console
-     *-display:1
-          description: 3D controller
-          product: Microsoft Corporation
-          vendor: Microsoft Corporation
-          physical id: a
-          bus info: pci@b918:00:00.0
-          version: 00
-          width: 32 bits
-          clock: 33MHz
-          capabilities: bus_master cap_list
-          configuration: driver=dxgkrnl latency=0
-          resources: irq:0
-     *-scsi:5
-          description: SCSI storage controller
-          product: Virtio filesystem
-          vendor: Red Hat, Inc.
-          physical id: 0
-          bus info: pci@e22d:00:00.0
+          bus info: pci@0507:00:00.0
           version: 01
           width: 64 bits
           clock: 33MHz
@@ -672,16 +546,108 @@ to download the full example code</p>
              physical id: 0
              bus info: virtio@4
              configuration: driver=9pnet_virtio
+     *-scsi:1
+          description: SCSI storage controller
+          product: Virtio filesystem
+          vendor: Red Hat, Inc.
+          physical id: 4
+          bus info: pci@1eca:00:00.0
+          version: 01
+          width: 64 bits
+          clock: 33MHz
+          capabilities: scsi bus_master cap_list
+          configuration: driver=virtio-pci latency=64
+          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe08000-9ffe08fff memory:9ffe09000-9ffe09fff memory:9ffe0a000-9ffe0afff
+        *-virtio3 UNCLAIMED
+             description: Virtual I/O device
+             physical id: 0
+             bus info: virtio@3
+             configuration: driver=9pnet_virtio
+     *-display:0
+          description: 3D controller
+          product: Microsoft Corporation
+          vendor: Microsoft Corporation
+          physical id: 5
+          bus info: pci@aaee:00:00.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+          capabilities: bus_master cap_list
+          configuration: driver=dxgkrnl latency=0
+          resources: irq:0
+     *-display:1
+          description: 3D controller
+          product: Microsoft Corporation
+          vendor: Microsoft Corporation
+          physical id: 6
+          bus info: pci@ab53:00:00.0
+          version: 00
+          width: 32 bits
+          clock: 33MHz
+          capabilities: bus_master cap_list
+          configuration: driver=dxgkrnl latency=0
+          resources: irq:0
+     *-scsi:2
+          description: SCSI storage controller
+          product: Virtio filesystem
+          vendor: Red Hat, Inc.
+          physical id: 7
+          bus info: pci@c522:00:00.0
+          version: 01
+          width: 64 bits
+          clock: 33MHz
+          capabilities: scsi bus_master cap_list
+          configuration: driver=virtio-pci latency=64
+          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe04000-9ffe04fff memory:9ffe05000-9ffe05fff memory:9ffe06000-9ffe06fff
+        *-virtio1 UNCLAIMED
+             description: Virtual I/O device
+             physical id: 0
+             bus info: virtio@1
+             configuration: driver=9pnet_virtio
+     *-scsi:3
+          description: SCSI storage controller
+          product: Virtio console
+          vendor: Red Hat, Inc.
+          physical id: 8
+          bus info: pci@de73:00:00.0
+          version: 01
+          width: 64 bits
+          clock: 33MHz
+          capabilities: scsi bus_master cap_list
+          configuration: driver=virtio-pci latency=64
+          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
+        *-virtio0 UNCLAIMED
+             description: Virtual I/O device
+             physical id: 0
+             bus info: virtio@0
+             configuration: driver=virtio_console
+     *-generic
+          description: System peripheral
+          product: Red Hat, Inc.
+          vendor: Red Hat, Inc.
+          physical id: 0
+          bus info: pci@f0b8:00:00.0
+          version: 01
+          width: 64 bits
+          clock: 33MHz
+          capabilities: bus_master cap_list
+          configuration: driver=virtio-pci latency=64
+          resources: iomemory:e0-df iomemory:e0-df iomemory:c0-bf irq:0 memory:e00000000-e00000fff memory:e00001000-e00001fff memory:c00000000-dffffffff
+        *-virtio2 UNCLAIMED
+             description: Virtual I/O device
+             physical id: 0
+             bus info: virtio@2
+             configuration: driver=virtiofs
      *-pnp00:00
           product: PnP device PNP0b00
-          physical id: b
+          physical id: 9
           capabilities: pnp
           configuration: driver=rtc_cmos
   *-network
        description: Ethernet interface
        physical id: 1
        logical name: eth0
-       serial: 00:15:5d:46:73:73
+       serial: 00:15:5d:3d:bb:b0
        size: 10Gbit/s
        capabilities: ethernet physical
        configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.90.2-microsoft-standard-WS duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s

@@ -97,7 +97,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         all_sizes                       ,
         all_funs                        ,
         show = True                     ,
-        title = f'Inplace conjugation'  ,
+        title = 'Inplace conjugation'   ,
     )
 
 
@@ -112,7 +112,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-140
+.. GENERATED FROM PYTHON SOURCE LINES 127-141
 
 .. code-block:: Python
 
@@ -125,7 +125,8 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         all_funs                            ,
         relative_to_val = relative_to_val   ,
         show = True                         ,
-        title = f'Inplace conjugation'      ,
+        title = 'Inplace conjugation'       ,
+        ylabel = 'Time relative to numpy_ufunc_inplace' ,
     )
 
 

@@ -119,7 +119,7 @@ pyquickbench.plot_benchmark(
     all_sizes                       ,
     all_funs                        ,
     show = True                     ,
-    title = f'Inplace conjugation'  ,
+    title = 'Inplace conjugation'   ,
 )
 
 # %% 
@@ -133,7 +133,8 @@ pyquickbench.plot_benchmark(
     all_funs                            ,
     relative_to_val = relative_to_val   ,
     show = True                         ,
-    title = f'Inplace conjugation'      ,
+    title = 'Inplace conjugation'       ,
+    ylabel = 'Time relative to numpy_ufunc_inplace' ,
 )
 
 

@@ -832,13 +832,12 @@ def plot_benchmark(
                             )
                         )
                         
-                    
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
-                                color = "white"                     ,
-                                label = ''   ,
-                                alpha = 0.                          ,
+                                color = "white" ,
+                                label = ''      ,
+                                alpha = 0.      ,
                             )
                         )
                 
@@ -850,9 +849,9 @@ def plot_benchmark(
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
-                                color = "white"                     ,
+                                color = "white"                         ,
                                 label = f'{name_curve_linestyle[0]}:'   ,
-                                alpha = 0.                          ,
+                                alpha = 0.                              ,
                             )
                         )
                     
@@ -875,9 +874,9 @@ def plot_benchmark(
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
-                                color = "white"                     ,
-                                label = ''   ,
-                                alpha = 0.                          ,
+                                color = "white" ,
+                                label = ''      ,
+                                alpha = 0.      ,
                             )
                         )
                 
@@ -889,9 +888,9 @@ def plot_benchmark(
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
-                                color = "white"                     ,
-                                label = f'{name_curve_pointstyle[0]}:'   ,
-                                alpha = 0.                          ,
+                                color = "white"                         ,
+                                label = f'{name_curve_pointstyle[0]}:'  ,
+                                alpha = 0.                              ,
                             )
                         )
                     
@@ -911,9 +910,9 @@ def plot_benchmark(
                                 markersize = Legend_markersize      ,
                             )
                         )
-                
-    for i_subplot_grid_x in range(n_subplot_grid_x):
-        for i_subplot_grid_y in range(n_subplot_grid_y):
+
+    for i_subplot_grid_x, idx_subplot_grid_x in enumerate(itertools.product(*[range(all_vals.shape[i]) for i in idx_all_subplot_grid_x])):
+        for i_subplot_grid_y, idx_subplot_grid_y in enumerate(itertools.product(*[range(all_vals.shape[i]) for i in idx_all_subplot_grid_y])):
 
             cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
 
@@ -925,6 +924,13 @@ def plot_benchmark(
                     loc = legend_location                                   ,
                     borderaxespad = 0.                                      ,
                 )
+                
+            KeyValLegend = True
+            ax_title = ''
+            ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, KeyValLegend, ax_title)
+            ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, KeyValLegend, ax_title)
+            ax_title = ax_title[:-2]
+            cur_ax.set_title(ax_title)
                 
             if logx_plot:
                 cur_ax.set_xscale('log')
@@ -940,9 +946,6 @@ def plot_benchmark(
                 
             if plot_ylim is not None:
                 cur_ax.set_ylim(plot_ylim)
-
-            if title is not None:
-                cur_ax.set_title(title)
                 
             if xlabel is None:
                 if (all_xvalues is None):
@@ -962,6 +965,12 @@ def plot_benchmark(
 
             cur_ax.set_xlabel(xlabel)
             cur_ax.set_ylabel(ylabel)
+
+    if title is not None:
+        if (n_subplot_grid_x*n_subplot_grid_y) > 1:
+            fig.suptitle(title, fontsize=20)
+        else:
+            fig.suptitle(title)
 
     if show:
         plt.tight_layout()

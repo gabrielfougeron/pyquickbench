@@ -68,7 +68,7 @@ def _check_sig_no_pos_only(fun):
                 raise ValueError(f'Input argument {param} to provided function {fun.__name__} is positional only. Positional-only arguments are unsupported')
         
 def _return_setup_vars_dict(setup, args):
-
+    
     setup_vars = setup(*args)
 
     if isinstance(setup_vars, dict):
@@ -134,7 +134,7 @@ def _save_benchmark_file(filename, all_vals, all_args):
         raise ValueError(f'Unknown file extension {file_ext}')
     
 def _build_args_shapes(all_args, all_funs, n_repeat):
-    
+
     if not(isinstance(all_args, dict)):
         all_args = {default_ax_name: all_args}
     

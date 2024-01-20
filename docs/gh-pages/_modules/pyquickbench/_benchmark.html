@@ -57,6 +57,7 @@
     <script src="../../_static/sphinx-needs/libs/html/datatables_loader.js?v=a2cae175"></script>
     <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=f783d6a5"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pyquickbench/_benchmark';</script>
+    <script src="../../_static/js/custom-icon.js?v=063adea7"></script>
     <link rel="canonical" href="https://github.com/gabrielfougeron/pyquickbench/_modules/pyquickbench/_benchmark.html" />
     <link rel="icon" href="../../_static/plot_icon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -241,6 +242,18 @@ document.write(`
           <a href="https://pypi.org/project/pyquickbench/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">PyPI</span></a>
         </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://anaconda.org/conda-forge" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Anaconda</span></a>
+        </li>
 </ul></div>
       
     </div>
@@ -355,6 +368,18 @@ document.write(`
           
           <a href="https://pypi.org/project/pyquickbench/" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">PyPI</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://anaconda.org/conda-forge" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Anaconda</span></a>
         </li>
 </ul></div>
         
@@ -1254,13 +1279,12 @@ document.write(`
                             <span class="p">)</span>
                         <span class="p">)</span>
                         
-                    
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
-                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                     <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>   <span class="p">,</span>
-                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                          <span class="p">,</span>
+                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span> <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>      <span class="p">,</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>      <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
                 
@@ -1272,9 +1296,9 @@ document.write(`
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
-                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                     <span class="p">,</span>
+                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                         <span class="p">,</span>
                                 <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_linestyle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>   <span class="p">,</span>
-                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                          <span class="p">,</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                              <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
                     
@@ -1297,9 +1321,9 @@ document.write(`
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
-                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                     <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>   <span class="p">,</span>
-                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                          <span class="p">,</span>
+                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span> <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>      <span class="p">,</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>      <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
                 
@@ -1311,9 +1335,9 @@ document.write(`
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
-                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                     <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_pointstyle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>   <span class="p">,</span>
-                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                          <span class="p">,</span>
+                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                         <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_pointstyle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>  <span class="p">,</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                              <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
                     
@@ -1333,9 +1357,9 @@ document.write(`
                                 <span class="n">markersize</span> <span class="o">=</span> <span class="n">Legend_markersize</span>      <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
-                
-    <span class="k">for</span> <span class="n">i_subplot_grid_x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i_subplot_grid_y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_y</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">i_subplot_grid_x</span><span class="p">,</span> <span class="n">idx_subplot_grid_x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_all_subplot_grid_x</span><span class="p">])):</span>
+        <span class="k">for</span> <span class="n">i_subplot_grid_y</span><span class="p">,</span> <span class="n">idx_subplot_grid_y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_all_subplot_grid_y</span><span class="p">])):</span>
 
             <span class="n">cur_ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i_subplot_grid_y</span><span class="p">,</span> <span class="n">i_subplot_grid_x</span><span class="p">]</span>
 
@@ -1347,6 +1371,13 @@ document.write(`
                     <span class="n">loc</span> <span class="o">=</span> <span class="n">legend_location</span>                                   <span class="p">,</span>
                     <span class="n">borderaxespad</span> <span class="o">=</span> <span class="mf">0.</span>                                      <span class="p">,</span>
                 <span class="p">)</span>
+                
+            <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">ax_title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_x</span><span class="p">,</span> <span class="n">name_subplot_grid_x</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
+            <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_y</span><span class="p">,</span> <span class="n">name_subplot_grid_y</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
+            <span class="n">ax_title</span> <span class="o">=</span> <span class="n">ax_title</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax_title</span><span class="p">)</span>
                 
             <span class="k">if</span> <span class="n">logx_plot</span><span class="p">:</span>
                 <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
@@ -1362,9 +1393,6 @@ document.write(`
                 
             <span class="k">if</span> <span class="n">plot_ylim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">plot_ylim</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
                 
             <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">all_xvalues</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -1384,6 +1412,12 @@ document.write(`
 
             <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
             <span class="n">cur_ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="o">*</span><span class="n">n_subplot_grid_y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
