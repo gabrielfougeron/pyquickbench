@@ -14,6 +14,8 @@ import pyquickbench
 
 
 def test_basic_benchmark(SimpleTimingsBenchmark):
+    
+    print("Launching basic timings benchmark")
 
     all_vals = pyquickbench.run_benchmark(
         SimpleTimingsBenchmark.all_args         ,
@@ -52,6 +54,16 @@ def test_all_options_timings(SimpleScalarBenchmark):
             all_StopOnExcept        ,
             all_ShowProgress        ,
         ):
+            
+            print()
+            print("Launching benchmark with parameters")
+            print(f'{n_repeat         = }')
+            print(f'{nproc            = }')
+            print(f'{pooltype         = }')
+            print(f'{ForceBenchmark   = }')
+            print(f'{PreventBenchmark = }')
+            print(f'{StopOnExcept     = }')
+            print(f'{ShowProgress     = }')
 
             all_vals = pyquickbench.run_benchmark(
                 SimpleScalarBenchmark.all_args          ,

@@ -12,7 +12,6 @@ __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.par
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
-
 project = "pyquickbench"
 author = "Gabriel Fougeron"
 project_copyright = "2024, Gabriel Fougeron"
@@ -84,7 +83,7 @@ html_logo_abs = os.path.join(__PROJECT_ROOT__, "docs", "source", "_static", "img
 html_logo_rel = "_static/img/plot_icon.png"
 html_logo = html_logo_rel
 html_favicon = html_logo_rel
-html_baseurl = "https://github.com/gabrielfougeron/pyquickbench"
+html_baseurl = "https://gabrielfougeron.github.io/pyquickbench/"
 html_show_sourcelink = True
 
 html_theme_options = {
