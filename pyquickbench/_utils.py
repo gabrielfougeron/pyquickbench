@@ -9,6 +9,32 @@ import numpy as np
 
 from pyquickbench._defaults import *
 
+class AutoTimer(timeit.Timer):
+    """
+    Enhancing Cpython's timeit.Timer.autorange. cf https://github.com/python/cpython/blob/main/Lib/timeit.py
+    """
+
+    def autorange(self, callback=None, time_target=0.2):
+        """Return the number of loops and time taken so that total time >= time_target.
+
+        Calls the timeit method with increasing numbers from the sequence
+        1, 2, 5, 10, 20, 50, ... until the time taken is at least 0.2
+        second.  Returns (number, time_taken).
+
+        If *callback* is given and is not None, it will be called after
+        each trial with two arguments: ``callback(number, time_taken)``.
+        """
+        i = 1
+        while True:
+            for j in 1, 2, 5:
+                number = i * j
+                time_taken = self.timeit(number)
+                if callback:
+                    callback(number, time_taken)
+                if time_taken >= time_target:
+                    return (number, time_taken)
+            i *= 10
+
 def isnotfinite(arr):
     res = np.isfinite(arr)
     np.bitwise_not(res, out=res)  # in-place
@@ -212,7 +238,7 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
 
             code = f'{fun_ax_name}(**setup_vars_dict)'
 
-            Timer = timeit.Timer(
+            Timer = AutoTimer(
                 code,
                 globals = global_dict,
             )
@@ -223,17 +249,17 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
                     Timer.timeit(number = 1)
 
                 # Estimate time of everything
-                n_timeit_0dot2, est_time = Timer.autorange()
+                n_timeit_autorange, est_time = Timer.autorange(time_target = time_per_test)
                 
-                if (n_repeat == 1) and (time_per_test == 0.2):
+                if (n_repeat == 1):
                     # Fast track: benchmark is not repeated and autorange results are kept as is.
 
-                    vals[i_fun, 0] = est_time / n_timeit_0dot2
+                    vals[i_fun, 0] = est_time / n_timeit_autorange
                     
                 else:
                     # Full benchmark is run
 
-                    n_timeit = math.ceil(n_timeit_0dot2 * time_per_test / est_time / n_repeat)
+                    n_timeit = math.ceil(n_timeit_autorange * time_per_test / est_time / n_repeat)
 
                     times = Timer.repeat(
                         repeat = n_repeat,
@@ -434,3 +460,4 @@ def _treat_future_result(future):
         future.all_vals[all_idx] = np.nan
         if future.StopOnExcept:
             raise exc
+        
