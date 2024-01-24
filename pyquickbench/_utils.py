@@ -18,7 +18,7 @@ class AutoTimer(timeit.Timer):
         """Return the number of loops and time taken so that total time >= time_target.
 
         Calls the timeit method with increasing numbers from the sequence
-        1, 2, 5, 10, 20, 50, ... until the time taken is at least 0.2
+        1, 2, 5, 10, 20, 50, ... until the time taken is at least time_target
         second.  Returns (number, time_taken).
 
         If *callback* is given and is not None, it will be called after
