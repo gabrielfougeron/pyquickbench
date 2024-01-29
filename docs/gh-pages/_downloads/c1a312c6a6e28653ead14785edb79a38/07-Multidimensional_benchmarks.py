@@ -89,7 +89,7 @@ print(all_values.shape[2] == n_repeat)
 # All the different timings can be superimposed on the same plot with the following ``plot_intent`` argument:
 
 plot_intent = {
-    pyquickbench.default_ax_name   : "points"      ,
+    pyquickbench.default_ax_name   : "points"       ,
     pyquickbench.fun_ax_name       : "curve_color"  ,
     pyquickbench.repeat_ax_name    : "same"         ,
 }

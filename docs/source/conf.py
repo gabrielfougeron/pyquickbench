@@ -112,8 +112,7 @@ html_theme_options = {
         },
         {
             "name": "Anaconda",
-            # "url": "https://anaconda.org/conda-forge/pyquickbench",
-            "url": "https://anaconda.org/conda-forge",
+            "url": "https://anaconda.org/conda-forge/pyquickbench",
             "icon": "fa-custom fa-anaconda",
         },
     ],
