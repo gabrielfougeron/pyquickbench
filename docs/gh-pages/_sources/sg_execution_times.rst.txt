@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:05.261** total execution time for 10 files **from all galleries**:
+**00:11.790** total execution time for 10 files **from all galleries**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` (``../../examples/tutorial/07-Multidimensional_benchmarks.py``)
-     - 00:05.261
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``../../examples/benchmarks/Benchmark_Hardware_Info.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``../../examples/benchmarks/Inplace_conjugate.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``../../examples/tutorial/01-First_benchmark.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``../../examples/tutorial/02-Caching_benchmarks.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``../../examples/tutorial/03-Preparing_inputs.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_04-Error_handling.py` (``../../examples/tutorial/04-Error_handling.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``../../examples/tutorial/05-Plotting_scalars.py``)
-     - 00:00.000
+     - 00:04.417
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` (``../../examples/tutorial/06-Transforming_values.py``)
-     - 00:00.000
+     - 00:01.600
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Lengthy_benchmarks.py` (``../../examples/tutorial/08-Lengthy_benchmarks.py``)
-     - 00:00.000
+     - 00:01.446
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``../../examples/tutorial/02-Caching_benchmarks.py``)
+     - 00:01.108
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``../../examples/benchmarks/Inplace_conjugate.py``)
+     - 00:00.925
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``../../examples/tutorial/05-Plotting_scalars.py``)
+     - 00:00.781
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``../../examples/benchmarks/Benchmark_Hardware_Info.py``)
+     - 00:00.483
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``../../examples/tutorial/03-Preparing_inputs.py``)
+     - 00:00.481
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``../../examples/tutorial/01-First_benchmark.py``)
+     - 00:00.351
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_04-Error_handling.py` (``../../examples/tutorial/04-Error_handling.py``)
+     - 00:00.198
      - 0.0

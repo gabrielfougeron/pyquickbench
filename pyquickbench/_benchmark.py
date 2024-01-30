@@ -36,6 +36,7 @@ from pyquickbench._utils import (
     _choose_idx_val         ,
     _treat_future_result    ,
     _arg_names_list_to_idx  ,
+    _product                ,
 )
 
 from pyquickbench._defaults import *
@@ -167,7 +168,7 @@ def run_benchmark(
         
         all_vals = np.full(list(res_shape.values()), -1.) # Negative values
 
-        total_iterations = math.prod(args_shape.values())
+        total_iterations = _product(args_shape.values())
         
         if ShowProgress:
 
@@ -211,10 +212,7 @@ def run_benchmark(
                 
             raise ValueError(f'Unknown mode {mode}')
             
-        with (
-            progress_bar(total = total_iterations) as progress  ,
-            PoolExecutor(nproc) as executor                     ,
-        ):
+        with progress_bar(total = total_iterations) as progress, PoolExecutor(nproc) as executor:
 
             for i_args, args in zip(
                 itertools.product(*[range(i) for i in args_shape.values()]) ,

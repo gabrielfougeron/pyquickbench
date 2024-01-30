@@ -297,7 +297,7 @@ class PhonyProcessPoolExecutor(object):
     def __exit__(self, *args):
         pass
     
-    def submit(self, fn, /, *args):
+    def submit(self, fn, *args):
         return FakeFuture(fn, *args)
 
 AllPoolExecutors = {
@@ -397,7 +397,7 @@ def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
                 elif isinstance(search_in, np.ndarray):
                     idx = np.nonzero(search_in == val)[0]
                 else:
-                    raise NotImplementedError(f"Searching in {type(all_args[name]) =} not yet supported.")
+                    raise NotImplementedError(f"Searching in {type(all_args[name])} not yet supported.")
     else:
         idx = None
         
@@ -461,3 +461,9 @@ def _treat_future_result(future):
         if future.StopOnExcept:
             raise exc
         
+def _product(it):
+    res = 1
+    for item in it:
+        res *= item
+        
+    return res

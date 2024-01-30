@@ -69,8 +69,8 @@ def RepeatTest(n = 10):
 
 @attrs.define
 class AllFunBenchmark:
-    all_args    :   dict[str]    
-    all_funs    :   dict[str, callable]   
+    all_args    :   typing.Dict[str, any]    
+    all_funs    :   typing.Dict[str, callable]   
     setup       :   callable
 
 def comprehension(n):

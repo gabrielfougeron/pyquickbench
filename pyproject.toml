@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyquickbench"
-version = "0.1.2"
+version = "0.1.3"
 description = "A pure Pyton tool to perform time and accuracy benchmarks"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
@@ -20,6 +20,8 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -27,7 +29,7 @@ classifiers = [
   "License :: OSI Approved :: BSD License",
   "Natural Language :: English",
 ]
-requires-python = ">= 3.9"
+requires-python = ">= 3.7"
 dynamic = ["dependencies", "optional-dependencies"]
 [tool.setuptools.dynamic.dependencies]
 file = ["requirements.txt"]
@@ -55,7 +57,3 @@ junit_family = "xunit2"
 junit_logging = "system-out"
 junit_suite_name = "Pytest test results"
 junit_log_passing_tests = true
-
-
-
-

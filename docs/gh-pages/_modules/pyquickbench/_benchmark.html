@@ -251,7 +251,7 @@ document.write(`
           
           
           
-          <a href="https://anaconda.org/conda-forge" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
+          <a href="https://anaconda.org/conda-forge/pyquickbench" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">Anaconda</span></a>
         </li>
 </ul></div>
@@ -378,7 +378,7 @@ document.write(`
           
           
           
-          <a href="https://anaconda.org/conda-forge" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
+          <a href="https://anaconda.org/conda-forge/pyquickbench" title="Anaconda" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-custom fa-anaconda fa-lg" aria-hidden="true"></i></span>
             <span class="sr-only">Anaconda</span></a>
         </li>
 </ul></div>
@@ -478,6 +478,7 @@ document.write(`
     <span class="n">_choose_idx_val</span>         <span class="p">,</span>
     <span class="n">_treat_future_result</span>    <span class="p">,</span>
     <span class="n">_arg_names_list_to_idx</span>  <span class="p">,</span>
+    <span class="n">_product</span>                <span class="p">,</span>
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">pyquickbench._defaults</span> <span class="kn">import</span> <span class="o">*</span>
@@ -611,7 +612,7 @@ document.write(`
         
         <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">res_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="o">-</span><span class="mf">1.</span><span class="p">)</span> <span class="c1"># Negative values</span>
 
-        <span class="n">total_iterations</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">total_iterations</span> <span class="o">=</span> <span class="n">_product</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         
         <span class="k">if</span> <span class="n">ShowProgress</span><span class="p">:</span>
 
@@ -655,10 +656,7 @@ document.write(`
                 
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             
-        <span class="k">with</span> <span class="p">(</span>
-            <span class="n">progress_bar</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="n">total_iterations</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span>  <span class="p">,</span>
-            <span class="n">PoolExecutor</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span>                     <span class="p">,</span>
-        <span class="p">):</span>
+        <span class="k">with</span> <span class="n">progress_bar</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="n">total_iterations</span><span class="p">)</span> <span class="k">as</span> <span class="n">progress</span><span class="p">,</span> <span class="n">PoolExecutor</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
 
             <span class="k">for</span> <span class="n">i_args</span><span class="p">,</span> <span class="n">args</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                 <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="p">,</span>

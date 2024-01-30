@@ -114,7 +114,7 @@ pyquickbench.run_benchmark(
 # sphinx_gallery_end_ignore
 ) 
 # %%
-#  This calling convention is why positional-only arguments are disallowed in :func:`pyquickbench.run_benchmark`. For instance, even though the following defines a legal Python function
+#  This calling convention is why positional-only arguments are disallowed in :func:`pyquickbench.run_benchmark`. For instance, even though the following defines a legal Python 3.8+ function
 
 def pos_only_fun(n,/):
     return n

@@ -54,16 +54,16 @@ def test_all_options_timings(SimpleScalarBenchmark):
             all_StopOnExcept        ,
             all_ShowProgress        ,
         ):
-            
+        
             print()
             print("Launching benchmark with parameters")
-            print(f'{n_repeat         = }')
-            print(f'{nproc            = }')
-            print(f'{pooltype         = }')
-            print(f'{ForceBenchmark   = }')
-            print(f'{PreventBenchmark = }')
-            print(f'{StopOnExcept     = }')
-            print(f'{ShowProgress     = }')
+            print(f'n_repeat         = {n_repeat        }')
+            print(f'nproc            = {nproc           }')
+            print(f'pooltype         = {pooltype        }')
+            print(f'ForceBenchmark   = {ForceBenchmark  }')
+            print(f'PreventBenchmark = {PreventBenchmark}')
+            print(f'StopOnExcept     = {StopOnExcept    }')
+            print(f'ShowProgress     = {ShowProgress    }')
 
             all_vals = pyquickbench.run_benchmark(
                 SimpleScalarBenchmark.all_args          ,
