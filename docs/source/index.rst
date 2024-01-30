@@ -30,7 +30,7 @@ Pyquickbench is available on the `Python Package Index <https://pypi.org/project
 
     pip install pyquickbench
 
-Pyquickbench is available on `conda-forge <https://conda-forge.org/>`_. To install using conda, simply type:
+Pyquickbench is available on `conda-forge <https://anaconda.org/conda-forge/pyquickbench>`_. To install using conda, simply type:
 
 .. code-block:: sh
 
