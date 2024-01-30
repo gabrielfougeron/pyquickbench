@@ -5,7 +5,7 @@
 [![Platform](https://anaconda.org/conda-forge/pyquickbench/badges/platforms.svg)](https://pypi.org/project/pyquickbench/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/pyquickbench.svg?style=flat-square)](https://pypi.org/pypi/pyquickbench/)
 [![PyPI version](https://badge.fury.io/py/pyquickbench.svg)](https://pypi.org/project/pyquickbench/)
-[![Anaconda version](https://anaconda.org/conda-forge/pyquickbench/badges/version.svg)](https://anaconda.org/conda-forge/pyquickbench)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/pyquickbench.svg)](https://anaconda.org/conda-forge/pyquickbench)
 
 # Pyquickbench
 
