@@ -121,16 +121,18 @@ def _load_benchmark_file(filename, all_args_in, shape):
 
         all_vals = file_content['all_vals']
         
-        BenchmarkUpToDate = True
-        assert all_vals.ndim == len(shape)
-        for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
-            BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
-            
-        for name, all_args_vals in all_args_in.items():
-            BenchmarkUpToDate = BenchmarkUpToDate and (name in file_content)
+        BenchmarkUpToDate = (all_vals.ndim == len(shape))
+        
+        if not(BenchmarkUpToDate):
+        
+            for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
+                BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
+                
+            for name, all_args_vals in all_args_in.items():
+                BenchmarkUpToDate = BenchmarkUpToDate and (name in file_content)
 
-            for loaded_val, expected_val in zip(file_content[name], all_args_vals):
-                BenchmarkUpToDate = BenchmarkUpToDate and (loaded_val == expected_val)
+                for loaded_val, expected_val in zip(file_content[name], all_args_vals):
+                    BenchmarkUpToDate = BenchmarkUpToDate and (loaded_val == expected_val)
             
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
