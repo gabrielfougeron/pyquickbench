@@ -132,7 +132,7 @@ def _load_benchmark_file(filename, all_args_in, shape):
                 BenchmarkUpToDate = BenchmarkUpToDate and (name in file_content)
 
                 for loaded_val, expected_val in zip(file_content[name], all_args_vals):
-                    BenchmarkUpToDate = BenchmarkUpToDate and (loaded_val == expected_val)
+                    BenchmarkUpToDate = BenchmarkUpToDate and (loaded_val == expected_val).all()
             
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
