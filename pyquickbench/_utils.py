@@ -118,12 +118,11 @@ def _load_benchmark_file(filename, all_args_in, shape):
 
     elif file_ext == '.npz':
         file_content = np.load(filename)
-
         all_vals = file_content['all_vals']
         
         BenchmarkUpToDate = (all_vals.ndim == len(shape))
         
-        if not(BenchmarkUpToDate):
+        if BenchmarkUpToDate:
         
             for loaded_axis_len, expected_axis_len in zip(all_vals.shape, shape.values()):
                 BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
