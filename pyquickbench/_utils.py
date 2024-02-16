@@ -212,7 +212,11 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, StopOnExcept):
         for i_repeat in range(n_repeat):
             
             try:
-                setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+                try: # Some structure cannot easily be deepcopied, like those created with Cython.
+                    setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+                except TypeError: 
+                    setup_vars_dict_cp = copy.copy(setup_vars_dict)
+                    
                 vals[i_fun, i_repeat] = fun(**setup_vars_dict_cp)
             except Exception as exc:
                 vals[i_fun, i_repeat] = np.nan
@@ -237,7 +241,12 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
         
         if DoTimings:
             
-            setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+            try: # Some structure cannot easily be deepcopied, like those created with Cython.
+                setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+            except TypeError: 
+                setup_vars_dict_cp = copy.copy(setup_vars_dict)
+            
+            
             global_dict = {
                 fun_ax_name         : fun               ,
                 'setup_vars_dict'   : setup_vars_dict_cp,

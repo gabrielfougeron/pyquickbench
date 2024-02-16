@@ -9,7 +9,7 @@ class TimeTrain():
     def __init__(
         self                    ,
         include_locs = True     ,
-        name=''                 ,
+        name = ''               ,
         align_toc_names = False ,
     ):
         
