@@ -322,11 +322,19 @@ AllPoolExecutors = {
     "process"       :   concurrent.futures.ProcessPoolExecutor  ,
 }
 
+def ma_logavg(obj, axis=None, keepdims=np._NoValue):
+
+    log = np.ma.log(obj)
+    avg = np.ma.mean(log, axis=axis, keepdims=keepdims)
+    
+    return np.exp(avg)
+
 all_reductions = {
     "avg"       : np.ma.mean    ,
     "min"       : np.ma.min     , 
     "max"       : np.ma.max     ,
     "median"    : np.ma.median  ,
+    "logavg"    : ma_logavg     ,
 }
 
 all_plot_intents = [
