@@ -420,25 +420,10 @@ def plot_benchmark(
     
     all_vals = np.ma.array(all_vals, mask=np.isnan(all_vals))
     
-    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_funs, all_vals.shape[-1])
-
-    if not(isinstance(all_vals, np.ndarray)):
-        raise ValueError(f'all_vals should be a np.ndarry. Provided all_vals is a {type(all_vals)} instead.')
-    
-    if not(all_vals.ndim == len(res_shape)):
-        raise ValueError(f'all_vals has the wrong number of dimensions.')
-
-    for loaded_axis_len, (axis_name, expected_axis_len) in zip(all_vals.shape, res_shape.items()):
-        if not(loaded_axis_len == expected_axis_len):
-            raise ValueError(f'Axis {axis_name} of the benchmark results has a length of {loaded_axis_len} instead of the expected {expected_axis_len}.')
-            
-    n_funs = res_shape[fun_ax_name]
-    n_repeat = res_shape[repeat_ax_name]
-
     if all_fun_names is None:
         
         if all_funs is None:
-            all_fun_names_list = ['Anonymous function']*n_funs
+            raise ValueError('At least one of all_funs or all_fun_names must be provided')
 
         else:
             
@@ -455,6 +440,21 @@ def plot_benchmark(
     else:
         all_fun_names_list = [name for name in all_fun_names]
     
+    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_fun_names_list, all_vals.shape[-1])
+
+    if not(isinstance(all_vals, np.ndarray)):
+        raise ValueError(f'all_vals should be a np.ndarry. Provided all_vals is a {type(all_vals)} instead.')
+    
+    if not(all_vals.ndim == len(res_shape)):
+        raise ValueError(f'all_vals has the wrong number of dimensions. Received {all_vals.ndim}, expected {len(res_shape)}.')
+
+    for loaded_axis_len, (axis_name, expected_axis_len) in zip(all_vals.shape, res_shape.items()):
+        if not(loaded_axis_len == expected_axis_len):
+            raise ValueError(f'Axis {axis_name} of the benchmark results has a length of {loaded_axis_len} instead of the expected {expected_axis_len}.')
+            
+    n_funs = res_shape[fun_ax_name]
+    n_repeat = res_shape[repeat_ax_name]
+
     assert n_funs == len(all_fun_names_list)
 
     if not(isinstance(color_list, list)):
