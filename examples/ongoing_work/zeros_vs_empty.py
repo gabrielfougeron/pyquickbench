@@ -68,7 +68,7 @@ all_funs = [
 
 
 all_args = {
-    "n" : np.array([2**n for n in range(0,30)]),
+    "n" : np.array([2**n for n in range(0, 30)]),
 }
 
 

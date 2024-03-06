@@ -367,7 +367,7 @@ def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
     
     idx_vals_tuple = tuple(idx_vals)
 
-    reduced_val = all_vals[idx_vals_tuple]
+    reduced_val = all_vals[idx_vals_tuple].copy()
 
     for red_idx_rel, (red_idx_abs, red_name) in enumerate(idx_to_reduction.items()):
 
