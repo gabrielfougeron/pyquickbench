@@ -173,6 +173,7 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
     
     assert not(fun_ax_name in all_args)
     assert not(repeat_ax_name in all_args)
+    assert not(out_ax_name in all_args)
     assert not('all_vals' in all_args)
 
     if isinstance(all_funs, dict):

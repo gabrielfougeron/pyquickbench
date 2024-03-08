@@ -2,19 +2,45 @@ import numpy as np
 import time
 import inspect
 import warnings
+import typing
+import numpy.typing
 
 from pyquickbench._defaults import *
 from pyquickbench._utils import all_reductions
 
 class TimeTrain():
+    """ Records elapsed time between interest points in code"""
     
     def __init__(
-        self                    ,
-        include_locs = True     ,
-        name = ''               ,
-        align_toc_names = False ,
-        names_reduction = None  ,
+        self                                                    ,
+        include_locs        : typing.Union[bool, None] = None   ,
+        include_filename    : bool = True                       ,
+        include_lineno      : bool = True                       ,
+        include_funname     : bool = True                       ,
+        name                : str  = ''                         ,
+        align_toc_names     : bool = False                      ,
+        names_reduction     : typing.Union[str, None] = None    ,
     ):
+        """ Returns a TimeTrain
+
+        Parameters
+        ----------
+        include_locs : typing.Union[bool, None], optional
+            Whether to include locations in code when printing the TimeTrain, by default None
+        include_filename : bool, optional
+            Whether to include the file name in locations in code when printing the TimeTrain, by default True
+        include_lineno : bool, optional
+            Whether to include the line number in locations in code when printing the TimeTrain, by default True
+        include_funname : bool, optional
+            Whether to include the function name in locations in code when printing the TimeTrain, by default True
+        name : str, optional
+            Name of the TimeTrain, by default ''
+        align_toc_names : bool, optional
+            Whether to align toc names when printing the TimeTrain, by default False
+        names_reduction : typing.Union[str, None], optional
+            Reduction to be applied to tocs that share the same name, by default None
+
+        """    
         
         self.n = 0
         self.name = name
@@ -24,7 +50,16 @@ class TimeTrain():
         self.all_tocs_names = []
         self.align_toc_names = align_toc_names
         self.max_name_len = 0
+        
+        if include_locs is None:
+            include_locs = include_filename or include_lineno or include_funname
+        
         self.include_locs = include_locs
+        
+        self.include_filename = include_filename
+        self.include_funname = include_funname
+        self.include_lineno = include_lineno
+        
         if self.include_locs:
             self.all_tocs_locs = []
             
@@ -38,7 +73,18 @@ class TimeTrain():
         if self.include_locs and (self.names_reduction is not None):
             warnings.warn("include_locs and names_reduction were both set to True. Only the first location will be displayed")
         
-    def toc(self, name=''):
+    def toc(
+        self                ,
+        name    : str = ''  ,
+    ):
+        """
+        Records a new wagon in the TimeTrain
+
+        Parameters
+        ----------
+        name : str, optional
+            _description_, by default ''
+        """        
         
         tbeg = time.perf_counter()
 
@@ -54,17 +100,29 @@ class TimeTrain():
         
         if self.include_locs:
             caller = inspect.getframeinfo(inspect.stack()[1][0])
-            self.all_tocs_locs.append(f'{caller.filename}: {caller.lineno} in {caller.function}')
+            
+            toc_loc = ''
+            if self.include_filename:
+                toc_loc += f'file {caller.filename}'
+            
+            if self.include_lineno:
+                toc_loc += f'line {caller.lineno}'
+
+            if self.include_funname and caller.function != '<module>':
+                toc_loc += f' in {caller.function}'
+            
+            self.all_tocs_locs.append(toc_loc)
             
         tend = time.perf_counter()
         dt = tend-tbeg
         self.all_tocs_record_time.append(dt)
         self.all_tocs_record_time_sum += dt
         
-    def get_recorded_time(self, idx):
-        return self.all_tocs[idx+1]-(self.all_tocs[idx]+self.all_tocs_record_time[idx])
-    
-    def get_total_time(self):
+    def _get_recorded_time(self, idx):
+        return self.all_tocs[idx+1]-(self.all_tocs[idx] + self.all_tocs_record_time[idx])
+
+    @property
+    def _total_time(self):
         return self.all_tocs[self.n]-self.all_tocs[0]-self.all_tocs_record_time_sum + self.all_tocs_record_time[self.n]
         
     def __repr__(self): 
@@ -90,7 +148,7 @@ class TimeTrain():
                 if name != '':
                     out += f'{name}{filler}: '
                 
-                out += f'{self.get_recorded_time(i):.8f} s'
+                out += f'{self._get_recorded_time(i):.8f} s'
                 if self.include_locs:
                     out += f' at {self.all_tocs_locs[i]}'
                     
@@ -115,18 +173,30 @@ class TimeTrain():
                     
                 out += '\n'
         out += '\n'
-        out += f'Total: {self.get_total_time():.8f} s\n'
+        out += f'Total: {self._total_time:.8f} s\n'
 
             
         return out
     
-    def to_dict(self, return_first_instance = False):
+    def to_dict(
+        self                                    ,
+        return_first_instance : bool = False    ,
+    ):
+        """
+        Returns time measurements within a TimeTrain as a Python dictionnary
+
+        Parameters
+        ----------
+        return_first_instance : bool, optional
+            Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
+
+        """        
         
         dict_list = {}
         dict_first = {}
         for i, name in enumerate(self.all_tocs_names):
             
-            t = self.get_recorded_time(i)
+            t = self._get_recorded_time(i)
             
             toclist = dict_list.get(name)
             if toclist is None:

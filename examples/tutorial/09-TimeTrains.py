@@ -7,7 +7,6 @@ TimeTrains
 # :class:`pyquickbench.TimeTrain`
 # 
 
-# sphinx_gallery_start_ignore
 
 import os
 import sys
@@ -24,36 +23,21 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-import matplotlib.pyplot as plt
-
-if ("--no-show" in sys.argv):
-    plt.show = (lambda : None)
-    
-timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files_time_consuming')
-basename = f'long_bench_1'
-timings_filename = os.path.join(timings_folder, basename+'.npz')
-
-# sphinx_gallery_end_ignore
-
 import numpy as np
-import pyquickbench
+import math as m
 import time
 
+import pyquickbench
 
 
-TT = pyquickbench.TimeTrain()
+TT = pyquickbench.TimeTrain(
+    include_locs = False     ,
+    names_reduction = 'sum',
+)
 
-for i in range(10):
-    time.sleep(0.0975)
-    TT.toc(i)
 
-for i in range(5):
-    time.sleep(0.0975)
-    TT.toc(i)
-
+for i in range(3):
+    time.sleep(0.02)
+    TT.toc("toto")
 
 print(TT)
-d = TT.to_dict()
-
-
-print(d)

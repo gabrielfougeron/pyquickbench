@@ -1,6 +1,6 @@
 """
-Summing elements of a numpy array
-=================================
+Time Trains example
+===================
 """
 
 # %% 
@@ -31,9 +31,7 @@ import pyquickbench
 
 
 TT = pyquickbench.TimeTrain(
-    include_locs = True     ,
-    # name = ''                ,
-    # align_toc_names = True ,
+    # include_locs = True     ,
     names_reduction = 'sum',
 )
 
@@ -41,11 +39,6 @@ TT = pyquickbench.TimeTrain(
 for i in range(3):
     time.sleep(0.02)
     TT.toc(0)
-#     
-# for i in range(5):
-#     time.sleep(0.01)
-#     TT.toc(i)
-
 
 print(TT)
-# print(TT.to_dict())
+

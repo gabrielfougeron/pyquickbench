@@ -3,6 +3,7 @@ import matplotlib as mpl
 default_ax_name = "n"
 fun_ax_name = "function"
 repeat_ax_name = "repeat"
+out_ax_name = "out"
 
 default_color_list = list(mpl.colors.TABLEAU_COLORS)
 default_color_list.append(mpl.colors.BASE_COLORS['b'])
