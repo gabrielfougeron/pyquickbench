@@ -334,6 +334,7 @@ all_reductions = {
     "min"       : np.ma.min     , 
     "max"       : np.ma.max     ,
     "median"    : np.ma.median  ,
+    "sum"       : np.ma.sum     ,
     "logavg"    : ma_logavg     ,
 }
 

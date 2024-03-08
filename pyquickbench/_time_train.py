@@ -36,7 +36,7 @@ class TimeTrain():
                 raise ValueError(f'Unknown reduction {names_reduction}')
         
         if self.include_locs and (self.names_reduction is not None):
-            warnings.warn("include_locs and names_reduction were both set to True which results in reduced functionnality")
+            warnings.warn("include_locs and names_reduction were both set to True. Only the first location will be displayed")
         
     def toc(self, name=''):
         
@@ -63,6 +63,9 @@ class TimeTrain():
         
     def get_recorded_time(self, idx):
         return self.all_tocs[idx+1]-(self.all_tocs[idx]+self.all_tocs_record_time[idx])
+    
+    def get_total_time(self):
+        return self.all_tocs[self.n]-self.all_tocs[0]-self.all_tocs_record_time_sum + self.all_tocs_record_time[self.n]
         
     def __repr__(self): 
         
@@ -95,7 +98,7 @@ class TimeTrain():
         
         else:
             
-            d = self.to_dict()
+            d, first = self.to_dict(return_first_instance=True)
             for name, arr in d.items():
                 
                 if self.align_toc_names:
@@ -108,17 +111,19 @@ class TimeTrain():
                     
                 out += f'{self.names_reduction(arr):.8f} s'
                 if self.include_locs:
-                    out += f' at {self.all_tocs_locs[i]}'
+                    out += f' at {self.all_tocs_locs[first[name]]}'
                     
                 out += '\n'
         out += '\n'
-        out += f'Total: {self.all_tocs[self.n]-self.all_tocs[0]-self.all_tocs_record_time_sum:.8f} s\n'
+        out += f'Total: {self.get_total_time():.8f} s\n'
+
             
         return out
     
-    def to_dict(self):
+    def to_dict(self, return_first_instance = False):
         
         dict_list = {}
+        dict_first = {}
         for i, name in enumerate(self.all_tocs_names):
             
             t = self.get_recorded_time(i)
@@ -126,10 +131,14 @@ class TimeTrain():
             toclist = dict_list.get(name)
             if toclist is None:
                 dict_list[name] = [t]
+                dict_first[name] = i 
             else:
                 toclist.append(t)
          
         res = {name:np.array(val) for name, val in dict_list.items()}
             
-        return res
+        if return_first_instance:
+            return res, dict_first
+        else:
+            return res
     

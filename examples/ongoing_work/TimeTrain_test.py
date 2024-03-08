@@ -31,20 +31,20 @@ import pyquickbench
 
 
 TT = pyquickbench.TimeTrain(
-    include_locs = False     ,
+    include_locs = True     ,
     # name = ''                ,
     # align_toc_names = True ,
-    # names_reduction = 'avg',
+    names_reduction = 'sum',
 )
 
 
 for i in range(3):
     time.sleep(0.02)
-    TT.toc(i)
-    
-for i in range(5):
-    time.sleep(0.01)
-    TT.toc(i)
+    TT.toc(0)
+#     
+# for i in range(5):
+#     time.sleep(0.01)
+#     TT.toc(i)
 
 
 print(TT)
