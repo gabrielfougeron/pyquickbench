@@ -130,7 +130,10 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat)
+    if mode in ["timings", "scalar_output"]:
+        n_out = 1
+
+    all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
 
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
 
@@ -163,18 +166,15 @@ def run_benchmark(
             _check_sig_no_pos_only(fun)
         
         all_vals = np.full(list(res_shape.values()), -1.) # Negative values
-
+        
         total_iterations = _product(args_shape.values())
         
         if ShowProgress:
-
             if (_in_ipynb()):
                 progress_bar = tqdm.notebook.tqdm
-                
             else:
                 progress_bar = tqdm.tqdm
         else:
-            
             progress_bar = FakeProgressBar
 
         if pooltype ==  None:
@@ -202,7 +202,7 @@ def run_benchmark(
         elif mode == "scalar_output": 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, all_funs_list, n_repeat, StopOnExcept)
+            extra_submit_args = (setup, all_funs_list, n_repeat, n_out, StopOnExcept)
         
         else:
                 
@@ -436,7 +436,7 @@ def plot_benchmark(
     else:
         all_fun_names_list = [name for name in all_fun_names]
     
-    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_fun_names_list, all_vals.shape[-1])
+    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_fun_names_list, all_vals.shape[-2], all_vals.shape[-1])
 
     if not(isinstance(all_vals, np.ndarray)):
         raise ValueError(f'all_vals should be a np.ndarry. Provided all_vals is a {type(all_vals)} instead.')
@@ -469,6 +469,7 @@ def plot_benchmark(
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
         plot_intent[fun_ax_name] = 'curve_color'
         plot_intent[repeat_ax_name] = 'reduction_min'
+        plot_intent[out_ax_name] = 'curve_linestyle'
 
     else:
         
@@ -478,6 +479,8 @@ def plot_benchmark(
             plot_intent[fun_ax_name] = 'curve_color'
         if repeat_ax_name not in plot_intent:
             plot_intent[repeat_ax_name] = 'reduction_min'
+        if out_ax_name not in plot_intent:
+            plot_intent[out_ax_name] = 'curve_linestyle'
         
         if not(len(plot_intent) == all_vals.ndim):  
             raise ValueError(f"Foud {len(plot_intent)} plot_intents. Expecting {all_vals.ndim}")

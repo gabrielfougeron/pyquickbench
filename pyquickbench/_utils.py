@@ -166,7 +166,7 @@ def _save_benchmark_file(filename, all_vals, all_args):
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
     
-def _build_args_shapes(all_args, all_funs, n_repeat):
+def _build_args_shapes(all_args, all_funs, n_repeat, n_out):
 
     if not(isinstance(all_args, dict)):
         all_args = {default_ax_name: all_args}
@@ -186,6 +186,7 @@ def _build_args_shapes(all_args, all_funs, n_repeat):
     res_shape = {name : value for name, value in args_shape.items()}
     res_shape[fun_ax_name] = len(all_funs)
     res_shape[repeat_ax_name] = n_repeat
+    res_shape[out_ax_name] = n_out
     
     return all_args, all_funs_list, args_shape, res_shape
 
@@ -202,11 +203,11 @@ class FakeProgressBar(object):
     def update(self, *args):
         pass
                
-def _measure_output(i_args, args, setup, all_funs_list, n_repeat, StopOnExcept):
+def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnExcept):
 
     setup_vars_dict = _return_setup_vars_dict(setup, args)
     n_funs = len(all_funs_list)
-    vals = np.full((n_funs, n_repeat), np.nan)
+    vals = np.full((n_funs, n_repeat, n_out), np.nan)
     
     for i_fun, fun in enumerate(all_funs_list):
         
@@ -218,9 +219,9 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, StopOnExcept):
                 except TypeError: 
                     setup_vars_dict_cp = copy.copy(setup_vars_dict)
                     
-                vals[i_fun, i_repeat] = fun(**setup_vars_dict_cp)
+                vals[i_fun, i_repeat, :] = fun(**setup_vars_dict_cp)
             except Exception as exc:
-                vals[i_fun, i_repeat] = np.nan
+                vals[i_fun, i_repeat, :] = np.nan
                 if StopOnExcept:
                     raise exc
     return vals
@@ -229,7 +230,7 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
     
     setup_vars_dict = _return_setup_vars_dict(setup, args)  
     n_funs = len(all_funs_list)
-    vals = np.full((n_funs, n_repeat), np.nan)  
+    vals = np.full((n_funs, n_repeat, 1), np.nan)  
     
     for i_fun, fun in enumerate(all_funs_list):
         
@@ -246,7 +247,6 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
                 setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
             except TypeError: 
                 setup_vars_dict_cp = copy.copy(setup_vars_dict)
-            
             
             global_dict = {
                 fun_ax_name         : fun               ,
@@ -271,7 +271,7 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
                 if (n_repeat == 1):
                     # Fast track: benchmark is not repeated and autorange results are kept as is.
 
-                    vals[i_fun, 0] = est_time / n_timeit_autorange
+                    vals[i_fun, 0, 0] = est_time / n_timeit_autorange
                     
                 else:
                     # Full benchmark is run
@@ -283,11 +283,11 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
                         number = n_timeit,
                     )
 
-                    vals[i_fun, :] = np.array(times) / n_timeit
+                    vals[i_fun, :, 0] = np.array(times) / n_timeit
 
             except Exception as exc:
 
-                vals[i_fun, :] = np.nan
+                vals[i_fun, :, 0] = np.nan
                 
                 if StopOnExcept:
                     raise exc
@@ -388,6 +388,8 @@ def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, K
             if cat_name == fun_ax_name:
                 val_name = all_fun_names_list[idx]
             elif cat_name == repeat_ax_name:
+                val_name = str(idx+1)
+            elif cat_name == out_ax_name:
                 val_name = str(idx+1)
             else:
                 raise ValueError("Could not figure out name")
