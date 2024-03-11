@@ -168,20 +168,12 @@ def _save_benchmark_file(filename, all_vals, all_args):
         raise ValueError(f'Unknown file extension {file_ext}')
     
 def _build_args_shapes(all_args, all_funs, n_repeat, n_out):
-
-    if not(isinstance(all_args, dict)):
-        all_args = {default_ax_name: all_args}
     
     assert not(fun_ax_name in all_args)
     assert not(repeat_ax_name in all_args)
     assert not(out_ax_name in all_args)
     assert not('all_vals' in all_args)
-
-    if isinstance(all_funs, dict):
-        all_funs_list = [fun for fun in all_funs.values()]
-    else:    
-        all_funs_list = [fun for fun in all_funs]
-     
+         
     args_shape = {name : len(value) for name, value in all_args.items()}
     
     res_shape = {name : value for name, value in args_shape.items()}
@@ -189,7 +181,26 @@ def _build_args_shapes(all_args, all_funs, n_repeat, n_out):
     res_shape[repeat_ax_name] = n_repeat
     res_shape[out_ax_name] = n_out
     
-    return all_args, all_funs_list, args_shape, res_shape
+    return args_shape, res_shape
+
+def _build_out_names(all_args, setup, all_funs_list):
+    
+    arg_0 = []
+    for argval in all_args.values():
+        arg_0.append(argval[0])
+    setup_vars_dict = _return_setup_vars_dict(setup, arg_0)
+    
+    res_0 = all_funs_list[0](**setup_vars_dict)
+
+    n_out = len(res_0)
+    
+    if isinstance(res_0, dict):
+        all_out_names = list(res_0.keys())
+    else:
+        n_fig = 1 + math.floor(math.log(n_out) / math.log(10))
+        all_out_names = [str(i).zfill(n_fig) for i in range(n_out)]
+            
+    return n_out, all_out_names
 
 class FakeProgressBar(object):
     def __init__(self, *args, **kwargs):
@@ -230,6 +241,12 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                     assert res.ndim == 1
                     assert n_out == res.shape[0]
                     vals[i_fun, i_repeat, :] = res
+                    
+                elif isinstance(res, dict):
+                    assert n_out == len(res)
+                    for i, val in enumerate(res.values()):
+                        vals[i_fun, i_repeat, i] = val
+                    
                 elif isinstance(res, TimeTrain):
                     raise NotImplementedError
                 else:
@@ -364,7 +381,7 @@ def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
     
     return reduced_val
 
-def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, KeyValLegend, label):
+def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label):
 
     for i, idx in enumerate(idx_curve):
 
@@ -376,7 +393,7 @@ def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, K
             elif cat_name == repeat_ax_name:
                 val_name = str(idx+1)
             elif cat_name == out_ax_name:
-                val_name = str(idx+1)
+                val_name = all_out_names_list[idx]
             else:
                 raise ValueError("Could not figure out name")
         else:

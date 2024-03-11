@@ -23,10 +23,12 @@ from pyquickbench._utils import (
     _load_benchmark_file    ,
     _save_benchmark_file    ,
     _build_args_shapes      ,
+    _build_out_names        ,
     FakeProgressBar         ,
     AllPoolExecutors        ,
     _measure_output         ,
     _measure_timings        ,
+    _return_setup_vars_dict ,
     _values_reduction       ,
     _build_product_legend   ,
     _choose_idx_val         ,
@@ -45,7 +47,6 @@ def run_benchmark(
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                 = default_setup             ,
     n_repeat        : int                       = 1                         ,
-    n_out           : typing.Union[int, None]   = None                      ,
     nproc           : int                       = None                      ,
     pooltype        : typing.Union[str, None]   = None                      ,
     time_per_test   : float                     = 0.2                       ,
@@ -134,13 +135,20 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    if n_out is None:
-        if mode in ["timings", "scalar_output"]:
-            n_out = 1
-        elif mode == ["vector_output"]:
-            raise ValueError("Please provide n_out in vector_output mode")
+    if not(isinstance(all_args, dict)):
+        all_args = {default_ax_name: all_args}
+        
+    if isinstance(all_funs, dict):
+        all_funs_list = [fun for fun in all_funs.values()]
+    else:    
+        all_funs_list = [fun for fun in all_funs]
+
+    if mode in ["timings", "scalar_output"]:
+        n_out = 1
+    elif mode == "vector_output":
+        n_out, all_out_names = _build_out_names(all_args, setup, all_funs_list)
             
-    all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
+    args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
 
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
 
@@ -254,6 +262,7 @@ def run_benchmark(
             all_args            ,
             all_funs            ,
             mode = mode         ,
+            setup = setup       ,
             show = show         ,
             **plot_kwargs       ,
         )
@@ -273,11 +282,17 @@ def plot_benchmark(
                                 typing.Iterable[str]            ,
                                 None                            ,
                             ]                                   = None                      ,
+    all_out_names           : typing.Union[
+                                typing.Iterable[str]            ,
+                                None                            ,
+                            ]                                   = None                      ,
     plot_intent             : typing.Union[
                                 typing.Iterable[str]            ,
                                 None                            ,
                             ]                                   = None                      ,        
     mode                    : str                               = "timings"                 ,
+    setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
+                                                                = default_setup             ,
     all_xvalues             : typing.Union[
                                 np.typing.ArrayLike             ,
                                 None                            ,
@@ -330,6 +345,8 @@ def plot_benchmark(
     all_fun_names : typing.Iterable[str] | None, optional
         Names of the benchmarked functions, by default ``None``.\n
         In case the functions ``__name__`` attribute is missing or uninformative.
+    all_out_names : typing.Iterable[str] | None, optional
+        Names of the outputs of the functions if ``mode="vector_output"``, by default ``None``.
     plot_intent : typing.Iterable[str] | None, optional
         Describes how to handle the axes of the benchmark results array ``all_vals``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n
@@ -338,6 +355,11 @@ def plot_benchmark(
         Benchmark mode, i.e. target of the benchmark.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n
         Possible values: ``"timings"`` or ``"scalar_output"``. By default ``"timings"``.
+    setup : callable, optional
+        Function that prepares the inputs for the functions to be benchmarked.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
+        Only used if ``all_out_names`` was not provided and ``mode="vector_output"``\n
+        By default ``lambda n: {pyquickbench.default_ax_name: n}``.
     all_xvalues : np.typing.ArrayLike | None, optional
         Values to be plotted on the x-axis if those differ from argument values.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n 
@@ -423,6 +445,9 @@ def plot_benchmark(
     
     all_vals = np.ma.array(all_vals, mask=np.isnan(all_vals))
     
+    if not(isinstance(all_args, dict)):
+        all_args = {default_ax_name: all_args}
+    
     if all_fun_names is None:
         
         if all_funs is None:
@@ -443,7 +468,7 @@ def plot_benchmark(
     else:
         all_fun_names_list = [name for name in all_fun_names]
     
-    all_args, _, args_shape, res_shape = _build_args_shapes(all_args, all_fun_names_list, all_vals.shape[-2], all_vals.shape[-1])
+    args_shape, res_shape = _build_args_shapes(all_args, all_fun_names_list, all_vals.shape[-2], all_vals.shape[-1])
 
     if not(isinstance(all_vals, np.ndarray)):
         raise ValueError(f'all_vals should be a np.ndarry. Provided all_vals is a {type(all_vals)} instead.')
@@ -457,7 +482,26 @@ def plot_benchmark(
             
     n_funs = res_shape[fun_ax_name]
     n_repeat = res_shape[repeat_ax_name]
+    n_out = res_shape[out_ax_name]
+     
+    if all_out_names is None:
+        
+        if all_funs is None:
 
+            all_out_names_list = [str(idx) for idx in range(n_out)]
+
+        else:
+            
+            if isinstance(all_funs, dict):
+                all_funs_list = [fun for fun in all_funs.values()]
+            else:    
+                all_funs_list = [fun for fun in all_funs]
+            
+            n_out, all_out_names_list = _build_out_names(all_args, setup, all_funs_list)
+
+    else:
+        all_out_names_list = [name for name in all_out_names]
+    
     assert n_funs == len(all_fun_names_list)
 
     if not(isinstance(color_list, list)):
@@ -681,9 +725,9 @@ def plot_benchmark(
                 KeyValLegend = (ncats > 1)
             
                 label = ''
-                label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, KeyValLegend, label)
-                label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, KeyValLegend, label)
-                label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                 label = label[:-2] # Removing final comma
                 
                 leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -823,7 +867,7 @@ def plot_benchmark(
                         color = color_list[i_color % n_colors]
 
                         label = ''
-                        label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
 
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -863,7 +907,7 @@ def plot_benchmark(
 
                         linestyle = linestyle_list[i_linestyle % n_linestyle]
                         label = ''
-                        label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.lines.Line2D([], []                 ,
@@ -902,7 +946,7 @@ def plot_benchmark(
 
                         pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
                         label = ''
-                        label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
 
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -932,8 +976,8 @@ def plot_benchmark(
             if (n_subplot_grid_x*n_subplot_grid_y) > 1:
                 KeyValLegend = True
                 ax_title = ''
-                ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, KeyValLegend, ax_title)
-                ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, KeyValLegend, ax_title)
+                ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
+                ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
                 ax_title = ax_title[:-2]
                 
             elif title is not None:
