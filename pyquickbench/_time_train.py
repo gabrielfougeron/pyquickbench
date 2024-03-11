@@ -1,3 +1,17 @@
+"""
+==========
+Time Train
+==========
+
+.. autosummary::
+   :toctree: generated/
+
+   TimeTrain
+   TimeTrain.toc
+   TimeTrain.to_dict
+   
+"""
+
 import numpy as np
 import time
 import inspect
@@ -6,7 +20,6 @@ import typing
 import numpy.typing
 
 from pyquickbench._defaults import *
-from pyquickbench._utils import all_reductions
 
 class TimeTrain():
     """ Records elapsed time between interest points in code"""

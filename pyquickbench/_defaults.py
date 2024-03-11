@@ -1,4 +1,5 @@
 import matplotlib as mpl
+import numpy as np
 
 default_ax_name = "n"
 fun_ax_name = "function"
@@ -66,3 +67,33 @@ Legend_markersize = 10
 Legend_bland_color = 'k'
 Legend_bland_linestyle = 'solid'
 Legend_bland_pointstyle = None
+
+def ma_logavg(obj, axis=None, keepdims=np._NoValue):
+
+    log = np.ma.log(obj)
+    avg = np.ma.mean(log, axis=axis, keepdims=keepdims)
+    
+    return np.exp(avg)
+
+all_reductions = {
+    "avg"       : np.ma.mean    ,
+    "min"       : np.ma.min     , 
+    "max"       : np.ma.max     ,
+    "median"    : np.ma.median  ,
+    "sum"       : np.ma.sum     ,
+    "logavg"    : ma_logavg     ,
+}
+
+all_plot_intents = [
+    'single_value'      ,
+    'points'            ,
+    'same'              ,
+    'curve_color'       ,
+    'curve_linestyle'   ,
+    'curve_pointstyle'  ,
+    'subplot_grid_x'    ,
+    'subplot_grid_y'    ,
+]
+
+all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
+

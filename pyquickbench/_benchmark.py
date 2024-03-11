@@ -1,3 +1,5 @@
+
+
 import os
 import math
 import itertools
@@ -26,8 +28,6 @@ from pyquickbench._utils import (
     _measure_output         ,
     _measure_timings        ,
     _values_reduction       ,
-    all_reductions          ,
-    all_plot_intents        ,
     _build_product_legend   ,
     _choose_idx_val         ,
     _treat_future_result    ,
@@ -45,6 +45,7 @@ def run_benchmark(
     setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                 = default_setup             ,
     n_repeat        : int                       = 1                         ,
+    n_out           : typing.Union[int, None]   = None                      ,
     nproc           : int                       = None                      ,
     pooltype        : typing.Union[str, None]   = None                      ,
     time_per_test   : float                     = 0.2                       ,
@@ -77,6 +78,9 @@ def run_benchmark(
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
     n_repeat : int, optional
         Number of times to repeat the benchmark for variability studies.\n
+        By default ``1``.
+    n_repeat : int, optional
+        Length of function output.\n
         By default ``1``.
     nproc : int, optional
         Number of workers in PoolExecutor.\n
@@ -130,9 +134,12 @@ def run_benchmark(
         Load_timings_file =  os.path.isfile(filename) and not(ForceBenchmark)
         Save_timings_file = True
 
-    if mode in ["timings", "scalar_output"]:
-        n_out = 1
-
+    if n_out is None:
+        if mode in ["timings", "scalar_output"]:
+            n_out = 1
+        elif mode == ["vector_output"]:
+            raise ValueError("Please provide n_out in vector_output mode")
+            
     all_args, all_funs_list, args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
 
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
@@ -199,7 +206,7 @@ def run_benchmark(
             measure_fun = _measure_timings
             extra_submit_args = (setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, WarmUp, all_vals)
             
-        elif mode == "scalar_output": 
+        elif mode in ["scalar_output", "vector_output"]: 
         
             measure_fun = _measure_output
             extra_submit_args = (setup, all_funs_list, n_repeat, n_out, StopOnExcept)

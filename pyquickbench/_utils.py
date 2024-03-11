@@ -8,6 +8,7 @@ import copy
 import numpy as np
 
 from pyquickbench._defaults import *
+from pyquickbench._time_train import TimeTrain
 
 class AutoTimer(timeit.Timer):
     """
@@ -219,7 +220,21 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                 except TypeError: 
                     setup_vars_dict_cp = copy.copy(setup_vars_dict)
                     
-                vals[i_fun, i_repeat, :] = fun(**setup_vars_dict_cp)
+                res = fun(**setup_vars_dict_cp)
+                
+                if isinstance(res, float):
+                    assert n_out == 1
+                    vals[i_fun, i_repeat, :] = res
+                    
+                elif isinstance(res, np.ndarray):
+                    assert res.ndim == 1
+                    assert n_out == res.shape[0]
+                    vals[i_fun, i_repeat, :] = res
+                elif isinstance(res, TimeTrain):
+                    raise NotImplementedError
+                else:
+                    raise TypeError(f'Unknown output type {type(res)}')
+                
             except Exception as exc:
                 vals[i_fun, i_repeat, :] = np.nan
                 if StopOnExcept:
@@ -322,35 +337,6 @@ AllPoolExecutors = {
     "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
     "process"       :   concurrent.futures.ProcessPoolExecutor  ,
 }
-
-def ma_logavg(obj, axis=None, keepdims=np._NoValue):
-
-    log = np.ma.log(obj)
-    avg = np.ma.mean(log, axis=axis, keepdims=keepdims)
-    
-    return np.exp(avg)
-
-all_reductions = {
-    "avg"       : np.ma.mean    ,
-    "min"       : np.ma.min     , 
-    "max"       : np.ma.max     ,
-    "median"    : np.ma.median  ,
-    "sum"       : np.ma.sum     ,
-    "logavg"    : ma_logavg     ,
-}
-
-all_plot_intents = [
-    'single_value'      ,
-    'points'            ,
-    'same'              ,
-    'curve_color'       ,
-    'curve_linestyle'   ,
-    'curve_pointstyle'  ,
-    'subplot_grid_x'    ,
-    'subplot_grid_y'    ,
-]
-
-all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
 
