@@ -3,8 +3,6 @@ API
 
 .. automodule:: pyquickbench
 
-   
-
 
 
 

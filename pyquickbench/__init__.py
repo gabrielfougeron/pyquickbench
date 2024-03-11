@@ -14,7 +14,12 @@ Pyquickbench
    TimeTrain
    TimeTrain.toc
    TimeTrain.to_dict
-
+   
+   
+.. toctree::
+   :caption: Constants
+   
+   constants
 
 """
 
