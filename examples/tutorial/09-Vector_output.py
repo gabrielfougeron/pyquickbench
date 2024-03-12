@@ -141,5 +141,5 @@ pyquickbench.plot_benchmark(
     plot_intent = plot_intent       ,
     show = True                     ,
     transform = "pol_cvgence_order" ,
-    ylabel = "Order of convergence of Estimator error"      ,
+    ylabel = "Order of convergence of estimator error"      ,
 )

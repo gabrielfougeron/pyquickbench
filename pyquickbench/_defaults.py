@@ -75,6 +75,36 @@ def ma_logavg(obj, axis=None, keepdims=np._NoValue):
     
     return np.exp(avg)
 
+def ma_idx_el(obj, idx , axis=None, keepdims=np._NoValue):
+    
+    if (keepdims is np._NoValue) or (not keepdims):        
+        return np.take(obj, idx, axis=axis)
+    else:
+        return np.take(obj, [idx], axis=axis)
+
+def ma_first_el(obj, axis=None, keepdims=np._NoValue):
+    
+    return ma_idx_el(obj, 0, axis=axis, keepdims=keepdims)
+
+def ma_last_el(obj, axis=None, keepdims=np._NoValue):
+    
+    if axis is None:
+        i = np.prod(obj.shape)-1
+    else:
+        i = obj.shape[axis]-1
+        
+    return ma_idx_el(obj, i, axis=axis, keepdims=keepdims)
+
+def ma_random_el(obj, axis=None, keepdims=np._NoValue):
+    
+    if axis is None:
+        n = np.prod(obj.shape)
+    else:
+        n = obj.shape[axis]
+    
+    i = np.random.randint(n)
+    return ma_idx_el(obj, i, axis=axis, keepdims=keepdims)
+
 all_reductions = {
     "avg"       : np.ma.mean    ,
     "min"       : np.ma.min     , 
@@ -82,6 +112,9 @@ all_reductions = {
     "median"    : np.ma.median  ,
     "sum"       : np.ma.sum     ,
     "logavg"    : ma_logavg     ,
+    "first_el"  : ma_first_el   ,
+    "last_el"   : ma_last_el    ,
+    "random_el" : ma_random_el  ,
 }
 
 all_plot_intents = [

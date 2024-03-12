@@ -217,6 +217,12 @@ def _build_out_names(all_args, setup, all_funs_list):
     if not(FoundValidRes):
         raise ValueError("Could not find a single valid result in the whole benchmark !")
 
+    if isinstance(res, TimeTrain):
+        if res.names_reduction is None:
+            res = res.to_dict()
+        else:
+            res = res.to_dict(names_reduction=all_reductions['sum'])
+
     if isinstance(res, float):
         n_out = 1
         all_out_names = ["0"]
@@ -261,6 +267,12 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                     
                 res = fun(**setup_vars_dict_cp)
                 
+                if isinstance(res, TimeTrain):
+                    if res.names_reduction is None:
+                        res = res.to_dict()
+                    else:
+                        res = res.to_dict(names_reduction=all_reductions['sum'])
+                
                 if isinstance(res, float):
                     assert n_out == 1
                     vals[i_fun, i_repeat, :] = res
@@ -274,9 +286,7 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                     assert n_out == len(res)
                     for i, val in enumerate(res.values()):
                         vals[i_fun, i_repeat, i] = val
-                    
-                elif isinstance(res, TimeTrain):
-                    raise NotImplementedError
+
                 else:
                     raise TypeError(f'Unknown output type {type(res)}')
                 

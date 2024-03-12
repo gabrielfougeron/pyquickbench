@@ -79,6 +79,9 @@ all_reductions = all_reductions
    * "median"    : Median
    * "sum"       : Sum
    * "logavg"    : Exponential of average of log
+   * "first_el"  : First element in the array
+   * "last_el"   : Last element in the array
+   * "random_el" : An element in the array picked randomly with uniform probability
     
    .. rubric:: See Also
 

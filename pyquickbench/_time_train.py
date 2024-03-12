@@ -24,7 +24,7 @@ class TimeTrain():
 
         Parameters
         ----------
-        include_locs : typing.Union[bool, None], optional
+        include_locs : bool | None, optional
             Whether to include locations in code when printing the TimeTrain, by default None
         include_filename : bool, optional
             Whether to include the file name in locations in code when printing the TimeTrain, by default True
@@ -36,7 +36,7 @@ class TimeTrain():
             Name of the TimeTrain, by default ''
         align_toc_names : bool, optional
             Whether to align toc names when printing the TimeTrain, by default False
-        names_reduction : typing.Union[str, None], optional
+        names_reduction : str | None, optional
             Reduction to be applied to tocs that share the same name, by default None
 
         """    
@@ -49,6 +49,8 @@ class TimeTrain():
         self.all_tocs_names = []
         self.align_toc_names = align_toc_names
         self.max_name_len = 0
+        self.name_set = set()
+        self.n_names = 0
         
         if include_locs is None:
             include_locs = include_filename or include_lineno or include_funname
@@ -95,20 +97,26 @@ class TimeTrain():
         self.n += 1
         self.all_tocs.append(tbeg)
         self.all_tocs_names.append(name)
-        self.max_name_len = max(self.max_name_len, len(name))
         
+        if name not in self.name_set:
+            self.name_set.add(name)
+            self.n_names +=1 
+            self.max_name_len = max(self.max_name_len, len(name))
+
         if self.include_locs:
             caller = inspect.getframeinfo(inspect.stack()[1][0])
             
             toc_loc = ''
             if self.include_filename:
-                toc_loc += f'file {caller.filename}'
+                toc_loc += f'file {caller.filename} '
             
             if self.include_lineno:
-                toc_loc += f'line {caller.lineno}'
+                toc_loc += f'line {caller.lineno} '
 
             if self.include_funname and caller.function != '<module>':
-                toc_loc += f' in {caller.function}'
+                toc_loc += f'in {caller.function} '
+            
+            toc_loc = toc_loc[:-2]
             
             self.all_tocs_locs.append(toc_loc)
             
@@ -180,6 +188,7 @@ class TimeTrain():
     def to_dict(
         self                                    ,
         return_first_instance : bool = False    ,
+        names_reduction = None                  ,
     ):
         """
         Returns time measurements within a TimeTrain as a Python dictionnary
@@ -203,11 +212,21 @@ class TimeTrain():
                 dict_first[name] = i 
             else:
                 toclist.append(t)
-         
-        res = {name:np.array(val) for name, val in dict_list.items()}
+                
+        if names_reduction is None:
+            names_reduction = self.names_reduction
+        
+        if names_reduction is None:
+            res = {name: np.array(l) for name, l in dict_list.items()}
+        else:
+            res = {name: names_reduction(np.array(l)) for name, l in dict_list.items()}
             
         if return_first_instance:
             return res, dict_first
         else:
             return res
     
+    def __len__(self):
+        
+        return self.n_names
+        
