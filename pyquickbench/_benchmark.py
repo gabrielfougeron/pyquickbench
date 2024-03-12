@@ -1,5 +1,3 @@
-
-
 import os
 import math
 import itertools
@@ -28,13 +26,13 @@ from pyquickbench._utils import (
     AllPoolExecutors        ,
     _measure_output         ,
     _measure_timings        ,
-    _return_setup_vars_dict ,
     _values_reduction       ,
     _build_product_legend   ,
     _choose_idx_val         ,
     _treat_future_result    ,
     _arg_names_list_to_idx  ,
     _product                ,
+    _count_Truthy           ,
 )
 
 from pyquickbench._defaults import *
@@ -245,8 +243,8 @@ def run_benchmark(
                 future.add_done_callback(lambda _: progress.update(1))
 
         # Sort values along repeat_ax_name axis, taking care of nans.
-        idx = np.argsort(all_vals, axis=-1)
-        all_vals = np.take_along_axis(all_vals, idx, axis=-1)
+        idx = np.argsort(all_vals, axis=-2)
+        all_vals = np.take_along_axis(all_vals, idx, axis=-2)
         
         if Save_timings_file:
             _save_benchmark_file(filename, all_vals, all_args)
@@ -321,7 +319,7 @@ def plot_benchmark(
     title                   : typing.Union[str, None]           = None                      ,
     xlabel                  : typing.Union[str, None]           = None                      ,
     ylabel                  : typing.Union[str, None]           = None                      ,
-    plot_legend             : bool                              = True                      ,
+    plot_legend             : typing.Union[None, bool, dict]    = None                      ,
     ProductLegend           : bool                              = False                     ,
     legend_location         : str                               = 'upper left'              ,
     plot_grid               : bool                              = True                      ,
@@ -330,7 +328,7 @@ def plot_benchmark(
     transform               : typing.Union[str, None]           = None                      ,
     clip_vals               : bool                              = False                     ,
     stop_after_first_clip   : bool                              = False                     ,
-) -> None :
+) -> None :    
     """Plots benchmarks results
 
     Parameters
@@ -413,8 +411,8 @@ def plot_benchmark(
         Override argument value as a default for plot x label, by default ``None``.
     ylabel : str | None, optional
         Override default for plot y label, by default ``None``.
-    plot_legend : bool, optional
-        Whether to give each plots a legend, by default ``True``.
+    plot_legend : bool | dict | None, optional
+        Whether to record each axis of the benchmark in a legend, by default ``None``.
     legend_location : str, optional
         Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``'upper left'``.
     plot_grid : bool, optional
@@ -550,10 +548,52 @@ def plot_benchmark(
 
         plot_intent = {name:plot_intent[name] for name in res_shape} 
 
+    if plot_legend is None:
+        
+        plot_legend = {name: True for name in all_args}
+        plot_legend[fun_ax_name] = (n_funs > 1)
+        plot_legend[repeat_ax_name] = (n_repeat > 1)
+        plot_legend[out_ax_name] = (n_out > 1)
+
+    elif isinstance(plot_legend, bool):
+        plot_legend_in = plot_legend
+
+        plot_legend = {name: plot_legend_in for name in all_args}
+        plot_legend[fun_ax_name] = plot_legend_in
+        plot_legend[repeat_ax_name] = plot_legend_in
+        plot_legend[out_ax_name] = plot_legend_in
+        
+    elif isinstance(plot_legend, dict):
+        
+        for name in all_args:
+            if name not in plot_legend:
+                plot_legend[name] = True
+        
+        if fun_ax_name not in plot_legend:
+            plot_legend[fun_ax_name] = (n_funs > 1)        
+        if repeat_ax_name not in plot_legend:
+            plot_legend[repeat_ax_name] = (n_repeat > 1)        
+        if out_ax_name not in plot_legend:
+            plot_legend[out_ax_name] = (n_out > 1)
+                
+            
+        if not(len(plot_legend) == all_vals.ndim):  
+            raise ValueError(f"Foud {len(plot_legend)} plot_legends. Expecting {all_vals.ndim}")
+        
+        for name, in_legend in plot_legend.items():
+            if not(name in res_shape):
+                raise ValueError(f'Unknown argument {name} in plot_legend')
+            
+            if not(isinstance(in_legend, bool)):
+                raise ValueError(f'Expected bool values in plot_legend dict. Got: {type(in_legend)}')
+            
+    else:
+        raise TypeError(f'Could not use plot_legend with type {type(plot_legend)}')
+
     if not((single_values_idx is None) or (single_values_val is None)):
-        raise ValueError("Both single_values_idx and single_values_val were set. only one of them should be")
+        raise ValueError("Both single_values_idx and single_values_val were set. Only one of them should be")
     if not((relative_to_idx is None) or (relative_to_val is None)):
-        raise ValueError("Both relative_to_idx and relative_to_val were set. only one of them should be")
+        raise ValueError("Both relative_to_idx and relative_to_val were set. Only one of them should be")
 
     n_points = 0
     idx_points = -1
@@ -580,6 +620,12 @@ def plot_benchmark(
     name_subplot_grid_y = []
     idx_relative = []
     
+    all_legend_curve_color = []
+    all_legend_curve_linestyle = []
+    all_legend_curve_pointstyle = []
+    all_legend_subplot_grid_x = []
+    all_legend_subplot_grid_y = []
+    
     for i, (name, value) in enumerate(plot_intent.items()):
         
         if value == 'points':
@@ -604,18 +650,23 @@ def plot_benchmark(
         elif value == 'curve_color':
             idx_all_curve_color.append(i)
             name_curve_color.append(name)
+            all_legend_curve_color.append(plot_legend[name])
         elif value == 'curve_linestyle':
             idx_all_curve_linestyle.append(i)
             name_curve_linestyle.append(name)
+            all_legend_curve_linestyle.append(plot_legend[name])
         elif value == 'curve_pointstyle':
             idx_all_curve_pointstyle.append(i)
             name_curve_pointstyle.append(name)
+            all_legend_curve_pointstyle.append(plot_legend[name])
         elif value == 'subplot_grid_x':
             idx_all_subplot_grid_x.append(i)
             name_subplot_grid_x.append(name)
+            all_legend_subplot_grid_x.append(plot_legend[name])
         elif value == 'subplot_grid_y':
             idx_all_subplot_grid_y.append(i)
             name_subplot_grid_y.append(name)
+            all_legend_subplot_grid_y.append(plot_legend[name])
         elif value.startswith("reduction_"):
             n_reductions += 1
             name = value[10:]
@@ -725,14 +776,19 @@ def plot_benchmark(
         if OnlyThisOnce:
             
             if ProductLegend: 
+                        
+                n_cat_color, i_cat_color = _count_Truthy(all_legend_curve_color)
+                n_cat_linestyle, i_cat_linestyle = _count_Truthy(all_legend_curve_linestyle)
+                n_cat_pointstyle, i_cat_pointstyle = _count_Truthy(all_legend_curve_pointstyle)
                 
-                ncats = len(idx_curve_color) + len(idx_curve_linestyle) + len(idx_curve_pointstyle)
+                ncats = n_cat_color + n_cat_linestyle + n_cat_pointstyle
+                
                 KeyValLegend = (ncats > 1)
             
                 label = ''
-                label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
-                label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
-                label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_color, all_legend_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_linestyle, all_legend_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                label = _build_product_legend(idx_curve_pointstyle, all_legend_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                 label = label[:-2] # Removing final comma
                 
                 leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -845,7 +901,11 @@ def plot_benchmark(
         
     if not(ProductLegend): 
         
-        ncats = len(idx_all_curve_color) + len(idx_all_curve_linestyle) + len(idx_all_curve_pointstyle)
+        n_cat_color, i_cat_color = _count_Truthy(all_legend_curve_color)
+        n_cat_linestyle, i_cat_linestyle = _count_Truthy(all_legend_curve_linestyle)
+        n_cat_pointstyle, i_cat_pointstyle = _count_Truthy(all_legend_curve_pointstyle)
+        
+        ncats = n_cat_color + n_cat_linestyle + n_cat_pointstyle
         HeaderLegend = (ncats > 1)
              
         for i_subplot_grid_x in range(n_subplot_grid_x):
@@ -853,17 +913,18 @@ def plot_benchmark(
 
                 cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
 
-                HeaderLegend = (len(idx_all_curve_color) == 1)
+                HeaderLegend = (n_cat_color == 1)
                 KeyValLegend = not(HeaderLegend)
                 
-                if len(idx_all_curve_color) > 0:
+                if n_cat_color > 0:
                     
                     if HeaderLegend:
+                        
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
-                                color = "white"                     ,
-                                label = f'{name_curve_color[0]}:'   ,
-                                alpha = 0.                          ,
+                                color = "white"                             ,
+                                label = f'{name_curve_color[i_cat_color]}:' ,
+                                alpha = 0.                                  ,
                             )
                         )
                     
@@ -872,7 +933,7 @@ def plot_benchmark(
                         color = color_list[i_color % n_colors]
 
                         label = ''
-                        label = _build_product_legend(idx_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_color, all_legend_curve_color, name_curve_color, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
 
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -894,16 +955,16 @@ def plot_benchmark(
                             )
                         )
                 
-                HeaderLegend = (len(idx_curve_linestyle) == 1)
+                HeaderLegend = (n_cat_linestyle == 1)
                 KeyValLegend = not(HeaderLegend)
                 
-                if len(idx_all_curve_linestyle) > 0:
+                if n_cat_linestyle > 0:
                     
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
                                 color = "white"                         ,
-                                label = f'{name_curve_linestyle[0]}:'   ,
+                                label = f'{name_curve_linestyle[i_cat_linestyle]}:'   ,
                                 alpha = 0.                              ,
                             )
                         )
@@ -912,7 +973,7 @@ def plot_benchmark(
 
                         linestyle = linestyle_list[i_linestyle % n_linestyle]
                         label = ''
-                        label = _build_product_legend(idx_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_linestyle, all_legend_curve_linestyle, name_curve_linestyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.lines.Line2D([], []                 ,
@@ -933,16 +994,16 @@ def plot_benchmark(
                             )
                         )
                 
-                HeaderLegend = (len(idx_curve_pointstyle) == 1)
+                HeaderLegend = (n_cat_pointstyle == 1)
                 KeyValLegend = not(HeaderLegend)
                         
-                if len(idx_all_curve_pointstyle) > 0:
+                if n_cat_pointstyle > 0:
                     
                     if HeaderLegend:
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
                             mpl.patches.Patch(
                                 color = "white"                         ,
-                                label = f'{name_curve_pointstyle[0]}:'  ,
+                                label = f'{name_curve_pointstyle[i_cat_pointstyle]}:'  ,
                                 alpha = 0.                              ,
                             )
                         )
@@ -951,7 +1012,7 @@ def plot_benchmark(
 
                         pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
                         label = ''
-                        label = _build_product_legend(idx_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
+                        label = _build_product_legend(idx_curve_pointstyle, all_legend_curve_pointstyle, name_curve_pointstyle, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label)
                         label = label[:-2] # Removing final comma
 
                         leg_patch[i_subplot_grid_x][i_subplot_grid_y].append(
@@ -978,11 +1039,16 @@ def plot_benchmark(
                     borderaxespad = 0.                                      ,
                 )
                 
-            if (n_subplot_grid_x*n_subplot_grid_y) > 1:
+            
+            n_cat_subplot_grid_x, i_cat_subplot_grid_x = _count_Truthy(all_legend_subplot_grid_x)
+            n_cat_subplot_grid_y, i_cat_subplot_grid_y = _count_Truthy(all_legend_subplot_grid_y)
+            ncats = n_cat_subplot_grid_x + n_cat_subplot_grid_y
+                
+            if (n_subplot_grid_x*n_subplot_grid_y > 1) and (ncats > 0):
                 KeyValLegend = True
                 ax_title = ''
-                ax_title = _build_product_legend(idx_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
-                ax_title = _build_product_legend(idx_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
+                ax_title = _build_product_legend(idx_subplot_grid_x, all_legend_subplot_grid_x, name_subplot_grid_x, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
+                ax_title = _build_product_legend(idx_subplot_grid_y, all_legend_subplot_grid_y, name_subplot_grid_y, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, ax_title)
                 ax_title = ax_title[:-2]
                 
             elif title is not None:

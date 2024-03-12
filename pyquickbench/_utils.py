@@ -37,10 +37,15 @@ class AutoTimer(timeit.Timer):
                     return (number, time_taken)
             i *= 10
 
-def isnotfinite(arr):
-    res = np.isfinite(arr)
-    np.bitwise_not(res, out=res)  # in-place
-    return res
+def _count_Truthy(iterator):
+    count = 0
+    first_true_idx = None
+    for i, val in enumerate(iterator):
+        if val:
+            count+=1
+            if first_true_idx is None:
+                first_true_idx = i
+    return count, first_true_idx
 
 def _mem_shift_restricted(idx, shape, only):
     
@@ -337,8 +342,10 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
                         repeat = n_repeat,
                         number = n_timeit,
                     )
+                    
+                    times_arr = np.array(times) / n_timeit
 
-                    vals[i_fun, :, 0] = np.array(times) / n_timeit
+                    vals[i_fun, :, 0] = times_arr
 
             except Exception as exc:
 
@@ -404,28 +411,29 @@ def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
     
     return reduced_val
 
-def _build_product_legend(idx_curve, name_curve, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label):
+def _build_product_legend(idx_curve, plot_legend_curve, name_curve, all_args, all_fun_names_list, all_out_names_list, KeyValLegend, label):
 
-    for i, idx in enumerate(idx_curve):
+    for idx, plot_legend, cat_name in zip(idx_curve, plot_legend_curve, name_curve):
 
-        cat_name = name_curve[i]
-        curve_vals = all_args.get(cat_name)
-        if curve_vals is None:
-            if cat_name == fun_ax_name:
-                val_name = all_fun_names_list[idx]
-            elif cat_name == repeat_ax_name:
-                val_name = str(idx+1)
-            elif cat_name == out_ax_name:
-                val_name = all_out_names_list[idx]
+        if plot_legend:
+            
+            curve_vals = all_args.get(cat_name)
+            if curve_vals is None:
+                if cat_name == fun_ax_name:
+                    val_name = all_fun_names_list[idx]
+                elif cat_name == repeat_ax_name:
+                    val_name = str(idx+1)
+                elif cat_name == out_ax_name:
+                    val_name = all_out_names_list[idx]
+                else:
+                    raise ValueError("Could not figure out name")
             else:
-                raise ValueError("Could not figure out name")
-        else:
-            val_name = str(curve_vals[idx])
-        
-        if KeyValLegend:
-            label += f'{cat_name} : {val_name}, '
-        else:
-            label += f'{val_name}, '
+                val_name = str(curve_vals[idx])
+            
+            if KeyValLegend:
+                label += f'{cat_name} : {val_name}, '
+            else:
+                label += f'{val_name}, '
             
     return label
 

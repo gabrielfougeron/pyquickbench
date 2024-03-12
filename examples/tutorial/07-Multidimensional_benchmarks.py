@@ -116,7 +116,7 @@ pyquickbench.plot_benchmark(
 )
 
 # %% 
-# The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can choose to plot minimal, median and maximal values:
+# The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can for instance choose to plot minimal, median and maximal values. The list of all possible reductions is accessible in :data:`pyquickbench.all_reductions`.
 # 
 
 dpi = 150
@@ -195,9 +195,10 @@ pyquickbench.plot_benchmark(
     all_sizes                       ,
     all_funs                        ,
     show = True                     ,
-    plot_intent =   plot_intent     ,
+    plot_intent = plot_intent       ,
 )
 
 
 # %% 
-# As can be seen in the above plots, the timings are automatically sorted along the pyquickbench.repeat_ax_name axis.
+# As can be seen in the above plots, the timings are automatically sorted along the :data:`pyquickbench.repeat_ax_name` axis.
+# The list of all possible ``plot_intent`` values is available in :data:`pyquickbench.all_plot_intents`.

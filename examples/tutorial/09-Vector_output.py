@@ -1,11 +1,11 @@
 """
-TimeTrains
-==========
+Vector outputs
+==============
 """
 
 # %% 
-
-
+# Pyquickbench can also be used to benchmark functions that return multiple values. This capability corresponds to ``mode = "vector_output"`` in :mod:`pyquickbench`. The following benchmark measures the convergence of quantile estimatores of a uniform random variable towards their theoretical values.
+# Let us first observe how the values of the naive quantile estimator as returned by ``uniform_quantiles`` evolve with increasing number of simulated random variables:
 
 # sphinx_gallery_start_ignore
 
@@ -39,19 +39,12 @@ import pyquickbench
 
 def uniform_quantiles(n,m):
     
-    assert n % m == 0
-    
-    nsm = n // m
-    
-    rng = np.random.default_rng()
-    vec = rng.random((n+1))
+    vec = np.random.random((n+1))
     vec.sort()
     
-    l = [vec[nsm*i]for i in range(m+1)]
+    return np.array([abs(vec[(n // m)*i]) for i in range(m+1)])
     
-    return np.array(l)
-    
-m = 4
+m = 10
 uniform_decile = functools.partial(uniform_quantiles, m=m)
 uniform_decile.__name__ = "uniform_decile"
     
@@ -59,10 +52,10 @@ all_funs = [
     uniform_decile   ,   
 ]
 
-n_bench = 20
-all_sizes = [2**n for n in range(5,n_bench)]
+n_bench = 10
+all_sizes = [m * 2**n for n in range(n_bench)]
 
-n_repeat = 1
+n_repeat = 100
     
 all_values = pyquickbench.run_benchmark(
     all_sizes                   ,
@@ -70,14 +63,12 @@ all_values = pyquickbench.run_benchmark(
     n_repeat = n_repeat         ,
     mode = "vector_output"      ,
     StopOnExcept = True         ,
-    nproc = 16                  ,
-
+    pooltype = 'process'        ,
 ) 
 
 plot_intent = {
     pyquickbench.default_ax_name : "points"         ,   
-    pyquickbench.fun_ax_name : "curve_color"        ,   
-    pyquickbench.repeat_ax_name : "reduction_median",   
+    pyquickbench.repeat_ax_name : "same"            ,   
     pyquickbench.out_ax_name : "curve_color"        ,   
 }
 
@@ -89,14 +80,13 @@ pyquickbench.plot_benchmark(
     show = True                     ,
     logy_plot = False               ,
     plot_ylim = (0.,1.)             ,
-    # alpha = 100./255                  ,
-    # title = "Computational cost growth order"   ,
-    # transform = "pol_growth_order"              ,
+    alpha = 50./255                 ,
+    ylabel = "Quantile estimator"   ,
 )
 
 
 # %% 
-
+# While the above plot hints at a convergence towards specific values, we can be a bit more precise and plot the actual convergence error.
 
 def uniform_quantiles_error(n,m):
     
@@ -112,7 +102,7 @@ all_funs = [
     uniform_decile_error   ,   
 ]
 
-n_repeat = 1000
+n_repeat = 10000
 
 all_errors = pyquickbench.run_benchmark(
     all_sizes                   ,
@@ -120,18 +110,16 @@ all_errors = pyquickbench.run_benchmark(
     n_repeat = n_repeat         ,
     mode = "vector_output"      ,
     StopOnExcept = True         ,
-    nproc = 16                  ,
+    pooltype = 'process'        ,
 
 ) 
 
 plot_intent = {
     pyquickbench.default_ax_name : "points"         ,   
     pyquickbench.fun_ax_name : "curve_color"        ,   
-    pyquickbench.repeat_ax_name : "reduction_avg"   ,   
+    pyquickbench.repeat_ax_name : "reduction_median",   
     pyquickbench.out_ax_name : "curve_color"        ,   
 }
-
-all_out_names = ["1st", "2nd", "3rd", "4th", "5th", ]
 
 pyquickbench.plot_benchmark(
     all_errors                      ,
@@ -140,10 +128,11 @@ pyquickbench.plot_benchmark(
     plot_intent = plot_intent       ,
     show = True                     ,
     ylabel = "Estimator error"      ,
-    all_out_names = all_out_names,
-    # title = "Computational cost growth order"   ,
-    # transform = "pol_growth_order"              ,
+
 )
+
+# %% 
+# The above plot shows a very distinct behavior for the estimation of the minimum and maximum values compared to the other quantiles. The following plot of convergence order makes this difference even more salient.
 
 pyquickbench.plot_benchmark(
     all_errors                      ,
@@ -151,7 +140,6 @@ pyquickbench.plot_benchmark(
     all_funs                        ,
     plot_intent = plot_intent       ,
     show = True                     ,
-    transform = "pol_growth_order"  ,
-    # title = "Computational cost growth order"   ,
-    # transform = "pol_growth_order"              ,
+    transform = "pol_cvgence_order" ,
+    ylabel = "Order of convergence of Estimator error"      ,
 )
