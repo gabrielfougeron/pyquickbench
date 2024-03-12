@@ -292,7 +292,7 @@ def plot_benchmark(
                             ]                                   = None                      ,        
     mode                    : str                               = "timings"                 ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
-                                                                = default_setup             ,
+                                                                = None                      ,
     all_xvalues             : typing.Union[
                                 np.typing.ArrayLike             ,
                                 None                            ,
@@ -492,12 +492,17 @@ def plot_benchmark(
 
         else:
             
-            if isinstance(all_funs, dict):
-                all_funs_list = [fun for fun in all_funs.values()]
-            else:    
-                all_funs_list = [fun for fun in all_funs]
-            
-            n_out, all_out_names_list = _build_out_names(all_args, setup, all_funs_list)
+            if setup is None:
+                all_out_names_list = [str(idx) for idx in range(n_out)]
+                    
+            else:
+                
+                if isinstance(all_funs, dict):
+                    all_funs_list = [fun for fun in all_funs.values()]
+                else:    
+                    all_funs_list = [fun for fun in all_funs]
+                
+                _, all_out_names_list = _build_out_names(all_args, setup, all_funs_list)
 
     else:
         all_out_names_list = [name for name in all_out_names]

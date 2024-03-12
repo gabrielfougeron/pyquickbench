@@ -3,6 +3,8 @@
 Benchmarks
 ==========
 
+The two main functions of :mod:`pyquickbench`.
+
 .. autosummary::
    :toctree: generated/
    :nosignatures:
@@ -14,6 +16,8 @@ Benchmarks
 ==========
 Time Train
 ==========
+
+Provides rudimentary profiling features to be used with :mod:`pyquickbench`.
 
 .. autosummary::
    :toctree: generated/
@@ -27,6 +31,8 @@ Time Train
 =========
 Constants
 =========
+
+A few named constants and default values in :mod:`pyquickbench`.
 
 .. autosummary::
    :toctree: generated/
@@ -71,13 +77,13 @@ all_reductions = all_reductions
    * "min"       : Minimum
    * "max"       : Maximum
    * "median"    : Median
-   * "sum"       : Sum  x
+   * "sum"       : Sum
    * "logavg"    : Exponential of average of log
     
    .. rubric:: See Also
 
    * :func:`pyquickbench.plot_benchmark` : Plot benchmarks    
-   * :class:`pyquickbench.TimeTrain` : Plot benchmarks    
+   * :class:`pyquickbench.TimeTrain` : Rudimentary profiling features
 
 """
 
@@ -86,20 +92,19 @@ all_plot_intents = all_plot_intents
 
    List of all available plot intents to be used in :func:`pyquickbench.plot_benchmark`.
 
-   * "single_value"     : A single value is drawn 
-   * "points"           : Minimum
-   * "same"             : Maximum
-   * "curve_color"      : Median
-   * "curve_linestyle"  : Sum  x
-   * "curve_pointstyle" : Exponential of average of log
-   * "subplot_grid_x"   : Exponential of average of log
-   * "subplot_grid_y"   : Exponential of average of log
-   * "reduction_***"    : Exponential of average of log
+   * "single_value"     : A single value is plotted. Requires either ``single_values_val`` or ``single_values_idx`` to be set.
+   * "points"           : Values are plotted as points along a curve.
+   * "same"             : All values are plotted the same way.
+   * "curve_color"      : Values are plotted as different curve colors.
+   * "curve_linestyle"  : Values are plotted as different curve line styles.
+   * "curve_pointstyle" : Values are plotted as different markers along the curve.
+   * "subplot_grid_x"   : Values are plotted on different plot aligned horizontally.
+   * "subplot_grid_y"   : Values are plotted on different plot aligned vertically.
+   * "reduction_``red``"    : Values are reduced before plotting. ``red`` can be any string in :data:`pyquickbench.all_reductions`.
 
    .. rubric:: See Also
 
    * :func:`pyquickbench.plot_benchmark` : Plot benchmarks
    * :data:`pyquickbench.all_reductions` : List of available data reductions
-   * 
 
 """

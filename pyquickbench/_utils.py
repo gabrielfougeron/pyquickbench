@@ -4,6 +4,7 @@ import math
 import inspect
 import concurrent.futures
 import copy
+import itertools
 
 import numpy as np
 
@@ -185,18 +186,40 @@ def _build_args_shapes(all_args, all_funs, n_repeat, n_out):
 
 def _build_out_names(all_args, setup, all_funs_list):
     
-    arg_0 = []
-    for argval in all_args.values():
-        arg_0.append(argval[0])
-    setup_vars_dict = _return_setup_vars_dict(setup, arg_0)
+    FoundValidRes = False
+    for args in itertools.product(*list(all_args.values())):
+        
+        setup_vars_dict = _return_setup_vars_dict(setup, args)
+        
+        for fun in all_funs_list:   
+            
+            try: # Some structure cannot easily be deepcopied, like those created with Cython.
+                setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+            except TypeError: 
+                setup_vars_dict_cp = copy.copy(setup_vars_dict)
+                
+            try:
+                res = fun(**setup_vars_dict_cp)
+            except Exception as err:
+                pass
+            else:
+                FoundValidRes = True
+                break
+                
+        if FoundValidRes:
+            break
     
-    res_0 = all_funs_list[0](**setup_vars_dict)
+    if not(FoundValidRes):
+        raise ValueError("Could not find a single valid result in the whole benchmark !")
 
-    n_out = len(res_0)
-    
-    if isinstance(res_0, dict):
-        all_out_names = list(res_0.keys())
+    if isinstance(res, float):
+        n_out = 1
+        all_out_names = ["0"]
+    elif isinstance(res, dict):
+        n_out = len(res)
+        all_out_names = list(res.keys())
     else:
+        n_out = len(res)
         n_fig = 1 + math.floor(math.log(n_out) / math.log(10))
         all_out_names = [str(i).zfill(n_fig) for i in range(n_out)]
             

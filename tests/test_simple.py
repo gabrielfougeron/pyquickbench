@@ -83,10 +83,11 @@ def test_all_options_timings(SimpleScalarBenchmark):
                 assert all_vals is None
             else:
                 assert isinstance(all_vals, np.ndarray)
-                assert all_vals.ndim == 3
+                assert all_vals.ndim == 4
                 assert all_vals.shape[0] == len(SimpleScalarBenchmark.all_args['n'])
                 assert all_vals.shape[1] == len(SimpleScalarBenchmark.all_funs)
                 assert all_vals.shape[2] == n_repeat
+                assert all_vals.shape[3] == 1
                 
 
 

@@ -1,17 +1,3 @@
-"""
-==========
-Time Train
-==========
-
-.. autosummary::
-   :toctree: generated/
-
-   TimeTrain
-   TimeTrain.toc
-   TimeTrain.to_dict
-   
-"""
-
 import numpy as np
 import time
 import inspect
