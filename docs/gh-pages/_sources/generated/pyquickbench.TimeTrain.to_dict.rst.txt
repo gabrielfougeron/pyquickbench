@@ -1,0 +1,6 @@
+pyquickbench.TimeTrain.to\_dict
+===============================
+
+.. currentmodule:: pyquickbench
+
+.. automethod:: TimeTrain.to_dict

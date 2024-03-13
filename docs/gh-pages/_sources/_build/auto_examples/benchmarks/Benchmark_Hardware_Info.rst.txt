@@ -54,72 +54,38 @@ Description of the machine on which benchmarks were run.
            physical id: 0
          *-memory
               description: System memory
-              physical id: 1
+              physical id: 0
               size: 31GiB
          *-cpu
               product: 11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz
               vendor: Intel Corp.
-              physical id: 2
+              physical id: 1
               bus info: cpu@0
               width: 64 bits
               capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp x86-64 constant_tsc arch_perfmon rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid pni pclmulqdq ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect flush_l1d arch_capabilities
-         *-scsi:0
-              description: SCSI storage controller
-              product: Virtio filesystem
-              vendor: Red Hat, Inc.
-              physical id: 3
-              bus info: pci@2635:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe04000-9ffe04fff memory:9ffe05000-9ffe05fff memory:9ffe06000-9ffe06fff
-            *-virtio1 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@1
-                 configuration: driver=9pnet_virtio
-         *-scsi:1
-              description: SCSI storage controller
-              product: Virtio filesystem
-              vendor: Red Hat, Inc.
-              physical id: 4
-              bus info: pci@3e82:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe0c000-9ffe0cfff memory:9ffe0d000-9ffe0dfff memory:9ffe0e000-9ffe0efff
-            *-virtio4 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@4
-                 configuration: driver=9pnet_virtio
          *-generic
               description: System peripheral
               product: Red Hat, Inc.
               vendor: Red Hat, Inc.
-              physical id: 5
-              bus info: pci@6012:00:00.0
+              physical id: 2
+              bus info: pci@1113:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
               capabilities: bus_master cap_list
               configuration: driver=virtio-pci latency=64
               resources: iomemory:e0-df iomemory:e0-df iomemory:c0-bf irq:0 memory:e00000000-e00000fff memory:e00001000-e00001fff memory:c00000000-dffffffff
-            *-virtio2 UNCLAIMED
+            *-virtio1 UNCLAIMED
                  description: Virtual I/O device
                  physical id: 0
-                 bus info: virtio@2
+                 bus info: virtio@1
                  configuration: driver=virtiofs
-         *-scsi:2
+         *-scsi
               description: SCSI storage controller
               product: Virtio console
               vendor: Red Hat, Inc.
-              physical id: 6
-              bus info: pci@903f:00:00.0
+              physical id: 3
+              bus info: pci@2902:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -135,8 +101,8 @@ Description of the machine on which benchmarks were run.
               description: 3D controller
               product: Microsoft Corporation
               vendor: Microsoft Corporation
-              physical id: 7
-              bus info: pci@a0b2:00:00.0
+              physical id: 4
+              bus info: pci@2b68:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
@@ -147,44 +113,27 @@ Description of the machine on which benchmarks were run.
               description: 3D controller
               product: Microsoft Corporation
               vendor: Microsoft Corporation
-              physical id: 8
-              bus info: pci@dbc0:00:00.0
+              physical id: 5
+              bus info: pci@cee2:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
               capabilities: bus_master cap_list
               configuration: driver=dxgkrnl latency=0
               resources: irq:0
-         *-scsi:3
-              description: SCSI storage controller
-              product: Virtio filesystem
-              vendor: Red Hat, Inc.
-              physical id: 0
-              bus info: pci@f627:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe08000-9ffe08fff memory:9ffe09000-9ffe09fff memory:9ffe0a000-9ffe0afff
-            *-virtio3 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@3
-                 configuration: driver=9pnet_virtio
          *-pnp00:00
               product: PnP device PNP0b00
-              physical id: 9
+              physical id: 6
               capabilities: pnp
               configuration: driver=rtc_cmos
       *-network
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:1b:e8:e9
+           serial: 00:15:5d:b4:e1:6f
            size: 10Gbit/s
            capabilities: ethernet physical
-           configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.90.2-microsoft-standard-WS duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
+           configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.146.1-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
 
 
 

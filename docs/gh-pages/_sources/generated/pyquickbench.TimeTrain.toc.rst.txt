@@ -1,0 +1,6 @@
+pyquickbench.TimeTrain.toc
+==========================
+
+.. currentmodule:: pyquickbench
+
+.. automethod:: TimeTrain.toc

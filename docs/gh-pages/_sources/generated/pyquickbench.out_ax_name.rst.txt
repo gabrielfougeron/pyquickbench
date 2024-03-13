@@ -1,0 +1,6 @@
+pyquickbench.out\_ax\_name
+==========================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: out_ax_name

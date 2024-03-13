@@ -161,7 +161,7 @@ print(len(all_sizes_lin) == len(all_sizes_small))
 print(all([size_lin == size_small for size_lin, size_small in zip(all_sizes_lin, all_sizes_small)]))
 
 # %%
-# Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the ``*.npy`` benchmark file. **The following plot is inaccurate**.
+# Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the ``*.npy`` benchmark file. **As a consequence, the following plot is inaccurate**.
 
 pyquickbench.run_benchmark(
     all_sizes_lin                   ,

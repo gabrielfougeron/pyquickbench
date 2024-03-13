@@ -423,6 +423,19 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.run_benchmark.html">pyquickbench.run_benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.plot_benchmark.html">pyquickbench.plot_benchmark</a></li>
 </ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.TimeTrain.html">pyquickbench.TimeTrain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.TimeTrain.toc.html">pyquickbench.TimeTrain.toc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.TimeTrain.to_dict.html">pyquickbench.TimeTrain.to_dict</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.default_ax_name.html">pyquickbench.default_ax_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.fun_ax_name.html">pyquickbench.fun_ax_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.repeat_ax_name.html">pyquickbench.repeat_ax_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.out_ax_name.html">pyquickbench.out_ax_name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.all_reductions.html">pyquickbench.all_reductions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/pyquickbench.all_plot_intents.html">pyquickbench.all_plot_intents</a></li>
+</ul>
 </div>
 </nav></div>
     </div>
@@ -476,18 +489,62 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-pyquickbench">
-<span id="api"></span><h1>API<a class="headerlink" href="#module-pyquickbench" title="Link to this heading">#</a></h1>
-<section id="pyquickbench">
-<h2>Pyquickbench<a class="headerlink" href="#pyquickbench" title="Link to this heading">#</a></h2>
-<p>Pyquickbench’s public API is only made up of two functions.</p>
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h1>
+<p>This page describes the public API of <a class="reference internal" href="#module-pyquickbench" title="pyquickbench"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyquickbench</span></code></a>.</p>
+<section id="benchmarks">
+<span id="module-pyquickbench"></span><h2>Benchmarks<a class="headerlink" href="#benchmarks" title="Link to this heading">#</a></h2>
+<p>The two main functions of <a class="reference internal" href="#module-pyquickbench" title="pyquickbench"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyquickbench</span></code></a>.</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_benchmark</span></code></a>(all_args, all_funs, *[, mode, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark" title="pyquickbench.run_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_benchmark</span></code></a></p></td>
 <td><p>Runs a full benchmark.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.plot_benchmark.html#pyquickbench.plot_benchmark" title="pyquickbench.plot_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_benchmark</span></code></a>(all_vals, all_args[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.plot_benchmark.html#pyquickbench.plot_benchmark" title="pyquickbench.plot_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_benchmark</span></code></a></p></td>
 <td><p>Plots benchmarks results</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="time-train">
+<h2>Time Train<a class="headerlink" href="#time-train" title="Link to this heading">#</a></h2>
+<p>Provides rudimentary profiling features to be used with <a class="reference internal" href="#module-pyquickbench" title="pyquickbench"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyquickbench</span></code></a>.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeTrain</span></code></a></p></td>
+<td><p>Records elapsed time between interest points in code</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.TimeTrain.toc.html#pyquickbench.TimeTrain.toc" title="pyquickbench.TimeTrain.toc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeTrain.toc</span></code></a></p></td>
+<td><p>Records a new wagon in the TimeTrain</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict" title="pyquickbench.TimeTrain.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeTrain.to_dict</span></code></a></p></td>
+<td><p>Returns time measurements within a TimeTrain as a Python dictionnary</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Link to this heading">#</a></h2>
+<p>A few named constants and default values in <a class="reference internal" href="#module-pyquickbench" title="pyquickbench"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyquickbench</span></code></a>.</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.default_ax_name.html#pyquickbench.default_ax_name" title="pyquickbench.default_ax_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_ax_name</span></code></a></p></td>
+<td><p>The default value for benchmarked functions arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.fun_ax_name.html#pyquickbench.fun_ax_name" title="pyquickbench.fun_ax_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fun_ax_name</span></code></a></p></td>
+<td><p>The axis name for functions to be benchmarked.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.repeat_ax_name.html#pyquickbench.repeat_ax_name" title="pyquickbench.repeat_ax_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repeat_ax_name</span></code></a></p></td>
+<td><p>The axis name for reapeated benchmarks.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.out_ax_name.html#pyquickbench.out_ax_name" title="pyquickbench.out_ax_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">out_ax_name</span></code></a></p></td>
+<td><p>The axis name for function output.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyquickbench.all_reductions.html#pyquickbench.all_reductions" title="pyquickbench.all_reductions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_reductions</span></code></a></p></td>
+<td><p>Available data reductions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyquickbench.all_plot_intents.html#pyquickbench.all_plot_intents" title="pyquickbench.all_plot_intents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_plot_intents</span></code></a></p></td>
+<td><p>Available plot intents.</p></td>
 </tr>
 </tbody>
 </table>
@@ -514,7 +571,9 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pyquickbench">Pyquickbench</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#benchmarks">Benchmarks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#time-train">Time Train</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constants">Constants</a></li>
 </ul>
   </nav></div>
 

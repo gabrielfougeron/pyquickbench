@@ -1,0 +1,6 @@
+pyquickbench.repeat\_ax\_name
+=============================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: repeat_ax_name

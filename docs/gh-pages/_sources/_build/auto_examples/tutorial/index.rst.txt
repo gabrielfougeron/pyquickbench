@@ -151,6 +151,40 @@ This is the best place to learn how to use :mod:`pyquickbench`.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Vector outputs">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_09-Vector_output_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_09-Vector_output.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Vector outputs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Time Trains">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_10-TimeTrains_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Time Trains</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -165,4 +199,6 @@ This is the best place to learn how to use :mod:`pyquickbench`.
    /_build/auto_examples/tutorial/06-Transforming_values
    /_build/auto_examples/tutorial/07-Multidimensional_benchmarks
    /_build/auto_examples/tutorial/08-Lengthy_benchmarks
+   /_build/auto_examples/tutorial/09-Vector_output
+   /_build/auto_examples/tutorial/10-TimeTrains
 

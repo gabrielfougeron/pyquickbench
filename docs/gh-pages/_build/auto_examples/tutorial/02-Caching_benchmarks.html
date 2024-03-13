@@ -429,6 +429,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="06-Transforming_values.html">Plotting transformed values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="07-Multidimensional_benchmarks.html">Multidimensional benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="08-Lengthy_benchmarks.html">Time-consuming benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09-Vector_output.html">Vector outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10-TimeTrains.html">Time Trains</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../benchmarks/index.html">Benchmarks</a><input checked class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -605,8 +607,8 @@ Caching benchmarks results is a great way to reduce this overhead.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Current benchmark shape </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_times_small</span><span class="o">.</span><span class="n">shape</span></a><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Initial benchmark shape (12, 3, 1)
-Current benchmark shape (8, 3, 1)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Initial benchmark shape (12, 3, 1, 1)
+Current benchmark shape (8, 3, 1, 1)
 </pre></div>
 </div>
 <p>This mechanism can easily be tricked as it only checks for array dimensions and not content. Indeed, <code class="docutils literal notranslate"><span class="pre">all_sizes</span></code> is not stored in the <code class="docutils literal notranslate"><span class="pre">*.npy</span></code> benchmark file, and the test only relies on file size.</p>
@@ -619,7 +621,7 @@ Current benchmark shape (8, 3, 1)
 False
 </pre></div>
 </div>
-<p>Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the <code class="docutils literal notranslate"><span class="pre">*.npy</span></code> benchmark file. <strong>The following plot is inaccurate</strong>.</p>
+<p>Hence, the following will not trigger a new benchmark although it should, as the sizes are not stored in the <code class="docutils literal notranslate"><span class="pre">*.npy</span></code> benchmark file. <strong>As a consequence, the following plot is inaccurate</strong>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pyquickbench</span><span class="o">.</span><span class="n">run_benchmark</span><span class="p">(</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_sizes_lin</span></a>                   <span class="p">,</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_funs</span></a>                        <span class="p">,</span>

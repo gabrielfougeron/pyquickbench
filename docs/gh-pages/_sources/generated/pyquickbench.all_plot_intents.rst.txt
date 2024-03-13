@@ -1,0 +1,6 @@
+pyquickbench.all\_plot\_intents
+===============================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: all_plot_intents

@@ -441,14 +441,10 @@ document.write(`
                   
   <h1>Source code for pyquickbench._benchmark</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">timeit</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">typing</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">concurrent.futures</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -467,18 +463,18 @@ document.write(`
     <span class="n">_load_benchmark_file</span>    <span class="p">,</span>
     <span class="n">_save_benchmark_file</span>    <span class="p">,</span>
     <span class="n">_build_args_shapes</span>      <span class="p">,</span>
+    <span class="n">_build_out_names</span>        <span class="p">,</span>
     <span class="n">FakeProgressBar</span>         <span class="p">,</span>
     <span class="n">AllPoolExecutors</span>        <span class="p">,</span>
     <span class="n">_measure_output</span>         <span class="p">,</span>
     <span class="n">_measure_timings</span>        <span class="p">,</span>
     <span class="n">_values_reduction</span>       <span class="p">,</span>
-    <span class="n">all_reductions</span>          <span class="p">,</span>
-    <span class="n">all_plot_intents</span>        <span class="p">,</span>
     <span class="n">_build_product_legend</span>   <span class="p">,</span>
     <span class="n">_choose_idx_val</span>         <span class="p">,</span>
     <span class="n">_treat_future_result</span>    <span class="p">,</span>
     <span class="n">_arg_names_list_to_idx</span>  <span class="p">,</span>
     <span class="n">_product</span>                <span class="p">,</span>
+    <span class="n">_count_Truthy</span>           <span class="p">,</span>
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">pyquickbench._defaults</span> <span class="kn">import</span> <span class="o">*</span>
@@ -525,6 +521,9 @@ document.write(`
 <span class="sd">        By default ``lambda n: {pyquickbench.default_ax_name: n}``.</span>
 <span class="sd">    n_repeat : int, optional</span>
 <span class="sd">        Number of times to repeat the benchmark for variability studies.\n</span>
+<span class="sd">        By default ``1``.</span>
+<span class="sd">    n_repeat : int, optional</span>
+<span class="sd">        Length of function output.\n</span>
 <span class="sd">        By default ``1``.</span>
 <span class="sd">    nproc : int, optional</span>
 <span class="sd">        Number of workers in PoolExecutor.\n</span>
@@ -578,7 +577,20 @@ document.write(`
         <span class="n">Load_timings_file</span> <span class="o">=</span>  <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ForceBenchmark</span><span class="p">)</span>
         <span class="n">Save_timings_file</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+        <span class="n">all_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">default_ax_name</span><span class="p">:</span> <span class="n">all_args</span><span class="p">}</span>
+        
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">all_funs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="k">else</span><span class="p">:</span>    
+        <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;timings&quot;</span><span class="p">,</span> <span class="s2">&quot;scalar_output&quot;</span><span class="p">]:</span>
+        <span class="n">n_out</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;vector_output&quot;</span><span class="p">:</span>
+        <span class="n">n_out</span><span class="p">,</span> <span class="n">all_out_names</span> <span class="o">=</span> <span class="n">_build_out_names</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">)</span>
+            
+    <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">n_out</span><span class="p">)</span>
 
     <span class="n">MonotonicAxes_idx</span> <span class="o">=</span> <span class="n">_arg_names_list_to_idx</span><span class="p">(</span><span class="n">MonotonicAxes</span><span class="p">,</span> <span class="n">all_args</span><span class="p">)</span>
 
@@ -611,18 +623,15 @@ document.write(`
             <span class="n">_check_sig_no_pos_only</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
         
         <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">res_shape</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="o">-</span><span class="mf">1.</span><span class="p">)</span> <span class="c1"># Negative values</span>
-
+        
         <span class="n">total_iterations</span> <span class="o">=</span> <span class="n">_product</span><span class="p">(</span><span class="n">args_shape</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         
         <span class="k">if</span> <span class="n">ShowProgress</span><span class="p">:</span>
-
             <span class="k">if</span> <span class="p">(</span><span class="n">_in_ipynb</span><span class="p">()):</span>
                 <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">notebook</span><span class="o">.</span><span class="n">tqdm</span>
-                
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span>
         <span class="k">else</span><span class="p">:</span>
-            
             <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">FakeProgressBar</span>
 
         <span class="k">if</span> <span class="n">pooltype</span> <span class="o">==</span>  <span class="kc">None</span><span class="p">:</span>
@@ -647,10 +656,10 @@ document.write(`
             <span class="n">measure_fun</span> <span class="o">=</span> <span class="n">_measure_timings</span>
             <span class="n">extra_submit_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">time_per_test</span><span class="p">,</span> <span class="n">StopOnExcept</span><span class="p">,</span> <span class="n">WarmUp</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">)</span>
             
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;scalar_output&quot;</span><span class="p">:</span> 
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;scalar_output&quot;</span><span class="p">,</span> <span class="s2">&quot;vector_output&quot;</span><span class="p">]:</span> 
         
             <span class="n">measure_fun</span> <span class="o">=</span> <span class="n">_measure_output</span>
-            <span class="n">extra_submit_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">StopOnExcept</span><span class="p">)</span>
+            <span class="n">extra_submit_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">n_out</span><span class="p">,</span> <span class="n">StopOnExcept</span><span class="p">)</span>
         
         <span class="k">else</span><span class="p">:</span>
                 
@@ -678,8 +687,8 @@ document.write(`
                 <span class="n">future</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># Sort values along repeat_ax_name axis, taking care of nans.</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">Save_timings_file</span><span class="p">:</span>
             <span class="n">_save_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_vals</span><span class="p">,</span> <span class="n">all_args</span><span class="p">)</span>
@@ -695,6 +704,7 @@ document.write(`
             <span class="n">all_args</span>            <span class="p">,</span>
             <span class="n">all_funs</span>            <span class="p">,</span>
             <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>         <span class="p">,</span>
+            <span class="n">setup</span> <span class="o">=</span> <span class="n">setup</span>       <span class="p">,</span>
             <span class="n">show</span> <span class="o">=</span> <span class="n">show</span>         <span class="p">,</span>
             <span class="o">**</span><span class="n">plot_kwargs</span>       <span class="p">,</span>
         <span class="p">)</span>
@@ -717,11 +727,17 @@ document.write(`
                                 <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>            <span class="p">,</span>
                                 <span class="kc">None</span>                            <span class="p">,</span>
                             <span class="p">]</span>                                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">all_out_names</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+                                <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>            <span class="p">,</span>
+                                <span class="kc">None</span>                            <span class="p">,</span>
+                            <span class="p">]</span>                                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">plot_intent</span>             <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
                                 <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>            <span class="p">,</span>
                                 <span class="kc">None</span>                            <span class="p">,</span>
                             <span class="p">]</span>                                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>        
     <span class="n">mode</span>                    <span class="p">:</span> <span class="nb">str</span>                               <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                 <span class="p">,</span>
+    <span class="n">setup</span>                   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+                                                                <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">all_xvalues</span>             <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
                                 <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span>             <span class="p">,</span>
                                 <span class="kc">None</span>                            <span class="p">,</span>
@@ -750,7 +766,7 @@ document.write(`
     <span class="n">title</span>                   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">xlabel</span>                  <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">ylabel</span>                  <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="n">plot_legend</span>             <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">True</span>                      <span class="p">,</span>
+    <span class="n">plot_legend</span>             <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span>    <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">ProductLegend</span>           <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">legend_location</span>         <span class="p">:</span> <span class="nb">str</span>                               <span class="o">=</span> <span class="s1">&#39;upper left&#39;</span>              <span class="p">,</span>
     <span class="n">plot_grid</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">True</span>                      <span class="p">,</span>
@@ -759,7 +775,7 @@ document.write(`
     <span class="n">transform</span>               <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">clip_vals</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">stop_after_first_clip</span>   <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="p">:</span>    
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots benchmarks results</span>
 
 <span class="sd">    Parameters</span>
@@ -774,6 +790,8 @@ document.write(`
 <span class="sd">    all_fun_names : typing.Iterable[str] | None, optional</span>
 <span class="sd">        Names of the benchmarked functions, by default ``None``.\n</span>
 <span class="sd">        In case the functions ``__name__`` attribute is missing or uninformative.</span>
+<span class="sd">    all_out_names : typing.Iterable[str] | None, optional</span>
+<span class="sd">        Names of the outputs of the functions if ``mode=&quot;vector_output&quot;``, by default ``None``.</span>
 <span class="sd">    plot_intent : typing.Iterable[str] | None, optional</span>
 <span class="sd">        Describes how to handle the axes of the benchmark results array ``all_vals``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n</span>
@@ -782,6 +800,11 @@ document.write(`
 <span class="sd">        Benchmark mode, i.e. target of the benchmark.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n</span>
 <span class="sd">        Possible values: ``&quot;timings&quot;`` or ``&quot;scalar_output&quot;``. By default ``&quot;timings&quot;``.</span>
+<span class="sd">    setup : callable, optional</span>
+<span class="sd">        Function that prepares the inputs for the functions to be benchmarked.\n</span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n</span>
+<span class="sd">        Only used if ``all_out_names`` was not provided and ``mode=&quot;vector_output&quot;``\n</span>
+<span class="sd">        By default ``lambda n: {pyquickbench.default_ax_name: n}``.</span>
 <span class="sd">    all_xvalues : np.typing.ArrayLike | None, optional</span>
 <span class="sd">        Values to be plotted on the x-axis if those differ from argument values.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n </span>
@@ -835,8 +858,8 @@ document.write(`
 <span class="sd">        Override argument value as a default for plot x label, by default ``None``.</span>
 <span class="sd">    ylabel : str | None, optional</span>
 <span class="sd">        Override default for plot y label, by default ``None``.</span>
-<span class="sd">    plot_legend : bool, optional</span>
-<span class="sd">        Whether to give each plots a legend, by default ``True``.</span>
+<span class="sd">    plot_legend : bool | dict | None, optional</span>
+<span class="sd">        Whether to record each axis of the benchmark in a legend, by default ``None``.</span>
 <span class="sd">    legend_location : str, optional</span>
 <span class="sd">        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``&#39;upper left&#39;``.</span>
 <span class="sd">    plot_grid : bool, optional</span>
@@ -867,25 +890,13 @@ document.write(`
     
     <span class="n">all_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">all_vals</span><span class="p">))</span>
     
-    <span class="n">all_args</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-
-    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;all_vals should be a np.ndarry. Provided all_vals is a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">all_vals</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+        <span class="n">all_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">default_ax_name</span><span class="p">:</span> <span class="n">all_args</span><span class="p">}</span>
     
-    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_shape</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;all_vals has the wrong number of dimensions.&#39;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">loaded_axis_len</span><span class="p">,</span> <span class="p">(</span><span class="n">axis_name</span><span class="p">,</span> <span class="n">expected_axis_len</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">res_shape</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">loaded_axis_len</span> <span class="o">==</span> <span class="n">expected_axis_len</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Axis </span><span class="si">{</span><span class="n">axis_name</span><span class="si">}</span><span class="s1"> of the benchmark results has a length of </span><span class="si">{</span><span class="n">loaded_axis_len</span><span class="si">}</span><span class="s1"> instead of the expected </span><span class="si">{</span><span class="n">expected_axis_len</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
-            
-    <span class="n">n_funs</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span>
-    <span class="n">n_repeat</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span>
-
     <span class="k">if</span> <span class="n">all_fun_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         
         <span class="k">if</span> <span class="n">all_funs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">all_fun_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Anonymous function&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">n_funs</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least one of all_funs or all_fun_names must be provided&#39;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             
@@ -901,6 +912,45 @@ document.write(`
                     
     <span class="k">else</span><span class="p">:</span>
         <span class="n">all_fun_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_fun_names</span><span class="p">]</span>
+    
+    <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;all_vals should be a np.ndarry. Provided all_vals is a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">all_vals</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead.&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_shape</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;all_vals has the wrong number of dimensions. Received </span><span class="si">{</span><span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s1">, expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">res_shape</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">loaded_axis_len</span><span class="p">,</span> <span class="p">(</span><span class="n">axis_name</span><span class="p">,</span> <span class="n">expected_axis_len</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">res_shape</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">loaded_axis_len</span> <span class="o">==</span> <span class="n">expected_axis_len</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Axis </span><span class="si">{</span><span class="n">axis_name</span><span class="si">}</span><span class="s1"> of the benchmark results has a length of </span><span class="si">{</span><span class="n">loaded_axis_len</span><span class="si">}</span><span class="s1"> instead of the expected </span><span class="si">{</span><span class="n">expected_axis_len</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            
+    <span class="n">n_funs</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span>
+    <span class="n">n_repeat</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span>
+    <span class="n">n_out</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span>
+     
+    <span class="k">if</span> <span class="n">all_out_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="k">if</span> <span class="n">all_funs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_out</span><span class="p">)]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_out</span><span class="p">)]</span>
+                    
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">all_funs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+                <span class="k">else</span><span class="p">:</span>    
+                    <span class="n">all_funs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">fun</span> <span class="k">for</span> <span class="n">fun</span> <span class="ow">in</span> <span class="n">all_funs</span><span class="p">]</span>
+                
+                <span class="n">_</span><span class="p">,</span> <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="n">_build_out_names</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_out_names</span><span class="p">]</span>
     
     <span class="k">assert</span> <span class="n">n_funs</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_fun_names_list</span><span class="p">)</span>
 
@@ -920,6 +970,7 @@ document.write(`
         <span class="n">plot_intent</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="s1">&#39;points&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;curve_color&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_args</span><span class="p">)}</span>
         <span class="n">plot_intent</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_color&#39;</span>
         <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reduction_min&#39;</span>
+        <span class="n">plot_intent</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_linestyle&#39;</span>
 
     <span class="k">else</span><span class="p">:</span>
         
@@ -929,6 +980,8 @@ document.write(`
             <span class="n">plot_intent</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_color&#39;</span>
         <span class="k">if</span> <span class="n">repeat_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_intent</span><span class="p">:</span>
             <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reduction_min&#39;</span>
+        <span class="k">if</span> <span class="n">out_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_intent</span><span class="p">:</span>
+            <span class="n">plot_intent</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_linestyle&#39;</span>
         
         <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_intent</span><span class="p">)</span> <span class="o">==</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>  
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Foud </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_intent</span><span class="p">)</span><span class="si">}</span><span class="s2"> plot_intents. Expecting </span><span class="si">{</span><span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -942,10 +995,52 @@ document.write(`
 
         <span class="n">plot_intent</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span><span class="n">plot_intent</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">res_shape</span><span class="p">}</span> 
 
+    <span class="k">if</span> <span class="n">plot_legend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        
+        <span class="n">plot_legend</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">}</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_funs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_repeat</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_out</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">plot_legend_in</span> <span class="o">=</span> <span class="n">plot_legend</span>
+
+        <span class="n">plot_legend</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">plot_legend_in</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">}</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_legend_in</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_legend_in</span>
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_legend_in</span>
+        
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_legend</span><span class="p">:</span>
+                <span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        
+        <span class="k">if</span> <span class="n">fun_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_legend</span><span class="p">:</span>
+            <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_funs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>        
+        <span class="k">if</span> <span class="n">repeat_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_legend</span><span class="p">:</span>
+            <span class="n">plot_legend</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_repeat</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>        
+        <span class="k">if</span> <span class="n">out_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_legend</span><span class="p">:</span>
+            <span class="n">plot_legend</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_out</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+                
+            
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">)</span> <span class="o">==</span> <span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>  
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Foud </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">)</span><span class="si">}</span><span class="s2"> plot_legends. Expecting </span><span class="si">{</span><span class="n">all_vals</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">in_legend</span> <span class="ow">in</span> <span class="n">plot_legend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">res_shape</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown argument </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> in plot_legend&#39;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">in_legend</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected bool values in plot_legend dict. Got: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">in_legend</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not use plot_legend with type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span><span class="p">((</span><span class="n">single_values_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">single_values_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both single_values_idx and single_values_val were set. only one of them should be&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both single_values_idx and single_values_val were set. Only one of them should be&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span><span class="p">((</span><span class="n">relative_to_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">relative_to_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both relative_to_idx and relative_to_val were set. only one of them should be&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both relative_to_idx and relative_to_val were set. Only one of them should be&quot;</span><span class="p">)</span>
 
     <span class="n">n_points</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">idx_points</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -972,6 +1067,12 @@ document.write(`
     <span class="n">name_subplot_grid_y</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">idx_relative</span> <span class="o">=</span> <span class="p">[]</span>
     
+    <span class="n">all_legend_curve_color</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_legend_curve_linestyle</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_legend_curve_pointstyle</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_legend_subplot_grid_x</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_legend_subplot_grid_y</span> <span class="o">=</span> <span class="p">[]</span>
+    
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plot_intent</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
         
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;points&#39;</span><span class="p">:</span>
@@ -996,18 +1097,23 @@ document.write(`
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;curve_color&#39;</span><span class="p">:</span>
             <span class="n">idx_all_curve_color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">name_curve_color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">all_legend_curve_color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;curve_linestyle&#39;</span><span class="p">:</span>
             <span class="n">idx_all_curve_linestyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">name_curve_linestyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">all_legend_curve_linestyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;curve_pointstyle&#39;</span><span class="p">:</span>
             <span class="n">idx_all_curve_pointstyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">name_curve_pointstyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">all_legend_curve_pointstyle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;subplot_grid_x&#39;</span><span class="p">:</span>
             <span class="n">idx_all_subplot_grid_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">name_subplot_grid_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">all_legend_subplot_grid_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;subplot_grid_y&#39;</span><span class="p">:</span>
             <span class="n">idx_all_subplot_grid_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">name_subplot_grid_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">all_legend_subplot_grid_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;reduction_&quot;</span><span class="p">):</span>
             <span class="n">n_reductions</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">10</span><span class="p">:]</span>
@@ -1117,14 +1223,19 @@ document.write(`
         <span class="k">if</span> <span class="n">OnlyThisOnce</span><span class="p">:</span>
             
             <span class="k">if</span> <span class="n">ProductLegend</span><span class="p">:</span> 
+                        
+                <span class="n">n_cat_color</span><span class="p">,</span> <span class="n">i_cat_color</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_color</span><span class="p">)</span>
+                <span class="n">n_cat_linestyle</span><span class="p">,</span> <span class="n">i_cat_linestyle</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_linestyle</span><span class="p">)</span>
+                <span class="n">n_cat_pointstyle</span><span class="p">,</span> <span class="n">i_cat_pointstyle</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_pointstyle</span><span class="p">)</span>
                 
-                <span class="n">ncats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_curve_color</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">)</span>
+                <span class="n">ncats</span> <span class="o">=</span> <span class="n">n_cat_color</span> <span class="o">+</span> <span class="n">n_cat_linestyle</span> <span class="o">+</span> <span class="n">n_cat_pointstyle</span>
+                
                 <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="p">(</span><span class="n">ncats</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
             
                 <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_color</span><span class="p">,</span> <span class="n">name_curve_color</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">,</span> <span class="n">name_curve_linestyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">,</span> <span class="n">name_curve_pointstyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_color</span><span class="p">,</span> <span class="n">all_legend_curve_color</span><span class="p">,</span> <span class="n">name_curve_color</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">,</span> <span class="n">all_legend_curve_linestyle</span><span class="p">,</span> <span class="n">name_curve_linestyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">,</span> <span class="n">all_legend_curve_pointstyle</span><span class="p">,</span> <span class="n">name_curve_pointstyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
                 <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Removing final comma</span>
                 
                 <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1237,7 +1348,11 @@ document.write(`
         
     <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">ProductLegend</span><span class="p">):</span> 
         
-        <span class="n">ncats</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_color</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_linestyle</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_pointstyle</span><span class="p">)</span>
+        <span class="n">n_cat_color</span><span class="p">,</span> <span class="n">i_cat_color</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_color</span><span class="p">)</span>
+        <span class="n">n_cat_linestyle</span><span class="p">,</span> <span class="n">i_cat_linestyle</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_linestyle</span><span class="p">)</span>
+        <span class="n">n_cat_pointstyle</span><span class="p">,</span> <span class="n">i_cat_pointstyle</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_curve_pointstyle</span><span class="p">)</span>
+        
+        <span class="n">ncats</span> <span class="o">=</span> <span class="n">n_cat_color</span> <span class="o">+</span> <span class="n">n_cat_linestyle</span> <span class="o">+</span> <span class="n">n_cat_pointstyle</span>
         <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="n">ncats</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
              
         <span class="k">for</span> <span class="n">i_subplot_grid_x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="p">):</span>
@@ -1245,17 +1360,18 @@ document.write(`
 
                 <span class="n">cur_ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i_subplot_grid_y</span><span class="p">,</span> <span class="n">i_subplot_grid_x</span><span class="p">]</span>
 
-                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cat_color</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">HeaderLegend</span><span class="p">)</span>
                 
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_color</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n_cat_color</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
+                        
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
-                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                     <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>   <span class="p">,</span>
-                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                          <span class="p">,</span>
+                                <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                             <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_color</span><span class="p">[</span><span class="n">i_cat_color</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span> <span class="p">,</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                                  <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
                     
@@ -1264,7 +1380,7 @@ document.write(`
                         <span class="n">color</span> <span class="o">=</span> <span class="n">color_list</span><span class="p">[</span><span class="n">i_color</span> <span class="o">%</span> <span class="n">n_colors</span><span class="p">]</span>
 
                         <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_color</span><span class="p">,</span> <span class="n">name_curve_color</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_color</span><span class="p">,</span> <span class="n">all_legend_curve_color</span><span class="p">,</span> <span class="n">name_curve_color</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Removing final comma</span>
 
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1286,16 +1402,16 @@ document.write(`
                             <span class="p">)</span>
                         <span class="p">)</span>
                 
-                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cat_linestyle</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">HeaderLegend</span><span class="p">)</span>
                 
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_linestyle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n_cat_linestyle</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
                                 <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                         <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_linestyle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>   <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_linestyle</span><span class="p">[</span><span class="n">i_cat_linestyle</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>   <span class="p">,</span>
                                 <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                              <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
@@ -1304,7 +1420,7 @@ document.write(`
 
                         <span class="n">linestyle</span> <span class="o">=</span> <span class="n">linestyle_list</span><span class="p">[</span><span class="n">i_linestyle</span> <span class="o">%</span> <span class="n">n_linestyle</span><span class="p">]</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">,</span> <span class="n">name_curve_linestyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_linestyle</span><span class="p">,</span> <span class="n">all_legend_curve_linestyle</span><span class="p">,</span> <span class="n">name_curve_linestyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Removing final comma</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span><span class="p">([],</span> <span class="p">[]</span>                 <span class="p">,</span>
@@ -1325,16 +1441,16 @@ document.write(`
                             <span class="p">)</span>
                         <span class="p">)</span>
                 
-                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">HeaderLegend</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cat_pointstyle</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">HeaderLegend</span><span class="p">)</span>
                         
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_curve_pointstyle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n_cat_pointstyle</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     
                     <span class="k">if</span> <span class="n">HeaderLegend</span><span class="p">:</span>
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span>
                                 <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>                         <span class="p">,</span>
-                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_pointstyle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>  <span class="p">,</span>
+                                <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name_curve_pointstyle</span><span class="p">[</span><span class="n">i_cat_pointstyle</span><span class="p">]</span><span class="si">}</span><span class="s1">:&#39;</span>  <span class="p">,</span>
                                 <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.</span>                              <span class="p">,</span>
                             <span class="p">)</span>
                         <span class="p">)</span>
@@ -1343,7 +1459,7 @@ document.write(`
 
                         <span class="n">pointstyle</span> <span class="o">=</span> <span class="n">pointstyle_list</span><span class="p">[</span><span class="n">i_pointstyle</span> <span class="o">%</span> <span class="n">n_pointstyle</span><span class="p">]</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">,</span> <span class="n">name_curve_pointstyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                        <span class="n">label</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_curve_pointstyle</span><span class="p">,</span> <span class="n">all_legend_curve_pointstyle</span><span class="p">,</span> <span class="n">name_curve_pointstyle</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
                         <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Removing final comma</span>
 
                         <span class="n">leg_patch</span><span class="p">[</span><span class="n">i_subplot_grid_x</span><span class="p">][</span><span class="n">i_subplot_grid_y</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1370,11 +1486,16 @@ document.write(`
                     <span class="n">borderaxespad</span> <span class="o">=</span> <span class="mf">0.</span>                                      <span class="p">,</span>
                 <span class="p">)</span>
                 
-            <span class="k">if</span> <span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="o">*</span><span class="n">n_subplot_grid_y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            
+            <span class="n">n_cat_subplot_grid_x</span><span class="p">,</span> <span class="n">i_cat_subplot_grid_x</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_subplot_grid_x</span><span class="p">)</span>
+            <span class="n">n_cat_subplot_grid_y</span><span class="p">,</span> <span class="n">i_cat_subplot_grid_y</span> <span class="o">=</span> <span class="n">_count_Truthy</span><span class="p">(</span><span class="n">all_legend_subplot_grid_y</span><span class="p">)</span>
+            <span class="n">ncats</span> <span class="o">=</span> <span class="n">n_cat_subplot_grid_x</span> <span class="o">+</span> <span class="n">n_cat_subplot_grid_y</span>
+                
+            <span class="k">if</span> <span class="p">(</span><span class="n">n_subplot_grid_x</span><span class="o">*</span><span class="n">n_subplot_grid_y</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ncats</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">KeyValLegend</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">ax_title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_x</span><span class="p">,</span> <span class="n">name_subplot_grid_x</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
-                <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_y</span><span class="p">,</span> <span class="n">name_subplot_grid_y</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
+                <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_x</span><span class="p">,</span> <span class="n">all_legend_subplot_grid_x</span><span class="p">,</span> <span class="n">name_subplot_grid_x</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
+                <span class="n">ax_title</span> <span class="o">=</span> <span class="n">_build_product_legend</span><span class="p">(</span><span class="n">idx_subplot_grid_y</span><span class="p">,</span> <span class="n">all_legend_subplot_grid_y</span><span class="p">,</span> <span class="n">name_subplot_grid_y</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">,</span> <span class="n">KeyValLegend</span><span class="p">,</span> <span class="n">ax_title</span><span class="p">)</span>
                 <span class="n">ax_title</span> <span class="o">=</span> <span class="n">ax_title</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
                 
             <span class="k">elif</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

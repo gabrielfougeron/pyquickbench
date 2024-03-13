@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import time
 import inspect
@@ -12,18 +13,21 @@ class TimeTrain():
     
     def __init__(
         self                                                    ,
+        path_prefix         : typing.Union[str , None] = None   ,
         include_locs        : typing.Union[bool, None] = None   ,
         include_filename    : bool = True                       ,
         include_lineno      : bool = True                       ,
         include_funname     : bool = True                       ,
         name                : str  = ''                         ,
-        align_toc_names     : bool = False                      ,
-        names_reduction     : typing.Union[str, None] = None    ,
+        align_toc_names     : bool = True                      ,
+        names_reduction     : typing.Union[str , None] = None   ,
     ):
         """ Returns a TimeTrain
 
         Parameters
         ----------
+        path_prefix : str | None, optional
+            Path relative to which other paths are to be understood, by default None
         include_locs : bool | None, optional
             Whether to include locations in code when printing the TimeTrain, by default None
         include_filename : bool, optional
@@ -35,7 +39,7 @@ class TimeTrain():
         name : str, optional
             Name of the TimeTrain, by default ''
         align_toc_names : bool, optional
-            Whether to align toc names when printing the TimeTrain, by default False
+            Whether to align toc names when printing the TimeTrain, by default True
         names_reduction : str | None, optional
             Reduction to be applied to tocs that share the same name, by default None
 
@@ -43,7 +47,6 @@ class TimeTrain():
         
         self.n = 0
         self.name = name
-        self.all_tocs = [time.perf_counter()]
         self.all_tocs_record_time = [0.]
         self.all_tocs_record_time_sum = 0.
         self.all_tocs_names = []
@@ -54,6 +57,11 @@ class TimeTrain():
         
         if include_locs is None:
             include_locs = include_filename or include_lineno or include_funname
+            
+        if path_prefix is None:
+            path_prefix = os.path.abspath(os.path.join(inspect.stack()[1][1], os.pardir))
+
+        self.path_prefix = path_prefix
         
         self.include_locs = include_locs
         
@@ -72,7 +80,11 @@ class TimeTrain():
                 raise ValueError(f'Unknown reduction {names_reduction}')
         
         if self.include_locs and (self.names_reduction is not None):
-            warnings.warn("include_locs and names_reduction were both set to True. Only the first location will be displayed")
+            warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
+        
+        # This line goes at the very end for more precise measurements
+        self.all_tocs = [time.perf_counter()]
+        
         
     def toc(
         self                ,
@@ -108,7 +120,9 @@ class TimeTrain():
             
             toc_loc = ''
             if self.include_filename:
-                toc_loc += f'file {caller.filename} '
+                filename = os.path.relpath(os.path.abspath(caller.filename), self.path_prefix)
+                
+                toc_loc += f'file {filename} '
             
             if self.include_lineno:
                 toc_loc += f'line {caller.lineno} '
@@ -116,7 +130,7 @@ class TimeTrain():
             if self.include_funname and caller.function != '<module>':
                 toc_loc += f'in {caller.function} '
             
-            toc_loc = toc_loc[:-2]
+            toc_loc = toc_loc[:-1]
             
             self.all_tocs_locs.append(toc_loc)
             

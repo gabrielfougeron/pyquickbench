@@ -1,0 +1,6 @@
+pyquickbench.default\_ax\_name
+==============================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: default_ax_name

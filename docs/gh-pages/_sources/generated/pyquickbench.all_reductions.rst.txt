@@ -1,0 +1,6 @@
+pyquickbench.all\_reductions
+============================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: all_reductions
