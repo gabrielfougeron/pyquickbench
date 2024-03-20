@@ -636,7 +636,7 @@ def plot_benchmark(
             idx_all_same.append(i)
         elif value == 'single_value':
 
-            fixed_idx = _choose_idx_val(name, single_values_idx, single_values_val, all_args, all_fun_names_list)
+            fixed_idx = _choose_idx_val(name, single_values_idx, single_values_val, all_args, all_fun_names_list, all_out_names_list)
             
             if fixed_idx is None:
                 warnings.warn("Arguments single_values_idx / single_values_val were not properly set. A sensible default was provided, but please beware.")
@@ -674,7 +674,7 @@ def plot_benchmark(
         else:
             raise ValueError("This error should never be raised")
             
-        relative_idx = _choose_idx_val(name, relative_to_idx, relative_to_val, all_args, all_fun_names_list)
+        relative_idx = _choose_idx_val(name, relative_to_idx, relative_to_val, all_args, all_fun_names_list, all_out_names_list)
         if isinstance(relative_idx, int):
             idx_all_relative.append(i)
             idx_relative.append(relative_idx)   

@@ -9,7 +9,11 @@ import numpy.typing
 from pyquickbench._defaults import *
 
 class TimeTrain():
-    """ Records elapsed time between interest points in code"""
+    """ Records elapsed time between interest points in code
+    
+    See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.\n
+    
+    """
     
     def __init__(
         self                                                    ,

@@ -447,7 +447,7 @@ def _build_product_legend(idx_curve, plot_legend_curve, name_curve, all_args, al
             
     return label
 
-def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
+def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list, all_out_names_list):
     
     if isinstance(all_idx, dict):
         idx = all_idx.get(name)
@@ -462,6 +462,8 @@ def _choose_idx_val(name, all_idx, all_val, all_args, all_fun_names_list):
                 idx = all_fun_names_list.index(val)
             elif name == repeat_ax_name:
                 idx = int(val)
+            elif name == out_ax_name:
+                idx = all_out_names_list.index(val)
             else:
                 search_in = all_args[name]
                 if isinstance(search_in, list):
