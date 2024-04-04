@@ -230,9 +230,13 @@ def _build_out_names(all_args, setup, all_funs_list):
         n_out = len(res)
         all_out_names = list(res.keys())
     else:
-        n_out = len(res)
-        n_fig = 1 + math.floor(math.log(n_out) / math.log(10))
-        all_out_names = [str(i).zfill(n_fig) for i in range(n_out)]
+        try:
+            n_out = len(res)
+        except TypeError:
+            raise ValueError("Could not determine size of output")            
+            
+        n_fill = 1 + math.floor(math.log(n_out) / math.log(10))
+        all_out_names = [str(i).zfill(n_fill) for i in range(n_out)]
             
     return n_out, all_out_names
 
