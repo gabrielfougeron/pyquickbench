@@ -145,7 +145,9 @@ def run_benchmark(
         n_out = 1
     elif mode == "vector_output":
         n_out, all_out_names = _build_out_names(all_args, setup, all_funs_list)
-            
+    else:
+        raise ValueError(f'Invalid mode: {mode}')
+
     args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
 
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
@@ -481,10 +483,14 @@ def plot_benchmark(
     n_funs = res_shape[fun_ax_name]
     n_repeat = res_shape[repeat_ax_name]
     n_out = res_shape[out_ax_name]
-     
-    if all_out_names is None:
+    
+    if (all_out_names is None):
         
-        if all_funs is None:
+        if (mode != 'vector_output'):
+            
+            all_out_names_list = [str(idx) for idx in range(n_out)]
+
+        elif all_funs is None:
 
             all_out_names_list = [str(idx) for idx in range(n_out)]
 
