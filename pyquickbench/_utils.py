@@ -219,9 +219,9 @@ def _build_out_names(all_args, setup, all_funs_list):
 
     if isinstance(res, TimeTrain):
         if res.names_reduction is None:
-            res = res.to_dict()
-        else:
             res = res.to_dict(names_reduction=all_reductions['sum'])
+        else:
+            res = res.to_dict()
 
     if isinstance(res, float):
         n_out = 1
@@ -273,9 +273,9 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                 
                 if isinstance(res, TimeTrain):
                     if res.names_reduction is None:
-                        res = res.to_dict()
-                    else:
                         res = res.to_dict(names_reduction=all_reductions['sum'])
+                    else:
+                        res = res.to_dict()
                 
                 if isinstance(res, float):
                     assert n_out == 1
