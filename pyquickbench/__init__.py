@@ -45,13 +45,14 @@ A few named constants and default values in :mod:`pyquickbench`.
    out_ax_name
    all_reductions
    all_plot_intents
+   all_transforms
    
 """
 
 from ._benchmark  import run_benchmark, plot_benchmark
 
 from ._defaults   import default_ax_name, fun_ax_name, repeat_ax_name, out_ax_name
-from ._defaults   import all_reductions, all_plot_intents
+from ._defaults   import all_reductions, all_plot_intents, all_transforms
 from ._time_train import TimeTrain
 
 
@@ -109,5 +110,21 @@ all_plot_intents = all_plot_intents
 
    * :func:`pyquickbench.plot_benchmark` : Plot benchmarks
    * :data:`pyquickbench.all_reductions` : List of available data reductions
+
+"""
+
+all_transforms = all_transforms
+"""Available data transformations.
+
+   List of all available data transformations to be used in :func:`pyquickbench.plot_benchmark`.
+
+   * "pol_growth_order"  : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^\\alpha`.
+   * "pol_cvgence_order" :  Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
+
+   See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
+
+   .. rubric:: See Also
+
+   * :func:`pyquickbench.plot_benchmark` : Plot benchmarks
 
 """

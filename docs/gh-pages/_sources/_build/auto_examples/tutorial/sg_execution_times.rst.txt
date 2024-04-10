@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:13.169** total execution time for 10 files **from _build/auto_examples/tutorial**:
+**00:12.967** total execution time for 10 files **from _build/auto_examples/tutorial**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` (``07-Multidimensional_benchmarks.py``)
-     - 00:04.476
+     - 00:04.353
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_09-Vector_output.py` (``09-Vector_output.py``)
-     - 00:02.159
+     - 00:02.115
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` (``06-Transforming_values.py``)
-     - 00:01.547
+     - 00:01.557
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_08-Lengthy_benchmarks.py` (``08-Lengthy_benchmarks.py``)
-     - 00:01.283
+     - 00:01.442
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` (``02-Caching_benchmarks.py``)
-     - 00:00.993
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``05-Plotting_scalars.py``)
-     - 00:00.918
+     - 00:00.951
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` (``10-TimeTrains.py``)
-     - 00:00.787
+     - 00:00.783
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` (``05-Plotting_scalars.py``)
+     - 00:00.772
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` (``03-Preparing_inputs.py``)
-     - 00:00.483
+     - 00:00.450
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_01-First_benchmark.py` (``01-First_benchmark.py``)
-     - 00:00.338
+     - 00:00.354
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_tutorial_04-Error_handling.py` (``04-Error_handling.py``)
-     - 00:00.186
+     - 00:00.189
      - 0.0

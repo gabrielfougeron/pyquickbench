@@ -589,7 +589,9 @@ document.write(`
         <span class="n">n_out</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;vector_output&quot;</span><span class="p">:</span>
         <span class="n">n_out</span><span class="p">,</span> <span class="n">all_out_names</span> <span class="o">=</span> <span class="n">_build_out_names</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">all_funs_list</span><span class="p">)</span>
-            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
     <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">n_out</span><span class="p">)</span>
 
     <span class="n">MonotonicAxes_idx</span> <span class="o">=</span> <span class="n">_arg_names_list_to_idx</span><span class="p">(</span><span class="n">MonotonicAxes</span><span class="p">,</span> <span class="n">all_args</span><span class="p">)</span>
@@ -928,10 +930,14 @@ document.write(`
     <span class="n">n_funs</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span>
     <span class="n">n_repeat</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span>
     <span class="n">n_out</span> <span class="o">=</span> <span class="n">res_shape</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span>
-     
-    <span class="k">if</span> <span class="n">all_out_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">all_out_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         
-        <span class="k">if</span> <span class="n">all_funs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;vector_output&#39;</span><span class="p">):</span>
+            
+            <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_out</span><span class="p">)]</span>
+
+        <span class="k">elif</span> <span class="n">all_funs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="n">all_out_names_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_out</span><span class="p">)]</span>
 
@@ -964,6 +970,10 @@ document.write(`
     <span class="n">n_colors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_list</span><span class="p">)</span>
     <span class="n">n_linestyle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">linestyle_list</span><span class="p">)</span>
     <span class="n">n_pointstyle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pointstyle_list</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">transform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">transform</span> <span class="ow">in</span> <span class="n">all_transforms</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="sa">f</span><span class="s1">&#39;Unknown transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1">. Possible values are: </span><span class="si">{</span><span class="n">all_transforms</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">plot_intent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         
@@ -1083,7 +1093,7 @@ document.write(`
             <span class="n">idx_all_same</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;single_value&#39;</span><span class="p">:</span>
 
-            <span class="n">fixed_idx</span> <span class="o">=</span> <span class="n">_choose_idx_val</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">single_values_idx</span><span class="p">,</span> <span class="n">single_values_val</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">)</span>
+            <span class="n">fixed_idx</span> <span class="o">=</span> <span class="n">_choose_idx_val</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">single_values_idx</span><span class="p">,</span> <span class="n">single_values_val</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">)</span>
             
             <span class="k">if</span> <span class="n">fixed_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Arguments single_values_idx / single_values_val were not properly set. A sensible default was provided, but please beware.&quot;</span><span class="p">)</span>
@@ -1121,7 +1131,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This error should never be raised&quot;</span><span class="p">)</span>
             
-        <span class="n">relative_idx</span> <span class="o">=</span> <span class="n">_choose_idx_val</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">relative_to_idx</span><span class="p">,</span> <span class="n">relative_to_val</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">)</span>
+        <span class="n">relative_idx</span> <span class="o">=</span> <span class="n">_choose_idx_val</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">relative_to_idx</span><span class="p">,</span> <span class="n">relative_to_val</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">idx_all_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">idx_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">)</span>   

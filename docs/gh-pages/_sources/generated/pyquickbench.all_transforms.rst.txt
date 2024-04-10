@@ -1,0 +1,6 @@
+pyquickbench.all\_transforms
+============================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: all_transforms

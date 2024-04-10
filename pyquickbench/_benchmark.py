@@ -523,6 +523,10 @@ def plot_benchmark(
     n_colors = len(color_list)
     n_linestyle = len(linestyle_list)
     n_pointstyle = len(pointstyle_list)
+    
+    if not(transform is None):
+        if not(transform in all_transforms):
+            raise ValueError((f'Unknown transform {transform}. Possible values are: {all_transforms}'))
 
     if plot_intent is None:
         

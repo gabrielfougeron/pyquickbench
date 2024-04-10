@@ -533,13 +533,13 @@ to download the full example code</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-0.01010310 s at file 10-TimeTrains.py line 49
-0.02011686 s at file 10-TimeTrains.py line 52
-0.03015785 s at file 10-TimeTrains.py line 55
-0.04015569 s at file 10-TimeTrains.py line 58
-0.01009340 s at file 10-TimeTrains.py line 61
+0.01008426 s at file 10-TimeTrains.py line 49
+0.02013099 s at file 10-TimeTrains.py line 52
+0.03015346 s at file 10-TimeTrains.py line 55
+0.04011813 s at file 10-TimeTrains.py line 58
+0.01015280 s at file 10-TimeTrains.py line 61
 
-Total: 0.11062689 s
+Total: 0.11063964 s
 </pre></div>
 </div>
 <p>Individual calls to <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.toc.html#pyquickbench.TimeTrain.toc" title="pyquickbench.TimeTrain.toc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.toc()</span></code></a> can be named.</p>
@@ -558,14 +558,14 @@ Total: 0.11062689 s
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-repeated: 0.01006574 s at file 10-TimeTrains.py line 73
-repeated: 0.01010417 s at file 10-TimeTrains.py line 73
-repeated: 0.01010703 s at file 10-TimeTrains.py line 73
-unique 1: 0.01010890 s at file 10-TimeTrains.py line 77
-unique 2: 0.01014369 s at file 10-TimeTrains.py line 77
-unique 3: 0.01009737 s at file 10-TimeTrains.py line 77
+repeated: 0.01008986 s at file 10-TimeTrains.py line 73
+repeated: 0.01010078 s at file 10-TimeTrains.py line 73
+repeated: 0.01010297 s at file 10-TimeTrains.py line 73
+unique 1: 0.01009064 s at file 10-TimeTrains.py line 77
+unique 2: 0.01010823 s at file 10-TimeTrains.py line 77
+unique 3: 0.01012357 s at file 10-TimeTrains.py line 77
 
-Total: 0.06062690 s
+Total: 0.06061606 s
 </pre></div>
 </div>
 <p>Timing measurements relative to identical names can be reduced using any reduction method in <a class="reference internal" href="../../../generated/pyquickbench.all_reductions.html#pyquickbench.all_reductions" title="pyquickbench.all_reductions"><code class="xref py py-data docutils literal notranslate"><span class="pre">pyquickbench.all_reductions</span></code></a>.</p>
@@ -584,16 +584,16 @@ Total: 0.06062690 s
 <span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:83: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:87: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
   warnings.warn(&quot;include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.&quot;)
 TimeTrain results:
 
-repeated: 0.03030984 s at file 10-TimeTrains.py line 90
-unique 1: 0.01006910 s at file 10-TimeTrains.py line 94
-unique 2: 0.01010922 s at file 10-TimeTrains.py line 94
-unique 3: 0.01010709 s at file 10-TimeTrains.py line 94
+repeated: 0.03033866 s at file 10-TimeTrains.py line 90
+unique 1: 0.01013671 s at file 10-TimeTrains.py line 94
+unique 2: 0.01011385 s at file 10-TimeTrains.py line 94
+unique 3: 0.01009836 s at file 10-TimeTrains.py line 94
 
-Total: 0.06059525 s
+Total: 0.06068757 s
 </pre></div>
 </div>
 <p>Reductions make locations ill-defined, which is why <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain</span></code></a> is issuing a warning. Another good reason to disable location recording is that the corresponding call to <a class="reference external" href="https://docs.python.org/3/library/inspect.html#inspect.stack" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">inspect.stack()</span></code></a> can be non-negligible (around 0.01s on a generic laptop computer).
@@ -616,12 +616,12 @@ Displaying locations can be disabled like so:</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-repeated: 0.03053879 s
-unique 1: 0.01026060 s
-unique 2: 0.01016178 s
-unique 3: 0.01015036 s
+repeated: 0.03053862 s
+unique 1: 0.01027490 s
+unique 2: 0.01027506 s
+unique 3: 0.01028256 s
 
-Total: 0.06111154 s
+Total: 0.06137115 s
 </pre></div>
 </div>
 <p>Let’s revisit the benchmark in <a class="reference internal" href="09-Vector_output.html#sphx-glr-build-auto-examples-tutorial-09-vector-output-py"><span class="std std-ref">Vector outputs</span></a> and measure the execution time of different parts of the function <code class="docutils literal notranslate"><span class="pre">uniform_quantiles</span></code> using <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain</span></code></a>.</p>
