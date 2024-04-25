@@ -78,9 +78,6 @@ def run_benchmark(
     n_repeat : int, optional
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
-    n_repeat : int, optional
-        Length of function output.\n
-        By default ``1``.
     nproc : int, optional
         Number of workers in PoolExecutor.\n
         By default :func:`python:multiprocessing.cpu_count()`.

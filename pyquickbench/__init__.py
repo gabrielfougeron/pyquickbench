@@ -119,7 +119,7 @@ all_transforms = all_transforms
    List of all available data transformations to be used in :func:`pyquickbench.plot_benchmark`.
 
    * "pol_growth_order"  : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^\\alpha`.
-   * "pol_cvgence_order" :  Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
+   * "pol_cvgence_order" : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
 
    See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
 
