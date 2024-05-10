@@ -2,7 +2,6 @@ import os
 import timeit
 import math
 import inspect
-import concurrent.futures
 import copy
 import itertools
 
@@ -10,6 +9,9 @@ import numpy as np
 
 from pyquickbench._defaults import *
 from pyquickbench._time_train import TimeTrain
+
+if MULTIPROCESSING_AVAILABLE:
+    import concurrent.futures
 
 class AutoTimer(timeit.Timer):
     """
@@ -395,10 +397,12 @@ class PhonyProcessPoolExecutor(object):
 
 AllPoolExecutors = {
     "phony"         :   PhonyProcessPoolExecutor                ,
-    "thread"        :   concurrent.futures.ThreadPoolExecutor   ,
-    "process"       :   concurrent.futures.ProcessPoolExecutor  ,
 }
 
+if MULTIPROCESSING_AVAILABLE:
+    AllPoolExecutors["thread"] = concurrent.futures.ThreadPoolExecutor
+    AllPoolExecutors["process"] = concurrent.futures.ProcessPoolExecutor
+    
 def _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction):
 
     idx_vals = idx_vals.copy()

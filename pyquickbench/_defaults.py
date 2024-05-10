@@ -1,5 +1,11 @@
 import matplotlib as mpl
 import numpy as np
+try:
+    import multiprocessing
+    MULTIPROCESSING_AVAILABLE = True
+except:
+    MULTIPROCESSING_AVAILABLE = False
+
 
 default_ax_name = "n"
 fun_ax_name = "function"

@@ -3,8 +3,7 @@ import math
 import itertools
 import typing
 import warnings
-import multiprocessing
-
+    
 import numpy as np
 import numpy.typing
 import matplotlib.pyplot as plt
@@ -196,7 +195,10 @@ def run_benchmark(
                 pooltype = "process"                
         else:
             if nproc is None:
-                nproc = multiprocessing.cpu_count()
+                if MULTIPROCESSING_AVAILABLE:
+                    nproc = multiprocessing.cpu_count()
+                else:
+                    nproc = 1
                     
         try:
             PoolExecutor = AllPoolExecutors[pooltype]
