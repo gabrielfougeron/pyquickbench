@@ -2,6 +2,8 @@ import matplotlib as mpl
 import numpy as np
 try:
     import multiprocessing
+    import _multiprocessing
+    import concurrent.futures
     MULTIPROCESSING_AVAILABLE = True
 except:
     MULTIPROCESSING_AVAILABLE = False

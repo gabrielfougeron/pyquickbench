@@ -10,9 +10,6 @@ import numpy as np
 from pyquickbench._defaults import *
 from pyquickbench._time_train import TimeTrain
 
-if MULTIPROCESSING_AVAILABLE:
-    import concurrent.futures
-
 class AutoTimer(timeit.Timer):
     """
     Enhancing Cpython's timeit.Timer.autorange. cf https://github.com/python/cpython/blob/main/Lib/timeit.py
