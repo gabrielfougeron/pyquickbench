@@ -146,7 +146,7 @@ Since we know that typically, time measurements will be higher with higher value
 .. code-block:: Python
 
 
-    basename = f'long_bench_2'
+    basename = 'long_bench_2'
     timings_filename = os.path.join(timings_folder, basename+'.npz')
 
     MonotonicAxes = ["n"]

@@ -8,7 +8,6 @@ try:
 except:
     MULTIPROCESSING_AVAILABLE = False
 
-
 default_ax_name = "n"
 fun_ax_name = "function"
 repeat_ax_name = "repeat"

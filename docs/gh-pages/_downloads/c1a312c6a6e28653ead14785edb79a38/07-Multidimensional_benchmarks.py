@@ -32,7 +32,7 @@ if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Muldidim_bench'
+basename = 'Muldidim_bench'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 # sphinx_gallery_end_ignore

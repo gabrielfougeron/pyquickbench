@@ -30,7 +30,7 @@ if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files_time_consuming')
-basename = f'long_bench_1'
+basename = 'long_bench_1'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 # sphinx_gallery_end_ignore
@@ -131,7 +131,7 @@ pyquickbench.plot_benchmark(
 # 
 # Since we know that typically, time measurements will be higher with higher values of ``"n"``, we can declare ``"n"`` as a ``MonotonicAxes``. Pyquickbench will skip benchmarks for high values of the parameters declared in ``MonotonicAxes`` as soon as a certain ``timeout`` is reached. This allows much larger values to be explored at a reasonnable cpu cost.
 
-basename = f'long_bench_2'
+basename = 'long_bench_2'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 MonotonicAxes = ["n"]

@@ -155,7 +155,7 @@ class TimeTrain():
         out = ''
         
         if self.name == '':
-            out += f'TimeTrain results:\n\n'
+            out += 'TimeTrain results:\n\n'
         else:
             out += f'TimeTrain {self.name} results:\n\n'
             
@@ -206,7 +206,7 @@ class TimeTrain():
     def to_dict(
         self                                    ,
         return_first_instance : bool = False    ,
-        names_reduction = None                  ,
+        names_reduction : str | None = None       ,
     ):
         """
         Returns time measurements within a TimeTrain as a Python dictionnary
@@ -215,7 +215,8 @@ class TimeTrain():
         ----------
         return_first_instance : bool, optional
             Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
-
+        names_reduction :  str | None, optional
+            Optionally override the TimeTrain's reduction, by default None
         """        
         
         dict_list = {}
@@ -233,6 +234,8 @@ class TimeTrain():
                 
         if names_reduction is None:
             names_reduction = self.names_reduction
+        elif names_reduction == "no":
+            names_reduction = None
         
         if names_reduction is None:
             res = {name: np.array(l) for name, l in dict_list.items()}

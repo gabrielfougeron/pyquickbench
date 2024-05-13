@@ -67,7 +67,7 @@ timings_filename = "My_benchmark_file.npy"
 # sphinx_gallery_start_ignore
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Caching_benchmarks'
+basename = 'Caching_benchmarks'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
@@ -128,7 +128,7 @@ all_sizes_small = [2**n for n in range(n_bench)]
 # sphinx_gallery_start_ignore
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Caching_benchmarks_smaller'
+basename = 'Caching_benchmarks_smaller'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
@@ -178,7 +178,7 @@ timings_filename = "My_benchmark_file.npz"
 # sphinx_gallery_start_ignore
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Caching_benchmarks_smaller'
+basename = 'Caching_benchmarks_smaller'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 # sphinx_gallery_end_ignore
@@ -196,7 +196,7 @@ pyquickbench.run_benchmark(
 # sphinx_gallery_start_ignore
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Caching_benchmarks_lin'
+basename = 'Caching_benchmarks_lin'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 
 # sphinx_gallery_end_ignore

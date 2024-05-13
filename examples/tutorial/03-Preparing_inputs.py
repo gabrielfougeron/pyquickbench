@@ -31,7 +31,7 @@ if ("--no-show" in sys.argv):
 import pyquickbench
 
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Preparing_inputs_n'
+basename = 'Preparing_inputs_n'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 
 # sphinx_gallery_end_ignore
@@ -90,7 +90,7 @@ all_funs = [
 
 # sphinx_gallery_start_ignore
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'Preparing_inputs_x'
+basename = 'Preparing_inputs_x'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
 # sphinx_gallery_end_ignore
 

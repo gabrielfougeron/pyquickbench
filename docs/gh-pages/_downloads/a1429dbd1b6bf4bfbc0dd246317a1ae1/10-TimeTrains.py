@@ -29,7 +29,7 @@ if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
     
 timings_folder = os.path.join(__PROJECT_ROOT__,'examples','generated_files')
-basename = f'TimeTrain'
+basename = 'TimeTrain'
 timings_filename = os.path.join(timings_folder, basename+'.npy')
     
 import numpy as np

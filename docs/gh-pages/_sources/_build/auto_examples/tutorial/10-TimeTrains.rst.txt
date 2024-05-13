@@ -76,13 +76,13 @@ As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be use
 
     TimeTrain results:
 
-    0.01008426 s at file 10-TimeTrains.py line 49
-    0.02013099 s at file 10-TimeTrains.py line 52
-    0.03015346 s at file 10-TimeTrains.py line 55
-    0.04011813 s at file 10-TimeTrains.py line 58
-    0.01015280 s at file 10-TimeTrains.py line 61
+    0.01008941 s at file 10-TimeTrains.py line 49
+    0.02011453 s at file 10-TimeTrains.py line 52
+    0.03014266 s at file 10-TimeTrains.py line 55
+    0.04013044 s at file 10-TimeTrains.py line 58
+    0.01008304 s at file 10-TimeTrains.py line 61
 
-    Total: 0.11063964 s
+    Total: 0.11056009 s
 
 
 
@@ -119,14 +119,14 @@ Individual calls to :meth:`pyquickbench.TimeTrain.toc` can be named.
 
     TimeTrain results:
 
-    repeated: 0.01008986 s at file 10-TimeTrains.py line 73
-    repeated: 0.01010078 s at file 10-TimeTrains.py line 73
-    repeated: 0.01010297 s at file 10-TimeTrains.py line 73
-    unique 1: 0.01009064 s at file 10-TimeTrains.py line 77
-    unique 2: 0.01010823 s at file 10-TimeTrains.py line 77
-    unique 3: 0.01012357 s at file 10-TimeTrains.py line 77
+    repeated: 0.01010623 s at file 10-TimeTrains.py line 73
+    repeated: 0.01007090 s at file 10-TimeTrains.py line 73
+    repeated: 0.01014701 s at file 10-TimeTrains.py line 73
+    unique 1: 0.01009269 s at file 10-TimeTrains.py line 77
+    unique 2: 0.01009717 s at file 10-TimeTrains.py line 77
+    unique 3: 0.01009150 s at file 10-TimeTrains.py line 77
 
-    Total: 0.06061606 s
+    Total: 0.06060550 s
 
 
 
@@ -168,12 +168,12 @@ Timing measurements relative to identical names can be reduced using any reducti
       warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
     TimeTrain results:
 
-    repeated: 0.03033866 s at file 10-TimeTrains.py line 90
-    unique 1: 0.01013671 s at file 10-TimeTrains.py line 94
-    unique 2: 0.01011385 s at file 10-TimeTrains.py line 94
-    unique 3: 0.01009836 s at file 10-TimeTrains.py line 94
+    repeated: 0.03032099 s at file 10-TimeTrains.py line 90
+    unique 1: 0.01009115 s at file 10-TimeTrains.py line 94
+    unique 2: 0.01009654 s at file 10-TimeTrains.py line 94
+    unique 3: 0.01009300 s at file 10-TimeTrains.py line 94
 
-    Total: 0.06068757 s
+    Total: 0.06060169 s
 
 
 
@@ -215,12 +215,12 @@ Displaying locations can be disabled like so:
 
     TimeTrain results:
 
-    repeated: 0.03053862 s
-    unique 1: 0.01027490 s
-    unique 2: 0.01027506 s
-    unique 3: 0.01028256 s
+    repeated: 0.03042473 s
+    unique 1: 0.01013447 s
+    unique 2: 0.01015115 s
+    unique 3: 0.01015635 s
 
-    Total: 0.06137115 s
+    Total: 0.06086670 s
 
 
 

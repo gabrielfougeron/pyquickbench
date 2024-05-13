@@ -171,7 +171,7 @@ pyquickbench.plot_benchmark(
     bench                                   ,
     mode = "scalar_output"                  ,
     plot_ylim = plot_ylim                   ,
-    title = f'Relative error on integrand'  ,
+    title = 'Relative error on integrand'  ,
     ylabel = "Relative error"               ,
     show = True                             ,
 )

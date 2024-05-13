@@ -445,8 +445,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span>
-
+    
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.typing</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -640,7 +639,10 @@ document.write(`
                 <span class="n">pooltype</span> <span class="o">=</span> <span class="s2">&quot;process&quot;</span>                
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">nproc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">nproc</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">MULTIPROCESSING_AVAILABLE</span><span class="p">:</span>
+                    <span class="n">nproc</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">nproc</span> <span class="o">=</span> <span class="mi">1</span>
                     
         <span class="k">try</span><span class="p">:</span>
             <span class="n">PoolExecutor</span> <span class="o">=</span> <span class="n">AllPoolExecutors</span><span class="p">[</span><span class="n">pooltype</span><span class="p">]</span>
