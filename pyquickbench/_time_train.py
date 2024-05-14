@@ -3,6 +3,8 @@ import numpy as np
 import time
 import inspect
 import warnings
+import functools
+
 import typing
 import numpy.typing
 
@@ -23,8 +25,9 @@ class TimeTrain():
         include_lineno      : bool = True                       ,
         include_funname     : bool = True                       ,
         name                : str  = ''                         ,
-        align_toc_names     : bool = True                      ,
+        align_toc_names     : bool = True                       ,
         names_reduction     : typing.Union[str , None] = None   ,
+        global_tictoc_sync  : bool = True                       ,
     ):
         """ Returns a TimeTrain
 
@@ -58,6 +61,7 @@ class TimeTrain():
         self.max_name_len = 0
         self.name_set = set()
         self.n_names = 0
+        self.global_tictoc_sync = global_tictoc_sync
         
         if include_locs is None:
             include_locs = include_filename or include_lineno or include_funname
@@ -89,10 +93,10 @@ class TimeTrain():
         # This line goes at the very end for more precise measurements
         self.all_tocs = [time.perf_counter()]
         
-        
     def toc(
         self                ,
         name    : str = ''  ,
+        context_depth = 1   ,
     ):
         """
         Records a new wagon in the TimeTrain
@@ -120,7 +124,7 @@ class TimeTrain():
             self.max_name_len = max(self.max_name_len, len(name))
 
         if self.include_locs:
-            caller = inspect.getframeinfo(inspect.stack()[1][0])
+            caller = inspect.getframeinfo(inspect.stack(context=context_depth)[context_depth][0])
             
             toc_loc = ''
             if self.include_filename:
@@ -197,10 +201,10 @@ class TimeTrain():
                     out += f' at {self.all_tocs_locs[first[name]]}'
                     
                 out += '\n'
-        out += '\n'
+        if (self.n) > 0:                
+            out += '\n'
         out += f'Total: {self._total_time:.8f} s\n'
 
-            
         return out
     
     def to_dict(
@@ -251,3 +255,21 @@ class TimeTrain():
         
         return self.n_names
         
+    @property
+    def tictoc(self):
+
+        def decorator(fun):
+
+            @functools.wraps(fun)
+            def wrapper(*args, **kwargs):
+                if self.global_tictoc_sync:
+                    self.toc(tictoc_sync_name, context_depth=2)
+                else:
+                    self.toc(f'{tictoc_sync_name}_{fun.__name__}', context_depth=2)    
+                
+                fun(*args, **kwargs)
+                self.toc(fun.__name__, context_depth=2)
+            return wrapper
+                
+        return decorator   
+            

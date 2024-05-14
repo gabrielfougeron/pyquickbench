@@ -141,3 +141,5 @@ all_transforms = [
     'pol_growth_order'  ,
     'pol_cvgence_order' ,
 ]
+
+tictoc_sync_name = "sync"

@@ -1,14 +1,21 @@
-import inspect
+import pyquickbench
+import time
 
-def toto(a,b=1):
-    return None
+TT = pyquickbench.TimeTrain(name="Toto", include_locs=False, names_reduction="sum")
 
-sig = inspect.signature(toto)
+@TT.tictoc
+def wait(n):
+    time.sleep(n)    
 
-print(inspect.signature(toto))
-print(type(sig))
-print(dir(sig))
+def cantwait(n):
+    time.sleep(n)    
+    
+wait(0.1)
+wait(0.1)
 
+cantwait(0.3)
+TT.toc("cantwait")
 
-sig_str = str(sig)
-print(sig_str)
+wait(0.2)
+
+print(TT)
