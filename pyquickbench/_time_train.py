@@ -28,6 +28,7 @@ class TimeTrain():
         align_toc_names     : bool = True                       ,
         names_reduction     : typing.Union[str , None] = None   ,
         global_tictoc_sync  : bool = True                       ,
+        ignore_names        : typing.Iterable[str]  = None      ,
     ):
         """ Returns a TimeTrain
 
@@ -49,6 +50,11 @@ class TimeTrain():
             Whether to align toc names when printing the TimeTrain, by default True
         names_reduction : str | None, optional
             Reduction to be applied to tocs that share the same name, by default None
+        global_tictoc_sync : bool, optional
+            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function, by default True.
+        ignore_names : str | None, optional
+            Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.
+            By default None
 
         """    
         
@@ -61,7 +67,14 @@ class TimeTrain():
         self.max_name_len = 0
         self.name_set = set()
         self.n_names = 0
+        self.context_depth = 1
         self.global_tictoc_sync = global_tictoc_sync
+        self.sum_notignored_time = 0
+        
+        if ignore_names is None:
+            self.ignore_names = default_TimeTrain_ignore_names
+        else:
+             self.ignore_names = ignore_names
         
         if include_locs is None:
             include_locs = include_filename or include_lineno or include_funname
@@ -96,7 +109,6 @@ class TimeTrain():
     def toc(
         self                ,
         name    : str = ''  ,
-        context_depth = 1   ,
     ):
         """
         Records a new wagon in the TimeTrain
@@ -114,17 +126,20 @@ class TimeTrain():
         elif not(isinstance(name, str)):
             name = str(name)
             
+        ignore = name in self.ignore_names
+            
         self.n += 1
         self.all_tocs.append(tbeg)
         self.all_tocs_names.append(name)
-        
+
         if name not in self.name_set:
             self.name_set.add(name)
             self.n_names +=1 
-            self.max_name_len = max(self.max_name_len, len(name))
+            if not ignore:
+                self.max_name_len = max(self.max_name_len, len(name)+1)
 
         if self.include_locs:
-            caller = inspect.getframeinfo(inspect.stack(context=context_depth)[context_depth][0])
+            caller = inspect.getframeinfo(inspect.stack(context=self.context_depth)[self.context_depth][0])
             
             toc_loc = ''
             if self.include_filename:
@@ -146,16 +161,13 @@ class TimeTrain():
         dt = tend-tbeg
         self.all_tocs_record_time.append(dt)
         self.all_tocs_record_time_sum += dt
-        
+
     def _get_recorded_time(self, idx):
         return self.all_tocs[idx+1]-(self.all_tocs[idx] + self.all_tocs_record_time[idx])
 
-    @property
-    def _total_time(self):
-        return self.all_tocs[self.n]-self.all_tocs[0]-self.all_tocs_record_time_sum + self.all_tocs_record_time[self.n]
-        
     def __repr__(self): 
         
+        total_time = 0
         out = ''
         
         if self.name == '':
@@ -167,21 +179,26 @@ class TimeTrain():
             
             for i in range(self.n):
 
-                name = self.all_tocs_names[i]            
+                name = self.all_tocs_names[i]    
                 
-                if self.align_toc_names:
-                    filler = ' ' * (self.max_name_len - len(name))
-                else:
-                    filler = ''
-                
-                if name != '':
-                    out += f'{name}{filler}: '
-                
-                out += f'{self._get_recorded_time(i):.8f} s'
-                if self.include_locs:
-                    out += f' at {self.all_tocs_locs[i]}'
+                if name not in self.ignore_names:        
                     
-                out += '\n'
+                    if self.align_toc_names:
+                        filler = ' ' * (self.max_name_len - len(name))
+                    else:
+                        filler = ''
+                    
+                    if name != '':
+                        out += f'{name}{filler}: '
+                    
+                    time = self._get_recorded_time(i)
+                    total_time += time
+                    
+                    out += f'{time:.8f} s'
+                    if self.include_locs:
+                        out += f' at {self.all_tocs_locs[i]}'
+                        
+                    out += '\n'
         
         else:
             
@@ -195,22 +212,27 @@ class TimeTrain():
                 
                 if name != '':
                     out += f'{name}{filler}: '
+                
+                time = self.names_reduction(arr)
+                total_time += time
                     
-                out += f'{self.names_reduction(arr):.8f} s'
+                out += f'{time:.8f} s'
                 if self.include_locs:
                     out += f' at {self.all_tocs_locs[first[name]]}'
                     
                 out += '\n'
+                
         if (self.n) > 0:                
             out += '\n'
-        out += f'Total: {self._total_time:.8f} s\n'
+            
+        out += f'Total: {total_time:.8f} s\n'
 
         return out
     
     def to_dict(
-        self                                    ,
-        return_first_instance : bool = False    ,
-        names_reduction : str | None = None       ,
+        self                                                                ,
+        return_first_instance   : bool                          = False     ,
+        names_reduction         : typing.Callable | str | None  = "default" ,
     ):
         """
         Returns time measurements within a TimeTrain as a Python dictionnary
@@ -220,7 +242,9 @@ class TimeTrain():
         return_first_instance : bool, optional
             Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
         names_reduction :  str | None, optional
-            Optionally override the TimeTrain's reduction, by default None
+            Optionally override the TimeTrain's reduction.
+            Set to "default" to not override reduction.
+            By default None
         """        
         
         dict_list = {}
@@ -236,15 +260,13 @@ class TimeTrain():
             else:
                 toclist.append(t)
                 
-        if names_reduction is None:
+        if names_reduction == "default":
             names_reduction = self.names_reduction
-        elif names_reduction == "no":
-            names_reduction = None
-        
+
         if names_reduction is None:
-            res = {name: np.array(l) for name, l in dict_list.items()}
+            res = {name: np.array(l) for name, l in dict_list.items() if name not in self.ignore_names}
         else:
-            res = {name: names_reduction(np.array(l)) for name, l in dict_list.items()}
+            res = {name: names_reduction(np.array(l)) for name, l in dict_list.items() if name not in self.ignore_names}
             
         if return_first_instance:
             return res, dict_first
@@ -257,18 +279,29 @@ class TimeTrain():
         
     @property
     def tictoc(self):
+        """
+        Decorates a function to record a new wagon in the TimeTrain before and after each call.
+        By default, the first wagon is used for synchronization and is ignored.
+        """        
 
         def decorator(fun):
 
             @functools.wraps(fun)
             def wrapper(*args, **kwargs):
+                
+                context_depth_prev = self.context_depth
+                self.context_depth = 2
+                
                 if self.global_tictoc_sync:
-                    self.toc(tictoc_sync_name, context_depth=2)
+                    self.toc(tictoc_sync_name)
                 else:
-                    self.toc(f'{tictoc_sync_name}_{fun.__name__}', context_depth=2)    
+                    self.toc(f'{tictoc_sync_name}_{wrapper.__name__}')    
                 
                 fun(*args, **kwargs)
-                self.toc(fun.__name__, context_depth=2)
+                
+                self.toc(wrapper.__name__)
+                self.context_depth = context_depth_prev
+            
             return wrapper
                 
         return decorator   

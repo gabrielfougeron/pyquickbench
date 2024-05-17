@@ -117,6 +117,78 @@ print(TT)
 
 
 # %% 
+# TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrumemnt a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
+
+TT = pyquickbench.TimeTrain()
+
+@TT.tictoc
+def wait_a_bit():
+    time.sleep(0.01)
+
+@TT.tictoc
+def wait_more():
+    time.sleep(0.01)
+    
+
+wait_a_bit()
+wait_more()
+
+print(TT)
+
+# %% 
+# Using :meth:`pyquickbench.TimeTrain.tictoc` with a regular wrapping syntax might lead to surprizing results:
+    
+TT = pyquickbench.TimeTrain()
+    
+def wait_unrecorded():
+    time.sleep(0.01)
+    
+wait_recorded = TT.tictoc(wait_unrecorded)
+
+wait_unrecorded()
+wait_recorded()
+
+print(TT)
+
+# %% 
+# This behavior is to be expected because under the hood, :meth:`pyquickbench.TimeTrain.tictoc` uses the __name__ attribute of the wrapped function. 
+    
+print(f'{wait_recorded.__name__ = }')
+
+# %% 
+# Overriding the __name__ of the wrapped function gives the expected result:
+
+TT = pyquickbench.TimeTrain()
+    
+def wait_unrecorded():
+    time.sleep(0.01)
+    
+wait_recorded = TT.tictoc(wait_unrecorded)
+wait_recorded.__name__ = 'wait_recorded'
+
+wait_unrecorded()
+wait_recorded()
+
+print(TT)
+
+# %% 
+# By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in between decorated function. This behavior can be overriden setting the ignore_names argument to an empty iterator:
+
+TT = pyquickbench.TimeTrain(ignore_names = [])
+    
+def wait_unrecorded():
+    time.sleep(0.01)
+    
+wait_recorded = TT.tictoc(wait_unrecorded)
+wait_recorded.__name__ = 'wait_recorded'
+
+wait_unrecorded()
+wait_recorded()
+
+print(TT)
+
+
+# %% 
 # Let's revisit the benchmark in :ref:`sphx_glr__build_auto_examples_tutorial_09-Vector_output.py` and measure the execution time of different parts of the function ``uniform_quantiles`` using :class:`pyquickbench.TimeTrain`.
 # 
 

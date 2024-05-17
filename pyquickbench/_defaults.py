@@ -142,4 +142,8 @@ all_transforms = [
     'pol_cvgence_order' ,
 ]
 
-tictoc_sync_name = "sync"
+tictoc_sync_name = "pyquickbench_sync"
+
+default_TimeTrain_ignore_names = set((
+    tictoc_sync_name    ,
+))

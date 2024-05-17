@@ -26,6 +26,7 @@ Provides rudimentary profiling features to be used with :mod:`pyquickbench`.
 
    TimeTrain
    TimeTrain.toc
+   TimeTrain.tictoc
    TimeTrain.to_dict
    
 =========
