@@ -533,13 +533,13 @@ to download the full example code</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-0.01008941 s at file 10-TimeTrains.py line 49
-0.02011453 s at file 10-TimeTrains.py line 52
-0.03014266 s at file 10-TimeTrains.py line 55
-0.04013044 s at file 10-TimeTrains.py line 58
-0.01008304 s at file 10-TimeTrains.py line 61
+0.01009467 s at file 10-TimeTrains.py line 49
+0.02014281 s at file 10-TimeTrains.py line 52
+0.03006505 s at file 10-TimeTrains.py line 55
+0.04016680 s at file 10-TimeTrains.py line 58
+0.01009727 s at file 10-TimeTrains.py line 61
 
-Total: 0.11056009 s
+Total: 0.11056659 s
 </pre></div>
 </div>
 <p>Individual calls to <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.toc.html#pyquickbench.TimeTrain.toc" title="pyquickbench.TimeTrain.toc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.toc()</span></code></a> can be named.</p>
@@ -558,14 +558,14 @@ Total: 0.11056009 s
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-repeated: 0.01010623 s at file 10-TimeTrains.py line 73
-repeated: 0.01007090 s at file 10-TimeTrains.py line 73
-repeated: 0.01014701 s at file 10-TimeTrains.py line 73
-unique 1: 0.01009269 s at file 10-TimeTrains.py line 77
-unique 2: 0.01009717 s at file 10-TimeTrains.py line 77
-unique 3: 0.01009150 s at file 10-TimeTrains.py line 77
+repeated : 0.01009308 s at file 10-TimeTrains.py line 73
+repeated : 0.01009290 s at file 10-TimeTrains.py line 73
+repeated : 0.01013636 s at file 10-TimeTrains.py line 73
+unique 1 : 0.01018333 s at file 10-TimeTrains.py line 77
+unique 2 : 0.01008358 s at file 10-TimeTrains.py line 77
+unique 3 : 0.01008128 s at file 10-TimeTrains.py line 77
 
-Total: 0.06060550 s
+Total: 0.06067054 s
 </pre></div>
 </div>
 <p>Timing measurements relative to identical names can be reduced using any reduction method in <a class="reference internal" href="../../../generated/pyquickbench.all_reductions.html#pyquickbench.all_reductions" title="pyquickbench.all_reductions"><code class="xref py py-data docutils literal notranslate"><span class="pre">pyquickbench.all_reductions</span></code></a>.</p>
@@ -584,16 +584,16 @@ Total: 0.06060550 s
 <span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:87: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:104: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
   warnings.warn(&quot;include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.&quot;)
 TimeTrain results:
 
-repeated: 0.03032099 s at file 10-TimeTrains.py line 90
-unique 1: 0.01009115 s at file 10-TimeTrains.py line 94
-unique 2: 0.01009654 s at file 10-TimeTrains.py line 94
-unique 3: 0.01009300 s at file 10-TimeTrains.py line 94
+repeated : 0.03034493 s at file 10-TimeTrains.py line 90
+unique 1 : 0.01009325 s at file 10-TimeTrains.py line 94
+unique 2 : 0.01008473 s at file 10-TimeTrains.py line 94
+unique 3 : 0.01007467 s at file 10-TimeTrains.py line 94
 
-Total: 0.06060169 s
+Total: 0.06059758 s
 </pre></div>
 </div>
 <p>Reductions make locations ill-defined, which is why <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain</span></code></a> is issuing a warning. Another good reason to disable location recording is that the corresponding call to <a class="reference external" href="https://docs.python.org/3/library/inspect.html#inspect.stack" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">inspect.stack()</span></code></a> can be non-negligible (around 0.01s on a generic laptop computer).
@@ -616,12 +616,133 @@ Displaying locations can be disabled like so:</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
 
-repeated: 0.03042473 s
-unique 1: 0.01013447 s
-unique 2: 0.01015115 s
-unique 3: 0.01015635 s
+repeated : 0.03041307 s
+unique 1 : 0.01015998 s
+unique 2 : 0.01018401 s
+unique 3 : 0.01024113 s
 
-Total: 0.06086670 s
+Total: 0.06099818 s
+</pre></div>
+</div>
+<p>TimeTrains can also time calls to a function. The function <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.tictoc()</span></code></a> will instrumemnt a given function to record its execution time. The most starightforward is to use <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.tictoc()</span></code></a> with a decorator syntax:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">TT</span> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">TimeTrain</span><span class="p">()</span>
+
+<span class="nd">@TT</span><span class="o">.</span><span class="n">tictoc</span>
+<span class="k">def</span> <span class="nf">wait_a_bit</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="nd">@TT</span><span class="o">.</span><span class="n">tictoc</span>
+<span class="k">def</span> <span class="nf">wait_more</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+
+<span class="n">wait_a_bit</span><span class="p">()</span>
+<span class="n">wait_more</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
+
+wait_a_bit : 0.01011929 s at file 10-TimeTrains.py line 133
+wait_more  : 0.01009280 s at file 10-TimeTrains.py line 134
+
+Total: 0.02021209 s
+</pre></div>
+</div>
+<p>Using <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.tictoc()</span></code></a> with a regular wrapping syntax might lead to surprizing results:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">TT</span> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">TimeTrain</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">wait_unrecorded</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">wait_recorded</span> <span class="o">=</span> <span class="n">TT</span><span class="o">.</span><span class="n">tictoc</span><span class="p">(</span><span class="n">wait_unrecorded</span><span class="p">)</span>
+
+<span class="n">wait_unrecorded</span><span class="p">()</span>
+<span class="n">wait_recorded</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
+
+wait_unrecorded : 0.01011512 s at file 10-TimeTrains.py line 149
+
+Total: 0.01011512 s
+</pre></div>
+</div>
+<p>This behavior is to be expected because under the hood, <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.tictoc()</span></code></a> uses the <code class="docutils literal notranslate"><span class="pre">__name__</span></code> attribute of the wrapped function.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">wait_recorded</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="si">= }</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>wait_recorded.__name__ = &#39;wait_unrecorded&#39;
+</pre></div>
+</div>
+<p>Overriding the <code class="docutils literal notranslate"><span class="pre">__name__</span></code> of the wrapped function gives the expected result:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">TT</span> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">TimeTrain</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">wait_unrecorded</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">wait_recorded</span> <span class="o">=</span> <span class="n">TT</span><span class="o">.</span><span class="n">tictoc</span><span class="p">(</span><span class="n">wait_unrecorded</span><span class="p">)</span>
+<span class="n">wait_recorded</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;wait_recorded&#39;</span>
+
+<span class="n">wait_unrecorded</span><span class="p">()</span>
+<span class="n">wait_recorded</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
+
+wait_recorded : 0.01008321 s at file 10-TimeTrains.py line 170
+
+Total: 0.01008321 s
+</pre></div>
+</div>
+<p>More simply, you can set a custom name with the following syntax:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">TT</span> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">TimeTrain</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">wait_unrecorded</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">wait_recorded</span> <span class="o">=</span> <span class="n">TT</span><span class="o">.</span><span class="n">tictoc</span><span class="p">(</span><span class="n">wait_unrecorded</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;my_custom_name&quot;</span><span class="p">)</span>
+
+<span class="n">wait_unrecorded</span><span class="p">()</span>
+<span class="n">wait_recorded</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
+
+my_custom_name : 0.01012475 s at file 10-TimeTrains.py line 184
+
+Total: 0.01012475 s
+</pre></div>
+</div>
+<p>By default, a <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain</span></code></a> will not show timings occuring in between decorated function. This behavior can be overriden setting the <code class="docutils literal notranslate"><span class="pre">ignore_names</span></code> argument to an empty iterator:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">TT</span> <span class="o">=</span> <span class="n">pyquickbench</span><span class="o">.</span><span class="n">TimeTrain</span><span class="p">(</span><span class="n">ignore_names</span> <span class="o">=</span> <span class="p">[])</span>
+
+<span class="k">def</span> <span class="nf">wait_unrecorded</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="nd">@TT</span><span class="o">.</span><span class="n">tictoc</span>
+<span class="k">def</span> <span class="nf">wait_recorded</span><span class="p">():</span>
+    <a href="https://docs.python.org/3/library/time.html#time.sleep" title="time.sleep" class="sphx-glr-backref-module-time sphx-glr-backref-type-py-function"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span></a><span class="p">(</span><span class="mf">0.02</span><span class="p">)</span>
+
+<span class="n">wait_unrecorded</span><span class="p">()</span>
+<span class="n">wait_recorded</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">TT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>TimeTrain results:
+
+pyquickbench_sync : 0.01010550 s at file 10-TimeTrains.py line 201
+wait_recorded     : 0.02009903 s at file 10-TimeTrains.py line 201
+
+Total: 0.03020453 s
 </pre></div>
 </div>
 <p>Let’s revisit the benchmark in <a class="reference internal" href="09-Vector_output.html#sphx-glr-build-auto-examples-tutorial-09-vector-output-py"><span class="std std-ref">Vector outputs</span></a> and measure the execution time of different parts of the function <code class="docutils literal notranslate"><span class="pre">uniform_quantiles</span></code> using <a class="reference internal" href="../../../generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain" title="pyquickbench.TimeTrain"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain</span></code></a>.</p>

@@ -21,4 +21,10 @@ pyquickbench.TimeTrain
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TimeTrain.tictoc
+   
    

@@ -1,0 +1,6 @@
+pyquickbench.TimeTrain.tictoc
+=============================
+
+.. currentmodule:: pyquickbench
+
+.. autoproperty:: TimeTrain.tictoc

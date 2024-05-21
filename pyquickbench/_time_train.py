@@ -51,7 +51,7 @@ class TimeTrain():
         names_reduction : str | None, optional
             Reduction to be applied to tocs that share the same name, by default None
         global_tictoc_sync : bool, optional
-            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function, by default True.
+            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function. By default True.
         ignore_names : str | None, optional
             Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.
             By default None
@@ -111,12 +111,15 @@ class TimeTrain():
         name    : str = ''  ,
     ):
         """
-        Records a new wagon in the TimeTrain
+        Records a new wagon in the TimeTrain.
+        
+        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.  
 
         Parameters
         ----------
         name : str, optional
-            _description_, by default ''
+            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n
+            By default ''
         """        
         
         tbeg = time.perf_counter()
@@ -165,7 +168,17 @@ class TimeTrain():
     def _get_recorded_time(self, idx):
         return self.all_tocs[idx+1]-(self.all_tocs[idx] + self.all_tocs_record_time[idx])
 
-    def __repr__(self): 
+    def __str__(self): 
+        """
+        __str__ _summary_
+
+        _extended_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """        
         
         total_time = 0
         out = ''
@@ -237,14 +250,17 @@ class TimeTrain():
         """
         Returns time measurements within a TimeTrain as a Python dictionnary
 
+        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.    
+
         Parameters
         ----------
         return_first_instance : bool, optional
             Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
         names_reduction :  str | None, optional
-            Optionally override the TimeTrain's reduction.
+            Optionally overrides the TimeTrain's reduction.
             Set to "default" to not override reduction.
             By default None
+            
         """        
         
         dict_list = {}
@@ -280,14 +296,29 @@ class TimeTrain():
     @property
     def tictoc(self):
         """
-        Decorates a function to record a new wagon in the TimeTrain before and after each call.
-        By default, the first wagon is used for synchronization and is ignored.
+        Decorates a function to record a new wagon in the TimeTrain before and after each call.\n
+        By default, the first wagon (used for synchronization) is ignored.
+        
+        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example. 
+        
+        Parameters
+        ----------
+        name :  str | None, optional
+            Optionally overrides the wrapped function's name.\n
+            By default None
+            
         """        
 
-        def decorator(fun):
-
+        def decorator(fun, name=None):
+            
             @functools.wraps(fun)
             def wrapper(*args, **kwargs):
+                
+                # Subtle python compiler behavior
+                if name is None:
+                    the_name = wrapper.__name__
+                else:
+                    the_name = name
                 
                 context_depth_prev = self.context_depth
                 self.context_depth = 2
@@ -295,11 +326,11 @@ class TimeTrain():
                 if self.global_tictoc_sync:
                     self.toc(tictoc_sync_name)
                 else:
-                    self.toc(f'{tictoc_sync_name}_{wrapper.__name__}')    
+                    self.toc(f'{tictoc_sync_name}_{the_name}')    
                 
                 fun(*args, **kwargs)
                 
-                self.toc(wrapper.__name__)
+                self.toc(the_name)
                 self.context_depth = context_depth_prev
             
             return wrapper

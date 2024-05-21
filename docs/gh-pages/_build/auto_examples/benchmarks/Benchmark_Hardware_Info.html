@@ -531,29 +531,12 @@ to download the full example code</p>
           bus info: cpu@0
           width: 64 bits
           capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp x86-64 constant_tsc arch_perfmon rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid pni pclmulqdq ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect md_clear flush_l1d arch_capabilities
-     *-scsi
-          description: SCSI storage controller
-          product: Virtio console
-          vendor: Red Hat, Inc.
-          physical id: 2
-          bus info: pci@1355:00:00.0
-          version: 01
-          width: 64 bits
-          clock: 33MHz
-          capabilities: scsi bus_master cap_list
-          configuration: driver=virtio-pci latency=64
-          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
-        *-virtio0 UNCLAIMED
-             description: Virtual I/O device
-             physical id: 0
-             bus info: virtio@0
-             configuration: driver=virtio_console
      *-generic
           description: System peripheral
           product: Red Hat, Inc.
           vendor: Red Hat, Inc.
-          physical id: 3
-          bus info: pci@33bc:00:00.0
+          physical id: 2
+          bus info: pci@2581:00:00.0
           version: 01
           width: 64 bits
           clock: 33MHz
@@ -569,20 +552,37 @@ to download the full example code</p>
           description: 3D controller
           product: Microsoft Corporation
           vendor: Microsoft Corporation
-          physical id: 4
-          bus info: pci@bba5:00:00.0
+          physical id: 3
+          bus info: pci@66f1:00:00.0
           version: 00
           width: 32 bits
           clock: 33MHz
           capabilities: bus_master cap_list
           configuration: driver=dxgkrnl latency=0
           resources: irq:0
+     *-scsi
+          description: SCSI storage controller
+          product: Virtio console
+          vendor: Red Hat, Inc.
+          physical id: 4
+          bus info: pci@871f:00:00.0
+          version: 01
+          width: 64 bits
+          clock: 33MHz
+          capabilities: scsi bus_master cap_list
+          configuration: driver=virtio-pci latency=64
+          resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
+        *-virtio0 UNCLAIMED
+             description: Virtual I/O device
+             physical id: 0
+             bus info: virtio@0
+             configuration: driver=virtio_console
      *-display:1
           description: 3D controller
           product: Microsoft Corporation
           vendor: Microsoft Corporation
           physical id: 5
-          bus info: pci@c72f:00:00.0
+          bus info: pci@eda6:00:00.0
           version: 00
           width: 32 bits
           clock: 33MHz
@@ -598,7 +598,7 @@ to download the full example code</p>
        description: Ethernet interface
        physical id: 1
        logical name: eth0
-       serial: 00:15:5d:c9:c9:aa
+       serial: 00:15:5d:bf:51:83
        size: 10Gbit/s
        capabilities: ethernet physical
        configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.146.1-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s

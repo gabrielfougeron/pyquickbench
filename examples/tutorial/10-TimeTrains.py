@@ -151,12 +151,12 @@ wait_recorded()
 print(TT)
 
 # %% 
-# This behavior is to be expected because under the hood, :meth:`pyquickbench.TimeTrain.tictoc` uses the __name__ attribute of the wrapped function. 
+# This behavior is to be expected because under the hood, :meth:`pyquickbench.TimeTrain.tictoc` uses the ``__name__`` attribute of the wrapped function. 
     
 print(f'{wait_recorded.__name__ = }')
 
 # %% 
-# Overriding the __name__ of the wrapped function gives the expected result:
+# Overriding the ``__name__`` of the wrapped function gives the expected result:
 
 TT = pyquickbench.TimeTrain()
     
@@ -170,17 +170,32 @@ wait_unrecorded()
 wait_recorded()
 
 print(TT)
+# %% 
+# More simply, you can set a custom name with the following syntax:
+
+TT = pyquickbench.TimeTrain()
+    
+def wait_unrecorded():
+    time.sleep(0.01)
+    
+wait_recorded = TT.tictoc(wait_unrecorded, name = "my_custom_name")
+
+wait_unrecorded()
+wait_recorded()
+
+print(TT)
 
 # %% 
-# By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in between decorated function. This behavior can be overriden setting the ignore_names argument to an empty iterator:
+# By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in between decorated function. This behavior can be overriden setting the ``ignore_names`` argument to an empty iterator:
 
 TT = pyquickbench.TimeTrain(ignore_names = [])
     
 def wait_unrecorded():
     time.sleep(0.01)
     
-wait_recorded = TT.tictoc(wait_unrecorded)
-wait_recorded.__name__ = 'wait_recorded'
+@TT.tictoc
+def wait_recorded():
+    time.sleep(0.02)
 
 wait_unrecorded()
 wait_recorded()

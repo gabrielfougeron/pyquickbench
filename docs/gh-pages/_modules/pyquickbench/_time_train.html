@@ -445,6 +445,8 @@ document.write(`
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
 <span class="kn">import</span> <span class="nn">typing</span>
 <span class="kn">import</span> <span class="nn">numpy.typing</span>
 
@@ -469,8 +471,10 @@ document.write(`
         <span class="n">include_lineno</span>      <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                       <span class="p">,</span>
         <span class="n">include_funname</span>     <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                       <span class="p">,</span>
         <span class="n">name</span>                <span class="p">:</span> <span class="nb">str</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span>                         <span class="p">,</span>
-        <span class="n">align_toc_names</span>     <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                      <span class="p">,</span>
+        <span class="n">align_toc_names</span>     <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                       <span class="p">,</span>
         <span class="n">names_reduction</span>     <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span> <span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>   <span class="p">,</span>
+        <span class="n">global_tictoc_sync</span>  <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                       <span class="p">,</span>
+        <span class="n">ignore_names</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="o">=</span> <span class="kc">None</span>      <span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns a TimeTrain</span>
 
@@ -492,6 +496,11 @@ document.write(`
 <span class="sd">            Whether to align toc names when printing the TimeTrain, by default True</span>
 <span class="sd">        names_reduction : str | None, optional</span>
 <span class="sd">            Reduction to be applied to tocs that share the same name, by default None</span>
+<span class="sd">        global_tictoc_sync : bool, optional</span>
+<span class="sd">            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function. By default True.</span>
+<span class="sd">        ignore_names : str | None, optional</span>
+<span class="sd">            Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.</span>
+<span class="sd">            By default None</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>    
         
@@ -504,6 +513,14 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_names</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_tictoc_sync</span> <span class="o">=</span> <span class="n">global_tictoc_sync</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum_notignored_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="k">if</span> <span class="n">ignore_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span> <span class="o">=</span> <span class="n">default_TimeTrain_ignore_names</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span> <span class="o">=</span> <span class="n">ignore_names</span>
         
         <span class="k">if</span> <span class="n">include_locs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">include_locs</span> <span class="o">=</span> <span class="n">include_filename</span> <span class="ow">or</span> <span class="n">include_lineno</span> <span class="ow">or</span> <span class="n">include_funname</span>
@@ -536,7 +553,6 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()]</span></div>
 
         
-        
 <div class="viewcode-block" id="TimeTrain.toc">
 <a class="viewcode-back" href="../../generated/pyquickbench.TimeTrain.toc.html#pyquickbench.TimeTrain.toc">[docs]</a>
     <span class="k">def</span> <span class="nf">toc</span><span class="p">(</span>
@@ -544,12 +560,15 @@ document.write(`
         <span class="n">name</span>    <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Records a new wagon in the TimeTrain</span>
+<span class="sd">        Records a new wagon in the TimeTrain.</span>
+<span class="sd">        </span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.  </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name : str, optional</span>
-<span class="sd">            _description_, by default &#39;&#39;</span>
+<span class="sd">            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n</span>
+<span class="sd">            By default &#39;&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="n">tbeg</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -559,17 +578,20 @@ document.write(`
         <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             
+        <span class="n">ignore</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span>
+            
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tbeg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_set</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_names</span> <span class="o">+=</span><span class="mi">1</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
-            <span class="n">caller</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getframeinfo</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">caller</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getframeinfo</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
             
             <span class="n">toc_loc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_filename</span><span class="p">:</span>
@@ -592,16 +614,23 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time_sum</span> <span class="o">+=</span> <span class="n">dt</span></div>
 
-        
+
     <span class="k">def</span> <span class="nf">_get_recorded_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time_sum</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        __str__ _summary_</span>
+
+<span class="sd">        _extended_summary_</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        _type_</span>
+<span class="sd">            _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
         
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
-        
+        <span class="n">total_time</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
@@ -613,21 +642,26 @@ document.write(`
             
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
 
-                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>            
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>    
                 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_toc_names</span><span class="p">:</span>
-                    <span class="n">filler</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">filler</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                
-                <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">filler</span><span class="si">}</span><span class="s1">: &#39;</span>
-                
-                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_time</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
-                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_locs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span><span class="p">:</span>        
                     
-                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_toc_names</span><span class="p">:</span>
+                        <span class="n">filler</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_name_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">filler</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    
+                    <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">filler</span><span class="si">}</span><span class="s1">: &#39;</span>
+                    
+                    <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_time</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">total_time</span> <span class="o">+=</span> <span class="n">time</span>
+                    
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_locs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                        
+                    <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         
         <span class="k">else</span><span class="p">:</span>
             
@@ -641,34 +675,44 @@ document.write(`
                 
                 <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">filler</span><span class="si">}</span><span class="s1">: &#39;</span>
+                
+                <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">names_reduction</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                <span class="n">total_time</span> <span class="o">+=</span> <span class="n">time</span>
                     
-                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">names_reduction</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_locs</span><span class="p">[</span><span class="n">first</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span><span class="si">}</span><span class="s1">&#39;</span>
                     
                 <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;Total: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s</span><span class="se">\n</span><span class="s1">&#39;</span>
-
+                
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>                
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
             
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;Total: </span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s</span><span class="se">\n</span><span class="s1">&#39;</span>
+
         <span class="k">return</span> <span class="n">out</span>
     
 <div class="viewcode-block" id="TimeTrain.to_dict">
 <a class="viewcode-back" href="../../generated/pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span>
-        <span class="bp">self</span>                                    <span class="p">,</span>
-        <span class="n">return_first_instance</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>    <span class="p">,</span>
-        <span class="n">names_reduction</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>       <span class="p">,</span>
+        <span class="bp">self</span>                                                                <span class="p">,</span>
+        <span class="n">return_first_instance</span>   <span class="p">:</span> <span class="nb">bool</span>                          <span class="o">=</span> <span class="kc">False</span>     <span class="p">,</span>
+        <span class="n">names_reduction</span>         <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>  <span class="o">=</span> <span class="s2">&quot;default&quot;</span> <span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns time measurements within a TimeTrain as a Python dictionnary</span>
+
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.    </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        return_first_instance : bool, optional</span>
 <span class="sd">            Whether to also return a dictionnary containing the index of the first occurence of every name, by default False</span>
 <span class="sd">        names_reduction :  str | None, optional</span>
-<span class="sd">            Optionally override the TimeTrain&#39;s reduction, by default None</span>
+<span class="sd">            Optionally overrides the TimeTrain&#39;s reduction.</span>
+<span class="sd">            Set to &quot;default&quot; to not override reduction.</span>
+<span class="sd">            By default None</span>
+<span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="n">dict_list</span> <span class="o">=</span> <span class="p">{}</span>
@@ -684,15 +728,13 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">toclist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
                 
-        <span class="k">if</span> <span class="n">names_reduction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">names_reduction</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
             <span class="n">names_reduction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">names_reduction</span>
-        <span class="k">elif</span> <span class="n">names_reduction</span> <span class="o">==</span> <span class="s2">&quot;no&quot;</span><span class="p">:</span>
-            <span class="n">names_reduction</span> <span class="o">=</span> <span class="kc">None</span>
-        
+
         <span class="k">if</span> <span class="n">names_reduction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">dict_list</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">dict_list</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">names_reduction</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">dict_list</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">names_reduction</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">dict_list</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span><span class="p">}</span>
             
         <span class="k">if</span> <span class="n">return_first_instance</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">dict_first</span>
@@ -702,9 +744,53 @@ document.write(`
     
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_names</span></div>
-
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_names</span>
         
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tictoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorates a function to record a new wagon in the TimeTrain before and after each call.\n</span>
+<span class="sd">        By default, the first wagon (used for synchronization) is ignored.</span>
+<span class="sd">        </span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name :  str | None, optional</span>
+<span class="sd">            Optionally overrides the wrapped function&#39;s name.\n</span>
+<span class="sd">            By default None</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            
+            <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                
+                <span class="c1"># Subtle python compiler behavior</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">the_name</span> <span class="o">=</span> <span class="n">wrapper</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">the_name</span> <span class="o">=</span> <span class="n">name</span>
+                
+                <span class="n">context_depth_prev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span> <span class="o">=</span> <span class="mi">2</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_tictoc_sync</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">toc</span><span class="p">(</span><span class="n">tictoc_sync_name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">toc</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tictoc_sync_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">the_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>    
+                
+                <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">toc</span><span class="p">(</span><span class="n">the_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">context_depth</span> <span class="o">=</span> <span class="n">context_depth_prev</span>
+            
+            <span class="k">return</span> <span class="n">wrapper</span>
+                
+        <span class="k">return</span> <span class="n">decorator</span>   </div>
+
+            
 </pre></div>
 
                 </article>
