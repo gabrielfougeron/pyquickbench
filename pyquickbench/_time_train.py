@@ -243,9 +243,9 @@ class TimeTrain():
         return out
     
     def to_dict(
-        self                                                                ,
-        return_first_instance   : bool                          = False     ,
-        names_reduction         : typing.Callable | str | None  = "default" ,
+        self                                                                            ,
+        return_first_instance   : bool                                      = False     ,
+        names_reduction         : typing.Union[typing.Callable, str, None]  = "default" ,
     ):
         """
         Returns time measurements within a TimeTrain as a Python dictionnary
@@ -256,7 +256,7 @@ class TimeTrain():
         ----------
         return_first_instance : bool, optional
             Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
-        names_reduction :  str | None, optional
+        names_reduction : callable | str | None, optional
             Optionally overrides the TimeTrain's reduction.
             Set to "default" to not override reduction.
             By default None
