@@ -94,8 +94,10 @@ class TimeTrain():
             self.all_tocs_locs = []
             
         if names_reduction is None:
+            self.names_reduction_key = None
             self.names_reduction = None   
         else:
+            self.names_reduction_key = names_reduction
             self.names_reduction = all_reductions.get(names_reduction)
             if self.names_reduction is None:
                 raise ValueError(f'Unknown reduction {names_reduction}')
@@ -169,26 +171,18 @@ class TimeTrain():
         return self.all_tocs[idx+1]-(self.all_tocs[idx] + self.all_tocs_record_time[idx])
 
     def __str__(self): 
-        """
-        __str__ _summary_
-
-        _extended_summary_
-
-        Returns
-        -------
-        _type_
-            _description_
-        """        
         
         total_time = 0
         out = ''
         
         if self.name == '':
-            out += 'TimeTrain results:\n\n'
+            out += 'TimeTrain results:' + os.linesep
         else:
-            out += f'TimeTrain {self.name} results:\n\n'
+            out += f'TimeTrain {self.name} results:' + os.linesep
             
         if self.names_reduction is None:
+            
+            out += os.linesep
             
             for i in range(self.n):
 
@@ -211,9 +205,11 @@ class TimeTrain():
                     if self.include_locs:
                         out += f' at {self.all_tocs_locs[i]}'
                         
-                    out += '\n'
+                    out += os.linesep
         
         else:
+            
+            out += f'Reduction: {self.names_reduction_key}' + os.linesep + os.linesep
             
             d, first = self.to_dict(return_first_instance=True)
             for name, arr in d.items():
@@ -227,18 +223,18 @@ class TimeTrain():
                     out += f'{name}{filler}: '
                 
                 time = self.names_reduction(arr)
-                total_time += time
+                total_time += np.sum(arr)
                     
                 out += f'{time:.8f} s'
                 if self.include_locs:
                     out += f' at {self.all_tocs_locs[first[name]]}'
                     
-                out += '\n'
+                out += os.linesep
                 
         if (self.n) > 0:                
-            out += '\n'
+            out += os.linesep
             
-        out += f'Total: {total_time:.8f} s\n'
+        out += f'Total: {total_time:.8f} s'+os.linesep
 
         return out
     
