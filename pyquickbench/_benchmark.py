@@ -1105,8 +1105,9 @@ def plot_benchmark(
         if (n_subplot_grid_x*n_subplot_grid_y) > 1:
             fig.suptitle(title, fontsize=20)
 
+    plt.tight_layout()
+    
     if show:
-        plt.tight_layout()
         return plt.show()
     else:
-        return (plt, ax)
+        return (fig, ax)
