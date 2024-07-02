@@ -12,6 +12,7 @@ This is the best place to learn how to use :mod:`pyquickbench`.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -182,6 +183,8 @@ This is the best place to learn how to use :mod:`pyquickbench`.
       <div class="sphx-glr-thumbnail-title">Time Trains</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

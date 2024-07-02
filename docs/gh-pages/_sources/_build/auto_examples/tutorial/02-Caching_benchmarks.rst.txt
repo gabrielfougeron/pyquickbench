@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download__build_auto_examples_tutorial_02-Caching_benchmarks.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -120,7 +120,7 @@ Another call to :func:`pyquickbench.run_benchmark` will detect that the file exi
  .. code-block:: none
 
 
-    True
+    np.True_
 
 
 

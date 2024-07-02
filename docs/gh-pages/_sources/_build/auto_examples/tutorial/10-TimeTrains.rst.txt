@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download__build_auto_examples_tutorial_10-TimeTrains.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -76,13 +76,13 @@ As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be use
 
     TimeTrain results:
 
-    0.01009467 s at file 10-TimeTrains.py line 49
-    0.02014281 s at file 10-TimeTrains.py line 52
-    0.03006505 s at file 10-TimeTrains.py line 55
-    0.04016680 s at file 10-TimeTrains.py line 58
-    0.01009727 s at file 10-TimeTrains.py line 61
+    0.01012184 s at file 10-TimeTrains.py line 49
+    0.02015140 s at file 10-TimeTrains.py line 52
+    0.03012828 s at file 10-TimeTrains.py line 55
+    0.04011506 s at file 10-TimeTrains.py line 58
+    0.01009519 s at file 10-TimeTrains.py line 61
 
-    Total: 0.11056659 s
+    Total: 0.11061177 s
 
 
 
@@ -119,14 +119,14 @@ Individual calls to :meth:`pyquickbench.TimeTrain.toc` can be named.
 
     TimeTrain results:
 
-    repeated : 0.01009308 s at file 10-TimeTrains.py line 73
-    repeated : 0.01009290 s at file 10-TimeTrains.py line 73
-    repeated : 0.01013636 s at file 10-TimeTrains.py line 73
-    unique 1 : 0.01018333 s at file 10-TimeTrains.py line 77
-    unique 2 : 0.01008358 s at file 10-TimeTrains.py line 77
-    unique 3 : 0.01008128 s at file 10-TimeTrains.py line 77
+    repeated : 0.01007632 s at file 10-TimeTrains.py line 73
+    repeated : 0.01007655 s at file 10-TimeTrains.py line 73
+    repeated : 0.01010012 s at file 10-TimeTrains.py line 73
+    unique 1 : 0.01011837 s at file 10-TimeTrains.py line 77
+    unique 2 : 0.01007872 s at file 10-TimeTrains.py line 77
+    unique 3 : 0.01009474 s at file 10-TimeTrains.py line 77
 
-    Total: 0.06067054 s
+    Total: 0.06054483 s
 
 
 
@@ -164,16 +164,17 @@ Timing measurements relative to identical names can be reduced using any reducti
 
  .. code-block:: none
 
-    /mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:104: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
+    /mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:106: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
       warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
     TimeTrain results:
+    Reduction: sum
 
-    repeated : 0.03034493 s at file 10-TimeTrains.py line 90
-    unique 1 : 0.01009325 s at file 10-TimeTrains.py line 94
-    unique 2 : 0.01008473 s at file 10-TimeTrains.py line 94
-    unique 3 : 0.01007467 s at file 10-TimeTrains.py line 94
+    repeated : 0.03031713 s at file 10-TimeTrains.py line 90
+    unique 1 : 0.01011277 s at file 10-TimeTrains.py line 94
+    unique 2 : 0.01009980 s at file 10-TimeTrains.py line 94
+    unique 3 : 0.01009946 s at file 10-TimeTrains.py line 94
 
-    Total: 0.06059758 s
+    Total: 0.06062915 s
 
 
 
@@ -214,13 +215,14 @@ Displaying locations can be disabled like so:
  .. code-block:: none
 
     TimeTrain results:
+    Reduction: sum
 
-    repeated : 0.03041307 s
-    unique 1 : 0.01015998 s
-    unique 2 : 0.01018401 s
-    unique 3 : 0.01024113 s
+    repeated : 0.03033586 s
+    unique 1 : 0.01018069 s
+    unique 2 : 0.01014831 s
+    unique 3 : 0.01024369 s
 
-    Total: 0.06099818 s
+    Total: 0.06090855 s
 
 
 
@@ -261,10 +263,10 @@ TimeTrains can also time calls to a function. The function :meth:`pyquickbench.T
 
     TimeTrain results:
 
-    wait_a_bit : 0.01011929 s at file 10-TimeTrains.py line 133
-    wait_more  : 0.01009280 s at file 10-TimeTrains.py line 134
+    wait_a_bit : 0.01009846 s at file 10-TimeTrains.py line 133
+    wait_more  : 0.01011132 s at file 10-TimeTrains.py line 134
 
-    Total: 0.02021209 s
+    Total: 0.02020977 s
 
 
 
@@ -301,9 +303,9 @@ Using :meth:`pyquickbench.TimeTrain.tictoc` with a regular wrapping syntax might
 
     TimeTrain results:
 
-    wait_unrecorded : 0.01011512 s at file 10-TimeTrains.py line 149
+    wait_unrecorded : 0.01010857 s at file 10-TimeTrains.py line 149
 
-    Total: 0.01011512 s
+    Total: 0.01010857 s
 
 
 
@@ -364,9 +366,9 @@ Overriding the ``__name__`` of the wrapped function gives the expected result:
 
     TimeTrain results:
 
-    wait_recorded : 0.01008321 s at file 10-TimeTrains.py line 170
+    wait_recorded : 0.01010101 s at file 10-TimeTrains.py line 170
 
-    Total: 0.01008321 s
+    Total: 0.01010101 s
 
 
 
@@ -403,9 +405,9 @@ More simply, you can set a custom name with the following syntax:
 
     TimeTrain results:
 
-    my_custom_name : 0.01012475 s at file 10-TimeTrains.py line 184
+    my_custom_name : 0.01008538 s at file 10-TimeTrains.py line 184
 
-    Total: 0.01012475 s
+    Total: 0.01008538 s
 
 
 
@@ -445,10 +447,10 @@ By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in 
 
     TimeTrain results:
 
-    pyquickbench_sync : 0.01010550 s at file 10-TimeTrains.py line 201
-    wait_recorded     : 0.02009903 s at file 10-TimeTrains.py line 201
+    pyquickbench_sync : 0.01008287 s at file 10-TimeTrains.py line 201
+    wait_recorded     : 0.02009400 s at file 10-TimeTrains.py line 201
 
-    Total: 0.03020453 s
+    Total: 0.03017687 s
 
 
 

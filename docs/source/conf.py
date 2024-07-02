@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 project = "pyquickbench"
 author = "Gabriel Fougeron"
 project_copyright = "2024, Gabriel Fougeron"
-version = "0.1.1"
+version = "0.2.3"
 
 # sys.path.append(os.path.abspath("./_pygments"))
 # from style import PythonVSMintedStyle
@@ -62,7 +62,7 @@ intersphinx_mapping = {
     "sphinx":       ("https://www.sphinx-doc.org/en/master/"        , None) ,
     "numpy":        ("http://docs.scipy.org/doc/numpy"              , None) ,
     "scipy":        ("http://docs.scipy.org/doc/scipy/reference/"   , None) ,
-    "matplotlib":   ("http://matplotlib.sourceforge.net/"           , None) , 
+    "matplotlib":   ("https://matplotlib.org/stable/"               , None) , 
 }
 
 intersphinx_disabled_reftypes = ["*"]

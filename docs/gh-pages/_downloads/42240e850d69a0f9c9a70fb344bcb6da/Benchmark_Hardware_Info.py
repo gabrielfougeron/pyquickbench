@@ -7,8 +7,9 @@ Description of the benchmark machine
 # Description of the machine on which benchmarks were run.
 
 import subprocess
+import os
 
-Id = subprocess.check_output(['lshw']).decode('utf-8').split('\n')
+Id = subprocess.check_output(['lshw']).decode('utf-8').split(os.linesep)
 for line in Id:
     print(line)
     

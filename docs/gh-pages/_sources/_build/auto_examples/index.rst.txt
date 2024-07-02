@@ -20,6 +20,9 @@ Gallery
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -35,6 +38,7 @@ This is the best place to learn how to use :mod:`pyquickbench`.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -206,6 +210,8 @@ This is the best place to learn how to use :mod:`pyquickbench`.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -220,6 +226,7 @@ This is a collection of actual benchmarks performed on the author's laptop compu
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -240,6 +247,23 @@ This is a collection of actual benchmarks performed on the author's laptop compu
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Time benchmark of built-in hashing in Python">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_Hashing_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_benchmarks_Hashing.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Time benchmark of built-in hashing in Python</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Benchmark of inplace conjugation of arrays">
 
 .. only:: html
@@ -254,6 +278,8 @@ This is a collection of actual benchmarks performed on the author's laptop compu
       <div class="sphx-glr-thumbnail-title">Benchmark of inplace conjugation of arrays</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
