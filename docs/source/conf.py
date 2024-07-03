@@ -233,6 +233,11 @@ napoleon_attr_annotations = True
 
 autodoc_typehints = "description"
 
+##########################
+# Sitemap and robots.txt #
+##########################
+
+sitemap_url_scheme = "{link}"
 html_extra_path = [
     "./robots.txt"    ,
 ]
