@@ -41,3 +41,4 @@ docs/build/
 !/docs/source/test-report/test_report_template.txt
 !requirements*.txt
 !docs/gh-pages/**
+!docs/source/robots.txt

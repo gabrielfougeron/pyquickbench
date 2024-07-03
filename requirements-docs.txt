@@ -8,5 +8,6 @@ sphinxcontrib-plantuml
 seed-intersphinx-mapping
 myst-parser
 sphinxext-rediraffe
+sphinx-sitemap
 scipy
 numba

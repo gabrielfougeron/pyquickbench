@@ -40,6 +40,7 @@ extensions = [
     "sphinxcontrib.plantuml"        ,
     "myst_parser"                   ,
     "sphinxext.rediraffe"           ,
+    "sphinx_sitemap"                ,
 ]
 
 # The suffix of source filenames.
@@ -231,3 +232,7 @@ napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
 autodoc_typehints = "description"
+
+html_extra_path = [
+    "./robots.txt"    ,
+]
