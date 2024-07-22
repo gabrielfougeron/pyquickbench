@@ -712,8 +712,13 @@ def plot_benchmark(
     for name in all_reductions:
         idx_all_reduction[name] = np.array(idx_all_reduction[name]  )
 
+    n_curves_color = _prod_rel_shapes(idx_all_curve_color, all_vals.shape)
+    n_curves_linestyle = _prod_rel_shapes(idx_all_curve_linestyle, all_vals.shape)
+    n_curves_pointstyle = _prod_rel_shapes(idx_all_curve_pointstyle, all_vals.shape)
     n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
     n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
+    
+    n_curves = n_curves_color * n_curves_linestyle * n_curves_pointstyle
 
     leg_patch = [[[] for _ in range(n_subplot_grid_y)] for __ in range(n_subplot_grid_x)]
 
@@ -781,6 +786,8 @@ def plot_benchmark(
         pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
         cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
         OnlyThisOnce = (i_same == 0)
+
+        i_curve = i_color + n_curves_color * (i_linestyle + n_curves_linestyle * i_pointstyle)
 
         if OnlyThisOnce:
             
@@ -888,14 +895,23 @@ def plot_benchmark(
         if isinstance(plot_x_val[0], str):
             
             logx_plot = False
+            
+            tick_width = 0.8
+            bar_width = tick_width / n_curves
+            x_pos_mid = np.arange(0, npts)
+            
+            x_pos = x_pos_mid + i_curve * bar_width - tick_width/2 + bar_width/2
 
             cur_ax.bar(
-                plot_x_val                  ,
+                x_pos                       ,
                 plot_y_val                  ,
+                width       = bar_width     ,
                 color       = color         ,
                 linestyle   = linestyle     ,
                 alpha       = alpha         ,
             )
+
+            plt.xticks(x_pos_mid, plot_x_val);
         
         else:    
             
@@ -1047,8 +1063,7 @@ def plot_benchmark(
                     loc = legend_location                                   ,
                     borderaxespad = 0.                                      ,
                 )
-                
-            
+                            
             n_cat_subplot_grid_x, i_cat_subplot_grid_x = _count_Truthy(all_legend_subplot_grid_x)
             n_cat_subplot_grid_y, i_cat_subplot_grid_y = _count_Truthy(all_legend_subplot_grid_y)
             ncats = n_cat_subplot_grid_x + n_cat_subplot_grid_y

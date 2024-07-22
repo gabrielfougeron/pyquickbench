@@ -23,11 +23,9 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-import functools
 import matplotlib.pyplot as plt
 import numpy as np
 import math as m
-import scipy
 import numba as nb
 
 numba_opt_dict = {
@@ -98,9 +96,9 @@ basename = 'matmul_timings_full'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "P" : [(2 ** k) for k in range(15)]     ,
-    "Q" : [(2 ** k) for k in range(15)]     ,
-    "R" : [(2 ** k) for k in range(15)]     ,
+    "P" : [(2 ** k) for k in range(8)]     ,
+    "Q" : [(2 ** k) for k in range(8)]     ,
+    "R" : [(2 ** k) for k in range(8)]     ,
     "real_dtype": ["float32", "float64"]    ,
 }
 
@@ -113,116 +111,65 @@ all_funs = [
     numpy_matmul                        ,
 ]
 
-n_repeat = 10
+n_repeat = 1
 
 MonotonicAxes = ["P", "Q", "R"]
+
+time_per_test = 0.02
 
 # %%
 
 all_timings = pyquickbench.run_benchmark(
-    all_args                ,
-    all_funs                ,
-    setup = setup_abc       ,
-    filename = filename     ,
-    StopOnExcept = True     ,
-    ShowProgress = True     ,
-    n_repeat = n_repeat     ,
-    MonotonicAxes = MonotonicAxes,
-    PreventBenchmark = True ,
+    all_args                        ,
+    all_funs                        ,
+    setup = setup_abc               ,
+    filename = filename             ,
+    StopOnExcept = True             ,
+    ShowProgress = True             ,
+    n_repeat = n_repeat             ,
+    time_per_test = time_per_test   ,
+    MonotonicAxes = MonotonicAxes   ,
+    PreventBenchmark = True         ,
 )
 
-plot_intent = {
-    "P" :  'single_value'           ,
-    "Q" : 'single_value'               ,
-    "R" :  'single_value'             ,
-    "real_dtype": 'points'  ,
-    pyquickbench.fun_ax_name :  'single_value'             ,
-}
+for ax in ["P","Q","R"]:
 
-single_values_val = {
-    "P" : 2**5        ,
-    "Q" : 2**5        ,
-    "R" : 2**5        ,
-    "real_dtype": "float64" ,
-    pyquickbench.fun_ax_name : "numpy_matmul"        ,
-}
+    plot_intent = {
+        "P" : 'single_value'           ,
+        "Q" : 'single_value'               ,
+        "R" : 'single_value'             ,
+        "real_dtype": 'points'  ,
+        # pyquickbench.fun_ax_name :  'single_value'             ,
+    }
 
-pyquickbench.plot_benchmark(
-    all_timings                             ,
-    all_args                                ,
-    all_funs                                ,
-    plot_intent = plot_intent               ,
-    single_values_val = single_values_val   ,
-    show = True                             ,
-)
+    single_values_val = {
+        "P" : 2**5        ,
+        "Q" : 2**5        ,
+        "R" : 2**5        ,
+        "real_dtype": "float64" ,
+        pyquickbench.fun_ax_name : "numpy_matmul"        ,
+    }
 
-
-# %%
-# 
-# relative_to_val = {
-#     "real_dtype": "float64" ,
-#     pyquickbench.fun_ax_name: "numpy_matmul"   ,
-# }
-# 
-# pyquickbench.plot_benchmark(
-#     all_timings                             ,
-#     all_args                                ,
-#     all_funs                                ,
-#     plot_intent = plot_intent               ,
-#     single_values_val = single_values_val   ,
-#     relative_to_val = relative_to_val       ,
-#     show = True                             ,
-# )
+    pyquickbench.plot_benchmark(
+        all_timings                             ,
+        all_args                                ,
+        all_funs                                ,
+        plot_intent = plot_intent               ,
+        single_values_val = single_values_val   ,
+        show = True                             ,
+    )
 
 
-# %%
-# 
 
-# pyquickbench.plot_benchmark(
-#     all_timings                             ,
-#     all_args                                ,
-#     all_funs                                ,
-#     plot_intent = plot_intent               ,
-#     single_values_val = single_values_val   ,
-#     ylabel = "Measured convergence rate"    ,
-#     logx_plot = True                        ,
-#     transform = "pol_growth_order"          ,
-#     # clip_vals = True                        ,
-#     show = True                             ,
-# )
+    # %%
 
-# %%
-# 
-# 
-# basename = 'matmul_timings_nopython'
-# filename = os.path.join(timings_folder,basename+'.npz')
-# 
-# ame = os.path.join(timings_folder,basename+'.npz')
-# 
-# all_args = {
-#     "P" : [(2 ** k) for k in range(13)]     ,
-#     "Q" : [(2 ** k) for k in range(13)]     ,
-#     "R" : [(2 ** k) for k in range(13)]     ,
-#     "real_dtype": ["float32", "float64"]    ,
-# }
-# 
-# all_funs = [
-#     Three_loops_python                  ,
-#     Three_loops_numba_serial            ,
-#     Three_loops_numba_auto_parallel     ,
-#     Three_loops_numba_parallel          ,
-#     Three_loops_numba_parallel_noreduce ,
-#     numpy_matmul                        ,
-# ]
-# 
-# all_timings = pyquickbench.run_benchmark(
-#     all_args                ,
-#     all_funs                ,
-#     setup = setup_abc       ,
-#     filename = filename     ,
-#     StopOnExcept = True     ,
-#     ShowProgress = True     ,
-#     n_repeat = n_repeat     ,
-#     MonotonicAxes = MonotonicAxes,
-#     # PreventBenchmark = True ,
-# )
+
+    pyquickbench.plot_benchmark(
+        all_timings                             ,
+        all_args                                ,
+        all_funs                                ,
+        plot_intent = plot_intent               ,
+        single_values_val = single_values_val   ,
+        logx_plot = True                        ,
+        show = True                             ,
+    )

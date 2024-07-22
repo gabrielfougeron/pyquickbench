@@ -187,14 +187,15 @@ sphinx_gallery_conf = {
 #############
 latex_engine = "pdflatex"
 
-
 # latex_documents = [("startdocname", "targetname", "title", "author", "theme", "toctree_only")]
-
 latex_documents = [
     (master_doc, "pyquickbench.tex", "Pyquickbench documentation", "Gabriel Fougeron", "manual"),
 ]
 
-latex_elements = {"preamble":r"\usepackage{xfrac}"}
+latex_elements = {
+    "preamble":r"\usepackage{xfrac}",
+    'sphinxsetup': "verbatimforcewraps, verbatimmaxunderfull=0",
+}
 
 latex_use_latex_multicolumn = False
 latex_show_urls = "footnote"
