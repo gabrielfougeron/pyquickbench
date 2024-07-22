@@ -186,37 +186,33 @@ The above plot is quite cluttered. For more concise information, let's use curve
 The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can for instance choose to plot minimal, median and maximal values. The list of all possible reductions is accessible in :data:`pyquickbench.all_reductions`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-164
+.. GENERATED FROM PYTHON SOURCE LINES 121-160
 
 .. code-block:: Python
 
 
-    dpi = 150
-    figsize = (1600/dpi, 800/dpi)
-
-    fig, ax = plt.subplots(
-        nrows   = 1         ,
-        ncols   = 1         ,
-        figsize = figsize   ,
-        dpi     = dpi       ,
-        squeeze = False     ,
+    fig, ax = pyquickbench.plot_benchmark(
+        all_values                  ,
+        all_sizes                   ,
+        all_funs                    ,
+        return_empty_plot = True    ,
     )
 
-    all_repeat_intents = ["reduction_min", "reduction_max", "reduction_median"]
+    all_reductions = ["reduction_min", "reduction_max", "reduction_median"]
     all_linestyles = ["dotted", "dashed", "solid"]
 
     for (
-        repeat_intent       ,
-        linestyle           ,
+        reduction   ,
+        linestyle   ,
     )in zip(
-        all_repeat_intents  ,
-        all_linestyles      ,
+        all_reductions  ,
+        all_linestyles  ,
     ):
 
         plot_intent = {
             pyquickbench.default_ax_name    : "points"      ,
             pyquickbench.fun_ax_name        : "curve_color" ,
-            pyquickbench.repeat_ax_name     : repeat_intent ,
+            pyquickbench.repeat_ax_name     : reduction     ,
         }
 
         pyquickbench.plot_benchmark(
@@ -245,11 +241,11 @@ The above plot gives a good idea of the concentration of data, but bounds on tim
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-166
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-184
+.. GENERATED FROM PYTHON SOURCE LINES 162-180
 
 .. code-block:: Python
 
@@ -283,11 +279,11 @@ More generally, the ``plot_intent`` argument controls what dimension of the arra
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-186
+.. GENERATED FROM PYTHON SOURCE LINES 181-182
 
 Or for all functions, but a single value of input size.
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-202
+.. GENERATED FROM PYTHON SOURCE LINES 182-198
 
 .. code-block:: Python
 
@@ -319,7 +315,7 @@ Or for all functions, but a single value of input size.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-204
+.. GENERATED FROM PYTHON SOURCE LINES 199-200
 
 As can be seen in the above plots, the timings are automatically sorted along the :data:`pyquickbench.repeat_ax_name` axis.
 The list of all possible ``plot_intent`` values is available in :data:`pyquickbench.all_plot_intents`.

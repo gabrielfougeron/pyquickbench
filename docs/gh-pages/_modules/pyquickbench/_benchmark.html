@@ -754,6 +754,7 @@ document.write(`
     <span class="n">plot_xlim</span>               <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>         <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">plot_ylim</span>               <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>         <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">show</span>                    <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">return_empty_plot</span>       <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">fig</span>                     <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
                                 <span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span>        <span class="p">,</span>
                                 <span class="kc">None</span>                            <span class="p">,</span>
@@ -836,7 +837,11 @@ document.write(`
 <span class="sd">    plot_ylim : tuple | None, optional</span>
 <span class="sd">        How to override limits on the y-axis of the plots, by default ``None``.</span>
 <span class="sd">    show : bool, optional</span>
-<span class="sd">        Whether to issue a ``plt.show()``, by default ``False``.</span>
+<span class="sd">        Whether to issue a ``plt.show()`` instead of returning a ``(fig, ax)`` tuple, by default ``False``.</span>
+<span class="sd">    return_empty_plot : bool, optional</span>
+<span class="sd">        Whether to prematurely return an empty ``(fig, ax)`` tuple.</span>
+<span class="sd">        Useful to create an empty plot and reuse it, see :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for instance.</span>
+<span class="sd">        By defaut ``False``.</span>
 <span class="sd">    fig : matplotlib.figure.Figure | None, optional</span>
 <span class="sd">        User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n </span>
 <span class="sd">        By default ``None``.</span>
@@ -978,7 +983,7 @@ document.write(`
         
         <span class="n">plot_intent</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="s1">&#39;points&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;curve_color&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_args</span><span class="p">)}</span>
         <span class="n">plot_intent</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_color&#39;</span>
-        <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reduction_min&#39;</span>
+        <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_reduction</span>
         <span class="n">plot_intent</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_linestyle&#39;</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -988,7 +993,7 @@ document.write(`
         <span class="k">if</span> <span class="n">fun_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_intent</span><span class="p">:</span>
             <span class="n">plot_intent</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_color&#39;</span>
         <span class="k">if</span> <span class="n">repeat_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_intent</span><span class="p">:</span>
-            <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reduction_min&#39;</span>
+            <span class="n">plot_intent</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_reduction</span>
         <span class="k">if</span> <span class="n">out_ax_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plot_intent</span><span class="p">:</span>
             <span class="n">plot_intent</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;curve_linestyle&#39;</span>
         
@@ -1211,6 +1216,9 @@ document.write(`
         
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Non compatible type for argument &quot;ax&quot;: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        
+    <span class="k">if</span>  <span class="n">return_empty_plot</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>    
         
     <span class="k">for</span> <span class="n">idx_curve</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">all_vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_all_curves</span><span class="p">]):</span>
         

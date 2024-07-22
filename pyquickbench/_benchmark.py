@@ -307,6 +307,7 @@ def plot_benchmark(
     plot_xlim               : typing.Union[tuple, None]         = None                      ,
     plot_ylim               : typing.Union[tuple, None]         = None                      ,
     show                    : bool                              = False                     ,
+    return_empty_plot       : bool                              = False                     ,
     fig                     : typing.Union[
                                 matplotlib.figure.Figure        ,
                                 None                            ,
@@ -389,7 +390,11 @@ def plot_benchmark(
     plot_ylim : tuple | None, optional
         How to override limits on the y-axis of the plots, by default ``None``.
     show : bool, optional
-        Whether to issue a ``plt.show()``, by default ``False``.
+        Whether to issue a ``plt.show()`` instead of returning a ``(fig, ax)`` tuple, by default ``False``.
+    return_empty_plot : bool, optional
+        Whether to prematurely return an empty ``(fig, ax)`` tuple.
+        Useful to create an empty plot and reuse it, see :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for instance.
+        By defaut ``False``.
     fig : matplotlib.figure.Figure | None, optional
         User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n 
         By default ``None``.
@@ -531,7 +536,7 @@ def plot_benchmark(
         
         plot_intent = {name: 'points' if (i==0) else 'curve_color' for i, name in enumerate(all_args)}
         plot_intent[fun_ax_name] = 'curve_color'
-        plot_intent[repeat_ax_name] = 'reduction_min'
+        plot_intent[repeat_ax_name] = default_reduction
         plot_intent[out_ax_name] = 'curve_linestyle'
 
     else:
@@ -541,7 +546,7 @@ def plot_benchmark(
         if fun_ax_name not in plot_intent:
             plot_intent[fun_ax_name] = 'curve_color'
         if repeat_ax_name not in plot_intent:
-            plot_intent[repeat_ax_name] = 'reduction_min'
+            plot_intent[repeat_ax_name] = default_reduction
         if out_ax_name not in plot_intent:
             plot_intent[out_ax_name] = 'curve_linestyle'
         
@@ -764,6 +769,9 @@ def plot_benchmark(
         
         else:
             raise TypeError(f'Non compatible type for argument "ax": {type(ax)}.')
+        
+    if  return_empty_plot:
+        return (fig, ax)    
         
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         

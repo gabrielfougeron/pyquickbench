@@ -119,32 +119,28 @@ pyquickbench.plot_benchmark(
 # The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can for instance choose to plot minimal, median and maximal values. The list of all possible reductions is accessible in :data:`pyquickbench.all_reductions`.
 # 
 
-dpi = 150
-figsize = (1600/dpi, 800/dpi)
-
-fig, ax = plt.subplots(
-    nrows   = 1         ,
-    ncols   = 1         ,
-    figsize = figsize   ,
-    dpi     = dpi       ,
-    squeeze = False     ,
+fig, ax = pyquickbench.plot_benchmark(
+    all_values                  ,
+    all_sizes                   ,
+    all_funs                    ,
+    return_empty_plot = True    ,
 )
 
-all_repeat_intents = ["reduction_min", "reduction_max", "reduction_median"]
+all_reductions = ["reduction_min", "reduction_max", "reduction_median"]
 all_linestyles = ["dotted", "dashed", "solid"]
 
 for (
-    repeat_intent       ,
-    linestyle           ,
+    reduction   ,
+    linestyle   ,
 )in zip(
-    all_repeat_intents  ,
-    all_linestyles      ,
+    all_reductions  ,
+    all_linestyles  ,
 ):
 
     plot_intent = {
         pyquickbench.default_ax_name    : "points"      ,
         pyquickbench.fun_ax_name        : "curve_color" ,
-        pyquickbench.repeat_ax_name     : repeat_intent ,
+        pyquickbench.repeat_ax_name     : reduction     ,
     }
 
     pyquickbench.plot_benchmark(
