@@ -41,6 +41,7 @@ extensions = [
     "myst_parser"                   ,
     "sphinxext.rediraffe"           ,
     "sphinx_sitemap"                ,
+    "sphinx_design"                 ,
 ]
 
 # The suffix of source filenames.
@@ -59,11 +60,21 @@ templates_path = ["templates"]
 exclude_patterns = []
 
 intersphinx_mapping = {
-    "python":       ("https://docs.python.org/3"                    , None) ,
-    "sphinx":       ("https://www.sphinx-doc.org/en/master/"        , None) ,
-    "numpy":        ("http://docs.scipy.org/doc/numpy"              , None) ,
-    "scipy":        ("http://docs.scipy.org/doc/scipy/reference/"   , None) ,
-    "matplotlib":   ("https://matplotlib.org/stable/"               , None) , 
+    "python"        : ("https://docs.python.org/3"                      , None),
+    "sphinx"        : ("https://www.sphinx-doc.org/en/master/"          , None),
+    'numpy'         : ('https://numpy.org/doc/stable/'                  , None),
+    "scipy"         : ("http://docs.scipy.org/doc/scipy/reference/"     , None),
+    "matplotlib"    : ("https://matplotlib.org/stable/"                 , None), 
+    # 'Pillow'        : ('https://pillow.readthedocs.io/en/stable/'       , None),
+    # 'cycler'        : ('https://matplotlib.org/cycler/'                 , None),
+    # 'dateutil'      : ('https://dateutil.readthedocs.io/en/stable/'     , None),
+    # 'ipykernel'     : ('https://ipykernel.readthedocs.io/en/latest/'    , None),
+    # 'pandas'        : ('https://pandas.pydata.org/pandas-docs/stable/'  , None),
+    # 'pytest'        : ('https://pytest.org/en/stable/'                  , None),
+    # 'tornado'       : ('https://www.tornadoweb.org/en/stable/'          , None),
+    # 'xarray'        : ('https://docs.xarray.dev/en/stable/'             , None),
+    # 'meson-python'  : ('https://meson-python.readthedocs.io/en/stable/' , None),
+    # 'pip'           : ('https://pip.pypa.io/en/stable/'                 , None),
 }
 
 intersphinx_disabled_reftypes = ["*"]
@@ -98,8 +109,8 @@ html_theme_options = {
     "show_prev_next": False,
     "header_links_before_dropdown": 20,
     "use_edit_page_button": True,
-    "pygment_light_style": "tango",
-    "pygment_dark_style":  "monokai",
+    "pygments_light_style": "tango",
+    "pygments_dark_style":  "monokai",
     "icon_links": [
         {
             "name": "GitHub",

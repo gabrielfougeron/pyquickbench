@@ -9,5 +9,6 @@ seed-intersphinx-mapping
 myst-parser
 sphinxext-rediraffe
 sphinx-sitemap
+sphinx-design
 scipy
 numba

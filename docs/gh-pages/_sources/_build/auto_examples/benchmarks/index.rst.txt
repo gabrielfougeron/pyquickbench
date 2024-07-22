@@ -65,6 +65,23 @@ This is a collection of actual benchmarks performed on the author's laptop compu
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Numpy array initialization">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/benchmarks/images/thumb/sphx_glr_numpy_array_init_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_benchmarks_numpy_array_init.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Numpy array initialization</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -78,4 +95,5 @@ This is a collection of actual benchmarks performed on the author's laptop compu
    /_build/auto_examples/benchmarks/Benchmark_Hardware_Info
    /_build/auto_examples/benchmarks/Hashing
    /_build/auto_examples/benchmarks/Inplace_conjugate
+   /_build/auto_examples/benchmarks/numpy_array_init
 

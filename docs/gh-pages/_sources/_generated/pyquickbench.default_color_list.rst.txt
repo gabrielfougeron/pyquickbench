@@ -1,0 +1,6 @@
+pyquickbench.default\_color\_list
+=================================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: default_color_list

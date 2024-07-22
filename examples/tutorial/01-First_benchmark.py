@@ -9,8 +9,8 @@ A first benchmark
 # Suppose I want to compare the efficiency of a few different methods to pre-allocate memory for a list of strings in Python.
 #
 # Let's define a separate python function for three different list pre-allocation strategies.
-# These functions all take an integer called "n" as an input, which stands for the length of the list to be pre-allocated.
-# The argument name "n" is the default in pyquickbench and can be changed in as described in :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py`.
+# These functions all take an integer called ``n`` as an input, which stands for the length of the list to be pre-allocated.
+# The argument name ``n`` is the :data:`pyquickbench.default_ax_name` and can be changed in as described in :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py`.
 # 
 
 # sphinx_gallery_start_ignore

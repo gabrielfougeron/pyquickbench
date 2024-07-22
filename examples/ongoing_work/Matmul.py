@@ -96,9 +96,9 @@ basename = 'matmul_timings_full'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "P" : [(2 ** k) for k in range(8)]     ,
-    "Q" : [(2 ** k) for k in range(8)]     ,
-    "R" : [(2 ** k) for k in range(8)]     ,
+    "P" : [(2 ** k) for k in range(15)]     ,
+    "Q" : [(2 ** k) for k in range(15)]     ,
+    "R" : [(2 ** k) for k in range(15)]     ,
     "real_dtype": ["float32", "float64"]    ,
 }
 
@@ -132,21 +132,26 @@ all_timings = pyquickbench.run_benchmark(
     PreventBenchmark = True         ,
 )
 
-for ax in ["P","Q","R"]:
+    
+default_ax_val = 2**5
+
+for ax_name in ["P","Q","R"]:
 
     plot_intent = {
-        "P" : 'single_value'           ,
-        "Q" : 'single_value'               ,
-        "R" : 'single_value'             ,
-        "real_dtype": 'points'  ,
-        # pyquickbench.fun_ax_name :  'single_value'             ,
+        "P" : 'single_value'                        ,
+        "Q" : 'single_value'                        ,
+        "R" : 'single_value'                        ,
+        "real_dtype" : "curve_linestyle"            ,
+        pyquickbench.fun_ax_name :  'single_value'  ,
     }
+    
+    plot_intent[ax_name] = "points"
 
     single_values_val = {
-        "P" : 2**5        ,
-        "Q" : 2**5        ,
-        "R" : 2**5        ,
-        "real_dtype": "float64" ,
+        "P" : default_ax_val        ,
+        "Q" : default_ax_val        ,
+        "R" : default_ax_val        ,
+        "real_dtype": "float64"     ,
         pyquickbench.fun_ax_name : "numpy_matmul"        ,
     }
 
@@ -162,7 +167,6 @@ for ax in ["P","Q","R"]:
 
 
     # %%
-
 
     pyquickbench.plot_benchmark(
         all_timings                             ,

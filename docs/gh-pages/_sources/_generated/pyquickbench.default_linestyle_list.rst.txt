@@ -1,0 +1,6 @@
+pyquickbench.default\_linestyle\_list
+=====================================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: default_linestyle_list

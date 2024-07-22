@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=87e54e7c" />
     <link rel="stylesheet" type="text/css" href="_static/assets/jsonview.bundle.css?v=f6ef2277" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/libs/html/datatables.min.css?v=4b4fd840" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/common.css?v=bd9ab754" />
@@ -52,6 +53,7 @@
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/assets/jsonview.bundle.js?v=18cd53c5"></script>
     <script src="_static/assets/jsonview_loader.js?v=f7ff7e7d"></script>
     <script src="_static/sphinx-needs/libs/html/datatables.min.js?v=8a4aee21"></script>
@@ -437,19 +439,33 @@ document.write(`
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h1>
 <p>Checkout the <a class="reference internal" href="_build/auto_examples/index.html#examples-index"><span class="std std-ref">Gallery</span></a> to get an idea of what pyquickbench is capable.</p>
 </section>
-<section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<p>Pyquickbench is available on the <a class="reference external" href="https://pypi.org/project/pyquickbench/">Python Package Index</a>. To install using pip, simply type:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyquickbench
-</pre></div>
-</div>
+<section id="install">
+<h1>Install<a class="headerlink" href="#install" title="Link to this heading">#</a></h1>
+<div class="sd-tab-set sd-width-content-min docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+conda-forge</label><div class="sd-tab-content docutils">
 <p>Pyquickbench is available on <a class="reference external" href="https://anaconda.org/conda-forge/pyquickbench">conda-forge</a>. To install using conda, simply type:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pyquickbench<span class="w"> </span>-c<span class="w"> </span>conda-forge
 </pre></div>
 </div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+pip-PyPI</label><div class="sd-tab-content docutils">
+<p>Pyquickbench is available on the <a class="reference external" href="https://pypi.org/project/pyquickbench/">Python Package Index</a>. To install using pip, simply type:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pyquickbench
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+pip-dev</label><div class="sd-tab-content docutils">
 <p>To install the current development version of pyquickbench from the <a class="reference external" href="https://github.com/gabrielfougeron/pyquickbench">github repository</a>, you can type:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+ssh://git@github.com/gabrielfougeron/pyquickbench.git
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="tests">
@@ -493,7 +509,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</sp
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Welcome to pyquickbench’s documentation!</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#main-features">Main features</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#install">Install</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#tests">Tests</a></li>
 </ul>
 

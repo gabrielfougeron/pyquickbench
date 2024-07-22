@@ -21,26 +21,35 @@ Usage
 
 Checkout the :ref:`Gallery <examples-index>` to get an idea of what pyquickbench is capable.
 
-Installation
-============
+Install
+=======
 
-Pyquickbench is available on the `Python Package Index <https://pypi.org/project/pyquickbench/>`_. To install using pip, simply type:
+.. tab-set::
+    :class: sd-width-content-min
 
-.. code-block:: sh
+    .. tab-item:: conda-forge
 
-    pip install pyquickbench
+        Pyquickbench is available on `conda-forge <https://anaconda.org/conda-forge/pyquickbench>`_. To install using conda, simply type:
 
-Pyquickbench is available on `conda-forge <https://anaconda.org/conda-forge/pyquickbench>`_. To install using conda, simply type:
+        .. code-block:: sh
 
-.. code-block:: sh
+            conda install pyquickbench -c conda-forge
 
-    conda install pyquickbench -c conda-forge
+    .. tab-item:: pip-PyPI
 
-To install the current development version of pyquickbench from the `github repository <https://github.com/gabrielfougeron/pyquickbench>`_, you can type:
+        Pyquickbench is available on the `Python Package Index <https://pypi.org/project/pyquickbench/>`_. To install using pip, simply type:
 
-.. code-block:: sh
+        .. code-block:: sh
 
-    pip install git+ssh://git@github.com/gabrielfougeron/pyquickbench.git 
+            pip install pyquickbench
+
+    .. tab-item:: pip-dev
+
+        To install the current development version of pyquickbench from the `github repository <https://github.com/gabrielfougeron/pyquickbench>`_, you can type:
+
+        .. code-block:: sh
+
+            pip install git+ssh://git@github.com/gabrielfougeron/pyquickbench.git 
 
 Tests
 =====

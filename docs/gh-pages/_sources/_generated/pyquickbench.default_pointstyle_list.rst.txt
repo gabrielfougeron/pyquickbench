@@ -1,0 +1,6 @@
+pyquickbench.default\_pointstyle\_list
+======================================
+
+.. currentmodule:: pyquickbench
+
+.. autodata:: default_pointstyle_list

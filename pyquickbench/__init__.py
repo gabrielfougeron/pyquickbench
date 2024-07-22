@@ -6,13 +6,14 @@ Benchmarks
 The two main functions of :mod:`pyquickbench`.
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: _generated/
    :nosignatures:
-   :recursive:
 
    run_benchmark
    plot_benchmark
-   
+  
+.. _api-time-train:
+ 
 ==========
 Time Train
 ==========
@@ -20,9 +21,8 @@ Time Train
 Provides rudimentary profiling features to be used with :mod:`pyquickbench`.
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: _generated/
    :nosignatures:
-   :recursive:
 
    TimeTrain
    TimeTrain.toc
@@ -35,24 +35,47 @@ Constants
 
 A few named constants and default values in :mod:`pyquickbench`.
 
+Named axes
+==========
+
 .. autosummary::
-   :toctree: generated/
+   :toctree: _generated/
    :nosignatures:
-   :recursive:
    
    default_ax_name
    fun_ax_name
    repeat_ax_name
    out_ax_name
+   
+Data handling
+=============
+
+.. autosummary::
+   :toctree: _generated/
+   :nosignatures:
+
    all_reductions
    all_plot_intents
    all_transforms
    
+Default curve styling
+=====================
+
+.. autosummary::
+   :toctree: _generated/
+   :nosignatures:
+   
+   default_color_list
+   default_linestyle_list
+   default_pointstyle_list
+      
+      
 """
 
 from ._benchmark  import run_benchmark, plot_benchmark
 
 from ._defaults   import default_ax_name, fun_ax_name, repeat_ax_name, out_ax_name
+from ._defaults   import default_color_list, default_linestyle_list, default_pointstyle_list
 from ._defaults   import all_reductions, all_plot_intents, all_transforms
 from ._time_train import TimeTrain
 
@@ -128,4 +151,38 @@ all_transforms = all_transforms
 
    * :func:`pyquickbench.plot_benchmark` : Plot benchmarks
 
+"""
+
+default_color_list = default_color_list
+""" Default list of curve colors.
+
+   Can be overriden using the ``color_list`` argument of :func:`pyquickbench.plot_benchmark`.
+   
+   .. rubric:: See Also
+
+   * :func:`pyquickbench.plot_benchmark` : Plot benchmarks
+   * :ref:`matplotlib:sphx_glr_users_explain_colors_colors.py` in the official matplotlib documentation.
+
+"""
+
+default_linestyle_list = default_linestyle_list
+""" Default list of curve linestyles.
+
+   Can be overriden using the ``linestyle_list`` argument of :func:`pyquickbench.plot_benchmark`.
+
+   .. rubric:: See Also
+
+   * :func:`pyquickbench.plot_benchmark`
+   * :ref:`matplotlib:sphx_glr_gallery_lines_bars_and_markers_linestyles.py` in the official matplotlib documentation.
+"""
+
+default_pointstyle_list = default_pointstyle_list
+""" Default list of curve markers.
+
+   Can be overriden using the ``pointstyle_list`` argument of :func:`pyquickbench.plot_benchmark`.
+
+   .. rubric:: See Also
+
+   * :func:`pyquickbench.plot_benchmark`
+   * :mod:`matplotlib:matplotlib.markers`
 """

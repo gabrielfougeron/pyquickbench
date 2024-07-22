@@ -17,6 +17,7 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/
 	rm -rf source/_build/
+	rm -rf source/_generated/
 
 all:
 	make html
