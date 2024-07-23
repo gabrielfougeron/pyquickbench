@@ -4,7 +4,7 @@ Numpy array initialization
 """
 
 # %% 
-# This benchmark compares the execution time of several :func:`numpy:numpy.array` initialization routines.
+# This benchmark compares the execution time of several :class:`numpy:numpy.ndarray` initialization routines.
 
 # sphinx_gallery_start_ignore
 

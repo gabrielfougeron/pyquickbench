@@ -25,7 +25,7 @@ Benchmark of inplace conjugation of arrays
 
 This is a benchmark of different ways to perform inplace conjugation of a complex numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-80
+.. GENERATED FROM PYTHON SOURCE LINES 9-81
 
 .. code-block:: Python
 
@@ -90,6 +90,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         setup = prepare_x               ,
         n_repeat = n_repeat             ,
         filename = timings_filename     ,
+        ShowProgress = True             ,
     )
 
     pyquickbench.plot_benchmark(
@@ -112,7 +113,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-141
+.. GENERATED FROM PYTHON SOURCE LINES 128-142
 
 .. code-block:: Python
 
@@ -156,6 +157,10 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: Inplace_conjugate.py <Inplace_conjugate.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Inplace_conjugate.zip <Inplace_conjugate.zip>`
 
 
 .. only:: html

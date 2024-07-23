@@ -4,7 +4,7 @@ Plotting scalar values
 """
 
 # %%
-# :mod:`pyquickbench` is not only designed to measure the execution time of your Python routines, but also their output. Suppose you want to understand the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy.integrate`:
+# :mod:`pyquickbench` is not only designed to measure and plot the execution time of your Python routines, but also their output. Suppose you want to understand the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy.integrate`:
 
 method_names = [
     "RK45"  ,  

@@ -52,7 +52,7 @@ def run_benchmark(
     PreventBenchmark: bool                      = False                     ,
     StopOnExcept    : bool                      = False                     ,
     ShowProgress    : bool                      = False                     ,
-    WarmUp          : bool                      = True                      ,
+    WarmUp          : bool                      = False                     ,
     MonotonicAxes   : list                      = []                        ,
     timeout         : float                     = 1.                        ,
     show            : bool                      = False                     ,

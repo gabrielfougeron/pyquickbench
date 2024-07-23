@@ -162,6 +162,10 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
       :download:`Download Python source code: Hashing.py <Hashing.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Hashing.zip <Hashing.zip>`
+
 
 .. only:: html
 

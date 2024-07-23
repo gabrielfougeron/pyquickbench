@@ -129,6 +129,10 @@ From this benchmark, it is easy to see that initializing a list to a given lengt
 
       :download:`Download Python source code: 01-First_benchmark.py <01-First_benchmark.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 01-First_benchmark.zip <01-First_benchmark.zip>`
+
 
 .. only:: html
 

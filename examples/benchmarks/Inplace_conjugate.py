@@ -112,6 +112,7 @@ all_values = pyquickbench.run_benchmark(
     setup = prepare_x               ,
     n_repeat = n_repeat             ,
     filename = timings_filename     ,
+    ShowProgress = True             ,
 )
 
 pyquickbench.plot_benchmark(

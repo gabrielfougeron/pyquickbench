@@ -267,6 +267,10 @@ We can also see that different methods need different sizes of input to reach th
 
       :download:`Download Python source code: 08-Lengthy_benchmarks.py <08-Lengthy_benchmarks.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 08-Lengthy_benchmarks.zip <08-Lengthy_benchmarks.zip>`
+
 
 .. only:: html
 

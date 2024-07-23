@@ -239,6 +239,10 @@ This comes with hardly any loss of generality since it is possible to wrap these
 
       :download:`Download Python source code: 03-Preparing_inputs.py <03-Preparing_inputs.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 03-Preparing_inputs.zip <03-Preparing_inputs.zip>`
+
 
 .. only:: html
 

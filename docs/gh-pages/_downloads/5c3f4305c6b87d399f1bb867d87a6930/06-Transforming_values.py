@@ -220,21 +220,12 @@ th_cvg_rate = {
     "Radau" : 5, 
 }
 
-fig, ax = plt.subplots(
-    nrows = 1                       ,
-    ncols = 1                       ,
-    figsize = (1600/150, 800/150)   ,
-    dpi = 150                       ,
-    squeeze = False                 ,
-)
-
-pyquickbench.plot_benchmark(
+fig, ax = pyquickbench.plot_benchmark(
     bench_results                           ,
     all_nint                                ,
     bench                                   ,
     mode = "scalar_output"                  ,
-    fig = fig                               ,
-    ax = ax                                 ,
+    show = False                            ,
     plot_ylim = plot_ylim                   ,
     ylabel = "Measured convergence rate"    ,
     logx_plot = True                        ,

@@ -335,6 +335,10 @@ The list of all possible ``plot_intent`` values is available in :data:`pyquickbe
 
       :download:`Download Python source code: 07-Multidimensional_benchmarks.py <07-Multidimensional_benchmarks.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 07-Multidimensional_benchmarks.zip <07-Multidimensional_benchmarks.zip>`
+
 
 .. only:: html
 

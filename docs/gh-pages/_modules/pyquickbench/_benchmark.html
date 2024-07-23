@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -496,7 +496,7 @@ document.write(`
     <span class="n">PreventBenchmark</span><span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">StopOnExcept</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">ShowProgress</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">WarmUp</span>          <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">True</span>                      <span class="p">,</span>
+    <span class="n">WarmUp</span>          <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">MonotonicAxes</span>   <span class="p">:</span> <span class="nb">list</span>                      <span class="o">=</span> <span class="p">[]</span>                        <span class="p">,</span>
     <span class="n">timeout</span>         <span class="p">:</span> <span class="nb">float</span>                     <span class="o">=</span> <span class="mf">1.</span>                        <span class="p">,</span>
     <span class="n">show</span>            <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
@@ -759,7 +759,11 @@ document.write(`
                                 <span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span>        <span class="p">,</span>
                                 <span class="kc">None</span>                            <span class="p">,</span>
                             <span class="p">]</span>                                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="n">ax</span>                      <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>      <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">ax</span>                      <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]</span>            <span class="p">,</span>
+                                <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span>                        <span class="p">,</span>
+                                <span class="kc">None</span>                            <span class="p">,</span>
+                            <span class="p">]</span>                                   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">dpi</span>                     <span class="p">:</span> <span class="nb">int</span>                               <span class="o">=</span> <span class="mi">150</span>                       <span class="p">,</span>
     <span class="n">pxl_per_plot_x</span>          <span class="p">:</span> <span class="nb">int</span>                               <span class="o">=</span> <span class="mi">1600</span>                      <span class="p">,</span>
     <span class="n">pxl_per_plot_y</span>          <span class="p">:</span> <span class="nb">int</span>                               <span class="o">=</span> <span class="mi">800</span>                       <span class="p">,</span>
@@ -777,7 +781,8 @@ document.write(`
     <span class="n">transform</span>               <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">clip_vals</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">stop_after_first_clip</span>   <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span> <span class="p">:</span>    
+    <span class="n">filename</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="p">:</span>    
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots benchmarks results</span>
 
 <span class="sd">    Parameters</span>
@@ -819,7 +824,7 @@ document.write(`
 <span class="sd">        List of point markers for plotted curves, by default ``default_pointstyle_list``.</span>
 <span class="sd">    alpha : float, optional</span>
 <span class="sd">        Alpha value for transparency of curves in plot.\n</span>
-<span class="sd">        By default, ``1.`` meaning curves are fully opaque            </span>
+<span class="sd">        By default, ``1.`` meaning curves are fully opaque.</span>
 <span class="sd">    single_values_idx : dict | None, optional</span>
 <span class="sd">        Indices of benchmarked values to be fixed by a ``plot_intent`` of ``&quot;single_value&quot;``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n</span>
@@ -844,9 +849,11 @@ document.write(`
 <span class="sd">        By defaut ``False``.</span>
 <span class="sd">    fig : matplotlib.figure.Figure | None, optional</span>
 <span class="sd">        User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n </span>
+<span class="sd">        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n</span>
 <span class="sd">        By default ``None``.</span>
 <span class="sd">    ax : plt.Axes | None, optional</span>
 <span class="sd">        User provided array of :class:`matplotlib:matplotlib.axes.Axes` objects as returned by :func:`matplotlib:matplotlib.pyplot.subplots`.\n</span>
+<span class="sd">        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n</span>
 <span class="sd">        By default ``None``.</span>
 <span class="sd">    dpi : int, optional</span>
 <span class="sd">        Output image resolution, by default ``150``.</span>
@@ -886,10 +893,13 @@ document.write(`
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
 <span class="sd">    clip_vals : bool, optional</span>
 <span class="sd">        Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.</span>
-<span class="sd">        By default``None``.\n</span>
+<span class="sd">        By default ``None``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
 <span class="sd">    stop_after_first_clip : bool, optional</span>
 <span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False</span>
+<span class="sd">    filename : str | None, optional</span>
+<span class="sd">        If not ``None``, saves resulting figure in ``filename``.\n</span>
+<span class="sd">        By default ``None``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># print(f&#39;{all_vals = }&#39;)</span>
@@ -1576,6 +1586,9 @@ document.write(`
             <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     
     <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>

@@ -346,6 +346,10 @@ Using a ``*.npz`` file as an output allows :func:`pyquickbench.run_benchmark` to
 
       :download:`Download Python source code: 02-Caching_benchmarks.py <02-Caching_benchmarks.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 02-Caching_benchmarks.zip <02-Caching_benchmarks.zip>`
+
 
 .. only:: html
 

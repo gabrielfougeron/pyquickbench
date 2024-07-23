@@ -23,7 +23,7 @@ Plotting scalar values
 
 .. GENERATED FROM PYTHON SOURCE LINES 7-8
 
-:mod:`pyquickbench` is not only designed to measure the execution time of your Python routines, but also their output. Suppose you want to understand the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy.integrate`:
+:mod:`pyquickbench` is not only designed to measure and plot the execution time of your Python routines, but also their output. Suppose you want to understand the convergence behavior of the following ODE integrators provided by :mod:`scipy:scipy.integrate`:
 
 .. GENERATED FROM PYTHON SOURCE LINES 8-17
 
@@ -237,6 +237,10 @@ The best method for a given use case is a compromise between speed and accuracy.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 05-Plotting_scalars.py <05-Plotting_scalars.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 05-Plotting_scalars.zip <05-Plotting_scalars.zip>`
 
 
 .. only:: html

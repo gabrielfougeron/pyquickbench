@@ -122,6 +122,10 @@ This default can be overriden with the argument ``StopOnExcept`` set to ``True``
 
       :download:`Download Python source code: 04-Error_handling.py <04-Error_handling.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 04-Error_handling.zip <04-Error_handling.zip>`
+
 
 .. only:: html
 

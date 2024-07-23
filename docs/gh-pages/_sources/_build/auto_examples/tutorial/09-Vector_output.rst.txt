@@ -203,6 +203,10 @@ The above plot shows a very distinct behavior for the estimation of the minimum 
 
       :download:`Download Python source code: 09-Vector_output.py <09-Vector_output.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 09-Vector_output.zip <09-Vector_output.zip>`
+
 
 .. only:: html
 

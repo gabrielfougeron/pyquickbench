@@ -69,36 +69,19 @@ Description of the machine on which benchmarks were run.
               product: Microsoft Corporation
               vendor: Microsoft Corporation
               physical id: 2
-              bus info: pci@4143:00:00.0
+              bus info: pci@2f20:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
               capabilities: bus_master cap_list
               configuration: driver=dxgkrnl latency=0
               resources: irq:0
-         *-scsi
-              description: SCSI storage controller
-              product: Virtio console
-              vendor: Red Hat, Inc.
-              physical id: 3
-              bus info: pci@6625:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
-            *-virtio0 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@0
-                 configuration: driver=virtio_console
          *-generic
               description: System peripheral
               product: Red Hat, Inc.
               vendor: Red Hat, Inc.
-              physical id: 4
-              bus info: pci@86b4:00:00.0
+              physical id: 3
+              bus info: pci@4b37:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -114,14 +97,31 @@ Description of the machine on which benchmarks were run.
               description: 3D controller
               product: Microsoft Corporation
               vendor: Microsoft Corporation
-              physical id: 5
-              bus info: pci@c0b1:00:00.0
+              physical id: 4
+              bus info: pci@8808:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
               capabilities: bus_master cap_list
               configuration: driver=dxgkrnl latency=0
               resources: irq:0
+         *-scsi
+              description: SCSI storage controller
+              product: Virtio console
+              vendor: Red Hat, Inc.
+              physical id: 5
+              bus info: pci@9b5d:00:00.0
+              version: 01
+              width: 64 bits
+              clock: 33MHz
+              capabilities: scsi bus_master cap_list
+              configuration: driver=virtio-pci latency=64
+              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
+            *-virtio0 UNCLAIMED
+                 description: Virtual I/O device
+                 physical id: 0
+                 bus info: virtio@0
+                 configuration: driver=virtio_console
          *-pnp00:00
               product: PnP device PNP0b00
               physical id: 6
@@ -131,7 +131,7 @@ Description of the machine on which benchmarks were run.
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:34:55:d8
+           serial: 00:15:5d:46:36:bc
            size: 10Gbit/s
            capabilities: ethernet physical
            configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.153.1-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
@@ -164,8 +164,8 @@ Numpy configuration informations
       blas:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas64/include
-        lib directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas64/lib
+        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/include
+        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/lib
         name: scipy-openblas
         openblas configuration: OpenBLAS 0.3.27  USE64BITINT DYNAMIC_ARCH NO_AFFINITY
           Zen MAX_THREADS=64
@@ -174,8 +174,8 @@ Numpy configuration informations
       lapack:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas64/include
-        lib directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas64/lib
+        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/include
+        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/lib
         name: scipy-openblas
         openblas configuration: OpenBLAS 0.3.27  USE64BITINT DYNAMIC_ARCH NO_AFFINITY
           Zen MAX_THREADS=64
@@ -209,8 +209,8 @@ Numpy configuration informations
         family: x86_64
         system: linux
     Python Information:
-      path: /tmp/build-env-hlh08g23/bin/python
-      version: '3.11'
+      path: /tmp/build-env-zw_fgdi0/bin/python
+      version: '3.12'
     SIMD Extensions:
       baseline:
       - SSE
@@ -261,8 +261,8 @@ Scipy configuration informations
       blas:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas32/include
-        lib directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas32/lib
+        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas32/include
+        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas32/lib
         name: scipy-openblas
         openblas configuration: OpenBLAS 0.3.27.dev DYNAMIC_ARCH NO_AFFINITY Zen MAX_THREADS=64
         pc file directory: /project
@@ -270,8 +270,8 @@ Scipy configuration informations
       lapack:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas32/include
-        lib directory: /opt/_internal/cpython-3.11.8/lib/python3.11/site-packages/scipy_openblas32/lib
+        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas32/include
+        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas32/lib
         name: scipy-openblas
         openblas configuration: OpenBLAS 0.3.27.dev DYNAMIC_ARCH NO_AFFINITY Zen MAX_THREADS=64
         pc file directory: /project
@@ -303,7 +303,7 @@ Scipy configuration informations
         name: gcc
         version: 10.2.1
       pythran:
-        include directory: ../../tmp/pip-build-env-bg_opkya/overlay/lib/python3.11/site-packages/pythran
+        include directory: ../../tmp/pip-build-env-ufvy_lvk/overlay/lib/python3.12/site-packages/pythran
         version: 0.16.1
     Machine Information:
       build:
@@ -318,8 +318,8 @@ Scipy configuration informations
         family: x86_64
         system: linux
     Python Information:
-      path: /opt/python/cp311-cp311/bin/python
-      version: '3.11'
+      path: /opt/python/cp312-cp312/bin/python
+      version: '3.12'
 
 
 
@@ -339,6 +339,10 @@ Scipy configuration informations
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: Benchmark_Hardware_Info.py <Benchmark_Hardware_Info.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Benchmark_Hardware_Info.zip <Benchmark_Hardware_Info.zip>`
 
 
 .. only:: html
