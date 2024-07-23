@@ -312,7 +312,11 @@ def plot_benchmark(
                                 matplotlib.figure.Figure        ,
                                 None                            ,
                             ]                                   = None                      ,
-    ax                      : typing.Union[plt.Axes, None]      = None                      ,
+    ax                      : typing.Union[
+                                np.ndarray[plt.Axes]            ,
+                                plt.Axes                        ,
+                                None                            ,
+                            ]                                   = None                      ,
     dpi                     : int                               = 150                       ,
     pxl_per_plot_x          : int                               = 1600                      ,
     pxl_per_plot_y          : int                               = 800                       ,
@@ -330,7 +334,8 @@ def plot_benchmark(
     transform               : typing.Union[str, None]           = None                      ,
     clip_vals               : bool                              = False                     ,
     stop_after_first_clip   : bool                              = False                     ,
-) -> None :    
+    filename                : typing.Union[str, None]           = None                      ,
+) -> typing.Union[tuple[matplotlib.figure.Figure, np.ndarray[plt.Axes]], None] :    
     """Plots benchmarks results
 
     Parameters
@@ -372,7 +377,7 @@ def plot_benchmark(
         List of point markers for plotted curves, by default ``default_pointstyle_list``.
     alpha : float, optional
         Alpha value for transparency of curves in plot.\n
-        By default, ``1.`` meaning curves are fully opaque            
+        By default, ``1.`` meaning curves are fully opaque.
     single_values_idx : dict | None, optional
         Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
@@ -397,9 +402,11 @@ def plot_benchmark(
         By defaut ``False``.
     fig : matplotlib.figure.Figure | None, optional
         User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n 
+        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n
         By default ``None``.
     ax : plt.Axes | None, optional
         User provided array of :class:`matplotlib:matplotlib.axes.Axes` objects as returned by :func:`matplotlib:matplotlib.pyplot.subplots`.\n
+        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n
         By default ``None``.
     dpi : int, optional
         Output image resolution, by default ``150``.
@@ -439,10 +446,13 @@ def plot_benchmark(
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
     clip_vals : bool, optional
         Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.
-        By default``None``.\n
+        By default ``None``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
     stop_after_first_clip : bool, optional
         Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False
+    filename : str | None, optional
+        If not ``None``, saves resulting figure in ``filename``.\n
+        By default ``None``.
     """
 
     # print(f'{all_vals = }')
@@ -1129,6 +1139,9 @@ def plot_benchmark(
             fig.suptitle(title, fontsize=20)
 
     plt.tight_layout()
+    
+    if filename is not None:
+        plt.savefig(filename)
     
     if show:
         return plt.show()

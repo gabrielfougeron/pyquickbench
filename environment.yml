@@ -2,7 +2,7 @@ name: pyquickbench-dev
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python
   - build
   - pip
   - pip:

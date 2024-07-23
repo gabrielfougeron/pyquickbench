@@ -181,7 +181,7 @@ sphinx_gallery_conf = {
         "../../examples/tutorial"  ,
         "../../examples/benchmarks",
     ])                                                      ,
-    "within_subsection_order"   : FileNameSortKey           ,
+    "within_subsection_order"   : "FileNameSortKey"         ,
     "backreferences_dir"        : "_build/generated"        ,
     "image_scrapers"            : ("matplotlib",)           ,
     "default_thumb_file"        : html_logo_abs             ,
