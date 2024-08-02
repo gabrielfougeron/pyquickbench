@@ -31,9 +31,9 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
 
 
-    import pyquickbench
-    import numpy as np
     import random
+    import pyquickbench
+
     def randbytes(n):
         return {'data':random.randbytes(n)}
 
@@ -82,7 +82,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         sha3_512    ,
     ]
 
-    all_sizes = np.array([2**n for n in range(25)])
+    all_sizes = [2**n for n in range(25)]
     basename = 'Hashing_bench'
     timings_filename = os.path.join(timings_folder, basename+'.npz')
 
@@ -117,7 +117,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-136
+.. GENERATED FROM PYTHON SOURCE LINES 116-130
 
 .. code-block:: Python
 

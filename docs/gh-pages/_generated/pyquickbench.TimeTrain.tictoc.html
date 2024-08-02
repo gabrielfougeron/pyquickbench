@@ -29,6 +29,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -53,6 +54,8 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/assets/jsonview.bundle.js?v=18cd53c5"></script>
     <script src="../_static/assets/jsonview_loader.js?v=f7ff7e7d"></script>
@@ -397,27 +400,32 @@ document.write(`
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.run_benchmark.html">pyquickbench.run_benchmark</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.plot_benchmark.html">pyquickbench.plot_benchmark</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Time Train</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.html">pyquickbench.TimeTrain</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.toc.html">pyquickbench.TimeTrain.toc</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">pyquickbench.TimeTrain.tictoc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.to_dict.html">pyquickbench.TimeTrain.to_dict</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Named axes</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.default_ax_name.html">pyquickbench.default_ax_name</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.fun_ax_name.html">pyquickbench.fun_ax_name</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.repeat_ax_name.html">pyquickbench.repeat_ax_name</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.out_ax_name.html">pyquickbench.out_ax_name</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Data handling</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.all_reductions.html">pyquickbench.all_reductions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.all_plot_intents.html">pyquickbench.all_plot_intents</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.all_transforms.html">pyquickbench.all_transforms</a></li>
 </ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Default curve styling</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.default_color_list.html">pyquickbench.default_color_list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.default_linestyle_list.html">pyquickbench.default_linestyle_list</a></li>

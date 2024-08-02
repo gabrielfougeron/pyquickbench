@@ -25,11 +25,14 @@ Numpy array initialization
 
 This benchmark compares the execution time of several :class:`numpy:numpy.ndarray` initialization routines.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-42
+.. GENERATED FROM PYTHON SOURCE LINES 8-45
 
 .. code-block:: Python
 
 
+
+    import numpy as np
+    import pyquickbench
 
     dtypes_dict = {
         "float32" : np.float32,
@@ -70,7 +73,7 @@ This benchmark compares the execution time of several :class:`numpy:numpy.ndarra
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-113
+.. GENERATED FROM PYTHON SOURCE LINES 84-109
 
 .. code-block:: Python
 
@@ -111,32 +114,12 @@ This benchmark compares the execution time of several :class:`numpy:numpy.ndarra
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-127
+.. GENERATED FROM PYTHON SOURCE LINES 110-116
 
-.. code-block:: Python
-
-
-    relative_to_val = {pyquickbench.fun_ax_name : 'empty'}
-
-    pyquickbench.plot_benchmark(
-        all_timings                             ,
-        all_args                                ,
-        all_funs                                ,
-        plot_intent = plot_intent               ,
-        show = True                             ,
-        relative_to_val = relative_to_val       ,
-    )
+While these measurement seem surprizing, they are explained in `the numpy documentation <https://numpy.org/doc/stable/benchmarking.html>`_ :
 
 
-
-
-
-.. image-sg:: /_build/auto_examples/benchmarks/images/sphx_glr_numpy_array_init_002.png
-   :alt: numpy array init
-   :srcset: /_build/auto_examples/benchmarks/images/sphx_glr_numpy_array_init_002.png
-   :class: sphx-glr-single-img
-
-
+      Be mindful that large arrays created with ``np.empty`` or ``np.zeros`` might not be allocated in physical memory until the memory is accessed. [...] One can force pagefaults to occur in the setup phase either by calling ``np.ones`` or ``arr.fill(value)`` after creating the array.
 
 
 

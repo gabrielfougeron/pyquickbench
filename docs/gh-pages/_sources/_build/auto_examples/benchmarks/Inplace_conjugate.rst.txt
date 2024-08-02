@@ -25,13 +25,22 @@ Benchmark of inplace conjugation of arrays
 
 This is a benchmark of different ways to perform inplace conjugation of a complex numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-81
+.. GENERATED FROM PYTHON SOURCE LINES 9-91
 
 .. code-block:: Python
 
 
 
+    import numpy as np
+    import numba as nb
     import pyquickbench
+
+    numba_opt_dict = {
+        'nopython':True     ,
+        'cache':True        ,
+        'fastmath':True     ,
+        'nogil':True        ,
+    }
 
     def numpy_ufunc_outofplace(x):
         x = np.conjugate(x)
@@ -91,6 +100,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
         n_repeat = n_repeat             ,
         filename = timings_filename     ,
         ShowProgress = True             ,
+        # ForceBenchmark = True           ,
     )
 
     pyquickbench.plot_benchmark(
@@ -113,7 +123,7 @@ This is a benchmark of different ways to perform inplace conjugation of a comple
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-142
+.. GENERATED FROM PYTHON SOURCE LINES 123-137
 
 .. code-block:: Python
 
