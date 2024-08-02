@@ -26,12 +26,6 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-os.environ['NUMEXPR_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['TBB_NUM_THREADS'] = '1'
-
 import matplotlib.pyplot as plt
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
@@ -43,9 +37,9 @@ if not(os.path.isdir(timings_folder)):
 
 # sphinx_gallery_end_ignore
 
-import pyquickbench
-import numpy as np
 import random
+import pyquickbench
+
 def randbytes(n):
     return {'data':random.randbytes(n)}
 
@@ -94,7 +88,7 @@ all_funs = [
     sha3_512    ,
 ]
 
-all_sizes = np.array([2**n for n in range(25)])
+all_sizes = [2**n for n in range(25)]
 basename = 'Hashing_bench'
 timings_filename = os.path.join(timings_folder, basename+'.npz')
 

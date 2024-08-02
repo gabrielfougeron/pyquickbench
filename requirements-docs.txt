@@ -10,5 +10,6 @@ myst-parser
 sphinxext-rediraffe
 sphinx-sitemap
 sphinx-design
+sphinx-copybutton
 scipy
 numba

@@ -26,22 +26,7 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-os.environ['NUMEXPR_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['TBB_NUM_THREADS'] = '1'
-
 import matplotlib.pyplot as plt
-import numpy as np
-import numba as nb
-
-numba_opt_dict = {
-    'nopython':True     ,
-    'cache':True        ,
-    'fastmath':True     ,
-    'nogil':True        ,
-}
 
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
@@ -53,7 +38,16 @@ if not(os.path.isdir(timings_folder)):
 
 # sphinx_gallery_end_ignore
 
+import numpy as np
+import numba as nb
 import pyquickbench
+
+numba_opt_dict = {
+    'nopython':True     ,
+    'cache':True        ,
+    'fastmath':True     ,
+    'nogil':True        ,
+}
 
 def numpy_ufunc_outofplace(x):
     x = np.conjugate(x)
@@ -113,6 +107,7 @@ all_values = pyquickbench.run_benchmark(
     n_repeat = n_repeat             ,
     filename = timings_filename     ,
     ShowProgress = True             ,
+    # ForceBenchmark = True           ,
 )
 
 pyquickbench.plot_benchmark(

@@ -42,6 +42,7 @@ extensions = [
     "sphinxext.rediraffe"           ,
     "sphinx_sitemap"                ,
     "sphinx_design"                 ,
+    'sphinx_copybutton'             ,
 ]
 
 # The suffix of source filenames.
@@ -244,6 +245,7 @@ napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
 autodoc_typehints = "description"
+autosummary_generate = True
 
 ##########################
 # Sitemap and robots.txt #

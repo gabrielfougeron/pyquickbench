@@ -23,12 +23,7 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-import functools
 import matplotlib.pyplot as plt
-import numpy as np
-import math as m
-import scipy
-import numba as nb
 
 numba_opt_dict = {
     'nopython':True     ,
@@ -36,8 +31,6 @@ numba_opt_dict = {
     'fastmath':True     ,
     'nogil':True        ,
 }
-
-import pyquickbench
 
 if ("--no-show" in sys.argv):
     plt.show = (lambda : None)
@@ -51,6 +44,9 @@ basename = 'numpy_array_init'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 # sphinx_gallery_end_ignore
+
+import numpy as np
+import pyquickbench
 
 dtypes_dict = {
     "float32" : np.float32,
@@ -111,16 +107,9 @@ pyquickbench.plot_benchmark(
 )
 
 # %%
-
-relative_to_val = {pyquickbench.fun_ax_name : 'empty'}
-
-pyquickbench.plot_benchmark(
-    all_timings                             ,
-    all_args                                ,
-    all_funs                                ,
-    plot_intent = plot_intent               ,
-    show = True                             ,
-    relative_to_val = relative_to_val       ,
-)
-
-
+# While these measurement seem surprizing, they are explained in `the numpy documentation <https://numpy.org/doc/stable/benchmarking.html>`_ :
+# 
+# 
+#       Be mindful that large arrays created with ``np.empty`` or ``np.zeros`` might not be allocated in physical memory until the memory is accessed. [...] One can force pagefaults to occur in the setup phase either by calling ``np.ones`` or ``arr.fill(value)`` after creating the array.
+# 
+# 

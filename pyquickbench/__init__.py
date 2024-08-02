@@ -7,6 +7,7 @@ The two main functions of :mod:`pyquickbench`.
 
 .. autosummary::
    :toctree: _generated/
+   :caption: Benchmarks
    :nosignatures:
 
    run_benchmark
@@ -22,6 +23,7 @@ Provides rudimentary profiling features to be used with :mod:`pyquickbench`.
 
 .. autosummary::
    :toctree: _generated/
+   :caption: Time Train
    :nosignatures:
 
    TimeTrain
@@ -40,8 +42,9 @@ Named axes
 
 .. autosummary::
    :toctree: _generated/
+   :caption: Named axes
    :nosignatures:
-   
+
    default_ax_name
    fun_ax_name
    repeat_ax_name
@@ -52,6 +55,7 @@ Data handling
 
 .. autosummary::
    :toctree: _generated/
+   :caption: Data handling
    :nosignatures:
 
    all_reductions
@@ -63,6 +67,7 @@ Default curve styling
 
 .. autosummary::
    :toctree: _generated/
+   :caption: Default curve styling
    :nosignatures:
    
    default_color_list
@@ -98,15 +103,15 @@ all_reductions = all_reductions
 
    List of all available data reductions to be used in :func:`pyquickbench.plot_benchmark` or :class:`pyquickbench.TimeTrain`.
 
-   * "avg"       : Average 
-   * "min"       : Minimum
-   * "max"       : Maximum
-   * "median"    : Median
-   * "sum"       : Sum
-   * "logavg"    : Exponential of average of log
-   * "first_el"  : First element in the array
-   * "last_el"   : Last element in the array
-   * "random_el" : An element in the array picked randomly with uniform probability
+   * ``"avg"``       : Average 
+   * ``"min"``       : Minimum
+   * ``"max"``       : Maximum
+   * ``"median"``    : Median
+   * ``"sum"``       : Sum
+   * ``"logavg"``    : Exponential of average of log
+   * ``"first_el"``  : First element in the array
+   * ``"last_el"``   : Last element in the array
+   * ``"random_el"`` : An element in the array picked randomly with uniform probability
     
    .. rubric:: See Also
 
@@ -120,15 +125,15 @@ all_plot_intents = all_plot_intents
 
    List of all available plot intents to be used in :func:`pyquickbench.plot_benchmark`.
 
-   * "single_value"     : A single value is plotted. Requires either ``single_values_val`` or ``single_values_idx`` to be set.
-   * "points"           : Values are plotted as points along a curve.
-   * "same"             : All values are plotted the same way.
-   * "curve_color"      : Values are plotted as different curve colors.
-   * "curve_linestyle"  : Values are plotted as different curve line styles.
-   * "curve_pointstyle" : Values are plotted as different markers along the curve.
-   * "subplot_grid_x"   : Values are plotted on different plot aligned horizontally.
-   * "subplot_grid_y"   : Values are plotted on different plot aligned vertically.
-   * "reduction_``red``"    : Values are reduced before plotting. ``red`` can be any string in :data:`pyquickbench.all_reductions`.
+   * ``"single_value"``       : A single value is plotted. Requires either ``single_values_val`` or ``single_values_idx`` to be set.
+   * ``"points"``             : Values are plotted as points along a curve.
+   * ``"same"``               : All values are plotted the same way.
+   * ``"curve_color"``        : Values are plotted as different curve colors.
+   * ``"curve_linestyle"``    : Values are plotted as different curve line styles.
+   * ``"curve_pointstyle"``   : Values are plotted as different markers along the curve.
+   * ``"subplot_grid_x"``     : Values are plotted on different plot aligned horizontally.
+   * ``"subplot_grid_y"``     : Values are plotted on different plot aligned vertically.
+   * ``"reduction_[red]"``    : Values are reduced before plotting. ``[red]`` can be any string in :data:`pyquickbench.all_reductions`.
 
    .. rubric:: See Also
 
@@ -142,8 +147,8 @@ all_transforms = all_transforms
 
    List of all available data transformations to be used in :func:`pyquickbench.plot_benchmark`.
 
-   * "pol_growth_order"  : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^\\alpha`.
-   * "pol_cvgence_order" : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
+   * ``"pol_growth_order"``  : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^\\alpha`.
+   * ``"pol_cvgence_order"`` : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
 
    See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
 
