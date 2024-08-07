@@ -358,6 +358,10 @@ def plot_benchmark(
         Describes how to handle the axes of the benchmark results array ``all_vals``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n
         By default ``None``.
+    plot_type : typing.Iterable[str] | None, optional
+        Any value that is not ``None`` overrides the default plot_type.\n
+        Possible values : ``"bar"``, ``"curve"``, ``"violin"``.\n
+        By default ``None``.
     mode : str, optional
         Benchmark mode, i.e. target of the benchmark.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n

@@ -157,29 +157,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# Another way to render data dispersion is the so-called "violin plot".
-
-fig, ax = pyquickbench.plot_benchmark(
-    all_values                  ,
-    all_sizes                   ,
-    all_funs                    ,
-    return_empty_plot = True    ,
-)
-
-plot_intent = {
-    pyquickbench.default_ax_name    : "points"          ,
-    pyquickbench.fun_ax_name        : "curve_color"     ,
-    pyquickbench.repeat_ax_name     : "reduction_median",
-}
-
-pyquickbench.plot_benchmark(
-    all_values                  ,
-    all_sizes                   ,
-    all_funs                    ,
-    plot_intent = plot_intent   ,
-    fig = fig                   ,
-    ax = ax                     ,
-)
+# Another way to render data dispersion is to use the "violin" plot intent. 
 
 plot_intent = {
     pyquickbench.default_ax_name    : "points"      ,
@@ -192,8 +170,6 @@ pyquickbench.plot_benchmark(
     all_sizes                   ,
     all_funs                    ,
     plot_intent = plot_intent   ,
-    fig = fig                   ,
-    ax = ax                     ,
     show = True                 ,
 )
 
