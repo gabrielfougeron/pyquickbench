@@ -156,6 +156,47 @@ for (
 plt.tight_layout()
 plt.show()
 
+# %%
+# Another way to render data dispersion is the so-called "violin plot".
+
+fig, ax = pyquickbench.plot_benchmark(
+    all_values                  ,
+    all_sizes                   ,
+    all_funs                    ,
+    return_empty_plot = True    ,
+)
+
+plot_intent = {
+    pyquickbench.default_ax_name    : "points"          ,
+    pyquickbench.fun_ax_name        : "curve_color"     ,
+    pyquickbench.repeat_ax_name     : "reduction_median",
+}
+
+pyquickbench.plot_benchmark(
+    all_values                  ,
+    all_sizes                   ,
+    all_funs                    ,
+    plot_intent = plot_intent   ,
+    fig = fig                   ,
+    ax = ax                     ,
+)
+
+plot_intent = {
+    pyquickbench.default_ax_name    : "points"      ,
+    pyquickbench.fun_ax_name        : "curve_color" ,
+    pyquickbench.repeat_ax_name     : "violin"      ,
+}
+
+pyquickbench.plot_benchmark(
+    all_values                  ,
+    all_sizes                   ,
+    all_funs                    ,
+    plot_intent = plot_intent   ,
+    fig = fig                   ,
+    ax = ax                     ,
+    show = True                 ,
+)
+
 
 # %% 
 # More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.

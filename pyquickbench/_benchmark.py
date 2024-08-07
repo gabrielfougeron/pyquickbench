@@ -32,6 +32,7 @@ from pyquickbench._utils import (
     _arg_names_list_to_idx  ,
     _product                ,
     _count_Truthy           ,
+    _log_violin_plot        ,
 )
 
 from pyquickbench._defaults import *
@@ -288,7 +289,8 @@ def plot_benchmark(
     plot_intent             : typing.Union[
                                 typing.Iterable[str]            ,
                                 None                            ,
-                            ]                                   = None                      ,        
+                            ]                                   = None                      ,
+    plot_type               : typing.Union[str, None]           = None                      ,
     mode                    : str                               = "timings"                 ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                                 = None                      ,
@@ -528,9 +530,9 @@ def plot_benchmark(
     assert n_funs == len(all_fun_names_list)
 
     if not(isinstance(color_list, list)):
-        color_list = [color_list]    
+        color_list = [color_list]
     if not(isinstance(linestyle_list, list)):
-        linestyle_list = [linestyle_list]    
+        linestyle_list = [linestyle_list]
     if not(isinstance(pointstyle_list, list)):
         pointstyle_list = [pointstyle_list]
     
@@ -570,7 +572,9 @@ def plot_benchmark(
             if not(intent in all_plot_intents):
                 raise ValueError(f'Unknown intent {intent} in plot_intent. Possible values are: {all_plot_intents}')
 
-        plot_intent = {name:plot_intent[name] for name in res_shape} 
+        plot_intent = {name:plot_intent[name] for name in res_shape} # In case the user passed extra keys
+        
+    unique_plot_intents = set(plot_intent.values())
 
     if plot_legend is None:
         
@@ -600,7 +604,6 @@ def plot_benchmark(
         if out_ax_name not in plot_legend:
             plot_legend[out_ax_name] = (n_out > 1)
                 
-            
         if not(len(plot_legend) == all_vals.ndim):  
             raise ValueError(f"Foud {len(plot_legend)} plot_legends. Expecting {all_vals.ndim}")
         
@@ -627,13 +630,14 @@ def plot_benchmark(
     idx_all_curve_color = []
     idx_all_curve_linestyle = []
     idx_all_curve_pointstyle = []
+    idx_all_violin = []
     idx_all_subplot_grid_x = []
     idx_all_subplot_grid_y = []
     idx_all_relative = []
     
     n_reductions = 0
     idx_all_reduction = {}
-    for name in all_reductions: # Valitity of reduction key was checked before
+    for name in all_reductions: # Validity of reduction key was checked before
         idx_all_reduction[name] = []
     
     idx_single_value = []
@@ -683,6 +687,8 @@ def plot_benchmark(
             idx_all_curve_pointstyle.append(i)
             name_curve_pointstyle.append(name)
             all_legend_curve_pointstyle.append(plot_legend[name])
+        elif value == 'violin':
+            idx_all_violin.append(i)
         elif value == 'subplot_grid_x':
             idx_all_subplot_grid_x.append(i)
             name_subplot_grid_x.append(name)
@@ -709,29 +715,35 @@ def plot_benchmark(
     if (n_reductions > 1):
         warnings.warn("Several reductions were requested. These reductions will be applied in the order of the axes of the benchmark. Watch out for surprizing results as reductions might not commute in general")
     
+    npts = all_vals.shape[idx_points]
+    
     idx_all_curves = []
-    idx_all_curves.extend(idx_all_same)
-    idx_all_curves.extend(idx_all_curve_color)
-    idx_all_curves.extend(idx_all_curve_linestyle)
-    idx_all_curves.extend(idx_all_curve_pointstyle)
-    idx_all_curves.extend(idx_all_subplot_grid_x)
-    idx_all_curves.extend(idx_all_subplot_grid_y)
+    idx_all_curves.extend(idx_all_same              )
+    idx_all_curves.extend(idx_all_curve_color       )
+    idx_all_curves.extend(idx_all_curve_linestyle   )
+    idx_all_curves.extend(idx_all_curve_pointstyle  )
+    idx_all_curves.extend(idx_all_violin            )
+    idx_all_curves.extend(idx_all_subplot_grid_x    )
+    idx_all_curves.extend(idx_all_subplot_grid_y    )
     
     idx_all_same                = np.array(idx_all_same             )
     idx_all_curve_color         = np.array(idx_all_curve_color      )
     idx_all_curve_linestyle     = np.array(idx_all_curve_linestyle  )
     idx_all_curve_pointstyle    = np.array(idx_all_curve_pointstyle )
+    idx_all_violin              = np.array(idx_all_violin           )
     idx_all_subplot_grid_x      = np.array(idx_all_subplot_grid_x   )
     idx_all_subplot_grid_y      = np.array(idx_all_subplot_grid_y   )
     
     for name in all_reductions:
         idx_all_reduction[name] = np.array(idx_all_reduction[name]  )
 
-    n_curves_color = _prod_rel_shapes(idx_all_curve_color, all_vals.shape)
-    n_curves_linestyle = _prod_rel_shapes(idx_all_curve_linestyle, all_vals.shape)
-    n_curves_pointstyle = _prod_rel_shapes(idx_all_curve_pointstyle, all_vals.shape)
-    n_subplot_grid_x = _prod_rel_shapes(idx_all_subplot_grid_x, all_vals.shape)
-    n_subplot_grid_y = _prod_rel_shapes(idx_all_subplot_grid_y, all_vals.shape)
+    n_curves_color      = _prod_rel_shapes(idx_all_curve_color      , all_vals.shape)
+    n_curves_linestyle  = _prod_rel_shapes(idx_all_curve_linestyle  , all_vals.shape)
+    n_curves_pointstyle = _prod_rel_shapes(idx_all_curve_pointstyle , all_vals.shape)
+    n_violin            = _prod_rel_shapes(idx_all_violin           , all_vals.shape)
+    n_subplot_grid_x    = _prod_rel_shapes(idx_all_subplot_grid_x   , all_vals.shape)
+    n_subplot_grid_y    = _prod_rel_shapes(idx_all_subplot_grid_y   , all_vals.shape)
+    n_same              = _prod_rel_shapes(idx_all_same             , all_vals.shape)
     
     n_curves = n_curves_color * n_curves_linestyle * n_curves_pointstyle
 
@@ -783,6 +795,31 @@ def plot_benchmark(
     if  return_empty_plot:
         return (fig, ax)    
         
+    all_plot_y_vals = np.ma.array(np.full((n_subplot_grid_x, n_subplot_grid_y, n_curves, n_same, n_violin, npts), np.nan))
+        
+    # What are we plotting ? Curves ? Bars ? Violins ?
+    if plot_type is None:
+        if "violin" in unique_plot_intents:
+            plot_type = "violin"
+            
+        else:
+            if all_xvalues is None:
+                if name_points == fun_ax_name:
+                    plot_type = "bar"
+                elif name_points == repeat_ax_name:
+                    plot_type = "curve"
+                else:
+                    if isinstance(all_args[name_points], str):
+                        plot_type = "bar"
+                    else:
+                        plot_type = "curve"
+            
+            else:
+                if all_xvalues.dtype == np.dtype.str: 
+                    plot_type = "bar"
+                else:
+                    plot_type = "curve"
+
     for idx_curve in itertools.product(*[range(all_vals.shape[i]) for i in idx_all_curves]):
         
         idx_vals = [None] * all_vals.ndim
@@ -795,6 +832,7 @@ def plot_benchmark(
         i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
         i_linestyle, idx_curve_linestyle = _get_rel_idx_from_maze(idx_all_curve_linestyle, idx_vals, all_vals.shape)
         i_pointstyle, idx_curve_pointstyle = _get_rel_idx_from_maze(idx_all_curve_pointstyle, idx_vals, all_vals.shape)
+        i_violin, idx_violin = _get_rel_idx_from_maze(idx_all_violin, idx_vals, all_vals.shape)
         i_subplot_grid_x, idx_subplot_grid_x =  _get_rel_idx_from_maze(idx_all_subplot_grid_x, idx_vals, all_vals.shape)
         i_subplot_grid_y, idx_subplot_grid_y =  _get_rel_idx_from_maze(idx_all_subplot_grid_y, idx_vals, all_vals.shape)
         i_same, idx_same =  _get_rel_idx_from_maze(idx_all_same, idx_vals, all_vals.shape)
@@ -843,7 +881,7 @@ def plot_benchmark(
             elif name_points == repeat_ax_name:
                 plot_x_val = np.array(range(n_repeat))
             else:
-                plot_x_val = all_args[name_points]
+                plot_x_val = np.array(all_args[name_points])
         else:  
             plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points, idx_all_reduction) 
             plot_x_val = plot_x_val.reshape(-1)
@@ -859,7 +897,7 @@ def plot_benchmark(
 
         plot_y_val = plot_y_val.reshape(-1)
 
-        npts = len(plot_x_val)
+        assert npts == len(plot_x_val)
         assert npts == len(plot_y_val)
         
         if transform in ["pol_growth_order", "pol_cvgence_order"]:
@@ -910,38 +948,82 @@ def plot_benchmark(
                     else:
                         plot_y_val[i_size] = np.nan
         
-        if isinstance(plot_x_val[0], str):
+        all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, i_violin, :] = plot_y_val
+    
+    for i_subplot_grid_x in range(n_subplot_grid_x):
+        for i_subplot_grid_y in range(n_subplot_grid_y):
+            cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]
             
-            logx_plot = False
-            
-            tick_width = 0.8
-            bar_width = tick_width / n_curves
-            x_pos_mid = np.arange(0, npts)
-            
-            x_pos = x_pos_mid + i_curve * bar_width - tick_width/2 + bar_width/2
+            for i_color in range(n_curves_color):
+                color = color_list[i_color % n_colors]
+                for i_linestyle in range(n_curves_linestyle):
+                    linestyle = linestyle_list[i_linestyle % n_linestyle]    
+                    for i_pointstyle in range(n_curves_pointstyle):
+                        pointstyle = pointstyle_list[i_pointstyle % n_pointstyle]
+                        i_curve = i_color + n_curves_color * (i_linestyle + n_curves_linestyle * i_pointstyle)
+                        
+                        for i_same in range(n_same):
+                            
+                            if plot_type == "bar":
+                                
+                                logx_plot = False
+                                tick_width = 0.8
+                                bar_width = tick_width / n_curves
+                                
+                                x_pos_mid = np.arange(0, npts)
+                                x_pos = x_pos_mid + i_curve * bar_width - tick_width/2 + bar_width/2
 
-            cur_ax.bar(
-                x_pos                       ,
-                plot_y_val                  ,
-                width       = bar_width     ,
-                color       = color         ,
-                linestyle   = linestyle     ,
-                alpha       = alpha         ,
-            )
+                                plot_y_val = all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
+                                
+                                cur_ax.bar(
+                                    x_pos                       ,
+                                    plot_y_val                  ,
+                                    width       = bar_width     ,
+                                    color       = color         ,
+                                    linestyle   = linestyle     ,
+                                    alpha       = alpha         ,
+                                )
 
-            plt.xticks(x_pos_mid, plot_x_val);
-        
-        else:    
-            
-            cur_ax.plot(
-                plot_x_val                  ,
-                plot_y_val                  ,
-                color       = color         ,
-                linestyle   = linestyle     ,
-                marker      = pointstyle    ,
-                alpha       = alpha         ,
-            )
-        
+                                plt.xticks(x_pos_mid, plot_x_val);
+                            
+                            elif plot_type == "curve":    
+                                
+                                plot_y_val = all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
+                                
+                                cur_ax.plot(
+                                    plot_x_val                  ,
+                                    plot_y_val                  ,
+                                    color       = color         ,
+                                    linestyle   = linestyle     ,
+                                    marker      = pointstyle    ,
+                                    alpha       = alpha         ,
+                                )
+                                
+                            elif plot_type == "violin":  
+             
+                                violin_res = _log_violin_plot(
+                                    cur_ax,
+                                    all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, :, :],
+                                    positions   = plot_x_val    ,
+                                    logx_plot = logx_plot       ,
+                                    logy_plot = logy_plot       ,
+                                )
+                                
+                                for pc in violin_res['bodies']:
+                                    pc.set_color(color)
+                                    pc.set_linestyle(linestyle)
+                                    # pc.set_alpha(alpha)
+                                                                        
+                                for key in ['cmeans', 'cmins', 'cmaxes', 'cbars', 'cmedians']:
+                                    pc = violin_res.get(key)
+                                    if pc is not None:
+                                        pc.set_color(color)
+                                        pc.set_linestyle(linestyle)
+                                        # pc.set_alpha(alpha)
+                                            
+                            else:
+                                raise ValueError(f"Unknown plot type : {plot_type}")
+                            
     if not(ProductLegend): 
         
         n_cat_color, i_cat_color = _count_Truthy(all_legend_curve_color)

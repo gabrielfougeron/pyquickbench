@@ -131,6 +131,7 @@ all_plot_intents = all_plot_intents
    * ``"curve_color"``        : Values are plotted as different curve colors.
    * ``"curve_linestyle"``    : Values are plotted as different curve line styles.
    * ``"curve_pointstyle"``   : Values are plotted as different markers along the curve.
+   * ``"violin"``             : Values are plotted as a violin dispersion plot.
    * ``"subplot_grid_x"``     : Values are plotted on different plot aligned horizontally.
    * ``"subplot_grid_y"``     : Values are plotted on different plot aligned vertically.
    * ``"reduction_[red]"``    : Values are reduced before plotting. ``[red]`` can be any string in :data:`pyquickbench.all_reductions`.
