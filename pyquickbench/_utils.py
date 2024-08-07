@@ -4,6 +4,9 @@ import math
 import inspect
 import copy
 import itertools
+import matplotlib.mlab as mlab
+import matplotlib.cbook as cbook
+import warnings
 
 import numpy as np
 
@@ -546,3 +549,59 @@ def _product(it):
         res *= item
         
     return res
+
+# From matplotlib
+def _kde_method(X, coords):
+    # Unpack in case of e.g. Pandas or xarray object
+    X = cbook._unpack_to_numpy(X)
+    # fallback gracefully if the vector contains only one value
+    if np.all(X[0] == X):
+        return (X[0] == coords).astype(float)
+    kde = mlab.GaussianKDE(X, None)
+    return kde.evaluate(coords)
+
+def _log_violin_plot(ax, dataset, positions=None, vert=None,
+                   orientation='vertical', showmeans=False,
+                   showextrema=True, showmedians=False, quantiles=None,
+                   points=100, bw_method=None, side='both', logx_plot=False, logy_plot=False):
+    
+    if logy_plot:
+        dataset = np.log(dataset)
+    
+    if positions is None:
+        widths = 0.5
+    else: 
+        if logx_plot:
+            widths = positions / (2*positions[0])
+        else:
+            if len(positions) < 2:
+                widths = 0.5 *positions[0]
+            else:
+                dp = np.array([positions[i+1]-positions[i] for i in range(len(positions)-1)])
+                widths = 0.5 * dp.mean()
+    
+            
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        vpstats = cbook.violin_stats(
+            dataset,
+            _kde_method,
+            points=points,
+            quantiles=quantiles,
+        )
+        
+    for stats in vpstats:
+        if logy_plot:
+            for key in ['coords','mean', 'median', 'min', 'max', 'quantiles']:
+                stats[key] = np.exp(stats[key])
+        
+    if orientation == 'vertical':
+        vert = True
+    
+    return ax.violin(
+        vpstats, positions=positions,
+        vert=vert,
+        # orientation=orientation, # new argument not supported on most matplotlib version
+        widths=widths,
+        showmeans=showmeans, showextrema=showextrema,
+        showmedians=showmedians, side=side)

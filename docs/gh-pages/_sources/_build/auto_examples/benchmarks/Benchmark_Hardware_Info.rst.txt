@@ -69,36 +69,7 @@ Description of the machine on which benchmarks were run.
               product: Microsoft Corporation
               vendor: Microsoft Corporation
               physical id: 2
-              bus info: pci@23ad:00:00.0
-              version: 00
-              width: 32 bits
-              clock: 33MHz
-              capabilities: bus_master cap_list
-              configuration: driver=dxgkrnl latency=0
-              resources: irq:0
-         *-scsi
-              description: SCSI storage controller
-              product: Virtio console
-              vendor: Red Hat, Inc.
-              physical id: 3
-              bus info: pci@8adb:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
-            *-virtio0 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@0
-                 configuration: driver=virtio_console
-         *-display:1
-              description: 3D controller
-              product: Microsoft Corporation
-              vendor: Microsoft Corporation
-              physical id: 4
-              bus info: pci@a8fe:00:00.0
+              bus info: pci@1ce3:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
@@ -109,8 +80,8 @@ Description of the machine on which benchmarks were run.
               description: System peripheral
               product: Red Hat, Inc.
               vendor: Red Hat, Inc.
-              physical id: 5
-              bus info: pci@f746:00:00.0
+              physical id: 3
+              bus info: pci@5044:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -122,6 +93,35 @@ Description of the machine on which benchmarks were run.
                  physical id: 0
                  bus info: virtio@1
                  configuration: driver=virtiofs
+         *-display:1
+              description: 3D controller
+              product: Microsoft Corporation
+              vendor: Microsoft Corporation
+              physical id: 4
+              bus info: pci@882f:00:00.0
+              version: 00
+              width: 32 bits
+              clock: 33MHz
+              capabilities: bus_master cap_list
+              configuration: driver=dxgkrnl latency=0
+              resources: irq:0
+         *-scsi
+              description: SCSI storage controller
+              product: Virtio console
+              vendor: Red Hat, Inc.
+              physical id: 5
+              bus info: pci@d4f6:00:00.0
+              version: 01
+              width: 64 bits
+              clock: 33MHz
+              capabilities: scsi bus_master cap_list
+              configuration: driver=virtio-pci latency=64
+              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
+            *-virtio0 UNCLAIMED
+                 description: Virtual I/O device
+                 physical id: 0
+                 bus info: virtio@0
+                 configuration: driver=virtio_console
          *-pnp00:00
               product: PnP device PNP0b00
               physical id: 6
@@ -131,7 +131,7 @@ Description of the machine on which benchmarks were run.
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:37:d2:dc
+           serial: 00:15:5d:93:d6:23
            size: 10Gbit/s
            capabilities: ethernet physical
            configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.153.1-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s

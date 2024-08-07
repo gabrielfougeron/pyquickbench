@@ -133,6 +133,7 @@ all_plot_intents = [
     'curve_color'       ,
     'curve_linestyle'   ,
     'curve_pointstyle'  ,
+    'violin'            ,
     'subplot_grid_x'    ,
     'subplot_grid_y'    ,
 ]

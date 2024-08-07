@@ -186,7 +186,7 @@ The above plot is quite cluttered. For more concise information, let's use curve
 The above plot gives a good idea of the concentration of data, but bounds on timing are not very clear. Using reductions in ``plot_intent``, we can for instance choose to plot minimal, median and maximal values. The list of all possible reductions is accessible in :data:`pyquickbench.all_reductions`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-160
+.. GENERATED FROM PYTHON SOURCE LINES 121-159
 
 .. code-block:: Python
 
@@ -231,7 +231,6 @@ The above plot gives a good idea of the concentration of data, but bounds on tim
 
 
 
-
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_004.png
    :alt: 07 Multidimensional benchmarks
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_004.png
@@ -241,11 +240,47 @@ The above plot gives a good idea of the concentration of data, but bounds on tim
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-162
+.. GENERATED FROM PYTHON SOURCE LINES 160-161
+
+Another way to render data dispersion is to use the "violin" plot intent. 
+
+.. GENERATED FROM PYTHON SOURCE LINES 161-177
+
+.. code-block:: Python
+
+
+    plot_intent = {
+        pyquickbench.default_ax_name    : "points"      ,
+        pyquickbench.fun_ax_name        : "curve_color" ,
+        pyquickbench.repeat_ax_name     : "violin"      ,
+    }
+
+    pyquickbench.plot_benchmark(
+        all_values                  ,
+        all_sizes                   ,
+        all_funs                    ,
+        plot_intent = plot_intent   ,
+        show = True                 ,
+    )
+
+
+
+
+
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_005.png
+   :alt: 07 Multidimensional benchmarks
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_005.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 178-179
 
 More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-180
+.. GENERATED FROM PYTHON SOURCE LINES 179-197
 
 .. code-block:: Python
 
@@ -270,20 +305,20 @@ More generally, the ``plot_intent`` argument controls what dimension of the arra
 
 
 
-.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_005.png
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_006.png
    :alt: 07 Multidimensional benchmarks
-   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_005.png
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_006.png
    :class: sphx-glr-single-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-182
+.. GENERATED FROM PYTHON SOURCE LINES 198-199
 
 Or for all functions, but a single value of input size.
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-198
+.. GENERATED FROM PYTHON SOURCE LINES 199-215
 
 .. code-block:: Python
 
@@ -306,16 +341,16 @@ Or for all functions, but a single value of input size.
 
 
 
-.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_006.png
+.. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_007.png
    :alt: 07 Multidimensional benchmarks
-   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_006.png
+   :srcset: /_build/auto_examples/tutorial/images/sphx_glr_07-Multidimensional_benchmarks_007.png
    :class: sphx-glr-single-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-200
+.. GENERATED FROM PYTHON SOURCE LINES 216-217
 
 As can be seen in the above plots, the timings are automatically sorted along the :data:`pyquickbench.repeat_ax_name` axis.
 The list of all possible ``plot_intent`` values is available in :data:`pyquickbench.all_plot_intents`.
