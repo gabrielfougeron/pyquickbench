@@ -242,9 +242,9 @@ The above plot gives a good idea of the concentration of data, but bounds on tim
 
 .. GENERATED FROM PYTHON SOURCE LINES 160-161
 
-Another way to render data dispersion is to use the "violin" plot intent. 
+Another way to render data dispersion is to use the ``"violin"`` plot intent. This type of plot shows a `Kernel Density Estimation <https://scikit-learn.org/stable/modules/density.html>`_ of the timings distribution as well as extreme measured values for every set of input parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-177
+.. GENERATED FROM PYTHON SOURCE LINES 161-176
 
 .. code-block:: Python
 
@@ -260,9 +260,8 @@ Another way to render data dispersion is to use the "violin" plot intent.
         all_sizes                   ,
         all_funs                    ,
         plot_intent = plot_intent   ,
-        show = True                 ,
+        show = True                 ,   
     )
-
 
 
 
@@ -276,11 +275,11 @@ Another way to render data dispersion is to use the "violin" plot intent.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-179
+.. GENERATED FROM PYTHON SOURCE LINES 177-178
 
 More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-197
+.. GENERATED FROM PYTHON SOURCE LINES 178-196
 
 .. code-block:: Python
 
@@ -314,11 +313,11 @@ More generally, the ``plot_intent`` argument controls what dimension of the arra
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-199
+.. GENERATED FROM PYTHON SOURCE LINES 197-198
 
 Or for all functions, but a single value of input size.
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-215
+.. GENERATED FROM PYTHON SOURCE LINES 198-214
 
 .. code-block:: Python
 
@@ -350,7 +349,7 @@ Or for all functions, but a single value of input size.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-217
+.. GENERATED FROM PYTHON SOURCE LINES 215-216
 
 As can be seen in the above plots, the timings are automatically sorted along the :data:`pyquickbench.repeat_ax_name` axis.
 The list of all possible ``plot_intent`` values is available in :data:`pyquickbench.all_plot_intents`.
