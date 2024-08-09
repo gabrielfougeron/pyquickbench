@@ -560,35 +560,54 @@ def _kde_method(X, coords):
     kde = mlab.GaussianKDE(X, None)
     return kde.evaluate(coords)
 
-def _log_violin_plot(ax, dataset, positions=None, vert=None,
-                   orientation='vertical', showmeans=False,
-                   showextrema=True, showmedians=False, quantiles=None,
-                   points=100, bw_method=None, side='both', logx_plot=False, logy_plot=False):
+def _log_violin_plot(
+    ax, dataset                 ,
+    positions = None            ,
+    vert = None                 ,
+    orientation = 'vertical'    ,
+    showmeans = False, showextrema = True, showmedians = False,
+    quantiles = None            ,
+    points = 100                ,
+    side = 'both'               ,
+    logx_plot = False, logy_plot = False,
+    violin_width_mul = 0.5      ,
+    color = None                ,
+    linestyle = None            ,
+    marker = "o"                ,
+    alpha = 1.                  ,
+    show_observations = False   ,
+):
     
     if logy_plot:
-        dataset = np.log(dataset)
+        dataset_kde = np.log(dataset)
+    else:
+        dataset_kde = dataset
     
     if positions is None:
-        widths = 0.5
+        widths = violin_width_mul
     else: 
         if logx_plot:
-            widths = positions / (2*positions[0])
+            widths = positions * (violin_width_mul / positions[0])
         else:
             if len(positions) < 2:
-                widths = 0.5 *positions[0]
+                widths = violin_width_mul *positions[0]
             else:
                 dp = np.array([positions[i+1]-positions[i] for i in range(len(positions)-1)])
-                widths = 0.5 * dp.mean()
-    
+                widths = violin_width_mul * dp.mean()
             
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         vpstats = cbook.violin_stats(
-            dataset,
-            _kde_method,
-            points=points,
-            quantiles=quantiles,
+            dataset_kde         ,
+            _kde_method         ,
+            points=points       ,
+            quantiles=quantiles ,
         )
+        
+    if side is None:
+        for stat in vpstats:
+            stat["vals"].fill(0)
+        side = "both"
         
     for stats in vpstats:
         if logy_plot:
@@ -598,10 +617,36 @@ def _log_violin_plot(ax, dataset, positions=None, vert=None,
     if orientation == 'vertical':
         vert = True
     
-    return ax.violin(
-        vpstats, positions=positions,
-        vert=vert,
-        # orientation=orientation, # new argument not supported on most matplotlib version
-        widths=widths,
-        showmeans=showmeans, showextrema=showextrema,
-        showmedians=showmedians, side=side)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        violin_res = ax.violin(
+            vpstats                     ,
+            positions = positions       ,
+            vert = vert                 ,
+            # orientation = orientation   , # new argument not supported on most matplotlib version
+            widths = widths             ,
+            showmeans = showmeans       ,
+            showextrema = showextrema   ,
+            showmedians = showmedians   ,
+            side = side                 ,
+        )
+    
+    for pc in violin_res['bodies']:
+        pc.set_color(color)
+        pc.set_linestyle(linestyle)
+        if alpha < 0.3: # default value in Matplotlib.
+            pc.set_alpha(alpha)
+                                            
+    for key in ['cmeans', 'cmins', 'cmaxes', 'cbars', 'cmedians']:
+        pc = violin_res.get(key)
+        if pc is not None:
+            pc.set_color(color)
+            pc.set_linestyle(linestyle)
+            pc.set_alpha(alpha)
+            
+    if show_observations:
+
+        nobs = dataset.shape[0]
+        
+        for ix, pos in enumerate(positions):
+            ax.scatter(np.full(nobs, pos), dataset[:,ix], marker=marker, color=color)

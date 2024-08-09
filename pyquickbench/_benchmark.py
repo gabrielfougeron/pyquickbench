@@ -302,6 +302,12 @@ def plot_benchmark(
     linestyle_list          : list                              = default_linestyle_list    ,
     pointstyle_list         : list                              = default_pointstyle_list   ,
     alpha                   : float                             = 1.                        ,
+    violin_width_mul        : float                             = 0.5                       ,
+    violin_showmeans        : bool                              = False                     ,
+    violin_showextrema      : bool                              = True                      ,
+    violin_showmedians      : bool                              = False                     ,
+    violin_show_observations: bool                              = False                     ,
+    violin_side             : str                               = "both"                    ,
     single_values_idx       : typing.Union[dict, None]          = None                      ,         
     single_values_val       : typing.Union[dict, None]          = None                      ,         
     logx_plot               : typing.Union[bool, None]          = None                      ,
@@ -384,6 +390,21 @@ def plot_benchmark(
     alpha : float, optional
         Alpha value for transparency of curves in plot.\n
         By default, ``1.`` meaning curves are fully opaque.
+    violin_width_mul : float, optional
+        Factor on violin plot width. Decrease for thinner plot, and increase for fatter ones.\n
+        By default, ``0.5``.
+    violin_showmeans : bool, optional
+        Whether to show mean values in violin plots, by default ``False``.
+    violin_showextrema : bool, optional
+        Whether to show min/max values in violin plots, by default ``True``.
+    violin_showmedians : bool, optional
+        Whether to show median values in violin plots, by default ``False``.
+    violin_show_observations : bool, optional
+        Whether to show individual observations in violin plot, by default ``False``.
+    violin_side : str | None, optional
+        Side of the `Kernel Density Estimation <https://scikit-learn.org/stable/modules/density.html>`_ reconstruction in violin plots.
+        Possible values: ``"both"``, ``"left"``, ``"right"``, ``None``.\n
+        By default ``"both"``.
     single_values_idx : dict | None, optional
         Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
@@ -1005,26 +1026,24 @@ def plot_benchmark(
                                 
                             elif plot_type == "violin":  
              
-                                violin_res = _log_violin_plot(
+                                _log_violin_plot(
                                     cur_ax,
                                     all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, :, :],
-                                    positions   = plot_x_val    ,
-                                    logx_plot = logx_plot       ,
-                                    logy_plot = logy_plot       ,
+                                    positions   = plot_x_val                                    ,
+                                    logx_plot = logx_plot                                       ,
+                                    logy_plot = logy_plot                                       ,
+                                    violin_width_mul = violin_width_mul                         ,
+                                    showmeans = violin_showmeans                                ,
+                                    showextrema = violin_showextrema                            ,
+                                    showmedians = violin_showmedians                            ,
+                                    side = violin_side_substitutions.get(violin_side, "both")   ,
+                                    color = color                                               ,
+                                    linestyle = linestyle                                       ,
+                                    marker = pointstyle                                         ,
+                                    alpha = alpha                                               ,
+                                    show_observations = violin_show_observations                ,
                                 )
-                                
-                                for pc in violin_res['bodies']:
-                                    pc.set_color(color)
-                                    pc.set_linestyle(linestyle)
-                                    # pc.set_alpha(alpha)
-                                                                        
-                                for key in ['cmeans', 'cmins', 'cmaxes', 'cbars', 'cmedians']:
-                                    pc = violin_res.get(key)
-                                    if pc is not None:
-                                        pc.set_color(color)
-                                        pc.set_linestyle(linestyle)
-                                        # pc.set_alpha(alpha)
-                                            
+
                             else:
                                 raise ValueError(f"Unknown plot type : {plot_type}")
                             
