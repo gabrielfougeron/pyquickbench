@@ -157,7 +157,7 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# Another way to render data dispersion is to use the "violin" plot intent. 
+# Another way to render data dispersion is to use the ``"violin"`` plot intent. This type of plot shows a `Kernel Density Estimation <https://scikit-learn.org/stable/modules/density.html>`_ of the timings distribution as well as extreme measured values for every set of input parameters.
 
 plot_intent = {
     pyquickbench.default_ax_name    : "points"      ,
@@ -170,9 +170,8 @@ pyquickbench.plot_benchmark(
     all_sizes                   ,
     all_funs                    ,
     plot_intent = plot_intent   ,
-    show = True                 ,
+    show = True                 ,   
 )
-
 
 # %% 
 # More generally, the ``plot_intent`` argument controls what dimension of the array ``all_values`` is plotted, and in what way. For instance, as a way to better understand the statistics of the measured timings, we can plot the measured time of execution as a function of the index of the repeated benchmark for a single function.

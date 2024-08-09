@@ -150,3 +150,13 @@ tictoc_sync_name = "pyquickbench_sync"
 default_TimeTrain_ignore_names = set((
     tictoc_sync_name    ,
 ))
+
+violin_side_substitutions = {
+    "both"  : "both"    ,
+    "low"   : "low"     ,
+    "left"  : "low"     ,
+    "high"  : "high"    ,
+    "right" : "high"    ,
+    None    : None      ,
+}
+    
