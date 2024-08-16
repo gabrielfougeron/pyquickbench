@@ -672,6 +672,7 @@ def plot_benchmark(
     name_subplot_grid_x = []
     name_subplot_grid_y = []
     idx_relative = []
+    idx_relative_points = None
     
     all_legend_curve_color = []
     all_legend_curve_linestyle = []
@@ -730,10 +731,30 @@ def plot_benchmark(
             raise ValueError("This error should never be raised")
             
         relative_idx = _choose_idx_val(name, relative_to_idx, relative_to_val, all_args, all_fun_names_list, all_out_names_list)
-        if isinstance(relative_idx, int):
-            idx_all_relative.append(i)
-            idx_relative.append(relative_idx)   
+
+        if isinstance(relative_idx, np.ndarray):
             
+            relative_idx = relative_idx.reshape(-1)
+            
+            if relative_idx.shape[0] == 1:
+                relative_idx = int(relative_idx[0])
+            else:
+                raise ValueError('Could not determine relative value index')
+        
+        if isinstance(relative_idx, int):
+            
+            if i == idx_points:
+                idx_relative_points = relative_idx
+                
+            else:
+                idx_all_relative.append(i)
+                idx_relative.append(relative_idx)   
+                
+        elif relative_idx is None:
+            pass
+        else:
+            raise ValueError('Could not determine relative value index')
+                
     if (n_points != 1):
         raise ValueError(f"There should be exactly one plot_intent named 'points'. There are currently {n_points}.")
     
@@ -911,13 +932,18 @@ def plot_benchmark(
             plot_x_val =_values_reduction(all_xvalues, idx_vals, idx_points, idx_all_reduction) 
             plot_x_val = plot_x_val.reshape(-1)
 
-        if len(idx_all_relative) > 0:
+        if (len(idx_all_relative) > 0) or (idx_relative_points is not None):
             
             for i, j in zip(idx_relative, idx_all_relative):
                 idx_vals[j] = i
-
+                
             relative_plot_y_val = _values_reduction(all_vals, idx_vals, idx_points, idx_all_reduction)
-            
+
+            if idx_relative_points is not None:                
+                relative_plot_y_val = relative_plot_y_val.reshape(-1)
+                assert npts == len(relative_plot_y_val)
+                relative_plot_y_val = relative_plot_y_val[idx_relative_points]
+
             plot_y_val /= relative_plot_y_val
 
         plot_y_val = plot_y_val.reshape(-1)

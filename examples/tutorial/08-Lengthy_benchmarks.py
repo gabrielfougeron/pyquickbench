@@ -129,7 +129,7 @@ pyquickbench.plot_benchmark(
 # 
 # Even worse: the previous benchmark only explores the pre-asymptotic behavior of the ``numpy`` implementation, but running the benchmark with higher values of ``"n"`` would be extremely time consuming.
 # 
-# Since we know that typically, time measurements will be higher with higher values of ``"n"``, we can declare ``"n"`` as a ``MonotonicAxes``. Pyquickbench will skip benchmarks for high values of the parameters declared in ``MonotonicAxes`` as soon as a certain ``timeout`` is reached. This allows much larger values to be explored at a reasonnable cpu cost.
+# Since we know that typically, time measurements will be higher with higher values of ``"n"``, we can declare ``"n"`` as a ``MonotonicAxes``. Pyquickbench will skip benchmarks for high values of the parameters declared in ``MonotonicAxes`` as soon as a certain ``timeout`` is reached. This allows much larger values to be explored at a reasonnable CPU cost.
 
 basename = 'long_bench_2'
 timings_filename = os.path.join(timings_folder, basename+'.npz')

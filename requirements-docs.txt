@@ -13,3 +13,5 @@ sphinx-design
 sphinx-copybutton
 scipy
 numba
+threadpoolctl
+mkl_fft

@@ -4,7 +4,7 @@ Time Trains
 """
 
 # %% 
-# As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be useful to measure the wall time of python functions. More often than not however, it can be useful to have a more precise idea of where cpu cycles are spent. This is the raison d'être of :class:`pyquickbench.TimeTrain`. As shown in the following few lines, using a :class:`pyquickbench.TimeTrain` is extremely simple: simply call the :meth:`pyquickbench.TimeTrain.toc` method between snippets of code you want to time and :mod:`pyquickbench` takes care of the rest!
+# As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be useful to measure the wall time of python functions. More often than not however, it can be useful to have a more precise idea of where CPU cycles are spent. This is the raison d'être of :class:`pyquickbench.TimeTrain`. As shown in the following few lines, using a :class:`pyquickbench.TimeTrain` is extremely simple: simply call the :meth:`pyquickbench.TimeTrain.toc` method between snippets of code you want to time and :mod:`pyquickbench` takes care of the rest!
 
 # sphinx_gallery_start_ignore
 
