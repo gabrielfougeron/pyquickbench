@@ -9,13 +9,13 @@ Complex 1D FFT
 import os
 import threadpoolctl
 
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-os.environ['NUMEXPR_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['TBB_NUM_THREADS'] = '1'
-
-threadpoolctl.threadpool_limits(limits=1).__enter__()
+# os.environ['OPENBLAS_NUM_THREADS'] = '1'
+# os.environ['NUMEXPR_NUM_THREADS'] = '1'
+# os.environ['MKL_NUM_THREADS'] = '1'
+# os.environ['OMP_NUM_THREADS'] = '1'
+# os.environ['TBB_NUM_THREADS'] = '1'
+# 
+# threadpoolctl.threadpool_limits(limits=1).__enter__()
 
 # sphinx_gallery_start_ignore
 
@@ -68,6 +68,7 @@ def setup(n_exp, base_fac, stride):
     n = base_fac * 2**n_exp
     return {'x': np.random.random((n, stride)) + 1j * np.random.random((n, stride))}
 
+
 # sphinx_gallery_start_ignore
 
 basename = 'complex_1D_fft'
@@ -75,15 +76,17 @@ timings_filename = os.path.join(timings_folder,basename+'.npz')
 
 # sphinx_gallery_end_ignore
 
-base_fac_list = [1]
-# base_fac_list = [1,3,5,7,11]
+# base_fac_list = [1]
+base_fac_list = [2*n+1 for n in range(13)]
 # base_fac_list = list(range(100))
 
-n_exp_min = 10
-n_exp_max = n_exp_min
-# n_exp_max = 15
 
-all_strides = [1, 2, 4, 8, 16, 32]
+n_exp_min = 5
+# n_exp_max = n_exp_min
+n_exp_max = 20
+
+all_strides = [1]
+# all_strides = [1, 2, 4, 8, 16, 32, 64]
 
 all_args = {
     "n_exp": np.array(range(n_exp_min, n_exp_max+1), dtype=np.intp) ,
@@ -108,22 +111,23 @@ all_errors = pyquickbench.run_benchmark(
     ShowProgress = True             ,
     StopOnExcept = True             ,
     # ForceBenchmark = True           ,
+    WarmUp = True                   ,
     MonotonicAxes = ["n_exp"]       ,
 )
 
-# plot_intent = {
-#     "n_exp"                     : "points"          ,
-#     "base_fac"                  : "curve_pointstyle",
-#     "stride"                    : "subplot_grid_y"  ,
-#     pyquickbench.fun_ax_name    : "curve_color"     ,
-# }
-
 plot_intent = {
-    "n_exp"                     : "subplot_grid_y"          ,
+    "n_exp"                     : "points"          ,
     "base_fac"                  : "subplot_grid_y",
-    "stride"                    : "points"  ,
+    "stride"                    : "subplot_grid_y"  ,
     pyquickbench.fun_ax_name    : "curve_color"     ,
 }
+
+# plot_intent = {
+#     "n_exp"                     : "subplot_grid_y"          ,
+#     "base_fac"                  : "subplot_grid_y",
+#     "stride"                    : "points"  ,
+#     pyquickbench.fun_ax_name    : "curve_color"     ,
+# }
 
 # plot_intent = {
 #     "n_exp"                     : "points"          ,
@@ -141,11 +145,11 @@ plot_intent = {
 
 
 
-# relative_to_val = None
-
-relative_to_val = {
-    "stride" : 1    ,
-}
+relative_to_val = None
+# 
+# relative_to_val = {
+#     "stride" : 8    ,
+# }
 
 
 pyquickbench.plot_benchmark(
