@@ -112,7 +112,7 @@ def ma_random_el(obj, axis=None, keepdims=np._NoValue):
     i = np.random.randint(n)
     return ma_idx_el(obj, i, axis=axis, keepdims=keepdims)
 
-default_reduction ="reduction_min"
+default_reduction = "reduction_min"
 
 all_reductions = {
     "avg"       : np.ma.mean    ,

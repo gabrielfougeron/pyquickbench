@@ -29,6 +29,7 @@ class TimeTrain():
         names_reduction     : typing.Union[str , None] = None   ,
         global_tictoc_sync  : bool = True                       ,
         ignore_names        : typing.Iterable[str]  = None      ,
+        relative_timings    : bool = False                      ,
     ):
         """ Returns a TimeTrain
 
@@ -55,6 +56,10 @@ class TimeTrain():
         ignore_names : str | None, optional
             Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.
             By default None
+        relative_timings : bool, optional
+            Whether to display relative timings when printing the TimeTrain.
+            Only makes sense if names_reduction is None.
+            By default False
 
         """    
         
@@ -75,6 +80,8 @@ class TimeTrain():
             self.ignore_names = default_TimeTrain_ignore_names
         else:
              self.ignore_names = ignore_names
+        
+        self.relative_timings = relative_timings
         
         if include_locs is None:
             include_locs = include_filename or include_lineno or include_funname
@@ -169,10 +176,21 @@ class TimeTrain():
 
     def _get_recorded_time(self, idx):
         return self.all_tocs[idx+1]-(self.all_tocs[idx] + self.all_tocs_record_time[idx])
+    
+    @property
+    def total_time(self):
+        
+        res = 0.
+    
+        for i in range(self.n):
 
+            if self.all_tocs_names[i] not in self.ignore_names:        
+                res += self._get_recorded_time(i)
+        return res
+    
     def __str__(self): 
         
-        total_time = 0
+        total_time = self.total_time
         out = ''
         
         if self.name == '':
@@ -199,9 +217,12 @@ class TimeTrain():
                         out += f'{name}{filler}: '
                     
                     time = self._get_recorded_time(i)
-                    total_time += time
                     
-                    out += f'{time:.8f} s'
+                    if self.relative_timings:
+                        out += f'{100*time/total_time:.8f} %'
+                    else:
+                        out += f'{time:.8f} s'
+                        
                     if self.include_locs:
                         out += f' at {self.all_tocs_locs[i]}'
                         
@@ -223,7 +244,6 @@ class TimeTrain():
                     out += f'{name}{filler}: '
                 
                 time = self.names_reduction(arr)
-                total_time += np.sum(arr)
                     
                 out += f'{time:.8f} s'
                 if self.include_locs:
@@ -244,14 +264,14 @@ class TimeTrain():
         names_reduction         : typing.Union[typing.Callable, str, None]  = "default" ,
     ):
         """
-        Returns time measurements within a TimeTrain as a Python dictionnary
+        Returns time measurements within a TimeTrain as a Python dictionary
 
         See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.    
 
         Parameters
         ----------
         return_first_instance : bool, optional
-            Whether to also return a dictionnary containing the index of the first occurence of every name, by default False
+            Whether to also return a dictionary containing the index of the first occurrence of every name, by default False
         names_reduction : callable | str | None, optional
             Optionally overrides the TimeTrain's reduction.
             Set to "default" to not override reduction.
