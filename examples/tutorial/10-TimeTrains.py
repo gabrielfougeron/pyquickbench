@@ -95,6 +95,24 @@ for i in range(3):
 
 print(TT)
 
+# %% 
+# Relative measured times can be reported using the keyword ``relative_timings``.
+
+TT = pyquickbench.TimeTrain(
+    names_reduction = 'avg',
+    relative_timings = True,
+)
+
+for i in range(3):
+    time.sleep(0.01)
+    TT.toc("repeated")
+
+for i in range(3):
+    time.sleep(0.01)
+    TT.toc(f"unique {i+1}")
+
+print(TT)
+
 
 # %% 
 # Reductions make locations ill-defined, which is why :class:`pyquickbench.TimeTrain` is issuing a warning. Another good reason to disable location recording is that the corresponding call to :func:`python:inspect.stack` can be non-negligible (around 0.01s on a generic laptop computer).
@@ -117,7 +135,7 @@ print(TT)
 
 
 # %% 
-# TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrumemnt a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
+# TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrument a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
 
 TT = pyquickbench.TimeTrain()
 

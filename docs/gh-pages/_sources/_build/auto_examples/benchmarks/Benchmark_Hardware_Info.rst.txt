@@ -64,29 +64,24 @@ Description of the machine on which benchmarks were run.
               bus info: cpu@0
               width: 64 bits
               capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp x86-64 constant_tsc arch_perfmon rep_good nopl xtopology tsc_reliable nonstop_tsc cpuid pni pclmulqdq ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect md_clear flush_l1d arch_capabilities
-         *-scsi
-              description: SCSI storage controller
-              product: Virtio console
-              vendor: Red Hat, Inc.
+         *-display:0
+              description: 3D controller
+              product: Microsoft Corporation
+              vendor: Microsoft Corporation
               physical id: 2
-              bus info: pci@858f:00:00.0
-              version: 01
-              width: 64 bits
+              bus info: pci@7a72:00:00.0
+              version: 00
+              width: 32 bits
               clock: 33MHz
-              capabilities: scsi bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
-            *-virtio0 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@0
-                 configuration: driver=virtio_console
+              capabilities: bus_master cap_list
+              configuration: driver=dxgkrnl latency=0
+              resources: irq:0
          *-generic
               description: System peripheral
               product: Red Hat, Inc.
               vendor: Red Hat, Inc.
               physical id: 3
-              bus info: pci@be0e:00:00.0
+              bus info: pci@7f41:00:00.0
               version: 01
               width: 64 bits
               clock: 33MHz
@@ -98,24 +93,29 @@ Description of the machine on which benchmarks were run.
                  physical id: 0
                  bus info: virtio@1
                  configuration: driver=virtiofs
-         *-display:0
-              description: 3D controller
-              product: Microsoft Corporation
-              vendor: Microsoft Corporation
+         *-scsi
+              description: SCSI storage controller
+              product: Virtio console
+              vendor: Red Hat, Inc.
               physical id: 4
-              bus info: pci@e238:00:00.0
-              version: 00
-              width: 32 bits
+              bus info: pci@b911:00:00.0
+              version: 01
+              width: 64 bits
               clock: 33MHz
-              capabilities: bus_master cap_list
-              configuration: driver=dxgkrnl latency=0
-              resources: irq:0
+              capabilities: scsi bus_master cap_list
+              configuration: driver=virtio-pci latency=64
+              resources: iomemory:90-8f iomemory:90-8f iomemory:90-8f irq:0 memory:9ffe00000-9ffe00fff memory:9ffe01000-9ffe01fff memory:9ffe02000-9ffe02fff
+            *-virtio0 UNCLAIMED
+                 description: Virtual I/O device
+                 physical id: 0
+                 bus info: virtio@0
+                 configuration: driver=virtio_console
          *-display:1
               description: 3D controller
               product: Microsoft Corporation
               vendor: Microsoft Corporation
               physical id: 5
-              bus info: pci@e9fd:00:00.0
+              bus info: pci@bd60:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
@@ -131,10 +131,10 @@ Description of the machine on which benchmarks were run.
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:03:41:01
+           serial: 00:15:5d:62:7b:ef
            size: 10Gbit/s
            capabilities: ethernet physical
-           configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.153.1-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
+           configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.167.4-microsoft-standard-W duplex=full firmware=N/A ip=172.28.251.236 link=yes multicast=yes speed=10Gbit/s
 
 
 
@@ -164,34 +164,58 @@ Numpy configuration informations
       blas:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/include
-        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/lib
-        name: scipy-openblas
-        openblas configuration: OpenBLAS 0.3.27  USE64BITINT DYNAMIC_ARCH NO_AFFINITY
-          Zen MAX_THREADS=64
-        pc file directory: /project/.openblas
-        version: 0.3.27
+        include directory: /home/gfo/mambaforge/envs/pyquickbench-dev/include
+        lib directory: /home/gfo/mambaforge/envs/pyquickbench-dev/lib
+        name: blas
+        openblas configuration: unknown
+        pc file directory: /home/gfo/mambaforge/envs/pyquickbench-dev/lib/pkgconfig
+        version: 3.9.0
       lapack:
         detection method: pkgconfig
         found: true
-        include directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/include
-        lib directory: /opt/_internal/cpython-3.12.2/lib/python3.12/site-packages/scipy_openblas64/lib
-        name: scipy-openblas
-        openblas configuration: OpenBLAS 0.3.27  USE64BITINT DYNAMIC_ARCH NO_AFFINITY
-          Zen MAX_THREADS=64
-        pc file directory: /project/.openblas
-        version: 0.3.27
+        include directory: /home/gfo/mambaforge/envs/pyquickbench-dev/include
+        lib directory: /home/gfo/mambaforge/envs/pyquickbench-dev/lib
+        name: lapack
+        openblas configuration: unknown
+        pc file directory: /home/gfo/mambaforge/envs/pyquickbench-dev/lib/pkgconfig
+        version: 3.9.0
     Compilers:
       c:
-        commands: cc
+        args: -march=nocona, -mtune=haswell, -ftree-vectorize, -fPIC, -fstack-protector-strong,
+          -fno-plt, -O2, -ffunction-sections, -pipe, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include,
+          -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/numpy_1721965843284/work=/usr/local/src/conda/numpy-2.0.1,
+          -fdebug-prefix-map=/home/gfo/mambaforge/envs/pyquickbench-dev=/usr/local/src/conda-prefix,
+          -DNDEBUG, -D_FORTIFY_SOURCE=2, -O2, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include
+        commands: /home/conda/feedstock_root/build_artifacts/numpy_1721965843284/_build_env/bin/x86_64-conda-linux-gnu-cc
         linker: ld.bfd
+        linker args: -Wl,-O2, -Wl,--sort-common, -Wl,--as-needed, -Wl,-z,relro, -Wl,-z,now,
+          -Wl,--disable-new-dtags, -Wl,--gc-sections, -Wl,--allow-shlib-undefined, -Wl,-rpath,/home/gfo/mambaforge/envs/pyquickbench-dev/lib,
+          -Wl,-rpath-link,/home/gfo/mambaforge/envs/pyquickbench-dev/lib, -L/home/gfo/mambaforge/envs/pyquickbench-dev/lib,
+          -march=nocona, -mtune=haswell, -ftree-vectorize, -fPIC, -fstack-protector-strong,
+          -fno-plt, -O2, -ffunction-sections, -pipe, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include,
+          -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/numpy_1721965843284/work=/usr/local/src/conda/numpy-2.0.1,
+          -fdebug-prefix-map=/home/gfo/mambaforge/envs/pyquickbench-dev=/usr/local/src/conda-prefix,
+          -DNDEBUG, -D_FORTIFY_SOURCE=2, -O2, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include
         name: gcc
-        version: 10.2.1
+        version: 12.4.0
       c++:
-        commands: c++
+        args: -fvisibility-inlines-hidden, -fmessage-length=0, -march=nocona, -mtune=haswell,
+          -ftree-vectorize, -fPIC, -fstack-protector-strong, -fno-plt, -O2, -ffunction-sections,
+          -pipe, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include, -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/numpy_1721965843284/work=/usr/local/src/conda/numpy-2.0.1,
+          -fdebug-prefix-map=/home/gfo/mambaforge/envs/pyquickbench-dev=/usr/local/src/conda-prefix,
+          -DNDEBUG, -D_FORTIFY_SOURCE=2, -O2, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include
+        commands: /home/conda/feedstock_root/build_artifacts/numpy_1721965843284/_build_env/bin/x86_64-conda-linux-gnu-c++
         linker: ld.bfd
+        linker args: -Wl,-O2, -Wl,--sort-common, -Wl,--as-needed, -Wl,-z,relro, -Wl,-z,now,
+          -Wl,--disable-new-dtags, -Wl,--gc-sections, -Wl,--allow-shlib-undefined, -Wl,-rpath,/home/gfo/mambaforge/envs/pyquickbench-dev/lib,
+          -Wl,-rpath-link,/home/gfo/mambaforge/envs/pyquickbench-dev/lib, -L/home/gfo/mambaforge/envs/pyquickbench-dev/lib,
+          -fvisibility-inlines-hidden, -fmessage-length=0, -march=nocona, -mtune=haswell,
+          -ftree-vectorize, -fPIC, -fstack-protector-strong, -fno-plt, -O2, -ffunction-sections,
+          -pipe, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include, -fdebug-prefix-map=/home/conda/feedstock_root/build_artifacts/numpy_1721965843284/work=/usr/local/src/conda/numpy-2.0.1,
+          -fdebug-prefix-map=/home/gfo/mambaforge/envs/pyquickbench-dev=/usr/local/src/conda-prefix,
+          -DNDEBUG, -D_FORTIFY_SOURCE=2, -O2, -isystem, /home/gfo/mambaforge/envs/pyquickbench-dev/include
         name: gcc
-        version: 10.2.1
+        version: 12.4.0
       cython:
         commands: cython
         linker: cython
@@ -209,7 +233,7 @@ Numpy configuration informations
         family: x86_64
         system: linux
     Python Information:
-      path: /tmp/build-env-zw_fgdi0/bin/python
+      path: /home/gfo/mambaforge/envs/pyquickbench-dev/bin/python
       version: '3.12'
     SIMD Extensions:
       baseline:
@@ -234,6 +258,7 @@ Numpy configuration informations
       not found:
       - AVX512_KNL
       - AVX512_KNM
+      - AVX512_SPR
 
 
 

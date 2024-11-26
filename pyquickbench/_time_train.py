@@ -112,6 +112,12 @@ class TimeTrain():
         if self.include_locs and (self.names_reduction is not None):
             warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
         
+        if self.relative_timings:
+            
+            if self.names_reduction_key not in [None, "sum"]:
+                
+                warnings.warn(f"Reduction {self.names_reduction_key} combined with \"relative_timings = True\" will lead to reported timings not adding up to 100%.")
+        
         # This line goes at the very end for more precise measurements
         self.all_tocs = [time.perf_counter()]
         
@@ -245,7 +251,11 @@ class TimeTrain():
                 
                 time = self.names_reduction(arr)
                     
-                out += f'{time:.8f} s'
+                if self.relative_timings:
+                    out += f'{100*time/total_time:.8f} %'
+                else:
+                    out += f'{time:.8f} s'
+                    
                 if self.include_locs:
                     out += f' at {self.all_tocs_locs[first[name]]}'
                     

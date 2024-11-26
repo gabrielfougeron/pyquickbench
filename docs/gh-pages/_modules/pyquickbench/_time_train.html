@@ -478,6 +478,7 @@ document.write(`
         <span class="n">names_reduction</span>     <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span> <span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>   <span class="p">,</span>
         <span class="n">global_tictoc_sync</span>  <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>                       <span class="p">,</span>
         <span class="n">ignore_names</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="o">=</span> <span class="kc">None</span>      <span class="p">,</span>
+        <span class="n">relative_timings</span>    <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>                      <span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns a TimeTrain</span>
 
@@ -504,6 +505,10 @@ document.write(`
 <span class="sd">        ignore_names : str | None, optional</span>
 <span class="sd">            Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.</span>
 <span class="sd">            By default None</span>
+<span class="sd">        relative_timings : bool, optional</span>
+<span class="sd">            Whether to display relative timings when printing the TimeTrain.</span>
+<span class="sd">            Only makes sense if names_reduction is None.</span>
+<span class="sd">            By default False</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>    
         
@@ -524,6 +529,8 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span> <span class="o">=</span> <span class="n">default_TimeTrain_ignore_names</span>
         <span class="k">else</span><span class="p">:</span>
              <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span> <span class="o">=</span> <span class="n">ignore_names</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">relative_timings</span> <span class="o">=</span> <span class="n">relative_timings</span>
         
         <span class="k">if</span> <span class="n">include_locs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">include_locs</span> <span class="o">=</span> <span class="n">include_filename</span> <span class="ow">or</span> <span class="n">include_lineno</span> <span class="ow">or</span> <span class="n">include_funname</span>
@@ -553,6 +560,12 @@ document.write(`
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names_reduction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_timings</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">names_reduction_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">]:</span>
+                
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reduction </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">names_reduction_key</span><span class="si">}</span><span class="s2"> combined with </span><span class="se">\&quot;</span><span class="s2">relative_timings = True</span><span class="se">\&quot;</span><span class="s2"> will lead to reported timings not adding up to 100%.&quot;</span><span class="p">)</span>
         
         <span class="c1"># This line goes at the very end for more precise measurements</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()]</span></div>
@@ -622,10 +635,21 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">_get_recorded_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">res</span> <span class="o">=</span> <span class="mf">0.</span>
+    
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_names</span><span class="p">:</span>        
+                <span class="n">res</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_time</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+    
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
         
-        <span class="n">total_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
@@ -652,9 +676,12 @@ document.write(`
                         <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">filler</span><span class="si">}</span><span class="s1">: &#39;</span>
                     
                     <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_time</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                    <span class="n">total_time</span> <span class="o">+=</span> <span class="n">time</span>
                     
-                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_timings</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">time</span><span class="o">/</span><span class="n">total_time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> %&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                        
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
                         <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_locs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
                         
@@ -676,9 +703,12 @@ document.write(`
                     <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">filler</span><span class="si">}</span><span class="s1">: &#39;</span>
                 
                 <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">names_reduction</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-                <span class="n">total_time</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
                     
-                <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_timings</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">time</span><span class="o">/</span><span class="n">total_time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> %&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">time</span><span class="si">:</span><span class="s1">.8f</span><span class="si">}</span><span class="s1"> s&#39;</span>
+                    
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">include_locs</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_locs</span><span class="p">[</span><span class="n">first</span><span class="p">[</span><span class="n">name</span><span class="p">]]</span><span class="si">}</span><span class="s1">&#39;</span>
                     
@@ -699,14 +729,14 @@ document.write(`
         <span class="n">names_reduction</span>         <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="o">=</span> <span class="s2">&quot;default&quot;</span> <span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns time measurements within a TimeTrain as a Python dictionnary</span>
+<span class="sd">        Returns time measurements within a TimeTrain as a Python dictionary</span>
 
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.    </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        return_first_instance : bool, optional</span>
-<span class="sd">            Whether to also return a dictionnary containing the index of the first occurence of every name, by default False</span>
+<span class="sd">            Whether to also return a dictionary containing the index of the first occurrence of every name, by default False</span>
 <span class="sd">        names_reduction : callable | str | None, optional</span>
 <span class="sd">            Optionally overrides the TimeTrain&#39;s reduction.</span>
 <span class="sd">            Set to &quot;default&quot; to not override reduction.</span>

@@ -26,5 +26,6 @@ pyquickbench.TimeTrain
    .. autosummary::
    
       ~TimeTrain.tictoc
+      ~TimeTrain.total_time
    
    

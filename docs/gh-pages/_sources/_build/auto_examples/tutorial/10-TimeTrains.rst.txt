@@ -23,7 +23,7 @@ Time Trains
 
 .. GENERATED FROM PYTHON SOURCE LINES 7-8
 
-As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be useful to measure the wall time of python functions. More often than not however, it can be useful to have a more precise idea of where cpu cycles are spent. This is the raison d'être of :class:`pyquickbench.TimeTrain`. As shown in the following few lines, using a :class:`pyquickbench.TimeTrain` is extremely simple: simply call the :meth:`pyquickbench.TimeTrain.toc` method between snippets of code you want to time and :mod:`pyquickbench` takes care of the rest!
+As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be useful to measure the wall time of python functions. More often than not however, it can be useful to have a more precise idea of where CPU cycles are spent. This is the raison d'être of :class:`pyquickbench.TimeTrain`. As shown in the following few lines, using a :class:`pyquickbench.TimeTrain` is extremely simple: simply call the :meth:`pyquickbench.TimeTrain.toc` method between snippets of code you want to time and :mod:`pyquickbench` takes care of the rest!
 
 .. GENERATED FROM PYTHON SOURCE LINES 8-13
 
@@ -76,13 +76,13 @@ As demonstrated in earlier posts in the tutorial, :mod:`pyquickbench` can be use
 
     TimeTrain results:
 
-    0.01001699 s at file 10-TimeTrains.py line 49
-    0.02028868 s at file 10-TimeTrains.py line 52
-    0.03001066 s at file 10-TimeTrains.py line 55
-    0.04002969 s at file 10-TimeTrains.py line 58
-    0.01001850 s at file 10-TimeTrains.py line 61
+    0.01672609 s at file 10-TimeTrains.py line 49
+    0.02678417 s at file 10-TimeTrains.py line 52
+    0.03248443 s at file 10-TimeTrains.py line 55
+    0.04692034 s at file 10-TimeTrains.py line 58
+    0.01053847 s at file 10-TimeTrains.py line 61
 
-    Total: 0.11036452 s
+    Total: 0.13345350 s
 
 
 
@@ -119,14 +119,14 @@ Individual calls to :meth:`pyquickbench.TimeTrain.toc` can be named.
 
     TimeTrain results:
 
-    repeated : 0.01001968 s at file 10-TimeTrains.py line 73
-    repeated : 0.01002906 s at file 10-TimeTrains.py line 73
-    repeated : 0.01000689 s at file 10-TimeTrains.py line 73
-    unique 1 : 0.01002947 s at file 10-TimeTrains.py line 77
-    unique 2 : 0.01001701 s at file 10-TimeTrains.py line 77
-    unique 3 : 0.01000890 s at file 10-TimeTrains.py line 77
+    repeated : 0.01259401 s at file 10-TimeTrains.py line 73
+    repeated : 0.01610158 s at file 10-TimeTrains.py line 73
+    repeated : 0.01582617 s at file 10-TimeTrains.py line 73
+    unique 1 : 0.01256310 s at file 10-TimeTrains.py line 77
+    unique 2 : 0.01574729 s at file 10-TimeTrains.py line 77
+    unique 3 : 0.01501624 s at file 10-TimeTrains.py line 77
 
-    Total: 0.06011101 s
+    Total: 0.08784840 s
 
 
 
@@ -136,7 +136,7 @@ Individual calls to :meth:`pyquickbench.TimeTrain.toc` can be named.
 
 Timing measurements relative to identical names can be reduced using any reduction method in :data:`pyquickbench.all_reductions`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-99
+.. GENERATED FROM PYTHON SOURCE LINES 83-98
 
 .. code-block:: Python
 
@@ -159,33 +159,81 @@ Timing measurements relative to identical names can be reduced using any reducti
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:113: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
+      warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
+    TimeTrain results:
+    Reduction: sum
+
+    repeated : 0.04925492 s at file 10-TimeTrains.py line 90
+    unique 1 : 0.01418037 s at file 10-TimeTrains.py line 94
+    unique 2 : 0.01615351 s at file 10-TimeTrains.py line 94
+    unique 3 : 0.01383813 s at file 10-TimeTrains.py line 94
+
+    Total: 0.09342692 s
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 99-100
+
+Relative measured times can be reported using the keyword ``relative_timings``.
+
+.. GENERATED FROM PYTHON SOURCE LINES 100-117
+
+.. code-block:: Python
+
+
+    TT = pyquickbench.TimeTrain(
+        names_reduction = 'avg',
+        relative_timings = True,
+    )
+
+    for i in range(3):
+        time.sleep(0.01)
+        TT.toc("repeated")
+
+    for i in range(3):
+        time.sleep(0.01)
+        TT.toc(f"unique {i+1}")
+
+    print(TT)
+
+
+
+
+
 
 .. rst-class:: sphx-glr-script-out
 
  .. code-block:: none
 
-    /mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:106: UserWarning: include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.
-      warnings.warn("include_locs and names_reduction were both enabled. Only the first location will be displayed for every name.")
+    /mnt/c/Users/gfo/Travail/Python/pyquickbench/pyquickbench/_time_train.py:119: UserWarning: Reduction avg combined with "relative_timings = True" will lead to reported timings not adding up to 100%.
+      warnings.warn(f"Reduction {self.names_reduction_key} combined with \"relative_timings = True\" will lead to reported timings not adding up to 100%.")
     TimeTrain results:
-    Reduction: sum
+    Reduction: avg
 
-    repeated : 0.03002766 s at file 10-TimeTrains.py line 90
-    unique 1 : 0.01001109 s at file 10-TimeTrains.py line 94
-    unique 2 : 0.01002195 s at file 10-TimeTrains.py line 94
-    unique 3 : 0.01001639 s at file 10-TimeTrains.py line 94
+    repeated : 16.02524953 % at file 10-TimeTrains.py line 108
+    unique 1 : 18.26718073 % at file 10-TimeTrains.py line 112
+    unique 2 : 16.79086783 % at file 10-TimeTrains.py line 112
+    unique 3 : 16.86620284 % at file 10-TimeTrains.py line 112
 
-    Total: 0.06007709 s
-
-
+    Total: 0.08951084 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 118-120
 
 Reductions make locations ill-defined, which is why :class:`pyquickbench.TimeTrain` is issuing a warning. Another good reason to disable location recording is that the corresponding call to :func:`python:inspect.stack` can be non-negligible (around 0.01s on a generic laptop computer).
 Displaying locations can be disabled like so:
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-119
+.. GENERATED FROM PYTHON SOURCE LINES 120-137
 
 .. code-block:: Python
 
@@ -217,22 +265,22 @@ Displaying locations can be disabled like so:
     TimeTrain results:
     Reduction: sum
 
-    repeated : 0.03002848 s
-    unique 1 : 0.01000969 s
-    unique 2 : 0.01000530 s
-    unique 3 : 0.01001121 s
+    repeated : 0.04306194 s
+    unique 1 : 0.01695401 s
+    unique 2 : 0.01695125 s
+    unique 3 : 0.01692700 s
 
-    Total: 0.06005468 s
-
-
+    Total: 0.09389420 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-121
 
-TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrumemnt a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-138
+.. GENERATED FROM PYTHON SOURCE LINES 138-139
+
+TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrument a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
+
+.. GENERATED FROM PYTHON SOURCE LINES 139-156
 
 .. code-block:: Python
 
@@ -263,20 +311,20 @@ TimeTrains can also time calls to a function. The function :meth:`pyquickbench.T
 
     TimeTrain results:
 
-    wait_a_bit : 0.01001038 s at file 10-TimeTrains.py line 133
-    wait_more  : 0.01000896 s at file 10-TimeTrains.py line 134
+    wait_a_bit : 0.01567347 s at file 10-TimeTrains.py line 151
+    wait_more  : 0.01683088 s at file 10-TimeTrains.py line 152
 
-    Total: 0.02001934 s
-
-
+    Total: 0.03250434 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-140
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 Using :meth:`pyquickbench.TimeTrain.tictoc` with a regular wrapping syntax might lead to surprizing results:
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-153
+.. GENERATED FROM PYTHON SOURCE LINES 158-171
 
 .. code-block:: Python
 
@@ -303,19 +351,19 @@ Using :meth:`pyquickbench.TimeTrain.tictoc` with a regular wrapping syntax might
 
     TimeTrain results:
 
-    wait_unrecorded : 0.01000667 s at file 10-TimeTrains.py line 149
+    wait_unrecorded : 0.01570200 s at file 10-TimeTrains.py line 167
 
-    Total: 0.01000667 s
-
-
+    Total: 0.01570200 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-155
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 172-173
 
 This behavior is to be expected because under the hood, :meth:`pyquickbench.TimeTrain.tictoc` uses the ``__name__`` attribute of the wrapped function. 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-158
+.. GENERATED FROM PYTHON SOURCE LINES 173-176
 
 .. code-block:: Python
 
@@ -335,11 +383,11 @@ This behavior is to be expected because under the hood, :meth:`pyquickbench.Time
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-160
+.. GENERATED FROM PYTHON SOURCE LINES 177-178
 
 Overriding the ``__name__`` of the wrapped function gives the expected result:
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-173
+.. GENERATED FROM PYTHON SOURCE LINES 178-191
 
 .. code-block:: Python
 
@@ -366,19 +414,19 @@ Overriding the ``__name__`` of the wrapped function gives the expected result:
 
     TimeTrain results:
 
-    wait_recorded : 0.01000844 s at file 10-TimeTrains.py line 170
+    wait_recorded : 0.01507591 s at file 10-TimeTrains.py line 188
 
-    Total: 0.01000844 s
-
-
+    Total: 0.01507591 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-175
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 192-193
 
 More simply, you can set a custom name with the following syntax:
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-188
+.. GENERATED FROM PYTHON SOURCE LINES 193-206
 
 .. code-block:: Python
 
@@ -405,19 +453,19 @@ More simply, you can set a custom name with the following syntax:
 
     TimeTrain results:
 
-    my_custom_name : 0.01001071 s at file 10-TimeTrains.py line 184
+    my_custom_name : 0.01682139 s at file 10-TimeTrains.py line 202
 
-    Total: 0.01001071 s
-
-
+    Total: 0.01682139 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-190
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 207-208
 
 By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in between decorated function. This behavior can be overriden setting the ``ignore_names`` argument to an empty iterator:
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-206
+.. GENERATED FROM PYTHON SOURCE LINES 208-224
 
 .. code-block:: Python
 
@@ -447,21 +495,21 @@ By default, a :class:`pyquickbench.TimeTrain` will not show timings occuring in 
 
     TimeTrain results:
 
-    pyquickbench_sync : 0.01001581 s at file 10-TimeTrains.py line 201
-    wait_recorded     : 0.02000847 s at file 10-TimeTrains.py line 201
+    pyquickbench_sync : 0.01186187 s at file 10-TimeTrains.py line 219
+    wait_recorded     : 0.02550233 s at file 10-TimeTrains.py line 219
 
-    Total: 0.03002428 s
-
-
+    Total: 0.03736420 s
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-209
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 225-227
 
 Let's revisit the benchmark in :ref:`sphx_glr__build_auto_examples_tutorial_09-Vector_output.py` and measure the execution time of different parts of the function ``uniform_quantiles`` using :class:`pyquickbench.TimeTrain`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-227
+.. GENERATED FROM PYTHON SOURCE LINES 227-245
 
 .. code-block:: Python
 
@@ -490,7 +538,7 @@ Let's revisit the benchmark in :ref:`sphx_glr__build_auto_examples_tutorial_09-V
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-233
+.. GENERATED FROM PYTHON SOURCE LINES 246-251
 
 This function can be divided up into three main parts:
 
@@ -498,7 +546,7 @@ This function can be divided up into three main parts:
 * A sorting phase where the random vector is sorted in-place. This part is expected to scale as :math:`\mathcal{O}(n\log(n))`, and thus be dominant for large :math:`n`.
 * A last phase where estimated quantiles are built and returned. This phase is expected to scale as :math:`\mathcal{O}(1)` and be negligible for large :math:`n`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-264
+.. GENERATED FROM PYTHON SOURCE LINES 252-282
 
 .. code-block:: Python
 

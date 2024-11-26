@@ -1122,6 +1122,7 @@ document.write(`
     <span class="n">name_subplot_grid_x</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">name_subplot_grid_y</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">idx_relative</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">idx_relative_points</span> <span class="o">=</span> <span class="kc">None</span>
     
     <span class="n">all_legend_curve_color</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">all_legend_curve_linestyle</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1180,10 +1181,30 @@ document.write(`
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This error should never be raised&quot;</span><span class="p">)</span>
             
         <span class="n">relative_idx</span> <span class="o">=</span> <span class="n">_choose_idx_val</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">relative_to_idx</span><span class="p">,</span> <span class="n">relative_to_val</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">all_fun_names_list</span><span class="p">,</span> <span class="n">all_out_names_list</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">idx_all_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="n">idx_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">)</span>   
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             
+            <span class="n">relative_idx</span> <span class="o">=</span> <span class="n">relative_idx</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">relative_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">relative_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not determine relative value index&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">idx_points</span><span class="p">:</span>
+                <span class="n">idx_relative_points</span> <span class="o">=</span> <span class="n">relative_idx</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idx_all_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">idx_relative</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relative_idx</span><span class="p">)</span>   
+                
+        <span class="k">elif</span> <span class="n">relative_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not determine relative value index&#39;</span><span class="p">)</span>
+                
     <span class="k">if</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There should be exactly one plot_intent named &#39;points&#39;. There are currently </span><span class="si">{</span><span class="n">n_points</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
     
@@ -1361,13 +1382,18 @@ document.write(`
             <span class="n">plot_x_val</span> <span class="o">=</span><span class="n">_values_reduction</span><span class="p">(</span><span class="n">all_xvalues</span><span class="p">,</span> <span class="n">idx_vals</span><span class="p">,</span> <span class="n">idx_points</span><span class="p">,</span> <span class="n">idx_all_reduction</span><span class="p">)</span> 
             <span class="n">plot_x_val</span> <span class="o">=</span> <span class="n">plot_x_val</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_all_relative</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_all_relative</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">idx_relative_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idx_relative</span><span class="p">,</span> <span class="n">idx_all_relative</span><span class="p">):</span>
                 <span class="n">idx_vals</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-
+                
             <span class="n">relative_plot_y_val</span> <span class="o">=</span> <span class="n">_values_reduction</span><span class="p">(</span><span class="n">all_vals</span><span class="p">,</span> <span class="n">idx_vals</span><span class="p">,</span> <span class="n">idx_points</span><span class="p">,</span> <span class="n">idx_all_reduction</span><span class="p">)</span>
-            
+
+            <span class="k">if</span> <span class="n">idx_relative_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>                
+                <span class="n">relative_plot_y_val</span> <span class="o">=</span> <span class="n">relative_plot_y_val</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">npts</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">relative_plot_y_val</span><span class="p">)</span>
+                <span class="n">relative_plot_y_val</span> <span class="o">=</span> <span class="n">relative_plot_y_val</span><span class="p">[</span><span class="n">idx_relative_points</span><span class="p">]</span>
+
             <span class="n">plot_y_val</span> <span class="o">/=</span> <span class="n">relative_plot_y_val</span>
 
         <span class="n">plot_y_val</span> <span class="o">=</span> <span class="n">plot_y_val</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
