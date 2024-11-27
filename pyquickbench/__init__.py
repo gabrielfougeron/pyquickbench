@@ -30,6 +30,7 @@ Provides rudimentary profiling features to be used with :mod:`pyquickbench`.
    TimeTrain.toc
    TimeTrain.tictoc
    TimeTrain.to_dict
+   TimeTrain.total_time
    
 =========
 Constants

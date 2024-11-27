@@ -411,6 +411,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.toc.html">pyquickbench.TimeTrain.toc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.tictoc.html">pyquickbench.TimeTrain.tictoc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.to_dict.html">pyquickbench.TimeTrain.to_dict</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.total_time.html">pyquickbench.TimeTrain.total_time</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Named axes</span></p>
 <ul class="nav bd-sidenav">
@@ -518,20 +519,20 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path_prefix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Path relative to which other paths are to be understood, by default None</p></li>
-<li><p><strong>include_locs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Whether to include locations in code when printing the TimeTrain, by default None</p></li>
-<li><p><strong>include_filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the file name in locations in code when printing the TimeTrain, by default True</p></li>
-<li><p><strong>include_lineno</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the line number in locations in code when printing the TimeTrain, by default True</p></li>
-<li><p><strong>include_funname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the function name in locations in code when printing the TimeTrain, by default True</p></li>
-<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – Name of the TimeTrain, by default ‘’</p></li>
-<li><p><strong>align_toc_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to align toc names when printing the TimeTrain, by default True</p></li>
-<li><p><strong>names_reduction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Reduction to be applied to tocs that share the same name, by default None</p></li>
-<li><p><strong>global_tictoc_sync</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function. By default True.</p></li>
-<li><p><strong>ignore_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Names to be ignored by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.__repr__()</span></code> and <a class="reference internal" href="pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict" title="pyquickbench.TimeTrain.to_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.to_dict()</span></code></a>.
-By default None</p></li>
+<li><p><strong>path_prefix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Path relative to which other paths are to be understood, by default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>include_locs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Whether to include locations in code when printing the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>include_filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the file name in locations in code when printing the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>include_lineno</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the line number in locations in code when printing the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>include_funname</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to include the function name in locations in code when printing the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <em>optional</em>) – Name of the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p></li>
+<li><p><strong>align_toc_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to align toc names when printing the TimeTrain, by default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>names_reduction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Reduction to be applied to tocs that share the same name, by default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>global_tictoc_sync</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to use a common shared name for synchronization in <a class="reference internal" href="pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.tictoc()</span></code></a> or to <code class="docutils literal notranslate"><span class="pre">False</span></code> to use a specific name for every decorated function. By default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>ignore_names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – Names to be ignored by <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.13)"><code class="docutils literal notranslate"><span class="pre">print()</span></code></a> and <a class="reference internal" href="pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict" title="pyquickbench.TimeTrain.to_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyquickbench.TimeTrain.to_dict()</span></code></a>.
+By default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
 <li><p><strong>relative_timings</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to display relative timings when printing the TimeTrain.
-Only makes sense if names_reduction is None.
-By default False</p></li>
+Relative timings only sum up to 100% if <code class="docutils literal notranslate"><span class="pre">names_reduction</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>.
+By default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -558,8 +559,8 @@ By default False</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="pyquickbench.TimeTrain.tictoc.html#pyquickbench.TimeTrain.tictoc" title="pyquickbench.TimeTrain.tictoc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tictoc</span></code></a></p></td>
 <td><p>Decorates a function to record a new wagon in the TimeTrain before and after each call.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_time</span></code></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pyquickbench.TimeTrain.total_time.html#pyquickbench.TimeTrain.total_time" title="pyquickbench.TimeTrain.total_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">total_time</span></code></a></p></td>
+<td><p>Returns the total time recorded by the TimeTrain so far.</p></td>
 </tr>
 </tbody>
 </table>

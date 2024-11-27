@@ -36,30 +36,30 @@ class TimeTrain():
         Parameters
         ----------
         path_prefix : str | None, optional
-            Path relative to which other paths are to be understood, by default None
+            Path relative to which other paths are to be understood, by default ``None``.
         include_locs : bool | None, optional
-            Whether to include locations in code when printing the TimeTrain, by default None
+            Whether to include locations in code when printing the TimeTrain, by default ``None``.
         include_filename : bool, optional
-            Whether to include the file name in locations in code when printing the TimeTrain, by default True
+            Whether to include the file name in locations in code when printing the TimeTrain, by default ``True``.
         include_lineno : bool, optional
-            Whether to include the line number in locations in code when printing the TimeTrain, by default True
+            Whether to include the line number in locations in code when printing the TimeTrain, by default ``True``.
         include_funname : bool, optional
-            Whether to include the function name in locations in code when printing the TimeTrain, by default True
+            Whether to include the function name in locations in code when printing the TimeTrain, by default ``True``.
         name : str, optional
-            Name of the TimeTrain, by default ''
+            Name of the TimeTrain, by default ``''``.
         align_toc_names : bool, optional
-            Whether to align toc names when printing the TimeTrain, by default True
+            Whether to align toc names when printing the TimeTrain, by default ``True``.
         names_reduction : str | None, optional
-            Reduction to be applied to tocs that share the same name, by default None
+            Reduction to be applied to tocs that share the same name, by default ``None``.
         global_tictoc_sync : bool, optional
-            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function. By default True.
+            Set to ``True`` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to ``False`` to use a specific name for every decorated function. By default ``True``.
         ignore_names : str | None, optional
-            Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.
-            By default None
+            Names to be ignored by :func:`python:print` and :meth:`pyquickbench.TimeTrain.to_dict`.
+            By default ``None``.
         relative_timings : bool, optional
             Whether to display relative timings when printing the TimeTrain.
-            Only makes sense if names_reduction is None.
-            By default False
+            Relative timings only sum up to 100% if ``names_reduction`` is ``None`` or ``\"sum\"``.
+            By default ``False``.
 
         """    
         
@@ -134,7 +134,7 @@ class TimeTrain():
         ----------
         name : str, optional
             Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n
-            By default ''
+            By default ``''``.
         """        
         
         tbeg = time.perf_counter()
@@ -185,6 +185,12 @@ class TimeTrain():
     
     @property
     def total_time(self):
+        """
+        Returns the total time recorded by the TimeTrain so far.
+        
+        Note that the time reported by :meth:`pyquickbench.TimeTrain.total_time` might differ significantly from wall clock time because pyquickbench tries to exclude its inner workings from the timing. 
+         
+        """
         
         res = 0.
     
@@ -268,6 +274,12 @@ class TimeTrain():
 
         return out
     
+    def __repr__(self):
+        return self.__str__()
+
+    def __format__(self, format_spec):
+        return self.__str__()
+        
     def to_dict(
         self                                                                            ,
         return_first_instance   : bool                                      = False     ,
@@ -281,11 +293,11 @@ class TimeTrain():
         Parameters
         ----------
         return_first_instance : bool, optional
-            Whether to also return a dictionary containing the index of the first occurrence of every name, by default False
+            Whether to also return a dictionary containing the index of the first occurrence of every name, by default ``False``.
         names_reduction : callable | str | None, optional
             Optionally overrides the TimeTrain's reduction.
-            Set to "default" to not override reduction.
-            By default None
+            Set to ``"default"`` to not override reduction.
+            By default ``"default"``.
             
         """        
         
@@ -331,7 +343,7 @@ class TimeTrain():
         ----------
         name :  str | None, optional
             Optionally overrides the wrapped function's name.\n
-            By default None
+            By default ``None``.
             
         """        
 

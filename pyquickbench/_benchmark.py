@@ -343,7 +343,7 @@ def plot_benchmark(
     clip_vals               : bool                              = False                     ,
     stop_after_first_clip   : bool                              = False                     ,
     filename                : typing.Union[str, None]           = None                      ,
-) -> typing.Union[tuple[matplotlib.figure.Figure, np.ndarray[plt.Axes]], None] :    
+) -> typing.Union[typing.Tuple[matplotlib.figure.Figure, np.typing.NDArray[plt.Axes]], None] :    
     """Plots benchmarks results
 
     Parameters
@@ -391,7 +391,7 @@ def plot_benchmark(
         Alpha value for transparency of curves in plot.\n
         By default, ``1.`` meaning curves are fully opaque.
     violin_width_mul : float, optional
-        Factor on violin plot width. Decrease for thinner plot, and increase for fatter ones.\n
+        Factor on violin plot width. Decrease this value for thinner plot, and increase for fatter ones.\n
         By default, ``0.5``.
     violin_showmeans : bool, optional
         Whether to show mean values in violin plots, by default ``False``.
@@ -476,10 +476,16 @@ def plot_benchmark(
         By default ``None``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
     stop_after_first_clip : bool, optional
-        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False
+        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default ``False``.
     filename : str | None, optional
         If not ``None``, saves resulting figure in ``filename``.\n
         By default ``None``.
+        
+    Returns
+    -------
+    tuple[matplotlib.figure.Figure, np.typing.NDArray[plt.Axes]] | None
+        Matplotlib figure and axes with the benchmark results, only if ``show == False``.
+        
     """
 
     # print(f'{all_vals = }')

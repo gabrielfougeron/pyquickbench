@@ -411,6 +411,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.toc.html">pyquickbench.TimeTrain.toc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.tictoc.html">pyquickbench.TimeTrain.tictoc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.to_dict.html">pyquickbench.TimeTrain.to_dict</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyquickbench.TimeTrain.total_time.html">pyquickbench.TimeTrain.total_time</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Named axes</span></p>
 <ul class="nav bd-sidenav">
@@ -532,7 +533,7 @@ document.write(`
 <li><p><strong>alpha</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – <p>Alpha value for transparency of curves in plot.</p>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">1.</span></code> meaning curves are fully opaque.</p>
 </p></li>
-<li><p><strong>violin_width_mul</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – <p>Factor on violin plot width. Decrease for thinner plot, and increase for fatter ones.</p>
+<li><p><strong>violin_width_mul</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <em>optional</em>) – <p>Factor on violin plot width. Decrease this value for thinner plot, and increase for fatter ones.</p>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p>
 </p></li>
 <li><p><strong>violin_showmeans</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to show mean values in violin plots, by default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
@@ -596,14 +597,17 @@ By defaut <code class="docutils literal notranslate"><span class="pre">False</sp
 By default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <p>See <a class="reference internal" href="../_build/auto_examples/tutorial/06-Transforming_values.html#sphx-glr-build-auto-examples-tutorial-06-transforming-values-py"><span class="std std-ref">Plotting transformed values</span></a> for usage example.</p>
 </p></li>
-<li><p><strong>stop_after_first_clip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to stop plotting after the first clipped value if <code class="docutils literal notranslate"><span class="pre">clip_vals</span> <span class="pre">==</span> <span class="pre">True</span></code>, by default False</p></li>
+<li><p><strong>stop_after_first_clip</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <em>optional</em>) – Whether to stop plotting after the first clipped value if <code class="docutils literal notranslate"><span class="pre">clip_vals</span> <span class="pre">==</span> <span class="pre">True</span></code>, by default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code>, <em>optional</em>) – <p>If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, saves resulting figure in <code class="docutils literal notranslate"><span class="pre">filename</span></code>.</p>
 <p>By default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple[<em>Figure</em>, <em>ndarray</em>[<em>Axes</em>]] | None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Matplotlib figure and axes with the benchmark results, only if <code class="docutils literal notranslate"><span class="pre">show</span> <span class="pre">==</span> <span class="pre">False</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple[matplotlib.figure.Figure</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">np.typing.NDArray[plt.Axes]]</span> <span class="pre">|</span> <span class="pre">None</span></code></p>
 </dd>
 </dl>
 </dd></dl>

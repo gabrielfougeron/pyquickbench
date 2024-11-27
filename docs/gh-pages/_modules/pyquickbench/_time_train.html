@@ -485,30 +485,30 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path_prefix : str | None, optional</span>
-<span class="sd">            Path relative to which other paths are to be understood, by default None</span>
+<span class="sd">            Path relative to which other paths are to be understood, by default ``None``.</span>
 <span class="sd">        include_locs : bool | None, optional</span>
-<span class="sd">            Whether to include locations in code when printing the TimeTrain, by default None</span>
+<span class="sd">            Whether to include locations in code when printing the TimeTrain, by default ``None``.</span>
 <span class="sd">        include_filename : bool, optional</span>
-<span class="sd">            Whether to include the file name in locations in code when printing the TimeTrain, by default True</span>
+<span class="sd">            Whether to include the file name in locations in code when printing the TimeTrain, by default ``True``.</span>
 <span class="sd">        include_lineno : bool, optional</span>
-<span class="sd">            Whether to include the line number in locations in code when printing the TimeTrain, by default True</span>
+<span class="sd">            Whether to include the line number in locations in code when printing the TimeTrain, by default ``True``.</span>
 <span class="sd">        include_funname : bool, optional</span>
-<span class="sd">            Whether to include the function name in locations in code when printing the TimeTrain, by default True</span>
+<span class="sd">            Whether to include the function name in locations in code when printing the TimeTrain, by default ``True``.</span>
 <span class="sd">        name : str, optional</span>
-<span class="sd">            Name of the TimeTrain, by default &#39;&#39;</span>
+<span class="sd">            Name of the TimeTrain, by default ``&#39;&#39;``.</span>
 <span class="sd">        align_toc_names : bool, optional</span>
-<span class="sd">            Whether to align toc names when printing the TimeTrain, by default True</span>
+<span class="sd">            Whether to align toc names when printing the TimeTrain, by default ``True``.</span>
 <span class="sd">        names_reduction : str | None, optional</span>
-<span class="sd">            Reduction to be applied to tocs that share the same name, by default None</span>
+<span class="sd">            Reduction to be applied to tocs that share the same name, by default ``None``.</span>
 <span class="sd">        global_tictoc_sync : bool, optional</span>
-<span class="sd">            Set to True to use a common shared name for synchronization in tictoc or to False to use a specific name for every decorated function. By default True.</span>
+<span class="sd">            Set to ``True`` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to ``False`` to use a specific name for every decorated function. By default ``True``.</span>
 <span class="sd">        ignore_names : str | None, optional</span>
-<span class="sd">            Names to be ignored by :meth:`pyquickbench.TimeTrain.__repr__` and :meth:`pyquickbench.TimeTrain.to_dict`.</span>
-<span class="sd">            By default None</span>
+<span class="sd">            Names to be ignored by :func:`python:print` and :meth:`pyquickbench.TimeTrain.to_dict`.</span>
+<span class="sd">            By default ``None``.</span>
 <span class="sd">        relative_timings : bool, optional</span>
 <span class="sd">            Whether to display relative timings when printing the TimeTrain.</span>
-<span class="sd">            Only makes sense if names_reduction is None.</span>
-<span class="sd">            By default False</span>
+<span class="sd">            Relative timings only sum up to 100% if ``names_reduction`` is ``None`` or ``\&quot;sum\&quot;``.</span>
+<span class="sd">            By default ``False``.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>    
         
@@ -586,7 +586,7 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        name : str, optional</span>
 <span class="sd">            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n</span>
-<span class="sd">            By default &#39;&#39;</span>
+<span class="sd">            By default ``&#39;&#39;``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="n">tbeg</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -638,6 +638,12 @@ document.write(`
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the total time recorded by the TimeTrain so far.</span>
+<span class="sd">        </span>
+<span class="sd">        Note that the time reported by :meth:`pyquickbench.TimeTrain.total_time` might differ significantly from wall clock time because pyquickbench tries to exclude its inner workings from the timing. </span>
+<span class="sd">         </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="n">res</span> <span class="o">=</span> <span class="mf">0.</span>
     
@@ -721,6 +727,12 @@ document.write(`
 
         <span class="k">return</span> <span class="n">out</span>
     
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+        
 <div class="viewcode-block" id="TimeTrain.to_dict">
 <a class="viewcode-back" href="../../_generated/pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict">[docs]</a>
     <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span>
@@ -736,11 +748,11 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        return_first_instance : bool, optional</span>
-<span class="sd">            Whether to also return a dictionary containing the index of the first occurrence of every name, by default False</span>
+<span class="sd">            Whether to also return a dictionary containing the index of the first occurrence of every name, by default ``False``.</span>
 <span class="sd">        names_reduction : callable | str | None, optional</span>
 <span class="sd">            Optionally overrides the TimeTrain&#39;s reduction.</span>
-<span class="sd">            Set to &quot;default&quot; to not override reduction.</span>
-<span class="sd">            By default None</span>
+<span class="sd">            Set to ``&quot;default&quot;`` to not override reduction.</span>
+<span class="sd">            By default ``&quot;default&quot;``.</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
@@ -787,7 +799,7 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        name :  str | None, optional</span>
 <span class="sd">            Optionally overrides the wrapped function&#39;s name.\n</span>
-<span class="sd">            By default None</span>
+<span class="sd">            By default ``None``.</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
 

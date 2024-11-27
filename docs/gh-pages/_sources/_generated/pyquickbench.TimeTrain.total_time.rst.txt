@@ -1,0 +1,6 @@
+pyquickbench.TimeTrain.total\_time
+==================================
+
+.. currentmodule:: pyquickbench
+
+.. autoproperty:: TimeTrain.total_time

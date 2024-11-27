@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:02.355** total execution time for 4 files **from _build/auto_examples/benchmarks**:
+**00:02.418** total execution time for 4 files **from _build/auto_examples/benchmarks**:
 
 .. container::
 
@@ -33,14 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Inplace_conjugate.py` (``Inplace_conjugate.py``)
-     - 00:00.852
-     - 0.0
-   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Hashing.py` (``Hashing.py``)
-     - 00:00.657
+     - 00:00.890
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_Benchmark_Hardware_Info.py` (``Benchmark_Hardware_Info.py``)
-     - 00:00.626
+     - 00:00.652
+     - 0.0
+   * - :ref:`sphx_glr__build_auto_examples_benchmarks_Hashing.py` (``Hashing.py``)
+     - 00:00.635
      - 0.0
    * - :ref:`sphx_glr__build_auto_examples_benchmarks_numpy_array_init.py` (``numpy_array_init.py``)
-     - 00:00.221
+     - 00:00.240
      - 0.0

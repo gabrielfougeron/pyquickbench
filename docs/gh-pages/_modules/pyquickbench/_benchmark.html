@@ -793,7 +793,7 @@ document.write(`
     <span class="n">clip_vals</span>               <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">stop_after_first_clip</span>   <span class="p">:</span> <span class="nb">bool</span>                              <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">filename</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>           <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="p">:</span>    
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="p">:</span>    
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots benchmarks results</span>
 
 <span class="sd">    Parameters</span>
@@ -841,7 +841,7 @@ document.write(`
 <span class="sd">        Alpha value for transparency of curves in plot.\n</span>
 <span class="sd">        By default, ``1.`` meaning curves are fully opaque.</span>
 <span class="sd">    violin_width_mul : float, optional</span>
-<span class="sd">        Factor on violin plot width. Decrease for thinner plot, and increase for fatter ones.\n</span>
+<span class="sd">        Factor on violin plot width. Decrease this value for thinner plot, and increase for fatter ones.\n</span>
 <span class="sd">        By default, ``0.5``.</span>
 <span class="sd">    violin_showmeans : bool, optional</span>
 <span class="sd">        Whether to show mean values in violin plots, by default ``False``.</span>
@@ -926,10 +926,16 @@ document.write(`
 <span class="sd">        By default ``None``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
 <span class="sd">    stop_after_first_clip : bool, optional</span>
-<span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default False</span>
+<span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default ``False``.</span>
 <span class="sd">    filename : str | None, optional</span>
 <span class="sd">        If not ``None``, saves resulting figure in ``filename``.\n</span>
 <span class="sd">        By default ``None``.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[matplotlib.figure.Figure, np.typing.NDArray[plt.Axes]] | None</span>
+<span class="sd">        Matplotlib figure and axes with the benchmark results, only if ``show == False``.</span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># print(f&#39;{all_vals = }&#39;)</span>
