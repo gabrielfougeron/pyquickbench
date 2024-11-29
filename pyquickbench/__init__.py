@@ -151,6 +151,7 @@ all_transforms = all_transforms
 
    * ``"pol_growth_order"``  : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^\\alpha`.
    * ``"pol_cvgence_order"`` : Plots an estimate of :math:`\\alpha` based on consecutive measured values if the data scales as :math:`\\approx n^{-\\alpha}`.
+   * ``"relative_curve_fraction"`` : Plots the relative fraction of all displayed curves, so that all curves sum up to :math:`100\\%`.
 
    See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
 

@@ -1007,6 +1007,9 @@ def plot_benchmark(
         
         all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, i_violin, :] = plot_y_val
     
+    if transform in ["relative_curve_fraction"]:
+        all_plot_y_vals /= all_plot_y_vals.sum(axis=2, keepdims=True)
+    
     for i_subplot_grid_x in range(n_subplot_grid_x):
         for i_subplot_grid_y in range(n_subplot_grid_y):
             cur_ax = ax[i_subplot_grid_y, i_subplot_grid_x]

@@ -141,8 +141,9 @@ all_plot_intents = [
 all_plot_intents.extend([f'reduction_{name}' for name in all_reductions])
 
 all_transforms = [
-    'pol_growth_order'  ,
-    'pol_cvgence_order' ,
+    'pol_growth_order'          ,
+    'pol_cvgence_order'         ,
+    'relative_curve_fraction'   ,
 ]
 
 tictoc_sync_name = "pyquickbench_sync"
