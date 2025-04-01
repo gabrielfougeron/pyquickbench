@@ -304,9 +304,20 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
 
 def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, WarmUp, all_vals):
     
-    setup_vars_dict = _return_setup_vars_dict(setup, args)  
     n_funs = len(all_funs_list)
     vals = np.full((n_funs, n_repeat, 1), np.nan)  
+        
+    all_idx_list = list(i_args)
+    all_idx_list.append(slice(None))
+    all_idx_list.append(0)
+    all_idx = tuple(all_idx_list)
+    
+    DoTimings = not(np.isnan(all_vals[all_idx]))
+    
+    if not(DoTimings):
+        return
+
+    setup_vars_dict = _return_setup_vars_dict(setup, args)  
     
     for i_fun, fun in enumerate(all_funs_list):
         
@@ -316,6 +327,8 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
         all_idx = tuple(all_idx_list)
         
         DoTimings = not(np.isnan(all_vals[all_idx]))
+        
+        print(f'{DoTimings = }')
         
         if DoTimings:
             
@@ -505,22 +518,22 @@ def _arg_names_list_to_idx(name_list, all_args):
     return idx_list
 
 def _treat_future_result(future):
-    
-    all_idx_list = list(future.i_args)
-    all_idx_list.append(slice(None))
-    all_idx_list.append(slice(None))
-    all_idx = tuple(all_idx_list)
-    
+
     try:
         
         res = future.result()
+        
+        print(f'{res.shape = }')
         
         for i_fun in range(res.shape[0]):
             
             all_idx_list = list(future.i_args)
             
             tot_time = np.sum(res[i_fun,:])
+            
             if (tot_time > future.timeout):
+                
+                print(f"timeout detected {tot_time}, {future.timeout}")
                 
                 for idx in future.MonotonicAxes_idx:
                     
@@ -539,6 +552,12 @@ def _treat_future_result(future):
         future.all_vals[all_idx] = res
 
     except Exception as exc:
+        
+        all_idx_list = list(future.i_args)
+        all_idx_list.append(slice(None))
+        all_idx_list.append(slice(None))
+        all_idx = tuple(all_idx_list)
+        
         future.all_vals[all_idx] = np.nan
         if future.StopOnExcept:
             raise exc

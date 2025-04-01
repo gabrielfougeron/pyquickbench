@@ -14,4 +14,4 @@ sphinx-copybutton
 scipy
 numba
 threadpoolctl
-mkl_fft
+# mkl-fft
