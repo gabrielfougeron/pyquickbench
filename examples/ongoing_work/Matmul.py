@@ -28,9 +28,8 @@ import numpy as np
 import math as m
 import numba as nb
 import torch
-
-for i in range(torch.cuda.device_count()):
-   print(torch.cuda.get_device_properties(i).name)
+import warnings
+warnings.filterwarnings("ignore")
 
 print(f'{torch.cuda.is_available() = }')
 print(f'{torch.cuda.get_device_name(0) = }')
@@ -105,46 +104,52 @@ def numpy_matmul(a, b, c, a_cu, b_cu, c_cu):
 def torch_matmul(a, b, c, a_cu, b_cu, c_cu):
     torch.matmul(a_cu, b_cu, out=c_cu)
 
-dtypes_dict = {
+np_dtypes_dict = {
     "float16" : np.float16,
     "float32" : np.float32,
     "float64" : np.float64,
 }
 
+torch_dtypes_dict = {
+    "float16" : torch.float16,
+    "float32" : torch.float32,
+    "float64" : torch.float64,
+}
+
 def setup_abc(P, R, Q, real_dtype):
     
-    a = np.random.random((P,R)).astype(dtype=dtypes_dict[real_dtype])
-    b = np.random.random((R,Q)).astype(dtype=dtypes_dict[real_dtype])
-    c = np.zeros((P,Q),dtype=dtypes_dict[real_dtype])
+    a = np.random.random((P,R)).astype(dtype=np_dtypes_dict[real_dtype])
+    b = np.random.random((R,Q)).astype(dtype=np_dtypes_dict[real_dtype])
+    c = np.zeros((P,Q),dtype=np_dtypes_dict[real_dtype])
     
-    a_cu = torch.from_numpy(a).to(device)
-    b_cu = torch.from_numpy(b).to(device)
-    c_cu = torch.from_numpy(c).to(device)
+    a_cu = torch.rand((P,R), dtype=torch_dtypes_dict[real_dtype], device=device)
+    b_cu = torch.rand((R,Q), dtype=torch_dtypes_dict[real_dtype], device=device)
+    c_cu = torch.zeros((P,Q), dtype=torch_dtypes_dict[real_dtype], device=device)
     
     return {'a':a, 'b':b, 'c':c, 'a_cu':a_cu, 'b_cu':b_cu, 'c_cu':c_cu}
 
 def setup_abc_square(N, real_dtype):
-    return setup_abc(N, N, N, real_dtype)
+    return setup_abc(2, 2, N, real_dtype)
 
 basename = 'matmul_timings_full'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "N" : [(2 ** k) for k in range(15)]     ,
+    "N" : [(2 ** k) for k in range(28)]     ,
     "real_dtype": ["float16", "float32", "float64"]    ,
 }
 
 all_funs = [
     python                  ,
-    # numba_serial            ,
-    # numba_auto_parallel     ,
-    # numba_parallel          ,
-    # numba_parallel_noreduce ,
-    # numpy_matmul            ,
-    # torch_matmul            ,
+    numba_serial            ,
+    numba_auto_parallel     ,
+    numba_parallel          ,
+    numba_parallel_noreduce ,
+    numpy_matmul            ,
+    torch_matmul            ,
 ]
 
-n_repeat = 1
+n_repeat = 100
 
 MonotonicAxes = ["N"]
 
@@ -163,9 +168,8 @@ all_timings = pyquickbench.run_benchmark(
     time_per_test = time_per_test   ,
     MonotonicAxes = MonotonicAxes   ,
     # PreventBenchmark = True         ,
-    timeout = 1e-4                  ,
     ForceBenchmark = True           ,
-    # WarmUp = True                   ,
+    WarmUp = True,
 )
 
 

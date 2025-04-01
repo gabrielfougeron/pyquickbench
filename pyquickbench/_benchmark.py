@@ -205,9 +205,7 @@ def run_benchmark(
             PoolExecutor = AllPoolExecutors[pooltype]
         except KeyError:
             raise ValueError(f"Unknown pooltype {pooltype}. Available pootypes: {list(AllPoolExecutors.keys())}")
-                  
-        print(f'{mode = }')              
-      
+
         if mode == "timings":
             
             if (pooltype != "phony"):

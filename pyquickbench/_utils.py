@@ -6,6 +6,7 @@ import copy
 import itertools
 import matplotlib.mlab as mlab
 import matplotlib.cbook as cbook
+import time
 import warnings
 
 import numpy as np
@@ -312,12 +313,14 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
     all_idx_list.append(0)
     all_idx = tuple(all_idx_list)
     
-    DoTimings = not(np.isnan(all_vals[all_idx]))
+    SkipTimings = np.all(np.isnan(all_vals[all_idx]))
     
-    if not(DoTimings):
+    if SkipTimings:
         return
 
+    setup_tbeg = time.perf_counter()
     setup_vars_dict = _return_setup_vars_dict(setup, args)  
+    setup_time = time.perf_counter() - setup_tbeg
     
     for i_fun, fun in enumerate(all_funs_list):
         
@@ -327,9 +330,7 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
         all_idx = tuple(all_idx_list)
         
         DoTimings = not(np.isnan(all_vals[all_idx]))
-        
-        print(f'{DoTimings = }')
-        
+
         if DoTimings:
             
             try: # Some structure cannot easily be deepcopied, like those created with Cython.
@@ -523,27 +524,21 @@ def _treat_future_result(future):
         
         res = future.result()
         
-        print(f'{res.shape = }')
-        
         for i_fun in range(res.shape[0]):
-            
-            all_idx_list = list(future.i_args)
             
             tot_time = np.sum(res[i_fun,:])
             
             if (tot_time > future.timeout):
                 
-                print(f"timeout detected {tot_time}, {future.timeout}")
-                
+                all_idx_list = list(future.i_args)
+
                 for idx in future.MonotonicAxes_idx:
-                    
                     all_idx_list[idx] = slice(future.i_args[idx], None, None)
         
-            all_idx_list.append(i_fun)
-            all_idx_list.append(slice(None))
-            all_idx = tuple(all_idx_list)
-            
-            future.all_vals[all_idx] = np.nan
+                all_idx_list.append(i_fun)
+                all_idx_list.append(slice(None))
+                all_idx = tuple(all_idx_list)
+                future.all_vals[all_idx] = np.nan
         
         all_idx_list = list(future.i_args)
         all_idx_list.append(slice(None))
