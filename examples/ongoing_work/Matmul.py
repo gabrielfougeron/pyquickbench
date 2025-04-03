@@ -10,6 +10,14 @@ Summing elements of a numpy array
 
 import os
 import sys
+import threadpoolctl
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['TBB_NUM_THREADS'] = '1'
+os.environ['NUMBA_NUM_THREADS'] = '1'
+threadpoolctl.threadpool_limits(limits=1).__enter__()
 
 try:
     __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.pardir,os.pardir))
@@ -63,7 +71,6 @@ def python_impl(a, b, c):
                 c[i,j] += a[i,k]*b[k,j]
 
 numba_serial_impl = nb.jit(python_impl,**numba_opt_dict)
-numba_auto_parallel_impl = nb.jit(python_impl,parallel=True,**numba_opt_dict)
 
 @nb.jit(parallel=True,**numba_opt_dict)
 def numba_parallel_impl(a, b, c):
@@ -73,30 +80,15 @@ def numba_parallel_impl(a, b, c):
             for k in range(a.shape[1]):
 
                 c[i,j] += a[i,k]*b[k,j]
-
-@nb.jit(parallel=True,**numba_opt_dict)
-def numba_parallel_noreduce_impl(a, b, c):
-
-    for i in nb.prange(a.shape[0]):
-        for j in range(b.shape[1]):
-            for k in range(a.shape[1]):
-
-                c[i,j] = c[i,j] + a[i,k]*b[k,j]
                 
 def python(a, b, c, a_cu, b_cu, c_cu):
     return python_impl(a, b, c)
              
 def numba_serial(a, b, c, a_cu, b_cu, c_cu):
     numba_serial_impl(a,b,c)
-    
-def numba_auto_parallel(a, b, c, a_cu, b_cu, c_cu):
-    numba_auto_parallel_impl(a,b,c)
-    
+
 def numba_parallel(a, b, c, a_cu, b_cu, c_cu):
     numba_parallel_impl(a,b,c)    
-    
-def numba_parallel_noreduce(a, b, c, a_cu, b_cu, c_cu):
-    numba_parallel_noreduce_impl(a,b,c)
 
 def numpy_matmul(a, b, c, a_cu, b_cu, c_cu):
     np.matmul(a, b, out=c)
@@ -129,27 +121,25 @@ def setup_abc(P, R, Q, real_dtype):
     return {'a':a, 'b':b, 'c':c, 'a_cu':a_cu, 'b_cu':b_cu, 'c_cu':c_cu}
 
 def setup_abc_square(N, real_dtype):
-    return setup_abc(2, 2, N, real_dtype)
+    return setup_abc(N, N, N, real_dtype)
 
 basename = 'matmul_timings_full'
 filename = os.path.join(timings_folder,basename+'.npz')
 
 all_args = {
-    "N" : [(2 ** k) for k in range(28)]     ,
+    "N" : [(2 ** k) for k in range(20)]     ,
     "real_dtype": ["float16", "float32", "float64"]    ,
 }
 
 all_funs = [
     python                  ,
     numba_serial            ,
-    numba_auto_parallel     ,
     numba_parallel          ,
-    numba_parallel_noreduce ,
     numpy_matmul            ,
     torch_matmul            ,
 ]
 
-n_repeat = 100
+n_repeat = 1
 
 MonotonicAxes = ["N"]
 
@@ -168,7 +158,7 @@ all_timings = pyquickbench.run_benchmark(
     time_per_test = time_per_test   ,
     MonotonicAxes = MonotonicAxes   ,
     # PreventBenchmark = True         ,
-    ForceBenchmark = True           ,
+    # ForceBenchmark = True           ,
     WarmUp = True,
 )
 
@@ -191,3 +181,4 @@ pyquickbench.plot_benchmark(
     single_values_val = single_values_val   ,
     show = True                             ,
 )
+

@@ -7,6 +7,12 @@ try:
     MULTIPROCESSING_AVAILABLE = True
 except:
     MULTIPROCESSING_AVAILABLE = False
+    
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except:
+    TORCH_AVAILABLE = False
 
 default_ax_name = "n"
 fun_ax_name = "function"

@@ -345,9 +345,17 @@ def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test
 
             code = f'{fun_ax_name}(**setup_vars_dict)'
 
+            if TORCH_AVAILABLE:
+                def timer():
+                    torch.cuda.synchronize()
+                    return time.perf_counter()
+            else:
+                timer = time.perf_counter
+
             Timer = AutoTimer(
-                code,
-                globals = global_dict,
+                code                    ,
+                globals = global_dict   ,
+                timer = timer           ,
             )
 
             try:
