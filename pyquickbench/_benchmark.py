@@ -616,6 +616,8 @@ def plot_benchmark(
         plot_legend[fun_ax_name] = (n_funs > 1)
         plot_legend[repeat_ax_name] = (n_repeat > 1)
         plot_legend[out_ax_name] = (n_out > 1)
+        
+        plot_legend[fun_ax_name] = plot_legend[fun_ax_name] or not(plot_legend[repeat_ax_name] or plot_legend[out_ax_name])
 
     elif isinstance(plot_legend, bool):
         plot_legend_in = plot_legend
