@@ -51,6 +51,7 @@ def run_benchmark(
     filename        : typing.Union[str, None]   = None                      ,
     ForceBenchmark  : bool                      = False                     ,
     PreventBenchmark: bool                      = False                     ,
+    allow_pickle    : bool                      = False                     ,
     StopOnExcept    : bool                      = False                     ,
     ShowProgress    : bool                      = False                     ,
     WarmUp          : bool                      = False                     ,
@@ -97,6 +98,8 @@ def run_benchmark(
         Whether to disregard existing cache and force a full re-run, by default ``False``.
     PreventBenchmark : bool, optional
         Whether to prevent a possibly lengthy full re-run, by default ``False``.
+    allow_pickle : bool, optional
+        Whether to allow pickling of data when loading benchmarks from disk. By default, ``False``.
     StopOnExcept : bool, optional
         Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.
     ShowProgress : bool, optional
@@ -153,7 +156,7 @@ def run_benchmark(
         
         try:
             
-            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape)
+            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape, allow_pickle = allow_pickle)
 
             DoBenchmark = not(BenchmarkUpToDate) and not(PreventBenchmark)
             if not(BenchmarkUpToDate) and PreventBenchmark:

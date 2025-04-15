@@ -114,12 +114,12 @@ def _return_setup_vars_dict(setup, args):
         
     return setup_vars_dict
 
-def _load_benchmark_file(filename, all_args_in, shape):
+def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
     
     file_base, file_ext = os.path.splitext(filename)
     
     if file_ext == '.npy':
-        all_vals = np.load(filename)    
+        all_vals = np.load(filename, allow_pickle = allow_pickle)    
 
         BenchmarkUpToDate = True
         assert all_vals.ndim == len(shape)
@@ -127,7 +127,7 @@ def _load_benchmark_file(filename, all_args_in, shape):
             BenchmarkUpToDate = BenchmarkUpToDate and (loaded_axis_len == expected_axis_len)
 
     elif file_ext == '.npz':
-        file_content = np.load(filename)
+        file_content = np.load(filename, allow_pickle = allow_pickle)
         all_vals = file_content['all_vals']
         
         BenchmarkUpToDate = (all_vals.ndim == len(shape))

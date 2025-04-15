@@ -11,7 +11,6 @@ import threadpoolctl
 
 # sphinx_gallery_start_ignore
 
-
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 os.environ['NUMEXPR_NUM_THREADS'] = '1'
 os.environ['MKL_NUM_THREADS'] = '1'
