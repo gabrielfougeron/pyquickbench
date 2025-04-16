@@ -160,7 +160,7 @@ Let's focus on accuracy measurements now.
         all_nint                                ,
         bench                                   ,
         mode = "scalar_output"                  ,
-        filename = scalar_filename               ,
+        filename = scalar_filename              ,
     )
 
     pyquickbench.plot_benchmark(
@@ -169,7 +169,7 @@ Let's focus on accuracy measurements now.
         bench                                   ,
         mode = "scalar_output"                  ,
         plot_ylim = plot_ylim                   ,
-        title = 'Relative error on integrand'  ,
+        title = 'Relative error on integrand'   ,
         ylabel = "Relative error"               ,
         show = True                             ,
     )
@@ -224,7 +224,7 @@ A natural question when assessing accuracy is to ask whether the measured conver
 
 .. GENERATED FROM PYTHON SOURCE LINES 198-199
 
-The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to ``True``.
+The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to :data:`python:True`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 199-213
 

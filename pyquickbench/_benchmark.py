@@ -64,64 +64,64 @@ def run_benchmark(
 
     Parameters
     ----------
-    all_args : dict | typing.Iterable
+    all_args : :class:`python:dict` | :term:`python:iterable`
         Describes the arguments to be given to the functions in the benchmark.
-    all_funs : dict | typing.Iterable
+    all_funs : :class:`python:dict` | :term:`python:iterable`
         Functions to be benchmarked.
-    mode : str, optional
+    mode : :class:`python:str`, optional
         Benchmark mode, i.e. target of the benchmark.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n
         Possible values: ``"timings"`` or ``"scalar_output"``. By default ``"timings"``.
-    setup : callable, optional
+    setup : :term:`python:callable`, optional
         Function that prepares the inputs for the functions to be benchmarked.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
-    n_repeat : int, optional
+    n_repeat : :class:`python:int`, optional
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
-    nproc : int, optional
-        Number of workers in PoolExecutor.\n
+    nproc : :class:`python:int`, optional
+        Number of workers in :class:`python:concurrent.futures.Executor`.\n
         By default :func:`python:multiprocessing.cpu_count()`.
-    pooltype : str, optional
-        Type of PoolExecutor.\n
+    pooltype : :class:`python:str`, optional
+        Type of :class:`python:concurrent.futures.Executor`.\n
         Possible values: ``"phony"``, ``"thread"`` or ``"process"``.\n  
         By default ``"phony"``.
-    time_per_test : float, optional
+    time_per_test : :class:`python:float`, optional
         Minimum time in seconds for benchmark in ``"timings"`` mode.\n
         By default ``0.2``.
-    filename : str | None, optional
+    filename : :class:`python:str` | :data:`python:None`, optional
         Filename for results caching.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` for usage example.\n
         Possible file extensions : ``*.npy`` or ``*.npz``.\n
-        By default ``None``.
-    ForceBenchmark : bool, optional
-        Whether to disregard existing cache and force a full re-run, by default ``False``.
-    PreventBenchmark : bool, optional
-        Whether to prevent a possibly lengthy full re-run, by default ``False``.
-    allow_pickle : bool, optional
-        Whether to allow pickling of data when loading benchmarks from disk. By default, ``False``.
-    StopOnExcept : bool, optional
-        Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.
-    ShowProgress : bool, optional
-        Whether to show a progress bar in the CLI during benchmark, by default ``False``.
-    WarmUp : bool, optional
+        By default :data:`python:None`.
+    ForceBenchmark : :class:`python:bool`, optional
+        Whether to disregard existing cache and force a full re-run, by default :data:`python:False`.
+    PreventBenchmark : :class:`python:bool`, optional
+        Whether to prevent a possibly lengthy full re-run, by default :data:`python:False`.
+    allow_pickle : :class:`python:bool`, optional
+        Whether to allow pickling of data when loading benchmarks from disk. By default, :data:`python:False`.
+    StopOnExcept : :class:`python:bool`, optional
+        Whether to interrupt the benchmark if exceptions are thrown, by default :data:`python:False`.
+    ShowProgress : :class:`python:bool`, optional
+        Whether to show a progress bar in the CLI during benchmark, by default :data:`python:False`.
+    WarmUp : :class:`python:bool`, optional
         Whether to run the function once without measurement. Can help with jit compilation caching for instance.\n
-        By default ``False``.
-    MonotonicAxes : list, optional
+        By default :data:`python:False`.
+    MonotonicAxes : :class:`python:list`, optional
         List of argument names for which timings are expected to get longer and longer.\n
         By default ``[]``.
-    timeout : float, optional
+    timeout : :class:`python:float`, optional
         Time in seconds after which a timing is considered too long.\n
         When a timing reaches this value, all longer timings (as detected by ``MonotonicAxes``) are cancelled.\n
         By default ``1.``.
-    show : bool, optional
-        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.
+    show : :class:`python:bool`, optional
+        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default :data:`python:False`.
     **plot_kwargs :
         Arguments to pass on to :func:`pyquickbench.plot_benchmark` after the benchmark is run.
 
     Returns
     -------
-    np.typing.NDArray[np.float64] | None
+    :class:`numpy:numpy.ndarray` [:obj:`numpy:numpy.float64`] | :data:`python:None`
         Benchmark results.
 
     """
@@ -351,142 +351,142 @@ def plot_benchmark(
 
     Parameters
     ----------
-    all_vals : np.typing.ArrayLike
+    all_vals : :class:`numpy:numpy.ndarray`
         Benchmark results as returned by :func:`pyquickbench.run_benchmark`.
-    all_args : dict | typing.Iterable
+    all_args : :class:`python:dict` | :obj:`python:typing.Iterable`
         Describes the arguments given to the functions in the benchmark.
-    all_funs : typing.Dict[str, callable] | typing.Iterable[str] | None, optional
-        Benchmarked functions, by default ``None``.\n
-        Only the ``__name__`` attribute is used here.
-    all_fun_names : typing.Iterable[str] | None, optional
-        Names of the benchmarked functions, by default ``None``.\n
-        In case the functions ``__name__`` attribute is missing or uninformative.
-    all_out_names : typing.Iterable[str] | None, optional
-        Names of the outputs of the functions if ``mode="vector_output"``, by default ``None``.
-    plot_intent : typing.Iterable[str] | None, optional
+    all_funs : :class:`python:dict` [:class:`python:str`, :term:`python:iterable`] | :obj:`python:typing.Iterable` [:class:`python:str`] | :data:`python:None`, optional
+        Benchmarked functions, by default :data:`python:None`.\n
+        Only the :obj:`python:function.__name__` attribute is used here.
+    all_fun_names : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional
+        Names of the benchmarked functions, by default :data:`python:None`.\n
+        In case the functions :obj:`python:function.__name__` attribute is missing or uninformative.
+    all_out_names : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional
+        Names of the outputs of the functions if ``mode="vector_output"``, by default :data:`python:None`.
+    plot_intent : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional
         Describes how to handle the axes of the benchmark results array ``all_vals``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n
-        By default ``None``.
-    plot_type : typing.Iterable[str] | None, optional
-        Any value that is not ``None`` overrides the default plot_type.\n
+        By default :data:`python:None`.
+    plot_type : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional
+        Any value that is not :data:`python:None` overrides the default plot_type.\n
         Possible values : ``"bar"``, ``"curve"``, ``"violin"``.\n
-        By default ``None``.
-    mode : str, optional
+        By default :data:`python:None`.
+    mode : :class:`python:str`, optional
         Benchmark mode, i.e. target of the benchmark.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n
         Possible values: ``"timings"`` or ``"scalar_output"``. By default ``"timings"``.
-    setup : callable, optional
+    setup : :term:`python:callable`, optional
         Function that prepares the inputs for the functions to be benchmarked.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
         Only used if ``all_out_names`` was not provided and ``mode="vector_output"``\n
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
-    all_xvalues : np.typing.ArrayLike | None, optional
+    all_xvalues :  :class:`numpy:numpy.ndarray` | :data:`python:None`, optional
         Values to be plotted on the x-axis if those differ from argument values.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n 
-        By default ``None``.
-    color_list : list, optional
-        List of colors for plotted curves, by default ``default_color_list``.
-    linestyle_list : list, optional
-        List of linestyles for plotted curves, by default ``default_linestyle_list``.
-    pointstyle_list : list, optional
-        List of point markers for plotted curves, by default ``default_pointstyle_list``.
-    alpha : float, optional
+        By default :data:`python:None`.
+    color_list : :class:`python:list` [:class:`python:str`], optional
+        List of colors for plotted curves, by default :data:`default_color_list`.
+    linestyle_list : :class:`python:list` [:class:`python:str`], optional
+        List of linestyles for plotted curves, by default  :data:`default_linestyle_list`.
+    pointstyle_list : :class:`python:list` [:class:`python:str`], optional
+        List of point markers for plotted curves, by default :data:`default_pointstyle_list`.
+    alpha : :class:`python:float`, optional
         Alpha value for transparency of curves in plot.\n
         By default, ``1.`` meaning curves are fully opaque.
-    violin_width_mul : float, optional
+    violin_width_mul : :class:`python:float`, optional
         Factor on violin plot width. Decrease this value for thinner plot, and increase for fatter ones.\n
         By default, ``0.5``.
-    violin_showmeans : bool, optional
-        Whether to show mean values in violin plots, by default ``False``.
-    violin_showextrema : bool, optional
-        Whether to show min/max values in violin plots, by default ``True``.
-    violin_showmedians : bool, optional
-        Whether to show median values in violin plots, by default ``False``.
-    violin_show_observations : bool, optional
-        Whether to show individual observations in violin plot, by default ``False``.
-    violin_side : str | None, optional
+    violin_showmeans : :class:`python:bool`, optional
+        Whether to show mean values in violin plots, by default :data:`python:False`.
+    violin_showextrema : :class:`python:bool`, optional
+        Whether to show min/max values in violin plots, by default :data:`python:True`.
+    violin_showmedians : :class:`python:bool`, optional
+        Whether to show median values in violin plots, by default :data:`python:False`.
+    violin_show_observations : :class:`python:bool`, optional
+        Whether to show individual observations in violin plot, by default :data:`python:False`.
+    violin_side : :class:`python:str` | :data:`python:None`, optional
         Side of the `Kernel Density Estimation <https://scikit-learn.org/stable/modules/density.html>`_ reconstruction in violin plots.
-        Possible values: ``"both"``, ``"left"``, ``"right"``, ``None``.\n
+        Possible values: ``"both"``, ``"left"``, ``"right"``, :data:`python:None`.\n
         By default ``"both"``.
-    single_values_idx : dict | None, optional
+    single_values_idx : :class:`python:dict` | :data:`python:None`, optional
         Indices of benchmarked values to be fixed by a ``plot_intent`` of ``"single_value"``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
-        By default ``None``.
-    single_values_val : dict | None, optional
+        By default :data:`python:None`.
+    single_values_val : :class:`python:dict` | :data:`python:None`, optional
         Values of benchmark to be fixed by a ``plot_intent`` of ``"single_value"``.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n
-        By default ``None``.
-    logx_plot : bool | None, optional
-        How to override log scaling on the x-axis of the plots, by default ``None``.
-    logy_plot : bool | None, optional
-        How to override log scaling on the y-axis of the plots, by default ``None``.
-    plot_xlim : tuple | None, optional
-       How to override limits on the x-axis of the plots, by default ``None``.
-    plot_ylim : tuple | None, optional
-        How to override limits on the y-axis of the plots, by default ``None``.
-    show : bool, optional
-        Whether to issue a ``plt.show()`` instead of returning a ``(fig, ax)`` tuple, by default ``False``.
-    return_empty_plot : bool, optional
+        By default :data:`python:None`.
+    logx_plot : :class:`python:bool` | :data:`python:None`, optional
+        How to override log scaling on the x-axis of the plots, by default :data:`python:None`.
+    logy_plot : :class:`python:bool` | :data:`python:None`, optional
+        How to override log scaling on the y-axis of the plots, by default :data:`python:None`.
+    plot_xlim :  :class:`python:tuple` | :data:`python:None`, optional
+       How to override limits on the x-axis of the plots, by default :data:`python:None`.
+    plot_ylim :  :class:`python:tuple` | :data:`python:None`, optional
+        How to override limits on the y-axis of the plots, by default :data:`python:None`.
+    show : :class:`python:bool`, optional
+        Whether to issue a call to :func:`matplotlib:matplotlib.pyplot.show` instead of returning a ``(fig, ax)`` tuple, by default :data:`python:False`.
+    return_empty_plot : :class:`python:bool`, optional
         Whether to prematurely return an empty ``(fig, ax)`` tuple.
         Useful to create an empty plot and reuse it, see :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for instance.
-        By defaut ``False``.
-    fig : matplotlib.figure.Figure | None, optional
-        User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n 
+        By defaut :data:`python:False`.
+    fig : :class:`matplotlib:matplotlib.figure.Figure` | :data:`python:None`, optional
+        User provided :class:`matplotlib:matplotlib.figure.Figure` object. If :data:`python:None`, a new one is generated.\n 
         Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n
-        By default ``None``.
-    ax : plt.Axes | None, optional
+        By default :data:`python:None`.
+    ax : :class:`numpy:numpy.ndarray` [:class:`matplotlib:matplotlib.axes.Axes`] | :data:`python:None`, optional
         User provided array of :class:`matplotlib:matplotlib.axes.Axes` objects as returned by :func:`matplotlib:matplotlib.pyplot.subplots`.\n
         Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n
-        By default ``None``.
-    dpi : int, optional
+        By default :data:`python:None`.
+    dpi : :class:`python:int`, optional
         Output image resolution, by default ``150``.
-    pxl_per_plot_x : int, optional
+    pxl_per_plot_x : :class:`python:int`, optional
         Output plot width, by default ``1600``.
-    pxl_per_plot_y : int, optional
+    pxl_per_plot_y : :class:`python:int`, optional
         Output plot height, by default ``800``.
-    sharex : bool, optional
-        Whether to share plot x-axis, by default ``True``.
-    sharey : bool, optional
-        Whether to share plot y-axis, by default ``False``.
-    title : str | None, optional
-        Image title, by default ``None``.
-    xlabel : str | None, optional
-        Override argument value as a default for plot x label, by default ``None``.
-    ylabel : str | None, optional
-        Override default for plot y label, by default ``None``.
-    plot_legend : bool | dict | None, optional
-        Whether to record each axis of the benchmark in a legend, by default ``None``.
-    legend_location : str, optional
-        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``'upper left'``.
-    plot_grid : bool, optional
-        Whether to plot a background grid to each plot, by default ``True``.
-    ProductLegend : bool, optional
+    sharex : :class:`python:bool`, optional
+        Whether to share plot x-axis, by default :data:`python:True`.
+    sharey : :class:`python:bool`, optional
+        Whether to share plot y-axis, by default :data:`python:False`.
+    title : :class:`python:str` | :data:`python:None`, optional
+        Image title, by default :data:`python:None`.
+    xlabel : :class:`python:str` | :data:`python:None`, optional
+        Override argument value as a default for plot x label, by default :data:`python:None`.
+    ylabel : :class:`python:str` | :data:`python:None`, optional
+        Override default for plot y label, by default :data:`python:None`.
+    plot_legend : :class:`python:bool` | :class:`python:dict` | :data:`python:None`, optional
+        Whether to record each axis of the benchmark in a legend, by default :data:`python:None`.
+    legend_location : :class:`python:str`, optional
+        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``"upper left"``.
+    plot_grid : :class:`python:bool`, optional
+        Whether to plot a background grid to each plot, by default :data:`python:True`.
+    ProductLegend : :class:`python:bool`, optional
         Whether to detail every curve in the legend, or aggregate benchmark axes, leading to more concise legends.\n
-        By default ``False``.
-    relative_to_idx : dict | None, optional
+        By default :data:`python:False`.
+    relative_to_idx : :class:`python:dict` | :data:`python:None`, optional
         Indices of benchmarked values against which curves will be plotted.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n
-        By default ``None``.
-    relative_to_val : dict | None, optional
+        By default :data:`python:None`.
+    relative_to_val : :class:`python:dict` | None, optional
         Values of benchmark against which curves will be plotted.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n
-        By default ``None``.
-    transform : str | None, optional
-        Data transformation before plotting, by default ``None``.\n
+        By default :data:`python:None`.
+    transform : :class:`python:str` | :data:`python:None`, optional
+        Data transformation before plotting, by default :data:`python:None`.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
-    clip_vals : bool, optional
+    clip_vals : :class:`python:bool`, optional
         Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.
-        By default ``None``.\n
+        By default :data:`python:None`.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.
-    stop_after_first_clip : bool, optional
-        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default ``False``.
-    filename : str | None, optional
-        If not ``None``, saves resulting figure in ``filename``.\n
-        By default ``None``.
+    stop_after_first_clip : :class:`python:bool`, optional
+        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default :data:`python:False`.
+    filename : :class:`python:str` | :data:`python:None`, optional
+        If not :data:`python:None`, saves resulting figure in ``filename``.\n
+        By default :data:`python:None`.
         
     Returns
     -------
-    tuple[matplotlib.figure.Figure, np.typing.NDArray[plt.Axes]] | None
+    :class:`python:tuple` [ :class:`matplotlib:matplotlib.figure.Figure`, :class:`numpy:numpy.ndarray` [:class:`matplotlib:matplotlib.axes.Axes`]] | :data:`python:None`
         Matplotlib figure and axes with the benchmark results, only if ``show == False``.
         
     """

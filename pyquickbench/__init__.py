@@ -102,7 +102,7 @@ out_ax_name = out_ax_name
 all_reductions = all_reductions
 """Available data reductions.
 
-   List of all available data reductions to be used in :func:`pyquickbench.plot_benchmark` or :class:`pyquickbench.TimeTrain`.
+   Dictionary of all available data reductions to be used in :func:`pyquickbench.plot_benchmark` or :class:`pyquickbench.TimeTrain`.
 
    * ``"avg"``       : Average 
    * ``"min"``       : Minimum
@@ -124,7 +124,7 @@ all_reductions = all_reductions
 all_plot_intents = all_plot_intents
 """Available plot intents.
 
-   List of all available plot intents to be used in :func:`pyquickbench.plot_benchmark`.
+   Dictionary of all available plot intents to be used in :func:`pyquickbench.plot_benchmark`.
 
    * ``"single_value"``       : A single value is plotted. Requires either ``single_values_val`` or ``single_values_idx`` to be set.
    * ``"points"``             : Values are plotted as points along a curve.

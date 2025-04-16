@@ -103,7 +103,7 @@ np.all(all_times == all_times_bis)
 # Forcing benchmarks
 # ******************
 # 
-# A full re-run can nonetheless be forced if the keyword ``ForceBenchmark`` is set to ``True``. The default value for ``ForceBenchmark`` is ``False``.
+# A full re-run can nonetheless be forced if the keyword ``ForceBenchmark`` is set to :data:`python:True`. The default value for ``ForceBenchmark`` is ``False``.
 #
 # .. code-block::
 # 

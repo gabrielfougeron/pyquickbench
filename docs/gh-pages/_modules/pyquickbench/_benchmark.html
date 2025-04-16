@@ -15,52 +15,58 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/assets/jsonview.bundle.css?v=f6ef2277" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-data-viewer/jsonview.bundle.css?v=f6ef2277" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/libs/html/datatables.min.css?v=4b4fd840" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common.css?v=bd9ab754" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css?v=ffa536d2" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/layouts.css?v=448c382f" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/styles.css?v=6c8eb985" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_style.css?v=92936fa5" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/needstable.css?v=5e1b6797" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_core.css?v=f5b60a78" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_toggle.css?v=5c6620df" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_links.css?v=2150a916" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css?v=803738c0" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-test-results/common.css?v=9ec2c1d5" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=f19979f9" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script src="../../_static/assets/jsonview.bundle.js?v=18cd53c5"></script>
-    <script src="../../_static/assets/jsonview_loader.js?v=f7ff7e7d"></script>
+    <script src="../../_static/sphinx-data-viewer/jsonview.bundle.js?v=18cd53c5"></script>
+    <script src="../../_static/sphinx-data-viewer/jsonview_loader.js?v=f7ff7e7d"></script>
     <script src="../../_static/sphinx-needs/libs/html/datatables.min.js?v=8a4aee21"></script>
     <script src="../../_static/sphinx-needs/libs/html/datatables_loader.js?v=a2cae175"></script>
-    <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=f783d6a5"></script>
+    <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=dca66431"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pyquickbench/_benchmark';</script>
     <script src="../../_static/js/custom-icon.js?v=063adea7"></script>
     <link rel="canonical" href="https://gabrielfougeron.github.io/pyquickbench/_modules/pyquickbench/_benchmark.html" />
@@ -69,6 +75,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
   </head>
   
   
@@ -84,19 +91,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -104,7 +100,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -112,8 +107,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -145,7 +140,7 @@
     
     
     <img src="../../_static/plot_icon.png" class="logo__image only-light" alt="pyquickbench"/>
-    <script>document.write(`<img src="../../_static/plot_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
+    <img src="../../_static/plot_icon.png" class="logo__image only-dark pst-js-only" alt="pyquickbench"/>
   
   
     <p class="title logo__title">pyquickbench</p>
@@ -193,29 +188,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -264,15 +251,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -289,7 +272,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -336,15 +320,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -392,9 +372,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -412,8 +397,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -425,7 +408,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">pyquickbench...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pyquickbench._benchmark</span></li>
   </ul>
 </nav>
 </div>
@@ -443,21 +426,21 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for pyquickbench._benchmark</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">typing</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
     
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-<span class="kn">import</span> <span class="nn">matplotlib.figure</span>
-<span class="kn">import</span> <span class="nn">tqdm</span>
-<span class="kn">import</span> <span class="nn">tqdm.notebook</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.figure</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tqdm.notebook</span>
 
-<span class="kn">from</span> <span class="nn">pyquickbench._utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyquickbench._utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_prod_rel_shapes</span>        <span class="p">,</span>
     <span class="n">_check_sig_no_pos_only</span>  <span class="p">,</span>
     <span class="n">_get_rel_idx_from_maze</span>  <span class="p">,</span>
@@ -480,11 +463,11 @@ document.write(`
     <span class="n">_log_violin_plot</span>        <span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">pyquickbench._defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyquickbench._defaults</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <div class="viewcode-block" id="run_benchmark">
 <a class="viewcode-back" href="../../_generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark">[docs]</a>
-<span class="k">def</span> <span class="nf">run_benchmark</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_benchmark</span><span class="p">(</span>
     <span class="n">all_args</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
     <span class="n">all_funs</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
     <span class="o">*</span>                                                                       <span class="p">,</span>
@@ -498,6 +481,7 @@ document.write(`
     <span class="n">filename</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
     <span class="n">ForceBenchmark</span>  <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">PreventBenchmark</span><span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">allow_pickle</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">StopOnExcept</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">ShowProgress</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
     <span class="n">WarmUp</span>          <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
@@ -510,62 +494,64 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    all_args : dict | typing.Iterable</span>
+<span class="sd">    all_args : :class:`python:dict` | :term:`python:iterable`</span>
 <span class="sd">        Describes the arguments to be given to the functions in the benchmark.</span>
-<span class="sd">    all_funs : dict | typing.Iterable</span>
+<span class="sd">    all_funs : :class:`python:dict` | :term:`python:iterable`</span>
 <span class="sd">        Functions to be benchmarked.</span>
-<span class="sd">    mode : str, optional</span>
+<span class="sd">    mode : :class:`python:str`, optional</span>
 <span class="sd">        Benchmark mode, i.e. target of the benchmark.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n</span>
 <span class="sd">        Possible values: ``&quot;timings&quot;`` or ``&quot;scalar_output&quot;``. By default ``&quot;timings&quot;``.</span>
-<span class="sd">    setup : callable, optional</span>
+<span class="sd">    setup : :term:`python:callable`, optional</span>
 <span class="sd">        Function that prepares the inputs for the functions to be benchmarked.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n</span>
 <span class="sd">        By default ``lambda n: {pyquickbench.default_ax_name: n}``.</span>
-<span class="sd">    n_repeat : int, optional</span>
+<span class="sd">    n_repeat : :class:`python:int`, optional</span>
 <span class="sd">        Number of times to repeat the benchmark for variability studies.\n</span>
 <span class="sd">        By default ``1``.</span>
-<span class="sd">    nproc : int, optional</span>
-<span class="sd">        Number of workers in PoolExecutor.\n</span>
+<span class="sd">    nproc : :class:`python:int`, optional</span>
+<span class="sd">        Number of workers in :class:`python:concurrent.futures.Executor`.\n</span>
 <span class="sd">        By default :func:`python:multiprocessing.cpu_count()`.</span>
-<span class="sd">    pooltype : str, optional</span>
-<span class="sd">        Type of PoolExecutor.\n</span>
+<span class="sd">    pooltype : :class:`python:str`, optional</span>
+<span class="sd">        Type of :class:`python:concurrent.futures.Executor`.\n</span>
 <span class="sd">        Possible values: ``&quot;phony&quot;``, ``&quot;thread&quot;`` or ``&quot;process&quot;``.\n  </span>
 <span class="sd">        By default ``&quot;phony&quot;``.</span>
-<span class="sd">    time_per_test : float, optional</span>
+<span class="sd">    time_per_test : :class:`python:float`, optional</span>
 <span class="sd">        Minimum time in seconds for benchmark in ``&quot;timings&quot;`` mode.\n</span>
 <span class="sd">        By default ``0.2``.</span>
-<span class="sd">    filename : str | None, optional</span>
+<span class="sd">    filename : :class:`python:str` | :data:`python:None`, optional</span>
 <span class="sd">        Filename for results caching.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_02-Caching_benchmarks.py` for usage example.\n</span>
 <span class="sd">        Possible file extensions : ``*.npy`` or ``*.npz``.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    ForceBenchmark : bool, optional</span>
-<span class="sd">        Whether to disregard existing cache and force a full re-run, by default ``False``.</span>
-<span class="sd">    PreventBenchmark : bool, optional</span>
-<span class="sd">        Whether to prevent a possibly lengthy full re-run, by default ``False``.</span>
-<span class="sd">    StopOnExcept : bool, optional</span>
-<span class="sd">        Whether to interrupt the benchmark if exceptions are thrown, by default ``False``.</span>
-<span class="sd">    ShowProgress : bool, optional</span>
-<span class="sd">        Whether to show a progress bar in the CLI during benchmark, by default ``False``.</span>
-<span class="sd">    WarmUp : bool, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    ForceBenchmark : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to disregard existing cache and force a full re-run, by default :data:`python:False`.</span>
+<span class="sd">    PreventBenchmark : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to prevent a possibly lengthy full re-run, by default :data:`python:False`.</span>
+<span class="sd">    allow_pickle : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to allow pickling of data when loading benchmarks from disk. By default, :data:`python:False`.</span>
+<span class="sd">    StopOnExcept : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to interrupt the benchmark if exceptions are thrown, by default :data:`python:False`.</span>
+<span class="sd">    ShowProgress : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to show a progress bar in the CLI during benchmark, by default :data:`python:False`.</span>
+<span class="sd">    WarmUp : :class:`python:bool`, optional</span>
 <span class="sd">        Whether to run the function once without measurement. Can help with jit compilation caching for instance.\n</span>
-<span class="sd">        By default ``False``.</span>
-<span class="sd">    MonotonicAxes : list, optional</span>
+<span class="sd">        By default :data:`python:False`.</span>
+<span class="sd">    MonotonicAxes : :class:`python:list`, optional</span>
 <span class="sd">        List of argument names for which timings are expected to get longer and longer.\n</span>
 <span class="sd">        By default ``[]``.</span>
-<span class="sd">    timeout : float, optional</span>
+<span class="sd">    timeout : :class:`python:float`, optional</span>
 <span class="sd">        Time in seconds after which a timing is considered too long.\n</span>
 <span class="sd">        When a timing reaches this value, all longer timings (as detected by ``MonotonicAxes``) are cancelled.\n</span>
 <span class="sd">        By default ``1.``.</span>
-<span class="sd">    show : bool, optional</span>
-<span class="sd">        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default ``False``.</span>
+<span class="sd">    show : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default :data:`python:False`.</span>
 <span class="sd">    **plot_kwargs :</span>
 <span class="sd">        Arguments to pass on to :func:`pyquickbench.plot_benchmark` after the benchmark is run.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    np.typing.NDArray[np.float64] | None</span>
+<span class="sd">    :class:`numpy:numpy.ndarray` [:obj:`numpy:numpy.float64`] | :data:`python:None`</span>
 <span class="sd">        Benchmark results.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -600,7 +586,7 @@ document.write(`
         
         <span class="k">try</span><span class="p">:</span>
             
-            <span class="n">all_vals</span><span class="p">,</span> <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">_load_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">res_shape</span><span class="p">)</span>
+            <span class="n">all_vals</span><span class="p">,</span> <span class="n">BenchmarkUpToDate</span> <span class="o">=</span> <span class="n">_load_benchmark_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">all_args</span><span class="p">,</span> <span class="n">res_shape</span><span class="p">,</span> <span class="n">allow_pickle</span> <span class="o">=</span> <span class="n">allow_pickle</span><span class="p">)</span>
 
             <span class="n">DoBenchmark</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span><span class="n">BenchmarkUpToDate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">PreventBenchmark</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">BenchmarkUpToDate</span><span class="p">)</span> <span class="ow">and</span> <span class="n">PreventBenchmark</span><span class="p">:</span>
@@ -652,7 +638,7 @@ document.write(`
             <span class="n">PoolExecutor</span> <span class="o">=</span> <span class="n">AllPoolExecutors</span><span class="p">[</span><span class="n">pooltype</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown pooltype </span><span class="si">{</span><span class="n">pooltype</span><span class="si">}</span><span class="s2">. Available pootypes: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">AllPoolExecutors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    
+
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;timings&quot;</span><span class="p">:</span>
             
             <span class="k">if</span> <span class="p">(</span><span class="n">pooltype</span> <span class="o">!=</span> <span class="s2">&quot;phony&quot;</span><span class="p">):</span>
@@ -719,7 +705,7 @@ document.write(`
 
 <div class="viewcode-block" id="plot_benchmark">
 <a class="viewcode-back" href="../../_generated/pyquickbench.plot_benchmark.html#pyquickbench.plot_benchmark">[docs]</a>
-<span class="k">def</span> <span class="nf">plot_benchmark</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_benchmark</span><span class="p">(</span>
     <span class="n">all_vals</span>                <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">ArrayLike</span>   <span class="p">,</span>
     <span class="n">all_args</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                           <span class="p">,</span>
     <span class="n">all_funs</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
@@ -798,142 +784,142 @@ document.write(`
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    all_vals : np.typing.ArrayLike</span>
+<span class="sd">    all_vals : :class:`numpy:numpy.ndarray`</span>
 <span class="sd">        Benchmark results as returned by :func:`pyquickbench.run_benchmark`.</span>
-<span class="sd">    all_args : dict | typing.Iterable</span>
+<span class="sd">    all_args : :class:`python:dict` | :obj:`python:typing.Iterable`</span>
 <span class="sd">        Describes the arguments given to the functions in the benchmark.</span>
-<span class="sd">    all_funs : typing.Dict[str, callable] | typing.Iterable[str] | None, optional</span>
-<span class="sd">        Benchmarked functions, by default ``None``.\n</span>
-<span class="sd">        Only the ``__name__`` attribute is used here.</span>
-<span class="sd">    all_fun_names : typing.Iterable[str] | None, optional</span>
-<span class="sd">        Names of the benchmarked functions, by default ``None``.\n</span>
-<span class="sd">        In case the functions ``__name__`` attribute is missing or uninformative.</span>
-<span class="sd">    all_out_names : typing.Iterable[str] | None, optional</span>
-<span class="sd">        Names of the outputs of the functions if ``mode=&quot;vector_output&quot;``, by default ``None``.</span>
-<span class="sd">    plot_intent : typing.Iterable[str] | None, optional</span>
+<span class="sd">    all_funs : :class:`python:dict` [:class:`python:str`, :term:`python:iterable`] | :obj:`python:typing.Iterable` [:class:`python:str`] | :data:`python:None`, optional</span>
+<span class="sd">        Benchmarked functions, by default :data:`python:None`.\n</span>
+<span class="sd">        Only the :obj:`python:function.__name__` attribute is used here.</span>
+<span class="sd">    all_fun_names : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional</span>
+<span class="sd">        Names of the benchmarked functions, by default :data:`python:None`.\n</span>
+<span class="sd">        In case the functions :obj:`python:function.__name__` attribute is missing or uninformative.</span>
+<span class="sd">    all_out_names : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional</span>
+<span class="sd">        Names of the outputs of the functions if ``mode=&quot;vector_output&quot;``, by default :data:`python:None`.</span>
+<span class="sd">    plot_intent : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional</span>
 <span class="sd">        Describes how to handle the axes of the benchmark results array ``all_vals``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage examples.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    plot_type : typing.Iterable[str] | None, optional</span>
-<span class="sd">        Any value that is not ``None`` overrides the default plot_type.\n</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    plot_type : :obj:`python:typing.Iterable` [:class:`python:str`] | None, optional</span>
+<span class="sd">        Any value that is not :data:`python:None` overrides the default plot_type.\n</span>
 <span class="sd">        Possible values : ``&quot;bar&quot;``, ``&quot;curve&quot;``, ``&quot;violin&quot;``.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    mode : str, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    mode : :class:`python:str`, optional</span>
 <span class="sd">        Benchmark mode, i.e. target of the benchmark.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n</span>
 <span class="sd">        Possible values: ``&quot;timings&quot;`` or ``&quot;scalar_output&quot;``. By default ``&quot;timings&quot;``.</span>
-<span class="sd">    setup : callable, optional</span>
+<span class="sd">    setup : :term:`python:callable`, optional</span>
 <span class="sd">        Function that prepares the inputs for the functions to be benchmarked.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n</span>
 <span class="sd">        Only used if ``all_out_names`` was not provided and ``mode=&quot;vector_output&quot;``\n</span>
 <span class="sd">        By default ``lambda n: {pyquickbench.default_ax_name: n}``.</span>
-<span class="sd">    all_xvalues : np.typing.ArrayLike | None, optional</span>
+<span class="sd">    all_xvalues :  :class:`numpy:numpy.ndarray` | :data:`python:None`, optional</span>
 <span class="sd">        Values to be plotted on the x-axis if those differ from argument values.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n </span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    color_list : list, optional</span>
-<span class="sd">        List of colors for plotted curves, by default ``default_color_list``.</span>
-<span class="sd">    linestyle_list : list, optional</span>
-<span class="sd">        List of linestyles for plotted curves, by default ``default_linestyle_list``.</span>
-<span class="sd">    pointstyle_list : list, optional</span>
-<span class="sd">        List of point markers for plotted curves, by default ``default_pointstyle_list``.</span>
-<span class="sd">    alpha : float, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    color_list : :class:`python:list` [:class:`python:str`], optional</span>
+<span class="sd">        List of colors for plotted curves, by default :data:`default_color_list`.</span>
+<span class="sd">    linestyle_list : :class:`python:list` [:class:`python:str`], optional</span>
+<span class="sd">        List of linestyles for plotted curves, by default  :data:`default_linestyle_list`.</span>
+<span class="sd">    pointstyle_list : :class:`python:list` [:class:`python:str`], optional</span>
+<span class="sd">        List of point markers for plotted curves, by default :data:`default_pointstyle_list`.</span>
+<span class="sd">    alpha : :class:`python:float`, optional</span>
 <span class="sd">        Alpha value for transparency of curves in plot.\n</span>
 <span class="sd">        By default, ``1.`` meaning curves are fully opaque.</span>
-<span class="sd">    violin_width_mul : float, optional</span>
+<span class="sd">    violin_width_mul : :class:`python:float`, optional</span>
 <span class="sd">        Factor on violin plot width. Decrease this value for thinner plot, and increase for fatter ones.\n</span>
 <span class="sd">        By default, ``0.5``.</span>
-<span class="sd">    violin_showmeans : bool, optional</span>
-<span class="sd">        Whether to show mean values in violin plots, by default ``False``.</span>
-<span class="sd">    violin_showextrema : bool, optional</span>
-<span class="sd">        Whether to show min/max values in violin plots, by default ``True``.</span>
-<span class="sd">    violin_showmedians : bool, optional</span>
-<span class="sd">        Whether to show median values in violin plots, by default ``False``.</span>
-<span class="sd">    violin_show_observations : bool, optional</span>
-<span class="sd">        Whether to show individual observations in violin plot, by default ``False``.</span>
-<span class="sd">    violin_side : str | None, optional</span>
+<span class="sd">    violin_showmeans : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to show mean values in violin plots, by default :data:`python:False`.</span>
+<span class="sd">    violin_showextrema : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to show min/max values in violin plots, by default :data:`python:True`.</span>
+<span class="sd">    violin_showmedians : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to show median values in violin plots, by default :data:`python:False`.</span>
+<span class="sd">    violin_show_observations : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to show individual observations in violin plot, by default :data:`python:False`.</span>
+<span class="sd">    violin_side : :class:`python:str` | :data:`python:None`, optional</span>
 <span class="sd">        Side of the `Kernel Density Estimation &lt;https://scikit-learn.org/stable/modules/density.html&gt;`_ reconstruction in violin plots.</span>
-<span class="sd">        Possible values: ``&quot;both&quot;``, ``&quot;left&quot;``, ``&quot;right&quot;``, ``None``.\n</span>
+<span class="sd">        Possible values: ``&quot;both&quot;``, ``&quot;left&quot;``, ``&quot;right&quot;``, :data:`python:None`.\n</span>
 <span class="sd">        By default ``&quot;both&quot;``.</span>
-<span class="sd">    single_values_idx : dict | None, optional</span>
+<span class="sd">    single_values_idx : :class:`python:dict` | :data:`python:None`, optional</span>
 <span class="sd">        Indices of benchmarked values to be fixed by a ``plot_intent`` of ``&quot;single_value&quot;``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    single_values_val : dict | None, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    single_values_val : :class:`python:dict` | :data:`python:None`, optional</span>
 <span class="sd">        Values of benchmark to be fixed by a ``plot_intent`` of ``&quot;single_value&quot;``.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for usage example.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    logx_plot : bool | None, optional</span>
-<span class="sd">        How to override log scaling on the x-axis of the plots, by default ``None``.</span>
-<span class="sd">    logy_plot : bool | None, optional</span>
-<span class="sd">        How to override log scaling on the y-axis of the plots, by default ``None``.</span>
-<span class="sd">    plot_xlim : tuple | None, optional</span>
-<span class="sd">       How to override limits on the x-axis of the plots, by default ``None``.</span>
-<span class="sd">    plot_ylim : tuple | None, optional</span>
-<span class="sd">        How to override limits on the y-axis of the plots, by default ``None``.</span>
-<span class="sd">    show : bool, optional</span>
-<span class="sd">        Whether to issue a ``plt.show()`` instead of returning a ``(fig, ax)`` tuple, by default ``False``.</span>
-<span class="sd">    return_empty_plot : bool, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    logx_plot : :class:`python:bool` | :data:`python:None`, optional</span>
+<span class="sd">        How to override log scaling on the x-axis of the plots, by default :data:`python:None`.</span>
+<span class="sd">    logy_plot : :class:`python:bool` | :data:`python:None`, optional</span>
+<span class="sd">        How to override log scaling on the y-axis of the plots, by default :data:`python:None`.</span>
+<span class="sd">    plot_xlim :  :class:`python:tuple` | :data:`python:None`, optional</span>
+<span class="sd">       How to override limits on the x-axis of the plots, by default :data:`python:None`.</span>
+<span class="sd">    plot_ylim :  :class:`python:tuple` | :data:`python:None`, optional</span>
+<span class="sd">        How to override limits on the y-axis of the plots, by default :data:`python:None`.</span>
+<span class="sd">    show : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to issue a call to :func:`matplotlib:matplotlib.pyplot.show` instead of returning a ``(fig, ax)`` tuple, by default :data:`python:False`.</span>
+<span class="sd">    return_empty_plot : :class:`python:bool`, optional</span>
 <span class="sd">        Whether to prematurely return an empty ``(fig, ax)`` tuple.</span>
 <span class="sd">        Useful to create an empty plot and reuse it, see :ref:`sphx_glr__build_auto_examples_tutorial_07-Multidimensional_benchmarks.py` for instance.</span>
-<span class="sd">        By defaut ``False``.</span>
-<span class="sd">    fig : matplotlib.figure.Figure | None, optional</span>
-<span class="sd">        User provided :class:`matplotlib:matplotlib.figure.Figure` object.\n </span>
+<span class="sd">        By defaut :data:`python:False`.</span>
+<span class="sd">    fig : :class:`matplotlib:matplotlib.figure.Figure` | :data:`python:None`, optional</span>
+<span class="sd">        User provided :class:`matplotlib:matplotlib.figure.Figure` object. If :data:`python:None`, a new one is generated.\n </span>
 <span class="sd">        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    ax : plt.Axes | None, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    ax : :class:`numpy:numpy.ndarray` [:class:`matplotlib:matplotlib.axes.Axes`] | :data:`python:None`, optional</span>
 <span class="sd">        User provided array of :class:`matplotlib:matplotlib.axes.Axes` objects as returned by :func:`matplotlib:matplotlib.pyplot.subplots`.\n</span>
 <span class="sd">        Typically, this argument is the result of a former call to :func:`pyquickbench.plot_benchmark`, potentially using argument ``return_empty_plot = True``.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    dpi : int, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    dpi : :class:`python:int`, optional</span>
 <span class="sd">        Output image resolution, by default ``150``.</span>
-<span class="sd">    pxl_per_plot_x : int, optional</span>
+<span class="sd">    pxl_per_plot_x : :class:`python:int`, optional</span>
 <span class="sd">        Output plot width, by default ``1600``.</span>
-<span class="sd">    pxl_per_plot_y : int, optional</span>
+<span class="sd">    pxl_per_plot_y : :class:`python:int`, optional</span>
 <span class="sd">        Output plot height, by default ``800``.</span>
-<span class="sd">    sharex : bool, optional</span>
-<span class="sd">        Whether to share plot x-axis, by default ``True``.</span>
-<span class="sd">    sharey : bool, optional</span>
-<span class="sd">        Whether to share plot y-axis, by default ``False``.</span>
-<span class="sd">    title : str | None, optional</span>
-<span class="sd">        Image title, by default ``None``.</span>
-<span class="sd">    xlabel : str | None, optional</span>
-<span class="sd">        Override argument value as a default for plot x label, by default ``None``.</span>
-<span class="sd">    ylabel : str | None, optional</span>
-<span class="sd">        Override default for plot y label, by default ``None``.</span>
-<span class="sd">    plot_legend : bool | dict | None, optional</span>
-<span class="sd">        Whether to record each axis of the benchmark in a legend, by default ``None``.</span>
-<span class="sd">    legend_location : str, optional</span>
-<span class="sd">        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``&#39;upper left&#39;``.</span>
-<span class="sd">    plot_grid : bool, optional</span>
-<span class="sd">        Whether to plot a background grid to each plot, by default ``True``.</span>
-<span class="sd">    ProductLegend : bool, optional</span>
+<span class="sd">    sharex : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to share plot x-axis, by default :data:`python:True`.</span>
+<span class="sd">    sharey : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to share plot y-axis, by default :data:`python:False`.</span>
+<span class="sd">    title : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">        Image title, by default :data:`python:None`.</span>
+<span class="sd">    xlabel : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">        Override argument value as a default for plot x label, by default :data:`python:None`.</span>
+<span class="sd">    ylabel : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">        Override default for plot y label, by default :data:`python:None`.</span>
+<span class="sd">    plot_legend : :class:`python:bool` | :class:`python:dict` | :data:`python:None`, optional</span>
+<span class="sd">        Whether to record each axis of the benchmark in a legend, by default :data:`python:None`.</span>
+<span class="sd">    legend_location : :class:`python:str`, optional</span>
+<span class="sd">        Location of plot legend as given to :meth:`matplotlib:matplotlib.axes.Axes.legend`, by default ``&quot;upper left&quot;``.</span>
+<span class="sd">    plot_grid : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to plot a background grid to each plot, by default :data:`python:True`.</span>
+<span class="sd">    ProductLegend : :class:`python:bool`, optional</span>
 <span class="sd">        Whether to detail every curve in the legend, or aggregate benchmark axes, leading to more concise legends.\n</span>
-<span class="sd">        By default ``False``.</span>
-<span class="sd">    relative_to_idx : dict | None, optional</span>
+<span class="sd">        By default :data:`python:False`.</span>
+<span class="sd">    relative_to_idx : :class:`python:dict` | :data:`python:None`, optional</span>
 <span class="sd">        Indices of benchmarked values against which curves will be plotted.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    relative_to_val : dict | None, optional</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    relative_to_val : :class:`python:dict` | None, optional</span>
 <span class="sd">        Values of benchmark against which curves will be plotted.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.\n</span>
-<span class="sd">        By default ``None``.</span>
-<span class="sd">    transform : str | None, optional</span>
-<span class="sd">        Data transformation before plotting, by default ``None``.\n</span>
+<span class="sd">        By default :data:`python:None`.</span>
+<span class="sd">    transform : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">        Data transformation before plotting, by default :data:`python:None`.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
-<span class="sd">    clip_vals : bool, optional</span>
+<span class="sd">    clip_vals : :class:`python:bool`, optional</span>
 <span class="sd">        Whether to clip values that are out of bounds. Requires the argument ``plot_ylim`` tu be set explicitely.</span>
-<span class="sd">        By default ``None``.\n</span>
+<span class="sd">        By default :data:`python:None`.\n</span>
 <span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_06-Transforming_values.py` for usage example.</span>
-<span class="sd">    stop_after_first_clip : bool, optional</span>
-<span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default ``False``.</span>
-<span class="sd">    filename : str | None, optional</span>
-<span class="sd">        If not ``None``, saves resulting figure in ``filename``.\n</span>
-<span class="sd">        By default ``None``.</span>
+<span class="sd">    stop_after_first_clip : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to stop plotting after the first clipped value if ``clip_vals == True``, by default :data:`python:False`.</span>
+<span class="sd">    filename : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">        If not :data:`python:None`, saves resulting figure in ``filename``.\n</span>
+<span class="sd">        By default :data:`python:None`.</span>
 <span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    tuple[matplotlib.figure.Figure, np.typing.NDArray[plt.Axes]] | None</span>
+<span class="sd">    :class:`python:tuple` [ :class:`matplotlib:matplotlib.figure.Figure`, :class:`numpy:numpy.ndarray` [:class:`matplotlib:matplotlib.axes.Axes`]] | :data:`python:None`</span>
 <span class="sd">        Matplotlib figure and axes with the benchmark results, only if ``show == False``.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1063,6 +1049,8 @@ document.write(`
         <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_funs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">plot_legend</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_repeat</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">plot_legend</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_out</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_legend</span><span class="p">[</span><span class="n">fun_ax_name</span><span class="p">]</span> <span class="ow">or</span> <span class="ow">not</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">[</span><span class="n">repeat_ax_name</span><span class="p">]</span> <span class="ow">or</span> <span class="n">plot_legend</span><span class="p">[</span><span class="n">out_ax_name</span><span class="p">])</span>
 
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_legend</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="n">plot_legend_in</span> <span class="o">=</span> <span class="n">plot_legend</span>
@@ -1761,8 +1749,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>

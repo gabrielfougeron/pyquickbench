@@ -195,7 +195,7 @@ pyquickbench.plot_benchmark(
 
 
 # %%
-# The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to ``True``.
+# The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to :data:`python:True`.
 
 pyquickbench.plot_benchmark(
     bench_results                           ,

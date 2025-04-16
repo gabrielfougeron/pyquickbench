@@ -35,31 +35,31 @@ class TimeTrain():
 
         Parameters
         ----------
-        path_prefix : str | None, optional
-            Path relative to which other paths are to be understood, by default ``None``.
-        include_locs : bool | None, optional
-            Whether to include locations in code when printing the TimeTrain, by default ``None``.
-        include_filename : bool, optional
-            Whether to include the file name in locations in code when printing the TimeTrain, by default ``True``.
-        include_lineno : bool, optional
-            Whether to include the line number in locations in code when printing the TimeTrain, by default ``True``.
-        include_funname : bool, optional
-            Whether to include the function name in locations in code when printing the TimeTrain, by default ``True``.
-        name : str, optional
+        path_prefix : :class:`python:str` | :data:`python:None`, optional
+            Path relative to which other paths are to be understood, by default :data:`python:None`.
+        include_locs : :class:`python:bool` | None, optional
+            Whether to include locations in code when printing the TimeTrain, by default :data:`python:None`.
+        include_filename : :class:`python:bool`, optional
+            Whether to include the file name in locations in code when printing the TimeTrain, by default :data:`python:True`.
+        include_lineno : :class:`python:bool`, optional
+            Whether to include the line number in locations in code when printing the TimeTrain, by default :data:`python:True`.
+        include_funname : :class:`python:bool`, optional
+            Whether to include the function name in locations in code when printing the TimeTrain, by default :data:`python:True`.
+        name : :class:`python:str`, optional
             Name of the TimeTrain, by default ``''``.
-        align_toc_names : bool, optional
-            Whether to align toc names when printing the TimeTrain, by default ``True``.
-        names_reduction : str | None, optional
-            Reduction to be applied to tocs that share the same name, by default ``None``.
-        global_tictoc_sync : bool, optional
-            Set to ``True`` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to ``False`` to use a specific name for every decorated function. By default ``True``.
-        ignore_names : str | None, optional
+        align_toc_names : :class:`python:bool`, optional
+            Whether to align toc names when printing the TimeTrain, by default :data:`python:True`.
+        names_reduction : :class:`python:str` | :data:`python:None`, optional
+            Reduction to be applied to tocs that share the same name, by default :data:`python:None`.
+        global_tictoc_sync : :class:`python:bool`, optional
+            Set to :data:`python:True` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to :data:`python:False` to use a specific name for every decorated function. By default :data:`python:True`.
+        ignore_names : :class:`python:str` | :data:`python:None`, optional
             Names to be ignored by :func:`python:print` and :meth:`pyquickbench.TimeTrain.to_dict`.
-            By default ``None``.
-        relative_timings : bool, optional
+            By default :data:`python:None`.
+        relative_timings : :class:`python:bool`, optional
             Whether to display relative timings when printing the TimeTrain.
-            Relative timings only sum up to 100% if ``names_reduction`` is ``None`` or ``\"sum\"``.
-            By default ``False``.
+            Relative timings only sum up to 100% if ``names_reduction`` is :data:`python:None` or ``\"sum\"``.
+            By default :data:`python:False`.
 
         """    
         
@@ -132,8 +132,8 @@ class TimeTrain():
 
         Parameters
         ----------
-        name : str, optional
-            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n
+        name : :class:`python:str`, optional
+            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :func:`python:print`.\n
             By default ``''``.
         """        
         
@@ -292,9 +292,9 @@ class TimeTrain():
 
         Parameters
         ----------
-        return_first_instance : bool, optional
-            Whether to also return a dictionary containing the index of the first occurrence of every name, by default ``False``.
-        names_reduction : callable | str | None, optional
+        return_first_instance : :class:`python:bool`, optional
+            Whether to also return a dictionary containing the index of the first occurrence of every name, by default :data:`python:False`.
+        names_reduction : :term:`python:callable` | :class:`python:str` | :data:`python:None`, optional
             Optionally overrides the TimeTrain's reduction.
             Set to ``"default"`` to not override reduction.
             By default ``"default"``.
@@ -341,9 +341,9 @@ class TimeTrain():
         
         Parameters
         ----------
-        name :  str | None, optional
+        name :  :class:`python:str` | :data:`python:None`, optional
             Optionally overrides the wrapped function's name.\n
-            By default ``None``.
+            By default :data:`python:None`.
             
         """        
 

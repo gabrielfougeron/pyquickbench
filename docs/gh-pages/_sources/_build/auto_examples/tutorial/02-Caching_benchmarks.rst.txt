@@ -129,7 +129,7 @@ Another call to :func:`pyquickbench.run_benchmark` will detect that the file exi
 Forcing benchmarks
 ******************
 
-A full re-run can nonetheless be forced if the keyword ``ForceBenchmark`` is set to ``True``. The default value for ``ForceBenchmark`` is ``False``.
+A full re-run can nonetheless be forced if the keyword ``ForceBenchmark`` is set to :data:`python:True`. The default value for ``ForceBenchmark`` is ``False``.
 
 .. code-block::
 

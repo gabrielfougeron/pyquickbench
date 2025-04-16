@@ -162,7 +162,7 @@ bench_results = pyquickbench.run_benchmark(
     all_nint                                ,
     bench                                   ,
     mode = "scalar_output"                  ,
-    filename = scalar_filename               ,
+    filename = scalar_filename              ,
 )
 
 pyquickbench.plot_benchmark(
@@ -171,7 +171,7 @@ pyquickbench.plot_benchmark(
     bench                                   ,
     mode = "scalar_output"                  ,
     plot_ylim = plot_ylim                   ,
-    title = 'Relative error on integrand'  ,
+    title = 'Relative error on integrand'   ,
     ylabel = "Relative error"               ,
     show = True                             ,
 )
@@ -195,7 +195,7 @@ pyquickbench.plot_benchmark(
 
 
 # %%
-# The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to ``True``.
+# The pre and post convergence behavior of the numerical algorithms really clutters the plots. In this case, a clearer plot is obtained if the argument ``clip_vals`` is set to :data:`python:True`.
 
 pyquickbench.plot_benchmark(
     bench_results                           ,

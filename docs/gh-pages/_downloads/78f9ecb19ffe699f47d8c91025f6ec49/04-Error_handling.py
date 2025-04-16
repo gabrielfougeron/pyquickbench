@@ -73,7 +73,7 @@ pyquickbench.run_benchmark(
 ) 
 
 # %%
-# This default can be overriden with the argument ``StopOnExcept`` set to ``True``. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
+# This default can be overriden with the argument ``StopOnExcept`` set to :data:`python:True`. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
 
 try:
     pyquickbench.run_benchmark(

@@ -79,7 +79,7 @@ By default, :func:`pyquickbench.run_benchmark` will try to benchmark as much as 
 
 .. GENERATED FROM PYTHON SOURCE LINES 76-77
 
-This default can be overriden with the argument ``StopOnExcept`` set to ``True``. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
+This default can be overriden with the argument ``StopOnExcept`` set to :data:`python:True`. The error is then not caught by :func:`pyquickbench.run_benchmark`, and it is the user's responsibility to handle it.
 
 .. GENERATED FROM PYTHON SOURCE LINES 77-86
 

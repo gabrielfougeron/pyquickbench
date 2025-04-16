@@ -15,52 +15,58 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-  
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/assets/jsonview.bundle.css?v=f6ef2277" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-data-viewer/jsonview.bundle.css?v=f6ef2277" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/libs/html/datatables.min.css?v=4b4fd840" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common.css?v=bd9ab754" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css?v=ffa536d2" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/layouts.css?v=448c382f" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/styles.css?v=6c8eb985" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_style.css?v=92936fa5" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/needstable.css?v=5e1b6797" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_core.css?v=f5b60a78" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_toggle.css?v=5c6620df" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common_css/need_links.css?v=2150a916" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css?v=803738c0" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-test-results/common.css?v=9ec2c1d5" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=f19979f9" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../_static/jquery.js?v=5d32c60e"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script src="../../_static/assets/jsonview.bundle.js?v=18cd53c5"></script>
-    <script src="../../_static/assets/jsonview_loader.js?v=f7ff7e7d"></script>
+    <script src="../../_static/sphinx-data-viewer/jsonview.bundle.js?v=18cd53c5"></script>
+    <script src="../../_static/sphinx-data-viewer/jsonview_loader.js?v=f7ff7e7d"></script>
     <script src="../../_static/sphinx-needs/libs/html/datatables.min.js?v=8a4aee21"></script>
     <script src="../../_static/sphinx-needs/libs/html/datatables_loader.js?v=a2cae175"></script>
-    <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=f783d6a5"></script>
+    <script src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js?v=dca66431"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/pyquickbench/_time_train';</script>
     <script src="../../_static/js/custom-icon.js?v=063adea7"></script>
     <link rel="canonical" href="https://gabrielfougeron.github.io/pyquickbench/_modules/pyquickbench/_time_train.html" />
@@ -69,6 +75,7 @@
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
   </head>
   
   
@@ -84,19 +91,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -104,7 +100,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -112,8 +107,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -145,7 +140,7 @@
     
     
     <img src="../../_static/plot_icon.png" class="logo__image only-light" alt="pyquickbench"/>
-    <script>document.write(`<img src="../../_static/plot_icon.png" class="logo__image only-dark" alt="pyquickbench"/>`);</script>
+    <img src="../../_static/plot_icon.png" class="logo__image only-dark pst-js-only" alt="pyquickbench"/>
   
   
     <p class="title logo__title">pyquickbench</p>
@@ -193,29 +188,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -264,15 +251,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -289,7 +272,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -336,15 +320,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -392,9 +372,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -412,8 +397,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -425,7 +408,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">pyquickbench...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pyquickbench._time_train</span></li>
   </ul>
 </nav>
 </div>
@@ -443,21 +426,21 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for pyquickbench._time_train</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">functools</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 
-<span class="kn">import</span> <span class="nn">typing</span>
-<span class="kn">import</span> <span class="nn">numpy.typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.typing</span>
 
-<span class="kn">from</span> <span class="nn">pyquickbench._defaults</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyquickbench._defaults</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <div class="viewcode-block" id="TimeTrain">
 <a class="viewcode-back" href="../../_generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain">[docs]</a>
-<span class="k">class</span> <span class="nc">TimeTrain</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimeTrain</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Records elapsed time between interest points in code</span>
 <span class="sd">    </span>
 <span class="sd">    See :ref:`sphx_glr__build_auto_examples_tutorial_10-TimeTrains.py` for usage example.\n</span>
@@ -466,7 +449,7 @@ document.write(`
     
 <div class="viewcode-block" id="TimeTrain.__init__">
 <a class="viewcode-back" href="../../_generated/pyquickbench.TimeTrain.html#pyquickbench.TimeTrain.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span>                                                    <span class="p">,</span>
         <span class="n">path_prefix</span>         <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span> <span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>   <span class="p">,</span>
         <span class="n">include_locs</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>   <span class="p">,</span>
@@ -484,31 +467,31 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path_prefix : str | None, optional</span>
-<span class="sd">            Path relative to which other paths are to be understood, by default ``None``.</span>
-<span class="sd">        include_locs : bool | None, optional</span>
-<span class="sd">            Whether to include locations in code when printing the TimeTrain, by default ``None``.</span>
-<span class="sd">        include_filename : bool, optional</span>
-<span class="sd">            Whether to include the file name in locations in code when printing the TimeTrain, by default ``True``.</span>
-<span class="sd">        include_lineno : bool, optional</span>
-<span class="sd">            Whether to include the line number in locations in code when printing the TimeTrain, by default ``True``.</span>
-<span class="sd">        include_funname : bool, optional</span>
-<span class="sd">            Whether to include the function name in locations in code when printing the TimeTrain, by default ``True``.</span>
-<span class="sd">        name : str, optional</span>
+<span class="sd">        path_prefix : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">            Path relative to which other paths are to be understood, by default :data:`python:None`.</span>
+<span class="sd">        include_locs : :class:`python:bool` | None, optional</span>
+<span class="sd">            Whether to include locations in code when printing the TimeTrain, by default :data:`python:None`.</span>
+<span class="sd">        include_filename : :class:`python:bool`, optional</span>
+<span class="sd">            Whether to include the file name in locations in code when printing the TimeTrain, by default :data:`python:True`.</span>
+<span class="sd">        include_lineno : :class:`python:bool`, optional</span>
+<span class="sd">            Whether to include the line number in locations in code when printing the TimeTrain, by default :data:`python:True`.</span>
+<span class="sd">        include_funname : :class:`python:bool`, optional</span>
+<span class="sd">            Whether to include the function name in locations in code when printing the TimeTrain, by default :data:`python:True`.</span>
+<span class="sd">        name : :class:`python:str`, optional</span>
 <span class="sd">            Name of the TimeTrain, by default ``&#39;&#39;``.</span>
-<span class="sd">        align_toc_names : bool, optional</span>
-<span class="sd">            Whether to align toc names when printing the TimeTrain, by default ``True``.</span>
-<span class="sd">        names_reduction : str | None, optional</span>
-<span class="sd">            Reduction to be applied to tocs that share the same name, by default ``None``.</span>
-<span class="sd">        global_tictoc_sync : bool, optional</span>
-<span class="sd">            Set to ``True`` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to ``False`` to use a specific name for every decorated function. By default ``True``.</span>
-<span class="sd">        ignore_names : str | None, optional</span>
+<span class="sd">        align_toc_names : :class:`python:bool`, optional</span>
+<span class="sd">            Whether to align toc names when printing the TimeTrain, by default :data:`python:True`.</span>
+<span class="sd">        names_reduction : :class:`python:str` | :data:`python:None`, optional</span>
+<span class="sd">            Reduction to be applied to tocs that share the same name, by default :data:`python:None`.</span>
+<span class="sd">        global_tictoc_sync : :class:`python:bool`, optional</span>
+<span class="sd">            Set to :data:`python:True` to use a common shared name for synchronization in :meth:`pyquickbench.TimeTrain.tictoc` or to :data:`python:False` to use a specific name for every decorated function. By default :data:`python:True`.</span>
+<span class="sd">        ignore_names : :class:`python:str` | :data:`python:None`, optional</span>
 <span class="sd">            Names to be ignored by :func:`python:print` and :meth:`pyquickbench.TimeTrain.to_dict`.</span>
-<span class="sd">            By default ``None``.</span>
-<span class="sd">        relative_timings : bool, optional</span>
+<span class="sd">            By default :data:`python:None`.</span>
+<span class="sd">        relative_timings : :class:`python:bool`, optional</span>
 <span class="sd">            Whether to display relative timings when printing the TimeTrain.</span>
-<span class="sd">            Relative timings only sum up to 100% if ``names_reduction`` is ``None`` or ``\&quot;sum\&quot;``.</span>
-<span class="sd">            By default ``False``.</span>
+<span class="sd">            Relative timings only sum up to 100% if ``names_reduction`` is :data:`python:None` or ``\&quot;sum\&quot;``.</span>
+<span class="sd">            By default :data:`python:False`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>    
         
@@ -573,7 +556,7 @@ document.write(`
         
 <div class="viewcode-block" id="TimeTrain.toc">
 <a class="viewcode-back" href="../../_generated/pyquickbench.TimeTrain.toc.html#pyquickbench.TimeTrain.toc">[docs]</a>
-    <span class="k">def</span> <span class="nf">toc</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toc</span><span class="p">(</span>
         <span class="bp">self</span>                <span class="p">,</span>
         <span class="n">name</span>    <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="p">,</span>
     <span class="p">):</span>
@@ -584,8 +567,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        name : str, optional</span>
-<span class="sd">            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :meth:`pyquickbench.TimeTrain.__str__`.\n</span>
+<span class="sd">        name : :class:`python:str`, optional</span>
+<span class="sd">            Name of the wagon. This name is used as a key in :meth:`pyquickbench.TimeTrain.to_dict` and in calls to :func:`python:print`.\n</span>
 <span class="sd">            By default ``&#39;&#39;``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
@@ -633,11 +616,11 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time_sum</span> <span class="o">+=</span> <span class="n">dt</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_recorded_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recorded_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_tocs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_tocs_record_time</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
     
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the total time recorded by the TimeTrain so far.</span>
 <span class="sd">        </span>
@@ -653,7 +636,7 @@ document.write(`
                 <span class="n">res</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_time</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
     
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
         
         <span class="n">total_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -727,15 +710,15 @@ document.write(`
 
         <span class="k">return</span> <span class="n">out</span>
     
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__format__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_spec</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         
 <div class="viewcode-block" id="TimeTrain.to_dict">
 <a class="viewcode-back" href="../../_generated/pyquickbench.TimeTrain.to_dict.html#pyquickbench.TimeTrain.to_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span>
         <span class="bp">self</span>                                                                            <span class="p">,</span>
         <span class="n">return_first_instance</span>   <span class="p">:</span> <span class="nb">bool</span>                                      <span class="o">=</span> <span class="kc">False</span>     <span class="p">,</span>
         <span class="n">names_reduction</span>         <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="o">=</span> <span class="s2">&quot;default&quot;</span> <span class="p">,</span>
@@ -747,9 +730,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        return_first_instance : bool, optional</span>
-<span class="sd">            Whether to also return a dictionary containing the index of the first occurrence of every name, by default ``False``.</span>
-<span class="sd">        names_reduction : callable | str | None, optional</span>
+<span class="sd">        return_first_instance : :class:`python:bool`, optional</span>
+<span class="sd">            Whether to also return a dictionary containing the index of the first occurrence of every name, by default :data:`python:False`.</span>
+<span class="sd">        names_reduction : :term:`python:callable` | :class:`python:str` | :data:`python:None`, optional</span>
 <span class="sd">            Optionally overrides the TimeTrain&#39;s reduction.</span>
 <span class="sd">            Set to ``&quot;default&quot;`` to not override reduction.</span>
 <span class="sd">            By default ``&quot;default&quot;``.</span>
@@ -783,12 +766,12 @@ document.write(`
             <span class="k">return</span> <span class="n">res</span></div>
 
     
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_names</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">tictoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tictoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decorates a function to record a new wagon in the TimeTrain before and after each call.\n</span>
 <span class="sd">        By default, the first wagon (used for synchronization) is ignored.</span>
@@ -797,16 +780,16 @@ document.write(`
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        name :  str | None, optional</span>
+<span class="sd">        name :  :class:`python:str` | :data:`python:None`, optional</span>
 <span class="sd">            Optionally overrides the wrapped function&#39;s name.\n</span>
-<span class="sd">            By default ``None``.</span>
+<span class="sd">            By default :data:`python:None`.</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
 
-        <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             
             <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
-            <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 
                 <span class="c1"># Subtle python compiler behavior</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -855,8 +838,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
