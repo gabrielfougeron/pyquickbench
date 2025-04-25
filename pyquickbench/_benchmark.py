@@ -853,6 +853,7 @@ def plot_benchmark(
         return (fig, ax)    
         
     all_plot_y_vals = np.ma.array(np.full((n_subplot_grid_x, n_subplot_grid_y, n_curves, n_same, n_violin, npts), np.nan))
+    all_plot_x_vals = np.ma.array(np.full((n_subplot_grid_x, n_subplot_grid_y, n_curves, n_same, n_violin, npts), np.nan))
         
     # What are we plotting ? Curves ? Bars ? Violins ?
     if plot_type is None:
@@ -1011,6 +1012,7 @@ def plot_benchmark(
                         plot_y_val[i_size] = np.nan
         
         all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, i_violin, :] = plot_y_val
+        all_plot_x_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, i_violin, :] = plot_x_val
     
     if transform in ["relative_curve_fraction"]:
         all_plot_y_vals /= all_plot_y_vals.sum(axis=2, keepdims=True)
@@ -1039,6 +1041,7 @@ def plot_benchmark(
                                 x_pos = x_pos_mid + i_curve * bar_width - tick_width/2 + bar_width/2
 
                                 plot_y_val = all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
+                                plot_x_val = all_plot_x_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
                                 
                                 cur_ax.bar(
                                     x_pos                       ,
@@ -1054,6 +1057,7 @@ def plot_benchmark(
                             elif plot_type == "curve":    
                                 
                                 plot_y_val = all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
+                                plot_x_val = all_plot_x_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
                                 
                                 cur_ax.plot(
                                     plot_x_val                  ,
@@ -1065,6 +1069,8 @@ def plot_benchmark(
                                 )
                                 
                             elif plot_type == "violin":  
+                                
+                                plot_x_val = all_plot_x_vals[i_subplot_grid_x, i_subplot_grid_y, i_curve, i_same, 0, :]
              
                                 _log_violin_plot(
                                     cur_ax,
