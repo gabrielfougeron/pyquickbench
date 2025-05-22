@@ -66,11 +66,28 @@ Description of the machine on which benchmarks were run.
               width: 64 bits
               capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp x86-64 constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm avx512_vp2intersect
               configuration: microcode=4294967295
+         *-generic
+              description: System peripheral
+              product: Virtio file system
+              vendor: Red Hat, Inc.
+              physical id: 2
+              bus info: pci@1e74:00:00.0
+              version: 01
+              width: 64 bits
+              clock: 33MHz
+              capabilities: bus_master cap_list
+              configuration: driver=virtio-pci latency=64
+              resources: iomemory:e0-df iomemory:e0-df iomemory:c0-bf irq:0 memory:e00000000-e00000fff memory:e00001000-e00001fff memory:c00000000-dffffffff
+            *-virtio1 UNCLAIMED
+                 description: Virtual I/O device
+                 physical id: 0
+                 bus info: virtio@1
+                 configuration: driver=virtiofs
          *-scsi
               description: SCSI storage controller
               product: Virtio 1.0 console
               vendor: Red Hat, Inc.
-              physical id: 2
+              physical id: 3
               bus info: pci@5582:00:00.0
               version: 01
               width: 64 bits
@@ -83,29 +100,12 @@ Description of the machine on which benchmarks were run.
                  physical id: 0
                  bus info: virtio@0
                  configuration: driver=virtio_console
-         *-generic
-              description: System peripheral
-              product: Virtio file system
-              vendor: Red Hat, Inc.
-              physical id: 3
-              bus info: pci@ca76:00:00.0
-              version: 01
-              width: 64 bits
-              clock: 33MHz
-              capabilities: bus_master cap_list
-              configuration: driver=virtio-pci latency=64
-              resources: iomemory:e0-df iomemory:e0-df iomemory:c0-bf irq:0 memory:e00000000-e00000fff memory:e00001000-e00001fff memory:c00000000-dffffffff
-            *-virtio1 UNCLAIMED
-                 description: Virtual I/O device
-                 physical id: 0
-                 bus info: virtio@1
-                 configuration: driver=virtiofs
          *-display:0
               description: 3D controller
               product: Basic Render Driver
               vendor: Microsoft Corporation
               physical id: 4
-              bus info: pci@da74:00:00.0
+              bus info: pci@b975:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
@@ -117,7 +117,7 @@ Description of the machine on which benchmarks were run.
               product: Basic Render Driver
               vendor: Microsoft Corporation
               physical id: 5
-              bus info: pci@fce3:00:00.0
+              bus info: pci@ed5d:00:00.0
               version: 00
               width: 32 bits
               clock: 33MHz
@@ -133,7 +133,7 @@ Description of the machine on which benchmarks were run.
            description: Ethernet interface
            physical id: 1
            logical name: eth0
-           serial: 00:15:5d:ff:ea:ed
+           serial: 00:15:5d:2e:20:e2
            size: 10Gbit/s
            capabilities: ethernet physical
            configuration: autonegotiation=off broadcast=yes driver=hv_netvsc driverversion=5.15.167.4-microsoft-standard-W duplex=full firmware=N/A ip=172.28.98.79 link=yes multicast=yes speed=10Gbit/s

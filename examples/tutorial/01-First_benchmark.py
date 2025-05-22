@@ -81,3 +81,16 @@ pyquickbench.run_benchmark(
 
 # %% 
 # From this benchmark, it is easy to see that initializing a list to a given length filled with a single value is quickest using the star operator.
+
+
+
+res = pyquickbench.run_benchmark(
+    all_sizes   ,
+    all_funs    ,
+    # sphinx_gallery_start_ignore
+    filename = timings_filename     ,
+# sphinx_gallery_end_ignore
+) 
+
+print(type(res))
+print(res.shape)

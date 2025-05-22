@@ -148,7 +148,8 @@ pyquickbench.plot_benchmark(
     all_nint                                ,
     bench                                   ,
     logx_plot = True                        ,
-    title = "Relative computational cost"   ,
+    title = "Relative computational cost compared to DOP853"    ,
+    xlabel = "Relative time"                ,
     relative_to_val = relative_to_val       ,
     show = True                             ,
 )
@@ -211,7 +212,7 @@ pyquickbench.plot_benchmark(
 )
 
 # %%
-# The measured values can now be compared to the theoretical convergence rates of the different methods. In order to plot your own data to the figure, you can handle the :class:`matplotlib:matplotlib.figure.Figure` and :class:`matplotlib:matplotlib.axes.Axes` objects yourself, And decouple the calls to :func:`pyquickbench.run_benchmark` and :func:`pyquickbench.plot_benchmark` as shown here.
+# The measured values can now be compared to the theoretical convergence rates of the different methods. In order to plot your own data to the figure, you can handle the :class:`matplotlib:matplotlib.figure.Figure` and :class:`matplotlib:matplotlib.axes.Axes` objects returned by :func:`pyquickbench.plot_benchmark` with argument :class:`show = False` yourself as shown here.
 
 th_cvg_rate = {
     "RK45"  : 5,  

@@ -468,27 +468,28 @@
 <div class="viewcode-block" id="run_benchmark">
 <a class="viewcode-back" href="../../_generated/pyquickbench.run_benchmark.html#pyquickbench.run_benchmark">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">run_benchmark</span><span class="p">(</span>
-    <span class="n">all_args</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
-    <span class="n">all_funs</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
-    <span class="o">*</span>                                                                       <span class="p">,</span>
-    <span class="n">mode</span>            <span class="p">:</span> <span class="nb">str</span>                       <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                 <span class="p">,</span>
-    <span class="n">setup</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
-                                                <span class="o">=</span> <span class="n">default_setup</span>             <span class="p">,</span>
-    <span class="n">n_repeat</span>        <span class="p">:</span> <span class="nb">int</span>                       <span class="o">=</span> <span class="mi">1</span>                         <span class="p">,</span>
-    <span class="n">nproc</span>           <span class="p">:</span> <span class="nb">int</span>                       <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="n">pooltype</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="n">time_per_test</span>   <span class="p">:</span> <span class="nb">float</span>                     <span class="o">=</span> <span class="mf">0.2</span>                       <span class="p">,</span>
-    <span class="n">filename</span>        <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
-    <span class="n">ForceBenchmark</span>  <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">PreventBenchmark</span><span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">allow_pickle</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">StopOnExcept</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">ShowProgress</span>    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">WarmUp</span>          <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="n">MonotonicAxes</span>   <span class="p">:</span> <span class="nb">list</span>                      <span class="o">=</span> <span class="p">[]</span>                        <span class="p">,</span>
-    <span class="n">timeout</span>         <span class="p">:</span> <span class="nb">float</span>                     <span class="o">=</span> <span class="mf">1.</span>                        <span class="p">,</span>
-    <span class="n">show</span>            <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
-    <span class="o">**</span><span class="n">plot_kwargs</span>   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>                          <span class="p">,</span>
+    <span class="n">all_args</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
+    <span class="n">all_funs</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">]</span>                   <span class="p">,</span>
+    <span class="o">*</span>                                                                               <span class="p">,</span>
+    <span class="n">mode</span>                    <span class="p">:</span> <span class="nb">str</span>                       <span class="o">=</span> <span class="s2">&quot;timings&quot;</span>                 <span class="p">,</span>
+    <span class="n">setup</span>                   <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+                                                        <span class="o">=</span> <span class="n">default_setup</span>             <span class="p">,</span>
+    <span class="n">n_repeat</span>                <span class="p">:</span> <span class="nb">int</span>                       <span class="o">=</span> <span class="mi">1</span>                         <span class="p">,</span>
+    <span class="n">nproc</span>                   <span class="p">:</span> <span class="nb">int</span>                       <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">pooltype</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">time_per_test</span>           <span class="p">:</span> <span class="nb">float</span>                     <span class="o">=</span> <span class="mf">0.2</span>                       <span class="p">,</span>
+    <span class="n">filename</span>                <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>   <span class="o">=</span> <span class="kc">None</span>                      <span class="p">,</span>
+    <span class="n">ForceBenchmark</span>          <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">PreventBenchmark</span>        <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">allow_pickle</span>            <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">StopOnExcept</span>            <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">ShowProgress</span>            <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">WarmUp</span>                  <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">MonotonicAxes</span>           <span class="p">:</span> <span class="nb">list</span>                      <span class="o">=</span> <span class="p">[]</span>                        <span class="p">,</span>
+    <span class="n">timeout</span>                 <span class="p">:</span> <span class="nb">float</span>                     <span class="o">=</span> <span class="mf">1.</span>                        <span class="p">,</span>
+    <span class="n">show</span>                    <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="n">return_array_descriptor</span> <span class="p">:</span> <span class="nb">bool</span>                      <span class="o">=</span> <span class="kc">False</span>                     <span class="p">,</span>
+    <span class="o">**</span><span class="n">plot_kwargs</span>           <span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>                          <span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Runs a full benchmark.</span>
 
@@ -546,6 +547,10 @@
 <span class="sd">        By default ``1.``.</span>
 <span class="sd">    show : :class:`python:bool`, optional</span>
 <span class="sd">        Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default :data:`python:False`.</span>
+<span class="sd">    return_array_descriptor : :class:`python:bool`, optional</span>
+<span class="sd">        Whether to exit the function without performing the benchmark and **only** return a description of the benchmark result array that would be generated.\n</span>
+<span class="sd">        See :ref:`sphx_glr__build_auto_examples_tutorial_11-Manual_benchmarks.py` for usage example.\n </span>
+<span class="sd">        By default :data:`python:False`.</span>
 <span class="sd">    **plot_kwargs :</span>
 <span class="sd">        Arguments to pass on to :func:`pyquickbench.plot_benchmark` after the benchmark is run.</span>
 
@@ -579,7 +584,10 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="n">args_shape</span><span class="p">,</span> <span class="n">res_shape</span> <span class="o">=</span> <span class="n">_build_args_shapes</span><span class="p">(</span><span class="n">all_args</span><span class="p">,</span> <span class="n">all_funs</span><span class="p">,</span> <span class="n">n_repeat</span><span class="p">,</span> <span class="n">n_out</span><span class="p">)</span>
-
+    
+    <span class="k">if</span> <span class="n">return_array_descriptor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">res_shape</span>
+    
     <span class="n">MonotonicAxes_idx</span> <span class="o">=</span> <span class="n">_arg_names_list_to_idx</span><span class="p">(</span><span class="n">MonotonicAxes</span><span class="p">,</span> <span class="n">all_args</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">Load_timings_file</span><span class="p">:</span>

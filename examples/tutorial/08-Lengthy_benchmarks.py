@@ -174,6 +174,8 @@ pyquickbench.plot_benchmark(
     all_funs                        ,
     plot_intent = plot_intent       ,
     show = True                     ,
+    title = "Relative computational cost compared to numpy" ,
+    ylabel = "Relative time"        ,
     relative_to_val = relative_to_val,
 )
 

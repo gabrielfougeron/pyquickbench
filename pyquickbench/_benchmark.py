@@ -38,27 +38,28 @@ from pyquickbench._utils import (
 from pyquickbench._defaults import *
 
 def run_benchmark(
-    all_args        : typing.Union[dict, typing.Iterable]                   ,
-    all_funs        : typing.Union[dict, typing.Iterable]                   ,
-    *                                                                       ,
-    mode            : str                       = "timings"                 ,
-    setup           : typing.Callable[[int], typing.Dict[str, typing.Any]]
-                                                = default_setup             ,
-    n_repeat        : int                       = 1                         ,
-    nproc           : int                       = None                      ,
-    pooltype        : typing.Union[str, None]   = None                      ,
-    time_per_test   : float                     = 0.2                       ,
-    filename        : typing.Union[str, None]   = None                      ,
-    ForceBenchmark  : bool                      = False                     ,
-    PreventBenchmark: bool                      = False                     ,
-    allow_pickle    : bool                      = False                     ,
-    StopOnExcept    : bool                      = False                     ,
-    ShowProgress    : bool                      = False                     ,
-    WarmUp          : bool                      = False                     ,
-    MonotonicAxes   : list                      = []                        ,
-    timeout         : float                     = 1.                        ,
-    show            : bool                      = False                     ,
-    **plot_kwargs   : typing.Dict[str, typing.Any]                          ,
+    all_args                : typing.Union[dict, typing.Iterable]                   ,
+    all_funs                : typing.Union[dict, typing.Iterable]                   ,
+    *                                                                               ,
+    mode                    : str                       = "timings"                 ,
+    setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
+                                                        = default_setup             ,
+    n_repeat                : int                       = 1                         ,
+    nproc                   : int                       = None                      ,
+    pooltype                : typing.Union[str, None]   = None                      ,
+    time_per_test           : float                     = 0.2                       ,
+    filename                : typing.Union[str, None]   = None                      ,
+    ForceBenchmark          : bool                      = False                     ,
+    PreventBenchmark        : bool                      = False                     ,
+    allow_pickle            : bool                      = False                     ,
+    StopOnExcept            : bool                      = False                     ,
+    ShowProgress            : bool                      = False                     ,
+    WarmUp                  : bool                      = False                     ,
+    MonotonicAxes           : list                      = []                        ,
+    timeout                 : float                     = 1.                        ,
+    show                    : bool                      = False                     ,
+    return_array_descriptor : bool                      = False                     ,
+    **plot_kwargs           : typing.Dict[str, typing.Any]                          ,
 ) -> typing.Union[np.typing.NDArray[np.float64], None] :
     """ Runs a full benchmark.
 
@@ -116,6 +117,10 @@ def run_benchmark(
         By default ``1.``.
     show : :class:`python:bool`, optional
         Whether to issue a call to :func:`pyquickbench.plot_benchmark` after the benchmark is run, by default :data:`python:False`.
+    return_array_descriptor : :class:`python:bool`, optional
+        Whether to exit the function without performing the benchmark and **only** return a description of the benchmark result array that would be generated.\n
+        See :ref:`sphx_glr__build_auto_examples_tutorial_11-Manual_benchmarks.py` for usage example.\n 
+        By default :data:`python:False`.
     **plot_kwargs :
         Arguments to pass on to :func:`pyquickbench.plot_benchmark` after the benchmark is run.
 
@@ -149,7 +154,10 @@ def run_benchmark(
         raise ValueError(f'Invalid mode: {mode}')
 
     args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
-
+    
+    if return_array_descriptor:
+        return res_shape
+    
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
 
     if Load_timings_file:

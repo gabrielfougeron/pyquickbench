@@ -210,6 +210,23 @@ This is the best place to learn how to use :mod:`pyquickbench`.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Running benchmarks manually">
+
+.. only:: html
+
+  .. image:: /_build/auto_examples/tutorial/images/thumb/sphx_glr_11-Manual_benchmarks_thumb.png
+    :alt:
+
+  :ref:`sphx_glr__build_auto_examples_tutorial_11-Manual_benchmarks.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Running benchmarks manually</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html

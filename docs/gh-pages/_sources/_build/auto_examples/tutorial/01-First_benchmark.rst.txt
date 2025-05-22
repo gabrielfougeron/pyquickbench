@@ -110,9 +110,36 @@ Now, let's import pyquickbench, run and plot the benchmark
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-83
+.. GENERATED FROM PYTHON SOURCE LINES 83-84
 
 From this benchmark, it is easy to see that initializing a list to a given length filled with a single value is quickest using the star operator.
+
+.. GENERATED FROM PYTHON SOURCE LINES 84-93
+
+.. code-block:: Python
+
+
+
+
+    res = pyquickbench.run_benchmark(
+        all_sizes   ,
+        all_funs    ,
+    ) 
+
+    print(type(res))
+    print(res.shape)
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    <class 'numpy.ndarray'>
+    (12, 3, 1, 1)
+
+
+
 
 
 .. _sphx_glr_download__build_auto_examples_tutorial_01-First_benchmark.py:

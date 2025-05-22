@@ -191,7 +191,7 @@ Since we know that typically, time measurements will be higher with higher value
 
 Plotting relative values shows that there can be a 100 000 fold difference between implementations!
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-180
+.. GENERATED FROM PYTHON SOURCE LINES 165-182
 
 .. code-block:: Python
 
@@ -207,6 +207,8 @@ Plotting relative values shows that there can be a 100 000 fold difference betwe
         all_funs                        ,
         plot_intent = plot_intent       ,
         show = True                     ,
+        title = "Relative computational cost compared to numpy" ,
+        ylabel = "Relative time"        ,
         relative_to_val = relative_to_val,
     )
 
@@ -214,7 +216,7 @@ Plotting relative values shows that there can be a 100 000 fold difference betwe
 
 
 .. image-sg:: /_build/auto_examples/tutorial/images/sphx_glr_08-Lengthy_benchmarks_003.png
-   :alt: 08 Lengthy benchmarks
+   :alt: Relative computational cost compared to numpy
    :srcset: /_build/auto_examples/tutorial/images/sphx_glr_08-Lengthy_benchmarks_003.png
    :class: sphx-glr-single-img
 
@@ -222,11 +224,11 @@ Plotting relative values shows that there can be a 100 000 fold difference betwe
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-182
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 We can also see that different methods need different sizes of input to reach their theoretically cubic asymptotic regime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-192
+.. GENERATED FROM PYTHON SOURCE LINES 184-194
 
 .. code-block:: Python
 
