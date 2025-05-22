@@ -8,10 +8,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyquickbench"
-version = "0.2.5"
+version = "0.2.6"
 description = "A pure Pyton tool to perform time and accuracy benchmarks"
 readme = {file = "README.md", content-type = "text/markdown"}
-license = {file = "LICENSE"}
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
 keywords = ["Python", "benchmark"]
 authors = [
   {name = "Gabriel Fougeron", email = "gabriel.fougeron@hotmail.fr"},
@@ -27,7 +28,6 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
-  "License :: OSI Approved :: BSD License",
   "Natural Language :: English",
 ]
 requires-python = ">= 3.7"
