@@ -94,16 +94,16 @@ plot_intent = {
 }
 
 pyquickbench.plot_benchmark(
-    timings_results_pyquickbench        ,
-    all_args                            ,
-    [timer_fun]                         ,
-    logx_plot = False                   ,
-    logy_plot = False                   ,
-    plot_intent = plot_intent           ,
-    title = 'Time of computation compared to 100% power' ,
-    xlabel = "Power rate"               ,
-    ylabel = "Time (s)"                 ,
-    show = True                         ,
+    timings_results_pyquickbench    ,
+    all_args                        ,
+    [timer_fun]                     ,
+    logx_plot = False               ,
+    logy_plot = False               ,
+    plot_intent = plot_intent       ,
+    title = 'Time of computation'   ,
+    xlabel = "Power rate"           ,
+    ylabel = "Time (s)"             ,
+    show = True                     ,
 )
 
 # %%
@@ -122,7 +122,7 @@ pyquickbench.plot_benchmark(
     logx_plot = False                   ,
     logy_plot = False                   ,
     plot_intent = plot_intent           ,
-    title = 'Update frequency compared to 100% power' ,
+    title = 'Update frequency'          ,
     xlabel = "Power rate"               ,
     ylabel = "Update frequency (it/s)"  ,
     show = True                         ,
@@ -149,7 +149,7 @@ pyquickbench.plot_benchmark(
     logx_plot = False                   ,
     logy_plot = False                   ,
     plot_intent = plot_intent           ,
-    title = 'Total energy consumption of the computation' ,
+    title = 'Relative energy consumption of the computation compared to 100% power' ,
     xlabel = "Power rate"               ,
     relative_to_val = {'power_rate': 1.},
     show = True                         ,

@@ -135,7 +135,7 @@ print(TT)
 
 
 # %% 
-# TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrument a given function to record its execution time. The most starightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
+# TimeTrains can also time calls to a function. The function :meth:`pyquickbench.TimeTrain.tictoc` will instrument a given function to record its execution time. The most straightforward is to use :meth:`pyquickbench.TimeTrain.tictoc` with a decorator syntax:
 
 TT = pyquickbench.TimeTrain()
 

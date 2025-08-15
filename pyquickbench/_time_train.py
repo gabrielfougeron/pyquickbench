@@ -366,10 +366,12 @@ class TimeTrain():
                 else:
                     self.toc(f'{tictoc_sync_name}_{the_name}')    
                 
-                fun(*args, **kwargs)
+                res = fun(*args, **kwargs)
                 
                 self.toc(the_name)
                 self.context_depth = context_depth_prev
+                
+                return res
             
             return wrapper
                 
