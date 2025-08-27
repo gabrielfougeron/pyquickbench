@@ -63,18 +63,18 @@ class TimeTrain():
 
         """    
         
-        self.n = 0
+        # self.n = 0
         self.name = name
-        self.all_tocs_record_time = [0.]
-        self.all_tocs_record_time_sum = 0.
-        self.all_tocs_names = []
+        # self.all_tocs_record_time = [0.]
+        # self.all_tocs_record_time_sum = 0.
+        # self.all_tocs_names = []
         self.align_toc_names = align_toc_names
-        self.max_name_len = 0
-        self.name_set = set()
-        self.n_names = 0
+        # self.max_name_len = 0
+        # self.name_set = set()
+        # self.n_names = 0
         self.context_depth = 1
         self.global_tictoc_sync = global_tictoc_sync
-        self.sum_notignored_time = 0
+        # self.sum_notignored_time = 0
         
         if ignore_names is None:
             self.ignore_names = default_TimeTrain_ignore_names
@@ -118,7 +118,19 @@ class TimeTrain():
                 
                 warnings.warn(f"Reduction {self.names_reduction_key} combined with \"relative_timings = True\" will lead to reported timings not adding up to 100%.")
         
-        # This line goes at the very end for more precise measurements
+        self.reset()
+        
+    def reset(self):
+        
+        self.n = 0
+        self.all_tocs_record_time = [0.]
+        self.all_tocs_record_time_sum = 0.
+        self.all_tocs_names = []
+        self.max_name_len = 0
+        self.name_set = set()
+        self.n_names = 0
+        self.sum_notignored_time = 0
+        
         self.all_tocs = [time.perf_counter()]
         
     def toc(

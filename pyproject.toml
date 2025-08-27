@@ -1,8 +1,10 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "build",
+    "setuptools>=77"  ,
+    "wheel"           ,
+    "build"           ,
+    "numpy"           ,
+    "cython"          ,
 ]
 build-backend = "setuptools.build_meta"
 
@@ -46,8 +48,9 @@ Repository = "https://github.com/gabrielfougeron/pyquickbench"
 Changelog = "https://github.com/gabrielfougeron/pyquickbench/releases/"
 
 [tool.pytest.ini_options]
+timeout = 1
 minversion = "6.0"
-addopts = "-v -ra --junit-xml=docs/pytest_out/junit.xml -n auto"
+addopts = "-v -ra --junit-xml=docs/pytest_out/junit.xml -n 0"
 testpaths = [
     "tests",
 ]

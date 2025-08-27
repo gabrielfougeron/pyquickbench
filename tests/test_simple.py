@@ -12,7 +12,7 @@ import numpy as np
 import itertools
 import pyquickbench
 
-
+@pytest.mark.slow(required_time = 10)
 def test_basic_benchmark(SimpleTimingsBenchmark):
     
     print("Launching basic timings benchmark")
@@ -24,6 +24,7 @@ def test_basic_benchmark(SimpleTimingsBenchmark):
         StopOnExcept = True                     ,
     ) 
 
+@pytest.mark.slow(required_time = 10)
 def test_all_options_timings(SimpleScalarBenchmark):
     
     all_n_repeat = [1, 2, 3]
@@ -89,6 +90,3 @@ def test_all_options_timings(SimpleScalarBenchmark):
                 assert all_vals.shape[2] == n_repeat
                 assert all_vals.shape[3] == 1
                 
-
-
-

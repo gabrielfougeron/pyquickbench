@@ -1,3 +1,4 @@
 attrs
 pytest
 pytest-xdist
+pytest_timeout
