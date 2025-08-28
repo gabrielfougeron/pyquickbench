@@ -41,7 +41,9 @@ def test_score_to_partial_order_count(lenlist):
 
     for k in range(1,nvec+1):
 
-        poc_opt = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        poc_bf =  pyquickbench.rankstats.score_to_partial_order_count_brute_force(k, l)
+        poc_opt = pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="opt")
+        # poc_bfc =  pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="brute_force_compiled")
+        poc_bf =  pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="brute_force")
         
-        assert np.array_equal(poc_opt, poc_bf)
+        # assert np.array_equal(poc_opt, poc_bfc)
+        assert np.array_equal(poc_opt, poc_bf )

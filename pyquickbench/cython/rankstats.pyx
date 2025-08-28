@@ -109,10 +109,15 @@ def from_left_lehmer(Py_ssize_t i, Py_ssize_t n):
 
     return res
 
-cdef void insertion_argsort(Py_ssize_t n, Py_ssize_t* arr, Py_ssize_t* perm) noexcept nogil:
+ctypedef fused num_t:
+    Py_ssize_t
+    float
+    double
+
+cdef void insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept nogil:
 
     cdef Py_ssize_t i, j, k
-    cdef Py_ssize_t key
+    cdef num_t key
 
     for i in range(n):
         perm[i] = i
@@ -129,83 +134,28 @@ cdef void insertion_argsort(Py_ssize_t n, Py_ssize_t* arr, Py_ssize_t* perm) noe
 
         perm[j + 1] = k
 
-def score_to_perm_count(list l):
-    
+def score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
+
     cdef Py_ssize_t nvec = len(l)
-    cdef Py_ssize_t i,j 
-
-    fac = math.factorial(nvec)
-    if np.iinfo(np.intp).max < fac:
-        raise ValueError("Too many vectors")
-
-    shapes = [l[i].shape[0] for i in range(nvec)]
-    
-    prod = 1
-    for i in range(nvec):
-        prod *= shapes[i]
-
-    if np.iinfo(np.intp).max < prod:
-        raise ValueError("Too many observations in vectors")
-
-
-    nelem_tot = sum(shapes)
-    
-    cum_shapes = np.zeros(nvec, dtype=np.intp)
-    cum_shapes[0] = shapes[0]
-    for i in range(nvec-1):
-        cum_shapes[i+1] = cum_shapes[i] + shapes[i+1]
-    
-    u = np.concatenate(l)
-    idx_sort = np.argsort(u)
-    idx_sorted_to_ivec = np.searchsorted(cum_shapes, idx_sort, side='right')
-
-    idx_sorted_to_ivec_compressed = []
-    idx_sorted_to_ivec_len = []
-    
-    start = 0
-    end = 0
-    while end < nelem_tot:
-
-        for end in range(start+1, nelem_tot):
-            if idx_sorted_to_ivec[start] != idx_sorted_to_ivec[end]:
-                break
-        else:
-            end = nelem_tot
-            
-        idx_sorted_to_ivec_compressed.append(idx_sorted_to_ivec[start])
-        idx_sorted_to_ivec_len.append(end-start)
-        
-        start = end
-
-    idx_sorted_to_ivec_compressed = np.array(idx_sorted_to_ivec_compressed, dtype=np.intp)
-    cdef Py_ssize_t[::1] idx_sorted_to_ivec_len_arr = np.array(idx_sorted_to_ivec_len, dtype=np.intp)
-    cdef Py_ssize_t nelem_reduced = idx_sorted_to_ivec_len_arr.shape[0]
-
-    ivec_to_idx_sorted_compressed = [[] for i in range(nvec)]
-    
-    for i in range(nelem_reduced):
-        ivec_to_idx_sorted_compressed[idx_sorted_to_ivec_compressed[i]].append(i)
-
-    for i in range(nvec):
-        ivec_to_idx_sorted_compressed[i] = np.array(ivec_to_idx_sorted_compressed[i])
-
-
-    cdef Py_ssize_t **ivec_to_idx_ptr = <Py_ssize_t**> malloc(sizeof(Py_ssize_t*)*nvec)
-
-    cdef Py_ssize_t[::1] tmp
+    cdef Py_ssize_t fac = math.factorial(nvec)
 
     cdef Py_ssize_t[::1] res = np.zeros(fac, dtype=np.intp)
-    cdef Py_ssize_t ivec, it, val
 
-    cdef Py_ssize_t[::1] ranges = np.empty(nvec, dtype=np.intp)
-    cdef Py_ssize_t[::1] itr = np.zeros(nvec, dtype=np.intp)
+    cdef Py_ssize_t[::1] tmp
+    cdef Py_ssize_t ivec, it, val
+    cdef Py_ssize_t mul
+
+    cdef Py_ssize_t **ivec_to_idx_ptr = <Py_ssize_t**> malloc(sizeof(Py_ssize_t*)*nvec)
     
+    cdef Py_ssize_t *ranges = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
+    cdef Py_ssize_t *itr = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
+    memset(itr, 0, sizeof(Py_ssize_t)*nvec)
+
     cdef Py_ssize_t nmax = 1
     for ivec in range(nvec):
-        ranges[ivec] = ivec_to_idx_sorted_compressed[ivec].shape[0]
-        
+        tmp = l[ivec]
+        ranges[ivec] = tmp.shape[0]
         nmax *= ranges[ivec]
-        tmp = ivec_to_idx_sorted_compressed[ivec]
         ivec_to_idx_ptr[ivec] = &tmp[0]
 
     cdef Py_ssize_t *dd = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(nvec-1))
@@ -218,7 +168,7 @@ def score_to_perm_count(list l):
         for ivec in range(nvec):
             val = ivec_to_idx_ptr[ivec][itr[ivec]]
             idx[ivec] = val
-            mul *= idx_sorted_to_ivec_len_arr[val]
+            mul *= cnt[val]
 
         insertion_argsort(nvec, idx, perm)
 
@@ -236,9 +186,7 @@ def score_to_perm_count(list l):
     free(dd)
     free(perm)
     free(idx)
-
-    return np.asarray(res)
-
-def score_to_perm_count_brute_force(list l):
+    free(ranges)
+    free(itr)
     
-    cdef Py_ssize_t nvec = len(l)
+    return np.asarray(res)
