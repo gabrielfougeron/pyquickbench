@@ -116,20 +116,21 @@ def score_to_partial_order_count(k, l, opt = "opt"):
         
     return res
 
-def build_sinkhorn_problem(order_count, minimize=False):
+def find_nvec_k_from_order_count_shape(order_count, kmax=100, nvec_max = 20):
     
-    # First, find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
+    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
     
-    kmax = 100
+    nsets = order_count.shape[0]
+    nopt_per_set = order_count.shape[1]
+    
     kfac = 1
     for k in range(1,kmax):
         kfac *= k
-        if kfac == order_count.shape[1]:
+        if kfac == nopt_per_set:
             break
     else:
         raise ValueError("Could not determine k")
     
-    nvec_max = 20
     c_arr = np.ones(nvec_max, dtype=np.intp)
     for nvec in range(1,k):
         for kk in range(nvec-1,0,-1):
@@ -139,20 +140,66 @@ def build_sinkhorn_problem(order_count, minimize=False):
         for kk in range(nvec-1,0,-1):
             c_arr[kk] += c_arr[kk-1] 
 
-        if c_arr[k] == order_count.shape[0]:
+        if c_arr[k] == nsets:
             break
     else:
         raise ValueError("Could not determine nvec")
+    
+    return nvec, k
+
+def condorcet_top_order(order_count, minimize=False):
+    
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    
+    if (k != 2):
+        raise ValueError(f'Expected pairwise comparison data. Received {k}-wise comparison data')
+    
+    if minimize:
+        i_opt = 0
+    else:
+        i_opt = 1
+        
+    available_options = list(range(nvec))
+    
+    res = np.full(nvec, -1, dtype=np.intp)
+    
+    for i_round in range(nvec):
+        
+        nrem_vec = nvec-i_round
+            
+        n_wins = np.zeros(nrem_vec, dtype=np.intp)
+        
+        for iset, comb in enumerate(itertools.combinations(range(nrem_vec), 2)):
+
+            if order_count[iset, i_opt] > order_count[iset, 1-i_opt]:
+                n_wins[available_options[comb[0]]] += 1
+            else:
+                n_wins[available_options[comb[1]]] += 1
+                
+        most_wins = np.argmax(n_wins)
+        
+        if n_wins[most_wins] == (nrem_vec-1):
+            res[nrem_vec-1] = available_options[most_wins]
+            available_options.pop(most_wins)
+        else:
+            break
+        
+    return res
+
+
+def build_sinkhorn_problem(order_count, minimize=False):
+    
+    nsets = order_count.shape[0]
+    nopt_per_set = order_count.shape[1]
+
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    
+    nopts = nvec
     
     if minimize:
         i_opt = 0
     else:
         i_opt = k-1
-    
-    nsets = order_count.shape[0]
-    nopt_per_set = order_count.shape[1]
-    
-    nopts = nvec
 
     p_int = np.zeros(nsets, dtype=order_count.dtype)    
     q_int = np.zeros(nopts, dtype=order_count.dtype)
@@ -167,9 +214,11 @@ def build_sinkhorn_problem(order_count, minimize=False):
             
             perm = from_left_lehmer(jperm, k)
             
-            total_sum += order_count[iset, jperm]
-            p_int[iset] += order_count[iset, jperm]
-            q_int[comb[perm[i_opt]]] += order_count[iset, jperm]
+            val = order_count[iset, jperm]
+            
+            total_sum += val
+            p_int[iset] += val
+            q_int[comb[perm[i_opt]]] += val
             
             for j in comb:
                 A[iset, j] = 0.

@@ -140,7 +140,7 @@ def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
             for name, all_args_vals in all_args_in.items():
                 BenchmarkUpToDate = BenchmarkUpToDate and (name in file_content)
 
-                for loaded_val, expected_val in zip(file_content[name], all_args_vals):
+                for loaded_val, expected_val in zip(file_content.get(name), all_args_vals):
                     
                     is_expected = (loaded_val == expected_val)
                     
@@ -201,7 +201,7 @@ def _build_out_names(all_args, setup, all_funs_list):
         
         for fun in all_funs_list:   
             
-            try: # Some structure cannot easily be deepcopied, like those created with Cython.
+            try: # Some structures cannot easily be deepcopied, like those created with Cython.
                 setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
             except TypeError: 
                 setup_vars_dict_cp = copy.copy(setup_vars_dict)

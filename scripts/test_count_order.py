@@ -26,6 +26,8 @@ lenlist = [n] * nvec
 d = 0.0
 l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
 
+
+
 moy = np.array([np.mean(l[ivec]) for ivec in range(nvec)])
 med = np.array([np.median(l[ivec]) for ivec in range(nvec)])
 
@@ -38,20 +40,15 @@ print(np.argsort(moy))
 # print(med)
 print(np.argsort(med))
 # print(np.argsort(log_v))
-print()
+# print()
 
 
 for k in range(2,nvec+1):
     
     order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
     A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-    
-    # exit()
-    
-    # print(q)
 
     method = 'sinkhorn'
-
 
     M, log = ot.bregman.sinkhorn(
         p,

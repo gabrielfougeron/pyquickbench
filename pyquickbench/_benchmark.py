@@ -45,7 +45,8 @@ def run_benchmark(
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                         = default_setup             ,
     n_repeat                : int                       = 1                         ,
-    nproc                   : int                       = None                      ,
+    n_out                   : typing.Union[int, None]   = None                      ,
+    nproc                   : typing.Union[int, None]   = None                      ,
     pooltype                : typing.Union[str, None]   = None                      ,
     time_per_test           : float                     = 0.2                       ,
     filename                : typing.Union[str, None]   = None                      ,
@@ -80,6 +81,8 @@ def run_benchmark(
     n_repeat : :class:`python:int`, optional
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
+    n_out : :class:`python:int`, optional
+        Number of output dimensions. A sensible default is provided if the value is not given.\n
     nproc : :class:`python:int`, optional
         Number of workers in :class:`python:concurrent.futures.Executor`.\n
         By default :func:`python:multiprocessing.cpu_count()`.
@@ -146,12 +149,13 @@ def run_benchmark(
     else:    
         all_funs_list = [fun for fun in all_funs]
 
-    if mode in ["timings", "scalar_output"]:
-        n_out = 1
-    elif mode == "vector_output":
-        n_out, all_out_names = _build_out_names(all_args, setup, all_funs_list)
-    else:
-        raise ValueError(f'Invalid mode: {mode}')
+    if n_out is None:
+        if mode in ["timings", "scalar_output"]:
+            n_out = 1
+        elif mode == "vector_output":
+            n_out, all_out_names = _build_out_names(all_args, setup, all_funs_list)
+        else:
+            raise ValueError(f'Invalid mode: {mode}')
 
     args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
     
