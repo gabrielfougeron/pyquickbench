@@ -14,6 +14,19 @@ cpdef void AssertFalse():
     assert False
 
 @cython.cdivision(True)
+cdef inline Py_ssize_t _binomial(Py_ssize_t n, Py_ssize_t k) noexcept nogil:
+
+    cdef Py_ssize_t i, res
+
+    res = 1
+
+    for i in range(k):
+        res *= n-i
+        res //= i+1
+
+    return res
+
+@cython.cdivision(True)
 cdef inline void _to_factorial_base(Py_ssize_t i, Py_ssize_t n, Py_ssize_t *out) noexcept nogil:
 
     memset(out, 0, sizeof(Py_ssize_t)*n)
@@ -40,6 +53,17 @@ cdef inline Py_ssize_t _from_factorial_base(Py_ssize_t n, Py_ssize_t *digits) no
 
     return res
 
+def to_factorial_base(Py_ssize_t i, Py_ssize_t n):
+
+    cdef np.ndarray[Py_ssize_t, ndim=1, mode='c'] res = np.empty((n), dtype=np.intp)
+    
+    _to_factorial_base(i, n, &res[0])
+    
+    return res
+
+def from_factorial_base(Py_ssize_t[::1] digits):
+    return _from_factorial_base(digits.shape[0], &digits[0])
+
 @cython.cdivision(True)
 cdef inline void _count_inversions(Py_ssize_t n, Py_ssize_t *perm, Py_ssize_t *out) noexcept nogil:
 
@@ -53,16 +77,23 @@ cdef inline void _count_inversions(Py_ssize_t n, Py_ssize_t *perm, Py_ssize_t *o
                 invcnt += 1
         out[i-1] = invcnt
 
-def to_factorial_base(Py_ssize_t i, Py_ssize_t n):
 
-    cdef np.ndarray[Py_ssize_t, ndim=1, mode='c'] res = np.empty((n), dtype=np.intp)
-    
-    _to_factorial_base(i, n, &res[0])
-    
-    return res
+@cython.cdivision(True)
+cdef inline void _from_inversions(Py_ssize_t i, Py_ssize_t m, Py_ssize_t * digits, Py_ssize_t *perm) noexcept nogil:
 
-def from_factorial_base(Py_ssize_t[::1] digits):
-    return _from_factorial_base(digits.shape[0], &digits[0])
+    cdef Py_ssize_t k, j, d
+
+    perm[0] = 0
+    for k in range(m):
+        for j in range(k+1):
+            if perm[j] >= digits[k]:
+                perm[j] += 1
+        perm[k+1] = digits[k]
+        
+    for k in range(m):
+        perm[k] = m - perm[k]
+    perm[m] = m - perm[m]
+
 
 @cython.cdivision(True)
 cdef inline Py_ssize_t _left_lehmer(Py_ssize_t n, Py_ssize_t *perm, Py_ssize_t *digits) noexcept nogil:
@@ -82,21 +113,11 @@ cpdef Py_ssize_t left_lehmer(Py_ssize_t[::1] perm):
 
 cdef inline void _from_left_lehmer(Py_ssize_t i, Py_ssize_t n, Py_ssize_t * digits, Py_ssize_t *perm) noexcept nogil:
 
-    _to_factorial_base(i, n-1, digits)
+    cdef Py_ssize_t m = n-1
 
-    cdef Py_ssize_t k, j, d, m
+    _to_factorial_base(i, m, digits)
+    _from_inversions(i, m, digits, perm)
 
-    m = n-1
-
-    perm[0] = 0
-    for k in range(m):
-        for j in range(k+1):
-            if perm[j] >= digits[k]:
-                perm[j] += 1
-        perm[k+1] = digits[k]
-        
-    for k in range(n):
-        perm[k] = m - perm[k]
 
 def from_left_lehmer(Py_ssize_t i, Py_ssize_t n):
 

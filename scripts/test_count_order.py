@@ -53,7 +53,7 @@ for k in range(2,nvec+1):
     M, log = ot.bregman.sinkhorn(
         p,
         q,
-        A,
+        -np.log(A),
         reg = 1. ,
         method=method,
         numItermax=1000000,

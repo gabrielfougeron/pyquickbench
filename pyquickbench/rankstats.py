@@ -163,26 +163,32 @@ def condorcet_top_order(order_count, minimize=False):
     
     res = np.full(nvec, -1, dtype=np.intp)
     
-    for i_round in range(nvec):
+    n_wins = np.zeros(nvec, dtype=np.intp)
+    
+    for i_round in range(nvec-1):
         
         nrem_vec = nvec-i_round
             
-        n_wins = np.zeros(nrem_vec, dtype=np.intp)
+        n_wins[:] = 0
         
-        for iset, comb in enumerate(itertools.combinations(range(nrem_vec), 2)):
+        for comb in itertools.combinations(available_options, 2):
+            
+            iset = comb[1]-1-(comb[0]+3-2*nvec)*comb[0]//2  # Magic formula for unranking binomial coeffs C(n,k) with k==2
 
             if order_count[iset, i_opt] > order_count[iset, 1-i_opt]:
-                n_wins[available_options[comb[0]]] += 1
+                n_wins[comb[0]] += 1
             else:
-                n_wins[available_options[comb[1]]] += 1
+                n_wins[comb[1]] += 1
                 
         most_wins = np.argmax(n_wins)
         
         if n_wins[most_wins] == (nrem_vec-1):
-            res[nrem_vec-1] = available_options[most_wins]
-            available_options.pop(most_wins)
+            res[nrem_vec-1] = most_wins
+            available_options.pop(available_options.index(most_wins))
         else:
             break
+    else:
+        res[0] = available_options.pop()
         
     return res
 
@@ -206,7 +212,7 @@ def build_sinkhorn_problem(order_count, minimize=False):
     
     total_sum = 0
     
-    A = np.full((nsets, nopts), np.inf, dtype=np.float64)
+    A = np.zeros((nsets, nopts), dtype=np.float64)
     
     for iset, comb in enumerate(itertools.combinations(range(nvec), k)):
 
@@ -221,7 +227,7 @@ def build_sinkhorn_problem(order_count, minimize=False):
             q_int[comb[perm[i_opt]]] += val
             
             for j in comb:
-                A[iset, j] = 0.
+                A[iset, j] = 1.
         
     p = np.empty(nsets, dtype=np.float64)    
     q = np.empty(nopts, dtype=np.float64)
@@ -233,7 +239,31 @@ def build_sinkhorn_problem(order_count, minimize=False):
                 
     return A, p, q
             
-            
+def build_tangent_sinkhorn_problem(A, u, v):    
+    
+    nsets = A.shape[0]
+    nopts = A.shape[1]
+    
+    n = nsets+nopts
+    
+    Av = np.dot(A,v)
+    uA = np.dot(u,A)
+    
+    J = np.zeros((n,n), dtype=np.float64)
+    
+    for iset in range(nsets):
+        J[iset,iset] = Av[iset]
+        J[iset,nsets:n] = u[iset] * A[iset,:]
         
+    for iopt in range(nopts):
+        i = nsets+iopt
+        J[0:nsets,i] = A[:,iopt] * v[iopt]
+        J[i,i] = uA[iopt]
+        
+    return J
+
+
+        
+    
     
     
