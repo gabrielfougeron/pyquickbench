@@ -29,7 +29,7 @@ def test_factorial_base():
         assert i == ii
 
 lenlist_list = [
-    # [100]       ,
+    [100]       ,
     [10]*3      ,
     [2,3,5,7]   ,
 ]

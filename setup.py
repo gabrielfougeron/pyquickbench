@@ -206,7 +206,8 @@ ext_modules = [
         extra_link_args = extra_link_args,
         define_macros  = define_macros ,
     )
-    for (name, source) in zip(cython_extnames, cython_filenames, strict = True)
+    # for (name, source) in zip(cython_extnames, cython_filenames, strict = True)
+    for (name, source) in zip(cython_extnames, cython_filenames)
 ]
 
 if platform.system() == "Windows":

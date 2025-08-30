@@ -7,6 +7,9 @@ import ot
 import itertools
 import scipy
 
+import warnings
+warnings.filterwarnings("ignore")
+
 # print(ot.backend.get_available_backend_implementations())
 
 TT = pyquickbench.TimeTrain(names_reduction='avg', include_locs=False)
@@ -14,9 +17,9 @@ TT = pyquickbench.TimeTrain(names_reduction='avg', include_locs=False)
 # np.random.seed(seed=0)
 
 nvec = 3
-n = 10
-lenlist = [n] * nvec
-# lenlist = [3,4,5,6,7,8]
+# n = 1000
+# lenlist = [n] * nvec
+lenlist = [10, 100, 1000]
 n_repeat = 1
 
 
@@ -32,7 +35,7 @@ for i_repeat in range(n_repeat):
     print()
     print(f'{i_repeat = }')
 
-    d = 0.
+    d = 0.01
     l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
     
     dl = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
@@ -90,7 +93,7 @@ for i_repeat in range(n_repeat):
 
         print("sin", k, np.argsort(log_v))
         
-        print(f'{log_v = }')
+        # print(f'{log_v = }')
 
         # print(np.argsort(log_v))
 
@@ -182,7 +185,7 @@ for i_repeat in range(n_repeat):
             
             errs[ieps] = relerr
             
-        print(errs.min())
+        # print(errs.min())
             
             
         

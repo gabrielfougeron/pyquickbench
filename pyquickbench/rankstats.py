@@ -192,6 +192,51 @@ def condorcet_top_order(order_count, minimize=False):
         
     return res
 
+# def ranked_pairs_order(order_count, minimize=False):
+#     
+#     nvec, k = find_nvec_k_from_order_count_shape(order_count)
+#     
+#     if (k != 2):
+#         raise ValueError(f'Expected pairwise comparison data. Received {k}-wise comparison data')
+#     
+#     if minimize:
+#         i_opt = 0
+#     else:
+#         i_opt = 1
+#         
+#     available_options = list(range(nvec))
+#     
+#     res = np.full(nvec, -1, dtype=np.intp)
+#     
+#     n_wins = np.zeros(nvec, dtype=np.intp)
+#     
+#     for i_round in range(nvec-1):
+#         
+#         nrem_vec = nvec-i_round
+#             
+#         n_wins[:] = 0
+#         
+#         for comb in itertools.combinations(available_options, 2):
+#             
+#             iset = comb[1]-1-(comb[0]+3-2*nvec)*comb[0]//2  # Magic formula for unranking binomial coeffs C(n,k) with k==2
+# 
+#             if order_count[iset, i_opt] > order_count[iset, 1-i_opt]:
+#                 n_wins[comb[0]] += 1
+#             else:
+#                 n_wins[comb[1]] += 1
+#                 
+#         most_wins = np.argmax(n_wins)
+#         
+#         if n_wins[most_wins] == (nrem_vec-1):
+#             res[nrem_vec-1] = most_wins
+#             available_options.pop(available_options.index(most_wins))
+#         else:
+#             break
+#     else:
+#         res[0] = available_options.pop()
+#         
+#     return res
+
 
 def build_sinkhorn_problem(order_count, minimize=False):
     

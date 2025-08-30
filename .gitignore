@@ -28,6 +28,7 @@
 *__pycache__*
 dist/
 build/
+wheelhouse/
 docs/build/
 /docs/source/_build/
 /docs/pytest_out/
