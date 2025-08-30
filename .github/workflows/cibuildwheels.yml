@@ -68,7 +68,7 @@ jobs:
     steps:
 
       - name: Download reports' artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           path: ./artifacts-dl
 
@@ -80,7 +80,7 @@ jobs:
           find ./artifacts-dl -name '*.whl' -exec cp {} ./pyquickbench-dist/dist \; 
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pyquickbench-dist
           path: './pyquickbench-dist/'
