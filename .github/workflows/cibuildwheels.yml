@@ -44,10 +44,16 @@ jobs:
       # - uses: ilammy/msvc-dev-cmd@v1
       #   if: ${{ (matrix.os == 'windows-latest') || (matrix.os == 'windows-11-arm') }}
 
-      - uses: TheMrMilchmann/setup-msvc-dev@v3
+      # - uses: TheMrMilchmann/setup-msvc-dev@v3
+      #   if: ${{ (matrix.os == 'windows-latest') }}
+      #   with:
+      #     arch: x64
+
+      - name: Setup MSVC (32-bit) 
         if: ${{ (matrix.os == 'windows-latest') }}
-        with:
-          arch: x64
+        uses: bus1/cabuild/action/msdevshell@e22aba57d6e74891d059d66501b6b5aed8123c4d  # v1 
+        with: 
+          architecture: 'x86' 
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
