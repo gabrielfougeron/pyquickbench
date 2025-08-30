@@ -55,6 +55,23 @@ jobs:
         with: 
           architecture: 'x86' 
 
+      - name: pkg-config-for-win
+        if: ${{ (matrix.os == 'windows-latest') }}
+        run: |
+          choco install -y --no-progress --stoponfirstfailure --checksum 6004DF17818F5A6DBF19CB335CC92702 pkgconfiglite
+          $CIBW = "${{ github.workspace }}/.openblas"
+          # pkgconfig needs a complete path, and not just "./openblas since the
+          # build is run in a tmp dir (?)
+          # It seems somewhere in the env passing, `\` is not
+          # passed through, so convert it to '/'
+          $CIBW = $CIBW.replace("\","/")
+          echo "CIBW_ENVIRONMENT_WINDOWS=PKG_CONFIG_PATH=$CIBW" >> $env:GITHUB_ENV
+
+
+
+
+
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
         env:
