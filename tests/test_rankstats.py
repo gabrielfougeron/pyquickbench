@@ -10,7 +10,6 @@ from test_config import *
 
 import numpy as np
 import pyquickbench
-import ot
 
 def test_factorial_base():
 
@@ -50,13 +49,30 @@ def test_score_to_partial_order_count(lenlist):
         assert np.array_equal(poc_opt, poc_bf )
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
-def test_luce_gradient(lenlist, reltol=1e-8):
+def test_sinkhorn_solver(lenlist, reltol=1e-13):
     
-    # method = 'sinkhorn'
-    method = 'sinkhorn_log'
-    # method = 'greenkhorn'
-    # method = 'sinkhorn_stabilized'
-    # method = 'sinkhorn_epsilon_scaling
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    for k in range(2,nvec+1):
+        
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+           
+        u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+            p                       ,
+            q                       ,
+            A                       ,
+            # reg = 1.                ,
+            numItermax = 1000000    ,
+            stopThr = reltol        ,
+        )
+        
+        assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
+        assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
+        
+@pytest.mark.parametrize("lenlist", lenlist_list)
+def test_luce_gradient(lenlist, reltol=1e-8):
     
     nvec = len(lenlist)
     l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
@@ -72,22 +88,14 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         
         n = nsets+nopts
 
-        M, log = ot.bregman.sinkhorn(
-            p                   ,
-            q                   ,
-            -np.log(A)          ,
-            reg = 1.            ,
-            method=method       ,
-            numItermax=1000000  ,
-            stopThr=1e-13       ,
-            verbose=False       ,
-            log=True            ,
-            warn=False          ,
-            warmstart=None      ,
+        u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+            p                       ,
+            q                       ,
+            A                       ,
+            # reg = 1.                ,
+            numItermax = 1000000    ,
+            stopThr = 1e-13         ,
         )
-
-        u = log['u']
-        v = log['v']
 
         log_v = np.log(u)
         log_u = np.log(v)
@@ -95,6 +103,7 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         log_v -= dd
         log_u += dd
 
+        M = np.einsum('i,ij,j->ij',u,A,v)
         J = pyquickbench.rankstats.build_log_tangent_sinkhorn_problem(M)
         
         order_countp = pyquickbench.rankstats.score_to_partial_order_count(k, lp)
@@ -115,43 +124,33 @@ def test_luce_gradient(lenlist, reltol=1e-8):
             
             eps = 10**(start_exp-ieps)
             
-            Mp, logp = ot.bregman.sinkhorn(
-                p+eps*dp            ,
-                q+eps*dq            ,
-                -np.log(A)          ,
-                reg = 1.            ,
-                method=method       ,
-                numItermax=1000000  ,
-                stopThr=1e-13       ,
-                verbose=False       ,
-                log=True            ,
-                warn=False          ,
-                warmstart=None      ,
-            ) 
+            up, vp = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+                p+eps*dp                ,
+                q+eps*dq                ,
+                A                       ,
+                # reg = 1.                ,
+                numItermax = 1000000    ,
+                stopThr = 1e-13         ,
+            )
             
-            log_vp = np.log(logp['v'])
-            log_up = np.log(logp['u'])
+            log_vp = np.log(vp)
+            log_up = np.log(up)
                     
             dd = (np.sum(log_vp) - np.sum(log_up) ) / n
             log_vp -= dd
             log_up += dd
 
-            Mm, logm = ot.bregman.sinkhorn(
-                p-eps*dp            ,
-                q-eps*dq            ,
-                -np.log(A)          ,
-                reg = 1.            ,
-                method=method       ,
-                numItermax=1000000  ,
-                stopThr=1e-13       ,
-                verbose=False       ,
-                log=True            ,
-                warn=False          ,
-                warmstart=None      ,
+            um, vm = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+                p-eps*dp                ,
+                q-eps*dq                ,
+                A                       ,
+                # reg = 1.                ,
+                numItermax = 1000000    ,
+                stopThr = 1e-13         ,
             )
             
-            log_vm = np.log(logm['v'])
-            log_um = np.log(logm['u'])
+            log_vm = np.log(vm)
+            log_um = np.log(um)
             
             dd = (np.sum(log_vm) - np.sum(log_um) ) / n
             log_vm -= dd

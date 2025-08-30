@@ -18,7 +18,8 @@ Cython.warn.undeclared = True
 src_ext = '.pyx'
 
 cython_extnames = [
-    "pyquickbench.cython.rankstats"  
+    "pyquickbench.cython.rankstats" ,
+    "pyquickbench.cython.sinkhorn"  ,
 ]
 
 for opt_key in ['profile','0','1','2','3','fast']:

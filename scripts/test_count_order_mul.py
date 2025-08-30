@@ -23,8 +23,8 @@ lenlist = [10, 100, 1000]
 n_repeat = 1
 
 
-# method = 'sinkhorn'
-method = 'sinkhorn_log'
+method = 'sinkhorn'
+# method = 'sinkhorn_log'
 # method = 'greenkhorn'
 # method = 'sinkhorn_stabilized'
 # method = 'sinkhorn_epsilon_scaling
