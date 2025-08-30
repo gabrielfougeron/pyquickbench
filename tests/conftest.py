@@ -1,14 +1,12 @@
 import os
 import sys
 import pytest
-import threadpoolctl
 import warnings
 import pyquickbench
 
 from pytest_timeout import _get_item_settings, SESSION_TIMEOUT_KEY # BAAAAD !!! Works wit timeout-2.3.1, might not work with other version
 
 def pytest_sessionstart(session):
-    threadpoolctl.threadpool_limits(limits=1).__enter__()
     
     try:
         pyquickbench.cython.rankstats.AssertFalse()

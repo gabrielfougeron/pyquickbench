@@ -12,7 +12,7 @@ import numpy as np
 import pyquickbench
 
 def test_factorial_base():
-
+    
     n = 10
     
     for i in range(1000):

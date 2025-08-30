@@ -1,0 +1,6 @@
+pyquickbench
+attrs
+pytest
+pytest-xdist
+pytest-timeout
+pytest-asyncio
