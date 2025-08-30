@@ -42,47 +42,48 @@ print(np.argsort(med))
 # print(np.argsort(log_v))
 # print()
 
+for method in [
+    'sinkhorn'  ,
+    'sinkhorn_log'  ,
+    'greenkhorn'    ,
+    # 'sinkhorn_stabilized'   ,
+    # 'sinkhorn_epsilon_scaling'   ,
+]:
 
-for k in range(2,nvec+1):
-    
-    order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-    A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+    print()
+    print(f'{method = }')
 
-    method = 'sinkhorn'
+    for k in range(2,3):
+    # for k in range(2,nvec+1):
+        
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
 
-    M, log = ot.bregman.sinkhorn(
-        p,
-        q,
-        -np.log(A),
-        reg = 1. ,
-        method=method,
-        numItermax=1000000,
-        stopThr=1e-13,
-        verbose=False,
-        log=True,
-        warn=False,
-        warmstart=None,
-    )
+        M, log = ot.bregman.sinkhorn(
+            p,
+            q,
+            -np.log(A),
+            reg = 1. ,
+            method=method,
+            numItermax=1000000,
+            stopThr=1e-13,
+            verbose=False,
+            log=True,
+            warn=False,
+            warmstart=None,
+        )
 
+        u = log['u']
+        v = log['v']
+        Ah = np.einsum('i,ij,j->ij', u, A, v)
+        
+        print(np.linalg.norm(M-Ah))
+        print(np.linalg.norm(p-np.sum(Ah,axis=1)))
+        print(np.linalg.norm(q-np.sum(Ah,axis=0)))
 
+        log_v = np.log(v)
+        log_v -= np.sum(log_v) / log_v.shape[0]
 
-    # print(f'nit = {log['err'][-1]}')
-
-    # print(np.linalg.norm(p-np.sum(M,axis=1)))
-    # print(np.linalg.norm(q-np.sum(M,axis=0)))
-
-    # niter = log.get('niter')
-    # if niter is None:
-    #     niter = log.get('n_iter')
-    # print(f'niter = {niter}')
-    # print(f'err = {log[errkey][-1]}')
-
-    log_v = np.log(log['v'])
-    log_v -= np.sum(log_v)/log_v.shape[0]
-
-    # print(log.keys())
-    # print(log['v']/log['v'][0])
-    # print(log_v)
-
-    
-    print(np.argsort(log_v))
+        # print("sin", k, np.argsort(log_v))
+        
+        print(f'{log_v = }')

@@ -13,8 +13,8 @@ TT = pyquickbench.TimeTrain(names_reduction='avg', include_locs=False)
 
 # np.random.seed(seed=0)
 
-nvec = 6
-n = 11
+nvec = 3
+n = 10
 lenlist = [n] * nvec
 # lenlist = [3,4,5,6,7,8]
 n_repeat = 10
@@ -26,7 +26,6 @@ for i_repeat in range(n_repeat):
 
     d = 0.
     l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
-    
     
     order_count = pyquickbench.rankstats.score_to_partial_order_count(2, l)
     condorcet_order = pyquickbench.rankstats.condorcet_top_order(order_count)
@@ -50,8 +49,17 @@ for i_repeat in range(n_repeat):
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
         A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        
+        nsets = p.shape[0]
+        nopts = q.shape[0]
+        
+        n = nsets+nopts
 
-        method = 'sinkhorn'
+        # method = 'sinkhorn'
+        method = 'sinkhorn_log'
+        # method = 'greenkhorn'
+        # method = 'sinkhorn_stabilized'
+        # method = 'sinkhorn_epsilon_scaling
 
         M, log = ot.bregman.sinkhorn(
             p                   ,
@@ -73,30 +81,40 @@ for i_repeat in range(n_repeat):
         # print(np.linalg.norm(p-np.sum(M,axis=1)))
         # print(np.linalg.norm(q-np.sum(M,axis=0)))
                 
-        Ah = np.einsum('i,ij,j->ij', u, A, v)
+        # Ah = np.einsum('i,ij,j->ij', u, A, v)
         
         # print(np.linalg.norm(np.matmul(A  , v) - p/u))
         # print(np.linalg.norm(np.matmul(A.T, u) - q/v))
 
         log_v = np.log(log['v'])
-        log_v -= np.sum(log_v) / log_v.shape[0]
+        log_u = np.log(log['u'])
+        dd = (np.sum(log_v)-np.sum(log_u)) / n
+        log_v -= dd
+        log_u += dd
+
+        print("sin", k, np.argsort(log_v))
         
-        # print(log_v)
+        print(f'{log_v = }')
 
         # print(np.argsort(log_v))
-        print("sin", k, np.argsort(log_v))
+
 
         # print(np.sort(log_v))
         
-        J = pyquickbench.rankstats.build_tangent_sinkhorn_problem(A, u, v)
+        J = pyquickbench.rankstats.build_log_tangent_sinkhorn_problem(M)
         
         # print(J)
         
 
-# 
+# # 
 #         print(np.linalg.norm(M-Ah))
 #         print(np.linalg.norm(p-np.sum(Ah,axis=1)))
 #         print(np.linalg.norm(q-np.sum(Ah,axis=0)))
+        
+        print(np.linalg.norm(p-u*np.dot(A,v)))
+        print(np.linalg.norm(q-np.dot(u,A)*v))
+        
+        
 #         print(np.linalg.norm(J))
 #         
         # U, s, Vh = scipy.linalg.svd(J)
@@ -113,15 +131,25 @@ for i_repeat in range(n_repeat):
         d_order_count[0,1] = -1
 
         A, pp, qp = pyquickbench.rankstats.build_sinkhorn_problem(order_count+d_order_count)
+        # 
+        # print(np.sum(pp))
+        # print(np.sum(qp))
+        # 
+        # dp = p - pp
+        # dq = q - qp
         
-        dp = pp - p
-        dq = qp - q
+        dp = np.random.random(nsets)
+        dq = np.random.random(nopts)
+        
+        dp -= dp.sum()/nsets
+        dq -= dq.sum()/nopts
+        
         
         dpq = np.concatenate((dp,dq))
         
         # print(f'{dpq = }')
         
-        eps = 1
+        eps = 1e-2
         
         Mp, logp = ot.bregman.sinkhorn(
             p+eps*dp            ,
@@ -135,8 +163,15 @@ for i_repeat in range(n_repeat):
             log=True            ,
             warn=False          ,
             warmstart=None      ,
-        )   
-          
+        ) 
+        
+        log_vp = np.log(logp['v'])
+        log_up = np.log(logp['u'])
+                
+        dd = (np.sum(log_vp) - np.sum(log_up) ) / n
+        log_vp -= dd
+        log_up += dd
+
         Mm, logm = ot.bregman.sinkhorn(
             p-eps*dp            ,
             q-eps*dq            ,
@@ -151,20 +186,51 @@ for i_repeat in range(n_repeat):
             warmstart=None      ,
         )
         
+        log_vm = np.log(logm['v'])
+        log_um = np.log(logm['u'])
         
-        du = (logp['u'] - logm['u']) / (2*eps)
-        dv = (logp['v'] - logm['v']) / (2*eps)
+        dd = (np.sum(log_vm) - np.sum(log_um) ) / n
+        log_vm -= dd
+        log_um += dd
         
-        duv_diff_fin = np.concatenate((du,dv))
+        # print(log_up)
+        # print(log_um)
+        # print(log_u)
         
-        # duv , _ , _ , _= np.linalg.lstsq(J,dpq)
-        duv = np.linalg.solve(J,dpq)
+        dlogu = (log_up - log_um) / (2*eps)
+        dlogv = (log_vp - log_vm) / (2*eps)
         
-        print(duv)
-        print(duv_diff_fin)
+        duv_diff_fin = np.concatenate((dlogu,dlogv))
+        
+        dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
+        # dd = (np.sum(dloguv[0:nsets]) - np.sum(dloguv[nsets:n]) ) / n
+        # dloguv -= dd
+        # dloguv += dd
+        
+        # dd = (np.sum(dloguv[0:nsets]) - np.sum(dloguv[nsets:n]) ) / n
+        # print(f'{dd = }')
+        
+        # dloguv = np.linalg.solve(J,dpq)
+        
+        # Jinv = np.linalg.inv(J)
+        # print(Jinv)
+        
+        # dloguv = duv / np.concatenate((u,v))
+        
+        
+        
+        # print(duv[nsets:])
+        # print(dlogv)
         # print(duv_diff_fin - duv)
-        # 
-        # print(np.linalg.norm(duv_diff_fin - duv) / np.linalg.norm(duv))
+        
+        # print(dloguv)
+        # print(duv_diff_fin)
+        # print(dloguv - duv_diff_fin)
+        
+        
+        # print(dlogv)
+        
+        print('err', np.linalg.norm(dloguv - duv_diff_fin) / np.linalg.norm(dloguv))
         
         
         

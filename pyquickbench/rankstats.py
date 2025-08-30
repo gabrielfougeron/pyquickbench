@@ -239,27 +239,32 @@ def build_sinkhorn_problem(order_count, minimize=False):
                 
     return A, p, q
             
-def build_tangent_sinkhorn_problem(A, u, v):    
+def build_log_tangent_sinkhorn_problem(M):    
     
-    nsets = A.shape[0]
-    nopts = A.shape[1]
+    nsets = M.shape[0]
+    nopts = M.shape[1]
     
     n = nsets+nopts
-    
-    Av = np.dot(A,v)
-    uA = np.dot(u,A)
-    
+
     J = np.zeros((n,n), dtype=np.float64)
     
+    ml = M.sum(axis=1)
+    mr = M.sum(axis=0)
+    
     for iset in range(nsets):
-        J[iset,iset] = Av[iset]
-        J[iset,nsets:n] = u[iset] * A[iset,:]
+        J[iset,iset] += ml[iset]
         
     for iopt in range(nopts):
         i = nsets+iopt
-        J[0:nsets,i] = A[:,iopt] * v[iopt]
-        J[i,i] = uA[iopt]
-        
+        J[i,i] += mr[iopt]
+    
+    for iset in range(nsets):
+        for iopt in range(nopts):
+            i = nsets+iopt
+
+            J[iset,i] += M[iset,iopt]
+            J[i,iset] += M[iset,iopt]
+                
     return J
 
 
