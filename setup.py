@@ -71,7 +71,8 @@ elif platform.system() == "Darwin": # MacOS
     ] 
     
     std_args = ["-Xpreprocessor", "-std=c99", "-lm"]
-    std_link_args = ["-lm", "-lomp"]
+    # std_link_args = ["-lm", "-lomp"]
+    std_link_args = ["-lm",]
 
     extra_compile_args = {
         "profile" : ["-Og", *std_args, *ignore_warnings_args],
