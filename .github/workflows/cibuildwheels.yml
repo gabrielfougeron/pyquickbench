@@ -27,14 +27,22 @@ jobs:
         with:
           python-version: ${{ env.main-python-version }}
 
-      - name: Install cibuildwheel
-        run: |
-          python -m pip install cibuildwheel
-          echo CIBW_BUILD=${{ fromJSON(env.python_version_to_cibw_build)[matrix.python-version] }} >> $GITHUB_ENV
+#       - name: Install cibuildwheel
+#         run: |
+#           python -m pip install cibuildwheel
+#           echo CIBW_BUILD=${{ fromJSON(env.python_version_to_cibw_build)[matrix.python-version] }} >> $GITHUB_ENV
+# 
+#       - name: Build wheels
+#         run: |
+#           python -m cibuildwheel --output-dir dist
 
       - name: Build wheels
-        run: |
-          python -m cibuildwheel --output-dir dist
+        uses: pypa/cibuildwheel@v3.1.4
+        env:
+          CIBW_BUILD: ${{ fromJSON(env.python_version_to_cibw_build)[matrix.python-version] }}
+        with:
+          package-dir: .
+          output-dir: dist
 
       - name: Install Pyodide Build
         if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == env.main-python-version) }}
