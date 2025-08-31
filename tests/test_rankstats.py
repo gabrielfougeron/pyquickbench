@@ -28,9 +28,9 @@ def test_factorial_base():
         assert i == ii
 
 lenlist_list = [
-    [100]       ,
-    [10]*3      ,
-    [2,3,5,7]   ,
+    [100]           ,
+    [10]*3          ,
+    [10,20,30,35]   ,
 ]
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
@@ -50,33 +50,26 @@ def test_score_to_partial_order_count(lenlist):
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):
-    
-    for i in range(1):
-        
-        nvec = len(lenlist)
-        l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
 
-        for k in range(2,nvec+1):
-            
-            order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-            A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-            
-            u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-                p                       ,
-                q                       ,
-                A                       ,
-                # reg = 1.                ,
-                numItermax = 10000      ,
-                stopThr = 1e-13        ,
-            )
-            
-            assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
-            assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
-            
-            assert np.all(p >= 0)
-            assert np.all(q >= 0)
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    for k in range(2,nvec+1):
         
-@pytest.mark.skip
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        
+        u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+            p, q, A,
+            stopThr = 1e-13 ,
+        )
+        
+        assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
+        assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
+        
+        assert np.all(p >= 0)
+        assert np.all(q >= 0)
+        
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_luce_gradient(lenlist, reltol=1e-8):
 
@@ -95,12 +88,8 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         n = nsets+nopts
 
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-            p                       ,
-            q                       ,
-            A                       ,
-            # reg = 1.                ,
-            numItermax = 1000000    ,
-            stopThr = 1e-13         ,
+            p, q, A,
+            stopThr = 1e-13 ,
         )
 
         log_v = np.log(u)

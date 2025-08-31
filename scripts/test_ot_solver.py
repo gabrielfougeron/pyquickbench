@@ -12,32 +12,42 @@ warnings.filterwarnings("ignore")
 
 # print(ot.backend.get_available_backend_implementations())
 
-TT = pyquickbench.TimeTrain(names_reduction='avg', include_locs=False)
+TT = pyquickbench.TimeTrain(names_reduction='sum', include_locs=False)
 
 # np.random.seed(seed=0)
 
-nvec = 3
+nvec = 4
 # n = 1000
 # lenlist = [n] * nvec
-lenlist = [10, 10, 10]
+# lenlist = [10, 10, 10]
+lenlist = [20,30,50,70]
 n_repeat = 1000
 
 
-method = 'sinkhorn'
+# method = 'sinkhorn'
 # method = 'sinkhorn_log'
 # method = 'greenkhorn'
 # method = 'sinkhorn_stabilized'
 # method = 'sinkhorn_epsilon_scaling
 
+methods = [
+    'sinkhorn',
+    # 'sinkhorn_log',
+    # 'greenkhorn',
+    # 'sinkhorn_stabilized',
+    # 'sinkhorn_epsilon_scaling',
+]
 
 for i_repeat in range(n_repeat):
+# for i_repeat in [8]:
     
     print()
     print(f'{i_repeat = }')
-
-    d = 0.01
-    l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
     
+    np.random.seed(seed=i_repeat)
+
+    d = 0.
+    l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
     dl = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
     
     order_count = pyquickbench.rankstats.score_to_partial_order_count(2, l)
@@ -58,7 +68,9 @@ for i_repeat in range(n_repeat):
 
 
     for k in range(2,nvec+1):
-    # for k in range(2,3):
+
+    
+        print(f'{k = }')    
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
         A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
@@ -68,29 +80,30 @@ for i_repeat in range(n_repeat):
         
         n = nsets+nopts
 
-        
-        TT.toc("start")
-        M, log = ot.bregman.sinkhorn(
-            p                   ,
-            q                   ,
-            -np.log(A)          ,
-            reg = 1.            ,
-            method=method       ,
-            numItermax=1000  ,
-            stopThr=1e-13       ,
-            verbose=False       ,
-            log=True            ,
-            warn=False          ,
-            warmstart=None      ,
-        )
-        TT.toc("POT")
-        
+        for method in methods:
 
-        uot = log['u']
-        vot = log['v']
+            TT.toc("start")
+            M, log = ot.bregman.sinkhorn(
+                p                   ,
+                q                   ,
+                -np.log(A)          ,
+                reg = 1.            ,
+                method=method       ,
+                numItermax=1000  ,
+                stopThr=1e-13       ,
+                verbose=False       ,
+                log=True            ,
+                warn=False          ,
+                warmstart=None      ,
+            )
+            TT.toc(f"POT-{method}")
+            
 
-        print("vot err ", np.linalg.norm(p-uot*np.dot(A,vot)))
-        print("uot err ", np.linalg.norm(q-np.dot(uot,A)*vot))
+#             uot = log['u']
+#             vot = log['v']
+# 
+#             print(f"vot {method} err ", np.linalg.norm(p-uot*np.dot(A,vot)))
+#             print(f"uot {method} err ", np.linalg.norm(q-np.dot(uot,A)*vot))
 
         TT.toc("start")
         ucy, vcy = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
@@ -104,8 +117,11 @@ for i_repeat in range(n_repeat):
         )
         TT.toc("Cython")
         
-        print("vcy err ", np.linalg.norm(p-ucy*np.dot(A,vcy)))
-        print("ucy err ", np.linalg.norm(q-np.dot(ucy,A)*vcy))        
+        # print("vcy err ", np.linalg.norm(p-ucy*np.dot(A,vcy)))
+        # print("ucy err ", np.linalg.norm(q-np.dot(ucy,A)*vcy))        
+        # 
+        # assert np.linalg.norm(p-ucy*np.dot(A,vcy)) < 1e-13
+        # assert np.linalg.norm(q-np.dot(ucy,A)*vcy) < 1e-13
         
     
 print(TT)

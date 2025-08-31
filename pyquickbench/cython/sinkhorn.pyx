@@ -65,41 +65,39 @@ def sinkhorn_knopp(
         u = warmstart[0]
         v = warmstart[1]
 
+    cdef double *uptr = &u[0]
+    cdef double *vptr = &v[0]
+
     cdef Py_ssize_t i_iter
     cdef Py_ssize_t  i_iter_rem = check_err_every-1
     cdef Py_ssize_t i
 
     cdef double tmp
-
-    cdef double[::1] uM = np.empty((dim_b), dtype=np.float64)
-    cdef double[::1] tmp_arr= np.empty((dim_b), dtype=np.float64)
+    cdef double * uM = <double*> malloc(sizeof(double)*dim_b)
 
     cdef double err = 1.
     for i_iter in range(numItermax):
 
-
-        scipy.linalg.cython_blas.dgemv(transn,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,&u[0],&int_one,&zero_double,&uM[0],&int_one)
+        scipy.linalg.cython_blas.dgemv(transn,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,uptr,&int_one,&zero_double,uM,&int_one)
 
         if i_iter % check_err_every == i_iter_rem:
 
+            err = 0.
             for i in range(dim_b):
-                tmp_arr[i] = v[i] * uM[i]
-
-            scipy.linalg.cython_blas.daxpy(&dim_b, &minusone_double, &b[0], &int_one, &tmp_arr[0], &int_one)
-            err = csqrt(scipy.linalg.cython_blas.ddot(&dim_b, &tmp_arr[0], &int_one, &tmp_arr[0], &int_one))
-
-
-            print(f'{i_iter = }')
-            print(err)
+                tmp = vptr[i] * uM[i] - b[i]
+                err += tmp * tmp
+            err = csqrt(err)
 
             if err < stopThr:
                 break
 
         for i in range(dim_b):
-            v[i] = b[i] / uM[i]
+            vptr[i] = b[i] / uM[i]
 
-        scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,&v[0],&int_one,&zero_double,&u[0],&int_one)
+        scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,vptr,&int_one,&zero_double,uptr,&int_one)
         for i in range(dim_a):
-            u[i] = a[i] / u[i]
+            uptr[i] = a[i] / uptr[i]
+
+    free(uM)
 
     return (np.asarray(u), np.asarray(v))
