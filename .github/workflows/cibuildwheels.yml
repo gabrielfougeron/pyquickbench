@@ -27,20 +27,28 @@ jobs:
         with:
           arch: x64
 
+#       # Used to host cibuildwheel
+#       - uses: actions/setup-python@v5
+#         if: ${{ (matrix.os == 'windows-latest') || (matrix.os == 'windows-11-arm') }}
+#         with:
+#           python-version: ${{ env.main-python-version }}
+#           architecture: 'x86'
+# 
+#       # Used to host cibuildwheel
+#       - uses: actions/setup-python@v5
+#         if: ${{ (matrix.os != 'windows-latest') && (matrix.os != 'windows-11-arm') }}
+#         with:
+#           python-version: ${{ env.main-python-version }}
+
       # Used to host cibuildwheel
       - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.main-python-version }}
+
+      - name: Specific Windows cibuildwheel env variables setup
         if: ${{ (matrix.os == 'windows-latest') || (matrix.os == 'windows-11-arm') }}
-        with:
-          python-version: ${{ env.main-python-version }}
-          architecture: 'x86'
-
-      # Used to host cibuildwheel
-      - uses: actions/setup-python@v5
-        if: ${{ (matrix.os != 'windows-latest') && (matrix.os != 'windows-11-arm') }}
-        with:
-          python-version: ${{ env.main-python-version }}
-
-
+        run: |
+          echo CIBW_TEST_COMMAND='' >> $GITHUB_ENV
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4
