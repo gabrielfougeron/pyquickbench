@@ -1,7 +1,7 @@
 name: Build using cibuildwheel
 
 env:
-  python_version_to_cibw_build: '{"3.9" : "cp39-*", "3.10" : "cp310-*", "3.11" : "cp311-*", "3.12" : "cp312-*", "3.13" : "cp313-*", "3.14" : "cp314-*", }'
+  python_version_to_cibw_build: '{"3.9" : "cp39*", "3.10" : "cp310*", "3.11" : "cp311*", "3.12" : "cp312*", "3.13" : "cp313*", "3.14" : "cp314*", }'
   main-python-version: '3.13'
 
 on: workflow_dispatch
@@ -29,11 +29,18 @@ jobs:
 
       # Used to host cibuildwheel
       - uses: actions/setup-python@v5
+        if: ${{ (matrix.os == 'windows-latest') || (matrix.os == 'windows-11-arm') }}
         with:
           python-version: ${{ env.main-python-version }}
-          architecture: 'x64'
+          architecture: 'x86'
 
-          
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v5
+        if: ${{ (matrix.os != 'windows-latest') && (matrix.os != 'windows-11-arm') }}
+        with:
+          python-version: ${{ env.main-python-version }}
+
+
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.4

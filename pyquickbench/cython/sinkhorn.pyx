@@ -77,6 +77,7 @@ def sinkhorn_knopp(
     cdef double err = 1.
     for i_iter in range(numItermax):
 
+
         scipy.linalg.cython_blas.dgemv(transn,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,&u[0],&int_one,&zero_double,&uM[0],&int_one)
 
         if i_iter % check_err_every == i_iter_rem:
@@ -86,6 +87,10 @@ def sinkhorn_knopp(
 
             scipy.linalg.cython_blas.daxpy(&dim_b, &minusone_double, &b[0], &int_one, &tmp_arr[0], &int_one)
             err = csqrt(scipy.linalg.cython_blas.ddot(&dim_b, &tmp_arr[0], &int_one, &tmp_arr[0], &int_one))
+
+
+            print(f'{i_iter = }')
+            print(err)
 
             if err < stopThr:
                 break

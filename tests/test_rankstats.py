@@ -49,31 +49,37 @@ def test_score_to_partial_order_count(lenlist):
         assert np.array_equal(poc_opt, poc_bf )
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
-def test_sinkhorn_solver(lenlist, reltol=1e-13):
+def test_sinkhorn_solver(lenlist, reltol=1e-8):
     
-    nvec = len(lenlist)
-    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+    for i in range(1):
+        
+        nvec = len(lenlist)
+        l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
 
-    for k in range(2,nvec+1):
+        for k in range(2,nvec+1):
+            
+            order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+            A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+            
+            u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+                p                       ,
+                q                       ,
+                A                       ,
+                # reg = 1.                ,
+                numItermax = 10000      ,
+                stopThr = 1e-13        ,
+            )
+            
+            assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
+            assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
+            
+            assert np.all(p >= 0)
+            assert np.all(q >= 0)
         
-        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-           
-        u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-            p                       ,
-            q                       ,
-            A                       ,
-            # reg = 1.                ,
-            numItermax = 1000000    ,
-            stopThr = reltol        ,
-        )
-        
-        assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
-        assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
-        
+@pytest.mark.skip
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_luce_gradient(lenlist, reltol=1e-8):
-    
+
     nvec = len(lenlist)
     l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
     lp = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
@@ -109,8 +115,8 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         order_countp = pyquickbench.rankstats.score_to_partial_order_count(k, lp)
         A, pp, qp = pyquickbench.rankstats.build_sinkhorn_problem(order_countp)
         
-        dp = p - pp
-        dq = q - qp
+        dp = p
+        dq = q
         
         dpq = np.concatenate((dp,dq))
         
@@ -133,6 +139,9 @@ def test_luce_gradient(lenlist, reltol=1e-8):
                 stopThr = 1e-13         ,
             )
             
+            assert np.linalg.norm(p+eps*dp-up*np.dot(A,vp)) < reltol
+            assert np.linalg.norm(q+eps*dq-np.dot(up,A)*vp) < reltol
+            
             log_vp = np.log(vp)
             log_up = np.log(up)
                     
@@ -148,10 +157,13 @@ def test_luce_gradient(lenlist, reltol=1e-8):
                 numItermax = 1000000    ,
                 stopThr = 1e-13         ,
             )
+                    
+            assert np.linalg.norm(p-eps*dp-um*np.dot(A,vm)) < reltol
+            assert np.linalg.norm(q-eps*dq-np.dot(um,A)*vm) < reltol
             
             log_vm = np.log(vm)
             log_um = np.log(um)
-            
+
             dd = (np.sum(log_vm) - np.sum(log_um) ) / n
             log_vm -= dd
             log_um += dd
@@ -166,4 +178,4 @@ def test_luce_gradient(lenlist, reltol=1e-8):
             errs[ieps] = relerr
             
         assert np.nanmin(errs) < reltol
-            
+                

@@ -85,3 +85,13 @@ pyodide-version = "0.28.2"
 [tool.cibuildwheel.pyodide]
 # Choose a specific pyodide-build version
 dependency-versions = { packages = ["pyodide-build==0.30.7"] }
+
+[tool.cibuildwheel.windows]
+archs = ["auto64"]
+
+[tool.cibuildwheel.macos]
+archs = ["auto"]
+
+# On an Linux Intel runner with qemu installed, build Intel and ARM wheels
+[tool.cibuildwheel.linux]
+archs = ["auto"]
