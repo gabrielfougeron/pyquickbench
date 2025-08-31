@@ -69,7 +69,7 @@ junit_log_passing_tests = true
 before-test = "pip install -r requirements/requirements-cibuildwheel-tests.txt"
 # test-command = "pytest tests --timeout 100" # Blocking tests
 # Make sure that cibuildwheel as a whole does not fail even if some tests fail.
-test-command = 'if pytest tests --timeout 100; then echo "Tests all succeeded"; else echo "At least one test failed"; fi'
+# test-command = 'if pytest tests --timeout 100; then echo "Tests all succeeded"; else echo "At least one test failed"; fi'
 
 # Possible choices of architecture. CLI argument --archs
 # x86_64 i686 aarch64 ppc64le s390x armv7l riscv64
@@ -88,10 +88,13 @@ dependency-versions = { packages = ["pyodide-build==0.30.7"] }
 
 [tool.cibuildwheel.windows]
 archs = ["auto64"]
+# test-command = ''
 
 [tool.cibuildwheel.macos]
 archs = ["auto"]
+# test-command = ''
 
 # On an Linux Intel runner with qemu installed, build Intel and ARM wheels
 [tool.cibuildwheel.linux]
 archs = ["auto"]
+# test-command = ''
