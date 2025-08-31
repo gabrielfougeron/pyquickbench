@@ -68,6 +68,9 @@ def sinkhorn_knopp(
     cdef double *uptr = &u[0]
     cdef double *vptr = &v[0]
 
+    cdef double *aptr = &a[0]
+    cdef double *bptr = &b[0]
+
     cdef Py_ssize_t i_iter
     cdef Py_ssize_t  i_iter_rem = check_err_every-1
     cdef Py_ssize_t i
@@ -84,7 +87,7 @@ def sinkhorn_knopp(
 
             err = 0.
             for i in range(dim_b):
-                tmp = vptr[i] * uM[i] - b[i]
+                tmp = vptr[i] * uM[i] - bptr[i]
                 err += tmp * tmp
             err = csqrt(err)
 
@@ -92,11 +95,11 @@ def sinkhorn_knopp(
                 break
 
         for i in range(dim_b):
-            vptr[i] = b[i] / uM[i]
+            vptr[i] = bptr[i] / uM[i]
 
         scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,vptr,&int_one,&zero_double,uptr,&int_one)
         for i in range(dim_a):
-            uptr[i] = a[i] / uptr[i]
+            uptr[i] = aptr[i] / uptr[i]
 
     free(uM)
 

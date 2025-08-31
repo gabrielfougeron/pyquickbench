@@ -256,9 +256,10 @@ class FakeProgressBar(object):
     def update(self, *args):
         pass
                
-def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnExcept):
+def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup):
 
-    setup_vars_dict = _return_setup_vars_dict(setup, args)
+    if deterministic_setup:
+        setup_vars_dict = _return_setup_vars_dict(setup, args)
     n_funs = len(all_funs_list)
     vals = np.full((n_funs, n_repeat, n_out), np.nan)
     
@@ -267,10 +268,13 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
         for i_repeat in range(n_repeat):
             
             try:
-                try: # Some structure cannot easily be deepcopied, like those created with Cython.
-                    setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
-                except TypeError: 
-                    setup_vars_dict_cp = copy.copy(setup_vars_dict)
+                if deterministic_setup:
+                    try: # Some structure cannot easily be deepcopied, like those created with Cython.
+                        setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+                    except TypeError: 
+                        setup_vars_dict_cp = copy.copy(setup_vars_dict)
+                else:
+                    setup_vars_dict_cp = _return_setup_vars_dict(setup, args)
                     
                 res = fun(**setup_vars_dict_cp)
                 
@@ -280,9 +284,9 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                     else:
                         res = res.to_dict()
                 
-                if isinstance(res, float):
+                if isinstance(res, (int, float)):
                     assert n_out == 1
-                    vals[i_fun, i_repeat, :] = res
+                    vals[i_fun, i_repeat, :] = float(res)
                     
                 elif isinstance(res, np.ndarray):
                     assert res.ndim == 1

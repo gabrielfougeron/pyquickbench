@@ -86,6 +86,7 @@ from ._defaults   import all_reductions, all_plot_intents, all_transforms
 from ._time_train import TimeTrain
 
 from . import rankstats
+from . import sort
 
 # Ugly hack to define Sphinx docstrings for variables
 default_ax_name = default_ax_name

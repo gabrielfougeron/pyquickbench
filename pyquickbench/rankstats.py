@@ -5,10 +5,10 @@ import numpy as np
 from .cython.rankstats import (
     left_lehmer                     ,
     from_left_lehmer                ,
-    score_to_perm_count_inner_loop  ,
+    exhaustive_score_to_perm_count_inner_loop  ,
 )
     
-def score_to_perm_count(l):
+def exhaustive_score_to_perm_count(l, argsort):
     
     nvec = len(l)
 
@@ -29,7 +29,7 @@ def score_to_perm_count(l):
         cum_shapes[i+1] = cum_shapes[i] + shapes[i+1]
     
     u = np.concatenate(l)
-    idx_sort = np.argsort(u)
+    idx_sort = argsort(u)
     idx_sorted_to_ivec = np.searchsorted(cum_shapes, idx_sort, side='right')
 
     idx_sorted_to_ivec_compressed = []
@@ -62,9 +62,9 @@ def score_to_perm_count(l):
     for i in range(nvec):
         ivec_to_idx_sorted_compressed[i] = np.array(ivec_to_idx_sorted_compressed[i])
 
-    return score_to_perm_count_inner_loop(ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr)
+    return exhaustive_score_to_perm_count_inner_loop(ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr)
 
-def score_to_perm_count_brute_force(l):
+def exhaustive_score_to_perm_count_brute_force(l, argsort):
     
     nvec = len(l)
     fac = math.factorial(nvec)
@@ -86,13 +86,13 @@ def score_to_perm_count_brute_force(l):
         for i in range(nvec):
             vals[i] = l[i][I[i]]
         
-        perm = np.argsort(vals)
+        perm = argsort(vals)
         i = left_lehmer(perm)
         res[i] += 1
         
     return res
 
-def score_to_partial_order_count(k, l, opt = "opt"):
+def exhaustive_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort):
     
     nvec = len(l)
     nfac = math.factorial(k)
@@ -106,15 +106,23 @@ def score_to_partial_order_count(k, l, opt = "opt"):
     for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
         
         ll = [l[c] for c in comb]
-        
+
         if opt == "opt":
-            res[icomb,:] = score_to_perm_count(ll)
+            res[icomb,:] = exhaustive_score_to_perm_count(ll, argsort)
         elif opt == "brute_force":
-            res[icomb,:] = score_to_perm_count_brute_force(ll)
+            res[icomb,:] = exhaustive_score_to_perm_count_brute_force(ll, argsort)
         else:
             raise ValueError('Unknown backend')
         
     return res
+
+def score_to_partial_order_count(k, l, method = "exhaustive", argsort=np.argsort):
+    
+    if method == "exhaustive":
+        return exhaustive_score_to_partial_order_count(k, l, argsort=argsort)
+    else:
+        raise NotImplementedError
+    
 
 def find_nvec_k_from_order_count_shape(order_count, kmax=100, nvec_max = 20):
     

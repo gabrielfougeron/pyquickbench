@@ -155,7 +155,7 @@ cdef void insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept
 
         perm[j + 1] = k
 
-def score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
+def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
 
     cdef Py_ssize_t nvec = len(l)
     cdef Py_ssize_t fac = math.factorial(nvec)

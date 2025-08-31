@@ -34,18 +34,16 @@ lenlist_list = [
 ]
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
-def test_score_to_partial_order_count(lenlist):
+def test_exhaustive_score_to_partial_order_count(lenlist):
     
     nvec = len(lenlist)
     l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
 
     for k in range(1,nvec+1):
 
-        poc_opt = pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="opt")
-        # poc_bfc =  pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="brute_force_compiled")
-        poc_bf =  pyquickbench.rankstats.score_to_partial_order_count(k, l, opt="brute_force")
+        poc_opt = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="opt")
+        poc_bf =  pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="brute_force")
         
-        # assert np.array_equal(poc_opt, poc_bfc)
         assert np.array_equal(poc_opt, poc_bf )
 
 @pytest.mark.parametrize("lenlist", lenlist_list)

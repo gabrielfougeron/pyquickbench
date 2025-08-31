@@ -44,6 +44,7 @@ def run_benchmark(
     mode                    : str                       = "timings"                 ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                         = default_setup             ,
+    deterministic_setup     : bool                      = True                      ,
     n_repeat                : int                       = 1                         ,
     n_out                   : typing.Union[int, None]   = None                      ,
     nproc                   : typing.Union[int, None]   = None                      ,
@@ -78,6 +79,9 @@ def run_benchmark(
         Function that prepares the inputs for the functions to be benchmarked.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
+    deterministic_setup : :class:`python:bool`, optional\n
+        Whether the result of the setup phase is deterministic (and hence can be cached) or not.\n
+        By default :data:`python:True`.
     n_repeat : :class:`python:int`, optional
         Number of times to repeat the benchmark for variability studies.\n
         By default ``1``.
@@ -232,7 +236,7 @@ def run_benchmark(
         elif mode in ["scalar_output", "vector_output"]: 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, all_funs_list, n_repeat, n_out, StopOnExcept)
+            extra_submit_args = (setup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup)
         
         else:
                 
