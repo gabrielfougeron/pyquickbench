@@ -77,7 +77,6 @@ cdef inline void _count_inversions(Py_ssize_t n, Py_ssize_t *perm, Py_ssize_t *o
                 invcnt += 1
         out[i-1] = invcnt
 
-
 @cython.cdivision(True)
 cdef inline void _from_inversions(Py_ssize_t i, Py_ssize_t m, Py_ssize_t * digits, Py_ssize_t *perm) noexcept nogil:
 
@@ -93,7 +92,6 @@ cdef inline void _from_inversions(Py_ssize_t i, Py_ssize_t m, Py_ssize_t * digit
     for k in range(m):
         perm[k] = m - perm[k]
     perm[m] = m - perm[m]
-
 
 @cython.cdivision(True)
 cdef inline Py_ssize_t _left_lehmer(Py_ssize_t n, Py_ssize_t *perm, Py_ssize_t *digits) noexcept nogil:
@@ -118,7 +116,6 @@ cdef inline void _from_left_lehmer(Py_ssize_t i, Py_ssize_t n, Py_ssize_t * digi
     _to_factorial_base(i, m, digits)
     _from_inversions(i, m, digits, perm)
 
-
 def from_left_lehmer(Py_ssize_t i, Py_ssize_t n):
 
     cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(n-1))
@@ -135,17 +132,16 @@ ctypedef fused num_t:
     float
     double
 
-cdef void insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept nogil:
+cdef inline void _insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept nogil:
 
-    cdef Py_ssize_t i, j, k
+    cdef Py_ssize_t i, j
     cdef num_t key
 
-    for i in range(n):
-        perm[i] = i
+    perm[0] = 0
 
     for i in range(1, n):
-        k = perm[i]
-        key = arr[k]
+    
+        key = arr[i]
         j = i-1
 
         while (j >= 0  and  arr[perm[j]] > key):
@@ -153,7 +149,15 @@ cdef void insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept
             perm[j + 1] = perm[j]
             j -= 1
 
-        perm[j + 1] = k
+        perm[j + 1] = i
+
+def insertion_argsort(num_t[::1] arr):
+
+    cdef np.ndarray[Py_ssize_t, ndim=1, mode='c'] res = np.empty(arr.shape[0], dtype=np.intp)
+    
+    _insertion_argsort(arr.shape[0], &arr[0], &res[0])
+
+    return res
 
 def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
 
@@ -191,7 +195,7 @@ def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
             idx[ivec] = val
             mul *= cnt[val]
 
-        insertion_argsort(nvec, idx, perm)
+        _insertion_argsort(nvec, idx, perm)
 
         i = _left_lehmer(nvec, perm, dd)
         res[i] += mul

@@ -50,9 +50,11 @@ class CountCmp():
         return self.cmp_lt(a, b)
     
 sort_name_to_fun = {
-    "merge_sort"        : pyquickbench.sort.merge_sort        ,
-    "heap_sort"         : pyquickbench.sort.heap_sort         ,
-    "insertion_sort"    : pyquickbench.sort.insertion_sort    ,
+    "binary_insertion_sort" : pyquickbench.sort.binary_insertion_sort   ,
+    "merge_sort"            : pyquickbench.sort.merge_sort              ,
+    "heap_sort"             : pyquickbench.sort.heap_sort               ,
+    "merge_insertion_sort"  : pyquickbench.sort.merge_insertion_sort    ,
+    "quick_sort"            : pyquickbench.sort.quick_sort              ,
 }
     
 def count_inplace_sort_comparisons(arr, sortname):
@@ -75,17 +77,14 @@ bench_filename = os.path.join(timings_folder,basename+'.npz')
 
 # sphinx_gallery_end_ignore
 
-alpha_max = 20.
-n_alpha = 100
-
 all_args = {
-    "n" : np.array([n for n in range(2,100)])   ,
+    "n" : np.array([n for n in range(2,200)])   ,
     "sort" : list(sort_name_to_fun.keys())      ,
 }
 
 # %%
 
-n_repeat = 10000
+n_repeat = 1000
 
 all_vals = pyquickbench.run_benchmark(
     all_args                            ,
@@ -97,50 +96,67 @@ all_vals = pyquickbench.run_benchmark(
     StopOnExcept = True                 ,
     ShowProgress = True                 ,
     deterministic_setup = False         ,
-    # PreventBenchmark=True,
-    # ForceBenchmark = True               ,
     pooltype = "process"                ,
 )
 
-fig, ax = pyquickbench.plot_benchmark(
+plot_intent = {
+    "n"                         : 'points'          ,
+    "sort"                      : 'curve_color'     ,
+    pyquickbench.repeat_ax_name : 'reduction_avg'   ,
+}
+
+pyquickbench.plot_benchmark(
     all_vals                            ,
     all_args                            ,
     [count_inplace_sort_comparisons]    ,
-    return_empty_plot = True            ,
+    plot_intent = plot_intent           ,
+    title = "Average number of comparisons needed to sort an array"   ,
+    ylabel = "Average number of comparisons"    ,
+    xlabel = "Size of the array"        ,
+    show = True                         ,
 )
 
-# all_reductions = ["reduction_min", "reduction_max", "reduction_median", "reduction_avg"]
-# all_linestyles = ["dotted", "dashed", "dashdot", "solid"]
+relative_to_val = {"sort":"binary_insertion_sort"}
 
-all_reductions = ["reduction_avg"]
-all_linestyles = ["solid"]
+pyquickbench.plot_benchmark(
+    all_vals                            ,
+    all_args                            ,
+    [count_inplace_sort_comparisons]    ,
+    plot_intent = plot_intent           ,
+    title = "Average number of comparisons needed to sort an array"   ,
+    ylabel = "Average number of comparisons"    ,
+    xlabel = "Size of the array"        ,
+    show = True                         ,
+    relative_to_val = relative_to_val   ,
+)
 
-for (
-    reduction   ,
-    linestyle   ,
-)in zip(
-    all_reductions  ,
-    all_linestyles  ,
-):
+# %%
 
-    plot_intent = {
-        "n"                         : 'points'      ,
-        "sort"                      : 'curve_color' ,
-        pyquickbench.repeat_ax_name : reduction     ,
-    }
+plot_intent = {
+    "n"                         : 'points'          ,
+    "sort"                      : 'curve_color'     ,
+    pyquickbench.repeat_ax_name : 'reduction_max'   ,
+}
 
-    pyquickbench.plot_benchmark(
-        all_vals                            ,
-        all_args                            ,
-        [count_inplace_sort_comparisons]    ,
-        linestyle_list = linestyle          ,
-        fig = fig                           ,
-        ax = ax                             ,
-        plot_intent = plot_intent           ,
-        title = "Number of comparisons needed to sort an array"   ,
-        ylabel = ""    ,
-        xlabel = "Size of the array"        ,
-    )
+pyquickbench.plot_benchmark(
+    all_vals                            ,
+    all_args                            ,
+    [count_inplace_sort_comparisons]    ,
+    plot_intent = plot_intent           ,
+    title = "Maximum number of comparisons needed to sort an array"   ,
+    ylabel = "Max number of comparisons",
+    xlabel = "Size of the array"        ,
+    show = True                         ,
+)
 
-plt.tight_layout()
-plt.show()
+pyquickbench.plot_benchmark(
+    all_vals                            ,
+    all_args                            ,
+    [count_inplace_sort_comparisons]    ,
+    plot_intent = plot_intent           ,
+    title = "Maximum number of comparisons needed to sort an array"   ,
+    ylabel = "Max number of comparisons",
+    xlabel = "Size of the array"        ,
+    relative_to_val = relative_to_val   ,
+    show = True                         ,
+)

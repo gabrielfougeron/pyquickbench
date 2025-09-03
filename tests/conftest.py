@@ -2,6 +2,7 @@ import os
 import sys
 import pytest
 import warnings
+import functools
 import pyquickbench
 
 from pytest_timeout import _get_item_settings, SESSION_TIMEOUT_KEY # BAAAAD !!! Works wit timeout-2.3.1, might not work with other version

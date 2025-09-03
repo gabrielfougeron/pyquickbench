@@ -71,8 +71,6 @@ jobs:
   gather-dists:
     runs-on: ubuntu-latest
     needs: build_wheels
-    env:
-      python-version-source: "ubuntu-latest-3.11"
     if: success() || failure()
     steps:
 

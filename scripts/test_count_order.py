@@ -12,78 +12,30 @@ TT = pyquickbench.TimeTrain(names_reduction='avg', include_locs=False)
 
 # np.random.seed(seed=0)
 
-nvec = 4
-n = 10
+nvec = 2
+n = 400
 lenlist = [n] * nvec
 # lenlist = [5, 20, 50, 100]
 
-# poc_opt = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_order_count, opt = "opt"), name="poc_opt")
-# poc_bfc = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_order_count, opt = "brute_force_compiled"), name="poc_bfc")
-# poc_bf = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_order_count, opt = "brute_force"), name="poc_bf")
-
-# print(lenlist)
+poc_opt = TT.tictoc(functools.partial(pyquickbench.rankstats.exhaustive_score_to_partial_order_count, opt="opt"), name="poc_opt")
+poc_bf_np = TT.tictoc(functools.partial(pyquickbench.rankstats.exhaustive_score_to_partial_order_count, argsort=np.argsort, opt="brute_force"), name="poc_bf_np")
+poc_bf_pqb = TT.tictoc(functools.partial(pyquickbench.rankstats.exhaustive_score_to_partial_order_count, argsort=pyquickbench.cython.rankstats.insertion_argsort, opt="brute_force"), name="poc_bf_pqb")
 
 d = 0.0
 l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
 
+k = nvec
 
+n_repeat = 1
+for i_repeat in range(n_repeat):
+    res_opt = poc_opt(k, l)
+    res_bf_np = poc_bf_np(k, l)
+    res_bf_pqb = poc_bf_pqb(k, l)
 
-moy = np.array([np.mean(l[ivec]) for ivec in range(nvec)])
-med = np.array([np.median(l[ivec]) for ivec in range(nvec)])
+# print(res_opt)
+# print(res_binary)
 
-# print(moy)
+assert np.array_equal(res_opt, res_bf_np)
+assert np.array_equal(res_opt, res_bf_pqb)
 
-# print(moy)
-print(np.argsort(moy))
-
-# print()
-# print(med)
-print(np.argsort(med))
-# print(np.argsort(log_v))
-# print()
-
-for method in [
-    'sinkhorn'  ,
-    'sinkhorn_log'  ,
-    'greenkhorn'    ,
-    # 'sinkhorn_stabilized'   ,
-    # 'sinkhorn_epsilon_scaling'   ,
-]:
-
-    print()
-    print(f'{method = }')
-
-    for k in range(2,3):
-    # for k in range(2,nvec+1):
-        
-        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-
-        M, log = ot.bregman.sinkhorn(
-            p,
-            q,
-            -np.log(A),
-            reg = 1. ,
-            method=method,
-            numItermax=1000000,
-            stopThr=1e-13,
-            verbose=False,
-            log=True,
-            warn=False,
-            warmstart=None,
-        )
-
-        u = log['u']
-        v = log['v']
-        Ah = np.einsum('i,ij,j->ij', u, A, v)
-        
-        print(np.linalg.norm(M-Ah))
-        print(np.linalg.norm(p-np.sum(Ah,axis=1)))
-        print(np.linalg.norm(q-np.sum(Ah,axis=0)))
-
-        log_v = np.log(v)
-        log_v -= np.sum(log_v) / log_v.shape[0]
-
-        # print("sin", k, np.argsort(log_v))
-        
-        print(f'{log_v = }')
+print(TT)

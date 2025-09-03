@@ -23,7 +23,8 @@ def sinkhorn_knopp(
     double[::1] a                   ,
     double[::1] b                   ,
     double[:,::1] M                 ,
-    # reg                 ,
+    double reg_alpham1 = 0.         ,
+    double reg_beta = 0.            ,
     Py_ssize_t numItermax = 1000    ,
     Py_ssize_t check_err_every = 100,
     double stopThr = 1e-9           ,
@@ -32,21 +33,17 @@ def sinkhorn_knopp(
 
     r"""
 
+    Regularized Sinkhorn-Knopp algorithm with Gamma(alpha, beta) prior.
 
-    cf POT
+    cf
 
-    @article{flamary2021pot,
-    author  = {R{\'e}mi Flamary and Nicolas Courty and Alexandre Gramfort and Mokhtar Z. Alaya and Aur{\'e}lie Boisbunon and Stanislas Chambon and Laetitia Chapel and Adrien Corenflos and Kilian Fatras and Nemo Fournier and L{\'e}o Gautheron and Nathalie T.H. Gayraud and Hicham Janati and Alain Rakotomamonjy and Ievgen Redko and Antoine Rolet and Antony Schutz and Vivien Seguy and Danica J. Sutherland and Romain Tavenard and Alexander Tong and Titouan Vayer},
-    title   = {POT: Python Optimal Transport},
-    journal = {Journal of Machine Learning Research},
-    year    = {2021},
-    volume  = {22},
-    number  = {78},
-    pages   = {1-8},
-    url     = {http://jmlr.org/papers/v22/20-451.html}
+    @article{qu2025sinkhorn,
+    title={On sinkhorn{\'}s algorithm and choice modeling},
+    author={Qu, Zhaonan and Galichon, Alfred and Gao, Wenzhi and Ugander, Johan},
+    journal={Operations Research},
+    year={2025},
+    publisher={INFORMS}
     }
-
-
 
     """
 
@@ -87,7 +84,7 @@ def sinkhorn_knopp(
 
             err = 0.
             for i in range(dim_b):
-                tmp = vptr[i] * uM[i] - bptr[i]
+                tmp = vptr[i] * (uM[i] + reg_beta) - (bptr[i] + reg_alpham1)
                 err += tmp * tmp
             err = csqrt(err)
 
@@ -95,7 +92,7 @@ def sinkhorn_knopp(
                 break
 
         for i in range(dim_b):
-            vptr[i] = bptr[i] / uM[i]
+            vptr[i] = (bptr[i] + reg_alpham1) / (uM[i] + reg_beta)
 
         scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,vptr,&int_one,&zero_double,uptr,&int_one)
         for i in range(dim_a):

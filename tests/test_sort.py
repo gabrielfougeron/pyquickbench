@@ -13,9 +13,12 @@ import pyquickbench
 n_list = [10, 100, 1000]
 
 pyquick_bench_sort_list = [
-    pyquickbench.sort.merge_sort        ,
-    pyquickbench.sort.heap_sort         ,
-    pyquickbench.sort.insertion_sort    ,
+    pyquickbench.sort.merge_sort            ,
+    pyquickbench.sort.heap_sort             ,
+    pyquickbench.sort.insertion_sort        ,
+    pyquickbench.sort.merge_insertion_sort  ,
+    pyquickbench.sort.quick_sort            ,
+    pyquickbench.sort.binary_insertion_sort ,
 ]
 
 @pytest.mark.parametrize("n", n_list)

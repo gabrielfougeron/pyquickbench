@@ -3,12 +3,12 @@ import math
 import numpy as np
 
 from .cython.rankstats import (
-    left_lehmer                     ,
-    from_left_lehmer                ,
-    exhaustive_score_to_perm_count_inner_loop  ,
+    left_lehmer                                 ,
+    from_left_lehmer                            ,
+    exhaustive_score_to_perm_count_inner_loop   ,
 )
     
-def exhaustive_score_to_perm_count(l, argsort):
+def exhaustive_score_to_perm_count(l):
     
     nvec = len(l)
 
@@ -29,7 +29,7 @@ def exhaustive_score_to_perm_count(l, argsort):
         cum_shapes[i+1] = cum_shapes[i] + shapes[i+1]
     
     u = np.concatenate(l)
-    idx_sort = argsort(u)
+    idx_sort = np.argsort(u)
     idx_sorted_to_ivec = np.searchsorted(cum_shapes, idx_sort, side='right')
 
     idx_sorted_to_ivec_compressed = []
@@ -108,7 +108,7 @@ def exhaustive_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort)
         ll = [l[c] for c in comb]
 
         if opt == "opt":
-            res[icomb,:] = exhaustive_score_to_perm_count(ll, argsort)
+            res[icomb,:] = exhaustive_score_to_perm_count(ll)
         elif opt == "brute_force":
             res[icomb,:] = exhaustive_score_to_perm_count_brute_force(ll, argsort)
         else:
@@ -116,10 +116,66 @@ def exhaustive_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort)
         
     return res
 
+# def montecarlo_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort):
+#     
+#     nvec = len(l)
+#     nfac = math.factorial(k)
+#     ncomb = math.comb(nvec, k)
+# 
+#     if np.iinfo(np.intp).max < nfac:
+#         raise ValueError("Too many vectors")
+# 
+#     res = np.zeros((ncomb, nfac), dtype=np.intp)    
+#     
+#     for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+#         
+#         ll = [l[c] for c in comb]
+# 
+# 
+# 
+# 
+#     nvec = len(l)
+#     fac = math.factorial(nvec)
+# 
+#     prod = 1
+#     for i in range(nvec):
+#         prod *= l[i].shape[0]
+# 
+#     if np.iinfo(np.intp).max < prod:
+#         raise ValueError("Too many observations in vectors")
+#     
+#     res = np.zeros(fac, dtype=np.intp)   
+#     vals = np.empty(nvec, dtype=np.float64)
+#     
+#     ranges = [range(l[i].shape[0]) for i in range(nvec)]
+#     
+#     for I in itertools.product(*ranges):
+#         
+#         for i in range(nvec):
+#             vals[i] = l[i][I[i]]
+#         
+#         perm = argsort(vals)
+#         i = left_lehmer(perm)
+#         res[i] += 1
+#         
+#     return res
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+#         
+#     return res
+
 def score_to_partial_order_count(k, l, method = "exhaustive", argsort=np.argsort):
     
     if method == "exhaustive":
         return exhaustive_score_to_partial_order_count(k, l, argsort=argsort)
+    # elif method == "montecarlo":
+    #     return montecarlo_score_to_partial_order_count(k, l, argsort=argsort)
     else:
         raise NotImplementedError
     

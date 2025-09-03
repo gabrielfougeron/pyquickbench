@@ -33,6 +33,10 @@ lenlist_list = [
     [10,20,30,35]   ,
 ]
 
+lenlist_illcond_list = [
+    [2,3,4,5]   ,
+]
+
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_exhaustive_score_to_partial_order_count(lenlist):
     
@@ -64,6 +68,34 @@ def test_sinkhorn_solver(lenlist, reltol=1e-8):
         
         assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
         assert np.linalg.norm(q-np.dot(u,A)*v) < reltol
+        
+        assert np.all(p >= 0)
+        assert np.all(q >= 0)
+
+@pytest.mark.parametrize("lenlist", lenlist_illcond_list)
+def test_sinkhorn_solver_illcond(lenlist, reltol=1e-8):
+
+    reg_alpham1 = 0.00001
+    reg_beta = 0.00001
+
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    for k in range(2,nvec+1):
+        
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        
+        u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+            p, q, A,
+            reg_alpham1 = reg_alpham1   ,
+            numItermax = 1000000        ,
+            reg_beta = reg_beta         ,
+            stopThr = 1e-13             ,
+        )
+        
+        assert np.linalg.norm(p-u*np.dot(A,v)) < reltol
+        assert np.linalg.norm((q+reg_alpham1)-(np.dot(u,A)+reg_beta)*v) < reltol
         
         assert np.all(p >= 0)
         assert np.all(q >= 0)
@@ -121,7 +153,6 @@ def test_luce_gradient(lenlist, reltol=1e-8):
                 p+eps*dp                ,
                 q+eps*dq                ,
                 A                       ,
-                # reg = 1.                ,
                 numItermax = 1000000    ,
                 stopThr = 1e-13         ,
             )
@@ -140,7 +171,6 @@ def test_luce_gradient(lenlist, reltol=1e-8):
                 p-eps*dp                ,
                 q-eps*dq                ,
                 A                       ,
-                # reg = 1.                ,
                 numItermax = 1000000    ,
                 stopThr = 1e-13         ,
             )
