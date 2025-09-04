@@ -117,7 +117,7 @@ def exhaustive_score_to_partial_order_count(k, l, opt="opt"):
         
     return res
 
-def montecarlo_score_to_partial_order_count(k, l, nmc = 1000):
+def montecarlo_score_to_partial_order_count(k, l, nmc = 1000, nrand_max = 10000):
     
     nvec = len(l)
     nfac = math.factorial(k)
@@ -139,21 +139,20 @@ def montecarlo_score_to_partial_order_count(k, l, nmc = 1000):
         if nobs_tot <= nmc :
             res[icomb,:] = exhaustive_score_to_perm_count(ll)
         else:
-            res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc)
+            res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
 
     return res
 
-def score_to_partial_order_count(k, l, method = "exhaustive", nmc = 1000):
+def score_to_partial_order_count(k, l, method = "exhaustive", nmc = 1000, nrand_max = 10000):
     
     if method == "exhaustive":
         return exhaustive_score_to_partial_order_count(k, l)
     elif method == "montecarlo":
-        return montecarlo_score_to_partial_order_count(k, l, nmc = nmc)
+        return montecarlo_score_to_partial_order_count(k, l, nmc = nmc, nrand_max = nrand_max)
     else:
         raise NotImplementedError
     
-
-def find_nvec_k_from_order_count_shape(order_count, kmax=100, nvec_max = 20):
+def find_nvec_k_from_order_count_shape(order_count, kmax = 100, nvec_max = 100):
     
     # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
     

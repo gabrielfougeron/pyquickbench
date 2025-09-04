@@ -216,7 +216,7 @@ def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
     
     return np.asarray(res)
 
-def montecarlo_score_to_perm_count(list l, num_t key, Py_ssize_t nmc = 1000):
+def montecarlo_score_to_perm_count(list l, num_t key, Py_ssize_t nmc = 1000, Py_ssize_t nrand_max = 10000):
 
     cdef Py_ssize_t nvec = len(l)
     cdef Py_ssize_t fac = math.factorial(nvec)
@@ -227,14 +227,8 @@ def montecarlo_score_to_perm_count(list l, num_t key, Py_ssize_t nmc = 1000):
     cdef Py_ssize_t ivec, it, val
 
     cdef Py_ssize_t **idx_all = <Py_ssize_t**> malloc(sizeof(Py_ssize_t*)*nvec)
-    idx_all_list = []
-    for ivec in range(nvec):
-        tmp_intp = np.random.randint(l[ivec].shape[0], size = nmc, dtype=np.intp)
-        idx_all_list.append(tmp_intp)
-        idx_all[ivec] = &tmp_intp[0]
-
+    
     cdef num_t **ivec_to_idx_ptr = <num_t**> malloc(sizeof(num_t*)*nvec)
-
     cdef num_t[::1] tmp
     for ivec in range(nvec):
         tmp = l[ivec]
@@ -244,15 +238,29 @@ def montecarlo_score_to_perm_count(list l, num_t key, Py_ssize_t nmc = 1000):
     cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
     cdef num_t *idx = <num_t*> malloc(sizeof(num_t)*nvec)
 
-    for it in range(nmc):
+    cdef Py_ssize_t nit
+    cdef Py_ssize_t nmc_rem = nmc
 
+    while nmc_rem > 0 :
+
+        nit = min(nrand_max, nmc_rem)
+        nmc_rem -= nit
+
+        idx_all_list = []
         for ivec in range(nvec):
-            idx[ivec] = ivec_to_idx_ptr[ivec][idx_all[ivec][it]]
+            tmp_intp = np.random.randint(l[ivec].shape[0], size = nit, dtype=np.intp)
+            idx_all_list.append(tmp_intp)
+            idx_all[ivec] = &tmp_intp[0]
 
-        _insertion_argsort(nvec, idx, perm)
+        for it in range(nit):
 
-        i = _left_lehmer(nvec, perm, dd)
-        res[i] += 1
+            for ivec in range(nvec):
+                idx[ivec] = ivec_to_idx_ptr[ivec][idx_all[ivec][it]]
+
+            _insertion_argsort(nvec, idx, perm)
+
+            i = _left_lehmer(nvec, perm, dd)
+            res[i] += 1
 
     free(idx_all)
     free(ivec_to_idx_ptr)
