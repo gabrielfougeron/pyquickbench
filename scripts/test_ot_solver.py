@@ -20,7 +20,7 @@ nvec = 4
 # n = 1000
 # lenlist = [n] * nvec
 # lenlist = [10, 10, 10]
-lenlist = [20,30,50,70]
+lenlist = [2,3,5,7]
 n_repeat = 1000
 
 
@@ -38,6 +38,8 @@ methods = [
     # 'sinkhorn_epsilon_scaling',
 ]
 
+stopThr = 1e-6
+neq = 0
 for i_repeat in range(n_repeat):
 # for i_repeat in [8]:
     
@@ -69,7 +71,7 @@ for i_repeat in range(n_repeat):
 
     for k in range(2,nvec+1):
 
-    
+        print()
         print(f'{k = }')    
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
@@ -80,48 +82,54 @@ for i_repeat in range(n_repeat):
         
         n = nsets+nopts
 
-        for method in methods:
-
-            TT.toc("start")
-            M, log = ot.bregman.sinkhorn(
-                p                   ,
-                q                   ,
-                -np.log(A)          ,
-                reg = 1.            ,
-                method=method       ,
-                numItermax=1000  ,
-                stopThr=1e-13       ,
-                verbose=False       ,
-                log=True            ,
-                warn=False          ,
-                warmstart=None      ,
-            )
-            TT.toc(f"POT-{method}")
-            
-
-#             uot = log['u']
-#             vot = log['v']
-# 
-#             print(f"vot {method} err ", np.linalg.norm(p-uot*np.dot(A,vot)))
-#             print(f"uot {method} err ", np.linalg.norm(q-np.dot(uot,A)*vot))
-
         TT.toc("start")
-        ucy, vcy = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+        u_noreg, v_noreg = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
             p                   ,
             q                   ,
             A                   ,
             # reg = 1.            ,
-            numItermax=1000  ,
-            stopThr=1e-13       ,
+            numItermax=10000000  ,
+            stopThr=stopThr       ,
             warmstart=None      ,
         )
-        TT.toc("Cython")
+        TT.toc("Cython noreg")
         
-        # print("vcy err ", np.linalg.norm(p-ucy*np.dot(A,vcy)))
-        # print("ucy err ", np.linalg.norm(q-np.dot(ucy,A)*vcy))        
-        # 
+        # print("u_noreg err ", np.linalg.norm(p-u_noreg*np.dot(A,v_noreg)))
+        # print("v_noreg err ", np.linalg.norm(q-np.dot(u_noreg,A)*v_noreg))  
+        
+        reg_alpham1 = 1e-4
+        reg_beta = 1.e-4
+        
+        TT.toc("start")
+        u_reg, v_reg = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+            p                           ,
+            q                           ,
+            A                           ,
+            reg_alpham1 = reg_alpham1   ,
+            reg_beta = reg_beta         ,
+            numItermax=10000000           ,
+            stopThr=stopThr               ,
+            warmstart=None              ,
+        )
+        TT.toc("Cython reg")
+        
+        # print("u_reg err ", np.linalg.norm(p-u_reg*np.dot(A,v_reg)))
+        # print("v_reg err ", np.linalg.norm(q-np.dot(u_reg,A)*v_reg))        
+        # print("v_reg err ", np.linalg.norm((q+reg_alpham1)-(np.dot(u_reg,A)+reg_beta)*v_reg))        
+        
         # assert np.linalg.norm(p-ucy*np.dot(A,vcy)) < 1e-13
         # assert np.linalg.norm(q-np.dot(ucy,A)*vcy) < 1e-13
         
-    
+        # print(np.argsort(v_noreg))
+        # print(np.argsort(v_reg))
+        
+        if np.array_equal(np.argsort(v_noreg), np.argsort(v_reg)):
+            neq += 1
+        
+print()
+print()
+print()
+print(f'{neq} / {(nvec-1)*n_repeat}')
+print()
+
 print(TT)

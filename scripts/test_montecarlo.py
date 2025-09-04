@@ -24,7 +24,7 @@ poc_mc = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_ord
 
 order_th = np.array(range(nvec))
 
-d = 0.01
+d = -0.1
 k = 2
 
 n_th_OK = 0
@@ -50,7 +50,7 @@ for i_repeat in range(n_repeat):
     if np.array_equal(order_exh, order_mc):
         n_mc_OK += 1
         
-
+    print(order_exh)
     
 print(f'{n_th_OK = } / {n_repeat}')
 print(f'{n_mc_OK = } / {n_repeat}')

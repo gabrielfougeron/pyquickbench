@@ -20,9 +20,9 @@ cdef double minusone_double = -1.
 
 @cython.cdivision(True)
 def sinkhorn_knopp(
+    double[:,::1] M                 ,
     double[::1] a                   ,
     double[::1] b                   ,
-    double[:,::1] M                 ,
     double reg_alpham1 = 0.         ,
     double reg_beta = 0.            ,
     Py_ssize_t numItermax = 1000    ,

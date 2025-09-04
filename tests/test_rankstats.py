@@ -48,7 +48,7 @@ def test_exhaustive_score_to_partial_order_count(lenlist):
         poc_opt = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="opt")
         poc_bf =  pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="brute_force")
         
-        assert np.array_equal(poc_opt, poc_bf )
+        assert np.array_equal(poc_opt, poc_bf)
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):
@@ -62,7 +62,7 @@ def test_sinkhorn_solver(lenlist, reltol=1e-8):
         A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
         
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-            p, q, A,
+            A, p, q,
             stopThr = 1e-13 ,
         )
         
@@ -87,7 +87,7 @@ def test_sinkhorn_solver_illcond(lenlist, reltol=1e-8):
         A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
         
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-            p, q, A,
+            A, p, q,
             reg_alpham1 = reg_alpham1   ,
             numItermax = 1000000        ,
             reg_beta = reg_beta         ,
@@ -118,7 +118,7 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         n = nsets+nopts
 
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
-            p, q, A,
+            A, p, q,
             stopThr = 1e-13 ,
         )
 
@@ -150,9 +150,9 @@ def test_luce_gradient(lenlist, reltol=1e-8):
             eps = 10**(start_exp-ieps)
             
             up, vp = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+                A                       ,
                 p+eps*dp                ,
                 q+eps*dq                ,
-                A                       ,
                 numItermax = 1000000    ,
                 stopThr = 1e-13         ,
             )
@@ -168,9 +168,9 @@ def test_luce_gradient(lenlist, reltol=1e-8):
             log_up += dd
 
             um, vm = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+                A                       ,
                 p-eps*dp                ,
                 q-eps*dq                ,
-                A                       ,
                 numItermax = 1000000    ,
                 stopThr = 1e-13         ,
             )

@@ -6,6 +6,7 @@ from .cython.rankstats import (
     left_lehmer                                 ,
     from_left_lehmer                            ,
     exhaustive_score_to_perm_count_inner_loop   ,
+    montecarlo_score_to_perm_count              ,
 )
     
 def exhaustive_score_to_perm_count(l):
@@ -64,7 +65,7 @@ def exhaustive_score_to_perm_count(l):
 
     return exhaustive_score_to_perm_count_inner_loop(ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr)
 
-def exhaustive_score_to_perm_count_brute_force(l, argsort):
+def exhaustive_score_to_perm_count_brute_force(l):
     
     nvec = len(l)
     fac = math.factorial(nvec)
@@ -86,13 +87,13 @@ def exhaustive_score_to_perm_count_brute_force(l, argsort):
         for i in range(nvec):
             vals[i] = l[i][I[i]]
         
-        perm = argsort(vals)
+        perm = np.argsort(vals)
         i = left_lehmer(perm)
         res[i] += 1
         
     return res
 
-def exhaustive_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort):
+def exhaustive_score_to_partial_order_count(k, l, opt="opt"):
     
     nvec = len(l)
     nfac = math.factorial(k)
@@ -110,72 +111,44 @@ def exhaustive_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort)
         if opt == "opt":
             res[icomb,:] = exhaustive_score_to_perm_count(ll)
         elif opt == "brute_force":
-            res[icomb,:] = exhaustive_score_to_perm_count_brute_force(ll, argsort)
+            res[icomb,:] = exhaustive_score_to_perm_count_brute_force(ll)
         else:
             raise ValueError('Unknown backend')
         
     return res
 
-# def montecarlo_score_to_partial_order_count(k, l, opt="opt", argsort=np.argsort):
-#     
-#     nvec = len(l)
-#     nfac = math.factorial(k)
-#     ncomb = math.comb(nvec, k)
-# 
-#     if np.iinfo(np.intp).max < nfac:
-#         raise ValueError("Too many vectors")
-# 
-#     res = np.zeros((ncomb, nfac), dtype=np.intp)    
-#     
-#     for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
-#         
-#         ll = [l[c] for c in comb]
-# 
-# 
-# 
-# 
-#     nvec = len(l)
-#     fac = math.factorial(nvec)
-# 
-#     prod = 1
-#     for i in range(nvec):
-#         prod *= l[i].shape[0]
-# 
-#     if np.iinfo(np.intp).max < prod:
-#         raise ValueError("Too many observations in vectors")
-#     
-#     res = np.zeros(fac, dtype=np.intp)   
-#     vals = np.empty(nvec, dtype=np.float64)
-#     
-#     ranges = [range(l[i].shape[0]) for i in range(nvec)]
-#     
-#     for I in itertools.product(*ranges):
-#         
-#         for i in range(nvec):
-#             vals[i] = l[i][I[i]]
-#         
-#         perm = argsort(vals)
-#         i = left_lehmer(perm)
-#         res[i] += 1
-#         
-#     return res
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-#         
-#     return res
+def montecarlo_score_to_partial_order_count(k, l, nmc = 1000):
+    
+    nvec = len(l)
+    nfac = math.factorial(k)
+    ncomb = math.comb(nvec, k)
 
-def score_to_partial_order_count(k, l, method = "exhaustive", argsort=np.argsort):
+    if np.iinfo(np.intp).max < nfac:
+        raise ValueError("Too many vectors")
+
+    res = np.zeros((ncomb, nfac), dtype=np.intp)  
+    
+    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+        
+        ll = [l[c] for c in comb]
+
+        nobs_tot = 1
+        for i in range(nvec):
+            nobs_tot *= l[i].shape[0]
+            
+        if nobs_tot <= nmc :
+            res[icomb,:] = exhaustive_score_to_perm_count(ll)
+        else:
+            res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc)
+
+    return res
+
+def score_to_partial_order_count(k, l, method = "exhaustive", nmc = 1000):
     
     if method == "exhaustive":
-        return exhaustive_score_to_partial_order_count(k, l, argsort=argsort)
-    # elif method == "montecarlo":
-    #     return montecarlo_score_to_partial_order_count(k, l, argsort=argsort)
+        return exhaustive_score_to_partial_order_count(k, l)
+    elif method == "montecarlo":
+        return montecarlo_score_to_partial_order_count(k, l, nmc = nmc)
     else:
         raise NotImplementedError
     
