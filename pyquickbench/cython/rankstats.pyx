@@ -127,6 +127,43 @@ def from_left_lehmer(Py_ssize_t i, Py_ssize_t n):
 
     return res
 
+cdef inline Py_ssize_t _rank_combination(Py_ssize_t[::1] comb, Py_ssize_t n, Py_ssize_t k) noexcept nogil:
+
+    cdef Py_ssize_t i
+    cdef Py_ssize_t res = _binomial(n, k) - 1
+
+    for i in range(k):
+        res -= _binomial(n-1-comb[i], k-i)
+
+    return res
+
+def rank_combination(Py_ssize_t[::1] comb, Py_ssize_t n, Py_ssize_t k):
+    return _rank_combination(comb, n, k)
+
+cdef inline void _unrank_combination(Py_ssize_t r, Py_ssize_t n, Py_ssize_t k, Py_ssize_t *res) noexcept nogil:
+
+    cdef Py_ssize_t restRank = _binomial(n, k) - 1 - r
+    cdef Py_ssize_t onesLeft = k
+    cdef Py_ssize_t binoVal
+
+    for j in range(n):
+
+        binoVal = _binomial(n-1-j, onesLeft)
+
+        if restRank >= binoVal:
+
+            res[k-onesLeft] = j
+            onesLeft -= 1
+            restRank -= binoVal
+
+def unrank_combination(Py_ssize_t r, Py_ssize_t n, Py_ssize_t k):
+
+    cdef np.ndarray[Py_ssize_t, ndim=1, mode='c'] res = np.empty(k, dtype=np.intp)
+
+    _unrank_combination(r, n, k, &res[0])
+
+    return res
+
 ctypedef fused num_t:
     Py_ssize_t
     float

@@ -5,6 +5,9 @@ import numpy as np
 from .cython.rankstats import (
     left_lehmer                                 ,
     from_left_lehmer                            ,
+    rank_combination                            ,
+    unrank_combination                          ,
+    exhaustive_score_to_perm_count_inner_loop   ,
     exhaustive_score_to_perm_count_inner_loop   ,
     montecarlo_score_to_perm_count              ,
 )
@@ -273,6 +276,37 @@ def condorcet_top_order(order_count, minimize=False):
 #         
 #     return res
 
+def fuse_score_to_partial_order_count(order_count, idx_fused):
+    
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    nfuse = len(idx_fused)
+    
+    ncomb = order_count.shape[0]
+    nfac = order_count.shape[1]
+    ncombfuse = math.comb(nfuse, k)
+
+    res = np.zeros((ncombfuse, nfac), dtype=np.intp)  
+    
+    ivec_to_idx_fused = np.empty(nvec, dtype=np.intp)
+    
+    for ifuse, idx in enumerate(idx_fused):
+        ivec_to_idx_fused[idx] = ifuse
+    
+    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+        
+        combfuse = [ivec_to_idx_fused[c] for c in comb]
+        combfuse_unique = np.unique(combfuse)
+        if combfuse_unique.shape[0] < k:
+            continue
+        
+        fuse_perm = np.argsort(combfuse)
+        
+
+
+
+    
+    
+    return res
 
 def build_sinkhorn_problem(order_count, minimize=False):
     

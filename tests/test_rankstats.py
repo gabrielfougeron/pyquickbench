@@ -6,6 +6,7 @@ sys.path.append(__PROJECT_ROOT__)
 
 import pytest
 import warnings
+import itertools
 from test_config import *
 
 import numpy as np
@@ -26,6 +27,24 @@ def test_factorial_base():
         ii == pyquickbench.cython.rankstats.left_lehmer(perm)
         
         assert i == ii
+
+def test_unrank_combinations():
+
+    nmax = 10
+    
+    for n in range(2,nmax+1):
+        
+        for k in range(2,n+1):
+
+            for icomb, comb in enumerate(itertools.combinations(range(n), k)):
+                
+                cpt_icomb = pyquickbench.rankstats.rank_combination(np.array(comb), n, k)
+                assert icomb == cpt_icomb    
+                
+                cpt_comb = pyquickbench.rankstats.unrank_combination(icomb, n, k)
+                
+                for i in range(k):
+                    assert cpt_comb[i] == comb[i]
 
 lenlist_list = [
     [100]           ,
@@ -49,6 +68,32 @@ def test_exhaustive_score_to_partial_order_count(lenlist):
         poc_bf =  pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="brute_force")
         
         assert np.array_equal(poc_opt, poc_bf)
+
+def test_fuse_score_to_partial_count():
+    
+    nvec = 10
+    n = 10
+    l = [np.random.random(n) for ivec in range(nvec)]
+    
+    nfuse = 3
+    l_fused = [None]*nfuse
+    idx_fused = [[]]*nfuse
+
+    for ivec in range(nvec):
+        ifuse = np.random.randint(nfuse)
+        
+        idx_fused[ifuse].append(ivec)
+        
+        if l_fused[ifuse] is None:
+            l_fused[ifuse] = l[ivec]
+        else:
+            l_fused[ifuse] = np.concatenate((l_fused[ifuse], l[ivec]))
+        
+    for k in range(2,nfuse+1):
+        
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        order_count_fused = pyquickbench.rankstats.score_to_partial_order_count(k, l_fused)
+
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):
