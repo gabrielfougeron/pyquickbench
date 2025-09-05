@@ -186,6 +186,68 @@ def find_nvec_k_from_order_count_shape(order_count, kmax = 100, nvec_max = 100):
     
     return nvec, k
 
+def fuse_score_to_partial_order_count(order_count, idx_fused):
+    
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    nfuse = len(idx_fused)
+    
+    ncomb = order_count.shape[0]
+    nfac = order_count.shape[1]
+    ncombfuse = math.comb(nfuse, k)
+
+    res = np.zeros((ncombfuse, nfac), dtype=np.intp)  
+    
+    ivec_to_idx_fused = np.full(nvec, -1, dtype=np.intp)
+    
+    for ifuse, idx in enumerate(idx_fused):
+        for i in idx:
+            ivec_to_idx_fused[i] = ifuse
+        
+    combfuse_unsorted = np.empty(k, dtype=np.intp)
+    combfuse = np.empty(k, dtype=np.intp)
+    permfuse = np.empty(k, dtype=np.intp)
+    invfuse_perm_sort = np.empty(k, dtype=np.intp)
+
+    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+
+        for i in range(k):
+            combfuse_unsorted[i] = ivec_to_idx_fused[comb[i]]
+            
+        fuse_perm_sort = np.argsort(combfuse_unsorted)
+        for i in range(k):
+            invfuse_perm_sort[fuse_perm_sort[i]] = i
+
+        if combfuse_unsorted[fuse_perm_sort[0]] < 0:
+            continue
+        
+        for i in range(k):
+            combfuse[i] = combfuse_unsorted[fuse_perm_sort[i]]
+            
+        for i in range(k-1):
+            if  combfuse[i+1] == combfuse[i]:
+                HasRepeatedEl = True
+                break
+        else:
+            HasRepeatedEl = False
+            
+        if HasRepeatedEl:
+            continue
+
+        icombfuse = rank_combination(combfuse, nfuse, k)
+        
+        for iperm in range(nfac):
+            
+            perm = from_left_lehmer(iperm, k)
+            
+            for i in range(k):
+                permfuse[i] = invfuse_perm_sort[perm[i]]
+            
+            ipermfuse = left_lehmer(permfuse)
+
+            res[icombfuse, ipermfuse] += order_count[icomb, iperm]
+
+    return res
+
 def condorcet_top_order(order_count, minimize=False):
     
     nvec, k = find_nvec_k_from_order_count_shape(order_count)
@@ -275,38 +337,6 @@ def condorcet_top_order(order_count, minimize=False):
 #         res[0] = available_options.pop()
 #         
 #     return res
-
-def fuse_score_to_partial_order_count(order_count, idx_fused):
-    
-    nvec, k = find_nvec_k_from_order_count_shape(order_count)
-    nfuse = len(idx_fused)
-    
-    ncomb = order_count.shape[0]
-    nfac = order_count.shape[1]
-    ncombfuse = math.comb(nfuse, k)
-
-    res = np.zeros((ncombfuse, nfac), dtype=np.intp)  
-    
-    ivec_to_idx_fused = np.empty(nvec, dtype=np.intp)
-    
-    for ifuse, idx in enumerate(idx_fused):
-        ivec_to_idx_fused[idx] = ifuse
-    
-    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
-        
-        combfuse = [ivec_to_idx_fused[c] for c in comb]
-        combfuse_unique = np.unique(combfuse)
-        if combfuse_unique.shape[0] < k:
-            continue
-        
-        fuse_perm = np.argsort(combfuse)
-        
-
-
-
-    
-    
-    return res
 
 def build_sinkhorn_problem(order_count, minimize=False):
     

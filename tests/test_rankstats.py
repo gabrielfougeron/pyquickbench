@@ -12,6 +12,16 @@ from test_config import *
 import numpy as np
 import pyquickbench
 
+lenlist_list = [
+    [100]           ,
+    [10]*3          ,
+    [10,20,30,35]   ,
+]
+
+lenlist_illcond_list = [
+    [2,3,4,5]   ,
+]
+
 def test_factorial_base():
     
     n = 10
@@ -46,16 +56,6 @@ def test_unrank_combinations():
                 for i in range(k):
                     assert cpt_comb[i] == comb[i]
 
-lenlist_list = [
-    [100]           ,
-    [10]*3          ,
-    [10,20,30,35]   ,
-]
-
-lenlist_illcond_list = [
-    [2,3,4,5]   ,
-]
-
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_exhaustive_score_to_partial_order_count(lenlist):
     
@@ -72,28 +72,35 @@ def test_exhaustive_score_to_partial_order_count(lenlist):
 def test_fuse_score_to_partial_count():
     
     nvec = 10
-    n = 10
-    l = [np.random.random(n) for ivec in range(nvec)]
+    nobs = 15
+    l = [np.random.random(np.random.randint(nobs//2, nobs)) for ivec in range(nvec)]
     
-    nfuse = 3
-    l_fused = [None]*nfuse
-    idx_fused = [[]]*nfuse
+    nfuse = 4
+    l_fused = []
+    idx_fused = [[] for ifuse in range(nfuse)]
+    
+    n_missing = 2
+    
+    for ifuse in range(nfuse):
+        ivec = ifuse
+        
+        idx_fused[ifuse].append(ivec)
+        l_fused.append(l[ivec])
 
-    for ivec in range(nvec):
+    for ivec in range(nfuse, nvec-n_missing):
         ifuse = np.random.randint(nfuse)
         
         idx_fused[ifuse].append(ivec)
-        
-        if l_fused[ifuse] is None:
-            l_fused[ifuse] = l[ivec]
-        else:
-            l_fused[ifuse] = np.concatenate((l_fused[ifuse], l[ivec]))
+        l_fused[ifuse] = np.concatenate((l_fused[ifuse], l[ivec]))
         
     for k in range(2,nfuse+1):
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        order_count_fused = pyquickbench.rankstats.score_to_partial_order_count(k, l_fused)
-
+        order_count_fused_from_list = pyquickbench.rankstats.score_to_partial_order_count(k, l_fused)
+        
+        order_count_fused_from_order_count = pyquickbench.rankstats.fuse_score_to_partial_order_count(order_count, idx_fused)
+        
+        assert np.array_equal(order_count_fused_from_list, order_count_fused_from_order_count)
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):

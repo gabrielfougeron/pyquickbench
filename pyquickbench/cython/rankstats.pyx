@@ -144,17 +144,21 @@ cdef inline void _unrank_combination(Py_ssize_t r, Py_ssize_t n, Py_ssize_t k, P
 
     cdef Py_ssize_t restRank = _binomial(n, k) - 1 - r
     cdef Py_ssize_t onesLeft = k
+    cdef Py_ssize_t j = 0
+    cdef Py_ssize_t nm1 = n-1
     cdef Py_ssize_t binoVal
 
-    for j in range(n):
+    while onesLeft > 0:
 
-        binoVal = _binomial(n-1-j, onesLeft)
+        binoVal = _binomial(nm1-j, onesLeft)
 
         if restRank >= binoVal:
 
             res[k-onesLeft] = j
             onesLeft -= 1
             restRank -= binoVal
+
+        j += 1
 
 def unrank_combination(Py_ssize_t r, Py_ssize_t n, Py_ssize_t k):
 
