@@ -310,3 +310,31 @@ def montecarlo_score_to_perm_count(list l, num_t key, Py_ssize_t nmc = 1000, Py_
     free(idx)
     
     return np.asarray(res)
+
+@cython.cdivision(True)
+cdef inline Py_ssize_t _KendallTauInversions(Py_ssize_t *perm_a, Py_ssize_t *perm_b, Py_ssize_t n) noexcept nogil:
+
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t res = 0
+
+    for j in range(1,n):
+        for i in range(j):
+            if (perm_a[i] < perm_a[j]) != (perm_b[i] < perm_b[j]):
+                res += 1
+
+    return res
+
+def KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
+
+    cdef Py_ssize_t n = perm_a.shape[0]
+
+    if perm_b.shape[0] != n:
+        raise ValueError(f"The two permutations should have the same size, but they do not. {perm_a.shape[0] = } {perm_b.shape[0] = }")
+
+    cdef Py_ssize_t ninv = _KendallTauInversions(&perm_a[0], &perm_b[0], n)
+    cdef double dist = (2.*ninv) / (n*(n-1))
+
+    return dist
+
+def KendallTauRankCorrelation(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
+    return 1. - 2*KendallTauDistance(perm_a, perm_b)

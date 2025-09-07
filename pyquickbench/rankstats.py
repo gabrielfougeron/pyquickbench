@@ -10,6 +10,8 @@ from .cython.rankstats import (
     exhaustive_score_to_perm_count_inner_loop   ,
     exhaustive_score_to_perm_count_inner_loop   ,
     montecarlo_score_to_perm_count              ,
+    KendallTauDistance                          ,
+    KendallTauRankCorrelation                   ,
 )
     
 def exhaustive_score_to_perm_count(l):

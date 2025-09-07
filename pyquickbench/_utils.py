@@ -192,7 +192,7 @@ def _build_args_shapes(all_args, all_funs, n_repeat, n_out):
     
     return args_shape, res_shape
 
-def _build_out_names(all_args, setup, all_funs_list):
+def _build_out_names(all_args, setup, wrapup, all_funs_list):
     
     FoundValidRes = False
     for args in itertools.product(*list(all_args.values())):
@@ -208,6 +208,8 @@ def _build_out_names(all_args, setup, all_funs_list):
                 
             try:
                 res = fun(**setup_vars_dict_cp)
+                if wrapup is not None:
+                    res = wrapup(res)
             except Exception as err:
                 pass
             else:
@@ -256,7 +258,7 @@ class FakeProgressBar(object):
     def update(self, *args):
         pass
                
-def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup):
+def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup):
 
     if deterministic_setup:
         setup_vars_dict = _return_setup_vars_dict(setup, args)
@@ -277,6 +279,9 @@ def _measure_output(i_args, args, setup, all_funs_list, n_repeat, n_out, StopOnE
                     setup_vars_dict_cp = _return_setup_vars_dict(setup, args)
                     
                 res = fun(**setup_vars_dict_cp)
+                
+                if wrapup is not None:
+                    res = wrapup(res)
                 
                 if isinstance(res, TimeTrain):
                     if res.names_reduction is None:

@@ -44,6 +44,8 @@ def run_benchmark(
     mode                    : str                       = "timings"                 ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
                                                         = default_setup             ,
+    wrapup                  : typing.Union[typing.Callable, None]
+                                                                = None              ,
     deterministic_setup     : bool                      = True                      ,
     n_repeat                : int                       = 1                         ,
     n_out                   : typing.Union[int, None]   = None                      ,
@@ -157,7 +159,7 @@ def run_benchmark(
         if mode in ["timings", "scalar_output"]:
             n_out = 1
         elif mode == "vector_output":
-            n_out, all_out_names = _build_out_names(all_args, setup, all_funs_list)
+            n_out, all_out_names = _build_out_names(all_args, setup, wrapup, all_funs_list)
         else:
             raise ValueError(f'Invalid mode: {mode}')
 
@@ -236,7 +238,7 @@ def run_benchmark(
         elif mode in ["scalar_output", "vector_output"]: 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup)
+            extra_submit_args = (setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup)
         
         else:
                 
@@ -282,6 +284,7 @@ def run_benchmark(
             all_funs            ,
             mode = mode         ,
             setup = setup       ,
+            wrapup = wrapup     ,
             show = show         ,
             **plot_kwargs       ,
         )
@@ -312,6 +315,8 @@ def plot_benchmark(
     plot_type               : typing.Union[str, None]           = None                      ,
     mode                    : str                               = "timings"                 ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
+                                                                = None                      ,
+    wrapup                  : typing.Union[typing.Callable, None]
                                                                 = None                      ,
     all_xvalues             : typing.Union[
                                 np.typing.ArrayLike             ,
@@ -572,7 +577,7 @@ def plot_benchmark(
                 else:    
                     all_funs_list = [fun for fun in all_funs]
                 
-                _, all_out_names_list = _build_out_names(all_args, setup, all_funs_list)
+                _, all_out_names_list = _build_out_names(all_args, setup, wrapup, all_funs_list)
 
     else:
         all_out_names_list = [name for name in all_out_names]
@@ -1032,6 +1037,15 @@ def plot_benchmark(
     
     if transform in ["relative_curve_fraction"]:
         all_plot_y_vals /= all_plot_y_vals.sum(axis=2, keepdims=True)
+    elif transform in ["ascending_rank"]:
+        for i_subplot_grid_x in range(n_subplot_grid_x):
+            for i_subplot_grid_y in range(n_subplot_grid_y):
+                for i_same in range(n_same):
+                    for i_violin in range(n_violin):
+                        for ix in range(npts):
+                            perm = np.argsort(all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, :, i_same, i_violin, ix])
+                            for i_curve in range(n_curves):
+                                all_plot_y_vals[i_subplot_grid_x, i_subplot_grid_y, perm[i_curve], i_same, i_violin, ix] = i_curve
     
     for i_subplot_grid_x in range(n_subplot_grid_x):
         for i_subplot_grid_y in range(n_subplot_grid_y):

@@ -56,7 +56,6 @@ for i_repeat in range(n_repeat):
     print("avg", 0,  np.argsort(moy))
     print("med", 0, np.argsort(med))
 
-
     for k in range(2,nvec+1):
     # for k in range(2,3):
         

@@ -150,6 +150,7 @@ all_transforms = [
     'pol_growth_order'          ,
     'pol_cvgence_order'         ,
     'relative_curve_fraction'   ,
+    'ascending_rank'            ,
 ]
 
 tictoc_sync_name = "pyquickbench_sync"
