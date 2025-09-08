@@ -64,26 +64,28 @@ def metrics(ranking):
         'FoundFirst' : FoundFirst(ranking)                                  ,
     }
 
-def setup(nvec, nobs, d):
-    l = [np.random.random(nobs) + d*ivec for ivec in range(nvec)]
-    return {"score_list" : l}
+do = 1.
 
-def average_order(score_list):
+def setup(nvec, nobs, d, method, nmc):
+    l = [np.random.random(nobs) + (do+d*ivec) for ivec in range(nvec)]
+    return {"score_list" : l,"method" : method, "nmc" : nmc}
+
+def average_order(score_list, method, nmc):
     nvec = len(score_list)
     moy = np.array([np.mean(score_list[ivec]) for ivec in range(nvec)])
     return np.argsort(moy)
     
-def median_order(score_list):
+def median_order(score_list, method, nmc):
     nvec = len(score_list)
     med = np.array([np.median(score_list[ivec]) for ivec in range(nvec)])
     return np.argsort(med)
 
-def condorcet_order(score_list):
-    order_count = pyquickbench.rankstats.score_to_partial_order_count(2, score_list)
+def condorcet_order(score_list, method, nmc):
+    order_count = pyquickbench.rankstats.score_to_partial_order_count(2, score_list, method=method, nmc=nmc)
     return pyquickbench.rankstats.condorcet_top_order(order_count)
 
-def plackett_luce_order(score_list, k):
-    order_count = pyquickbench.rankstats.score_to_partial_order_count(k, score_list)
+def plackett_luce_order(score_list, k, method, nmc):
+    order_count = pyquickbench.rankstats.score_to_partial_order_count(k, score_list, method=method, nmc=nmc)
     A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
     u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
         A, p, q,
@@ -92,24 +94,11 @@ def plackett_luce_order(score_list, k):
     )
     return np.argsort(v)
 
-def count_order_max(score_list):
+def count_order_max(score_list, method, nmc):
     nvec = len(score_list)
-    order_count = pyquickbench.rankstats.score_to_partial_order_count(nvec, score_list)
+    order_count = pyquickbench.rankstats.score_to_partial_order_count(nvec, score_list, method=method, nmc=nmc)
     imax = np.argmax(order_count[0,:])
     return pyquickbench.rankstats.from_left_lehmer(imax, nvec)
-
-dmax = 0.1
-nd = 32*2-1
-do = dmax/nd
-
-nvec = 5
-
-all_args = {
-    "nvec"  : [nvec]   ,
-    # "nobs"  : [2**i for i in range(10)]  ,
-    "nobs"  : [50]  ,
-    "d"     : [0. + do*i for i in range(nd+1)]  ,
-}
 
 all_funs = [
     average_order       ,
@@ -118,12 +107,26 @@ all_funs = [
     count_order_max     ,
 ]
 
+nvec = 5
+
 for k in range(2,nvec+1):
     f = functools.partial(plackett_luce_order, k=k)
     f.__name__ = f'plackett_luce_order_{k}'
     all_funs.append(f)
-    
-n_repeat = 10
+
+ddmax = 0.4
+nd = 32*4-1
+dd = ddmax/nd
+
+n_repeat = 10000
+
+all_args = {
+    "nvec"  : [nvec]   ,
+    "nobs"  : [10]  ,
+    "d"     : [dd*i for i in range(nd+1)]  ,
+    "method"  : ["exhaustive"]  ,
+    "nmc"     : [0]  ,
+}
 
 all_values = pyquickbench.run_benchmark(
     all_args                            ,
@@ -136,23 +139,22 @@ all_values = pyquickbench.run_benchmark(
     n_out = 3                           ,
     StopOnExcept = True                 ,
     ShowProgress = True                 ,
-    # ForceBenchmark = True                 ,
     deterministic_setup = False         ,
+    # ForceBenchmark = True               ,
     pooltype = "process"                ,
 )
-
-# print(all_values)
 
 plot_intent = {
     "nvec"                      : 'same'            ,
     "nobs"                      : 'same'            ,
     "d"                         : 'points'          ,
+    "method"                    : 'same'            ,
+    "nmc"                       : 'same'            ,
     pyquickbench.fun_ax_name    : 'curve_color'     ,
     pyquickbench.out_ax_name    : 'subplot_grid_y'  ,
     pyquickbench.repeat_ax_name : 'reduction_avg'   ,
 }
 
-
 pyquickbench.plot_benchmark(
     all_values                          ,
     all_args                            ,
@@ -161,31 +163,69 @@ pyquickbench.plot_benchmark(
     wrapup = metrics                    ,
     mode = "vector_output"              ,
     plot_intent = plot_intent           ,
-    # plot_type = "bar"                   ,
-    # title = "Average number of comparisons needed to sort an array"   ,
-    # ylabel = "Kendall Tau Ranking Coefficient"    ,
-    xlabel = "Size of the array"        ,
-    logx_plot = False                   ,
-    logy_plot = False                   ,
+    xlabel = "Base distribution separation" ,
+    logx_plot = False                       ,
+    logy_plot = False                       ,
     plot_ylim = [-0.05,1.05]                ,
-    show = True                         ,
+    show = True                             ,
 )
 
-pyquickbench.plot_benchmark(
-    all_values                          ,
+# %%
+
+basename = 'ranking_results_2'
+bench_filename = os.path.join(timings_folder, basename+'.npz')
+
+n_repeat = 100000
+
+nmc_max = 200.
+nnmc = 32*4
+
+all_args = {
+    "nvec"  : [nvec]   ,
+    "nobs"  : [100]  ,
+    "d"     : [0.1]  ,
+    "method"  : ["montecarlo"]  ,
+    "nmc"     : [int(nmc_max*i/nnmc) for i in range(1,nnmc+1)]  ,
+}
+
+all_values = pyquickbench.run_benchmark(
     all_args                            ,
     all_funs                            ,
     setup = setup                       ,
     wrapup = metrics                    ,
     mode = "vector_output"              ,
-    plot_intent = plot_intent           ,
-    # plot_type = "bar"                   ,
-    # title = "Average number of comparisons needed to sort an array"   ,
-    ylabel = ""    ,
-    # xlabel = "Size of the array"        ,
-    logx_plot = False                   ,
-    logy_plot = False                   ,
-    plot_ylim = [-0.05,len(all_funs)-1 + 0.05]                ,
-    transform = 'ascending_rank'        ,
-    show = True                         ,
+    n_repeat = n_repeat                 ,
+    filename = bench_filename           ,
+    n_out = 3                           ,
+    StopOnExcept = True                 ,
+    ShowProgress = True                 ,
+    deterministic_setup = False         ,
+    # ForceBenchmark = True               ,
+    pooltype = "process"                ,
+)
+
+plot_intent = {
+    "nvec"                      : 'same'            ,
+    "nobs"                      : 'same'            ,
+    "d"                         : 'same'          ,
+    "method"                    : 'same'            ,
+    "nmc"                       : 'points'            ,
+    pyquickbench.fun_ax_name    : 'curve_color'     ,
+    pyquickbench.out_ax_name    : 'subplot_grid_y'  ,
+    pyquickbench.repeat_ax_name : 'reduction_avg'   ,
+}
+
+pyquickbench.plot_benchmark(
+    all_values                              ,
+    all_args                                ,
+    all_funs                                ,
+    setup = setup                           ,
+    wrapup = metrics                        ,
+    mode = "vector_output"                  ,
+    plot_intent = plot_intent               ,
+    xlabel = "Number of MonteCarlo comparisons" ,
+    logx_plot = False                       ,
+    logy_plot = False                       ,
+    plot_ylim = [-0.05,1.05]                ,
+    show = True                             ,
 )

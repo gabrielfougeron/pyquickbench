@@ -265,19 +265,20 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
     n_funs = len(all_funs_list)
     vals = np.full((n_funs, n_repeat, n_out), np.nan)
     
-    for i_fun, fun in enumerate(all_funs_list):
-        
-        for i_repeat in range(n_repeat):
+    for i_repeat in range(n_repeat):
+
+        if not deterministic_setup:
+            setup_vars_dict = _return_setup_vars_dict(setup, args)
+
+        for i_fun, fun in enumerate(all_funs_list):
             
             try:
-                if deterministic_setup:
-                    try: # Some structure cannot easily be deepcopied, like those created with Cython.
-                        setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
-                    except TypeError: 
-                        setup_vars_dict_cp = copy.copy(setup_vars_dict)
-                else:
-                    setup_vars_dict_cp = _return_setup_vars_dict(setup, args)
-                    
+            
+                try: # Some structure cannot easily be deepcopied, like those created with Cython.
+                    setup_vars_dict_cp = copy.deepcopy(setup_vars_dict)
+                except TypeError: 
+                    setup_vars_dict_cp = copy.copy(setup_vars_dict)
+
                 res = fun(**setup_vars_dict_cp)
                 
                 if wrapup is not None:
@@ -310,6 +311,7 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
                 vals[i_fun, i_repeat, :] = np.nan
                 if StopOnExcept:
                     raise exc
+                
     return vals
 
 def _measure_timings(i_args, args, setup, all_funs_list, n_repeat, time_per_test, StopOnExcept, WarmUp, all_vals):
