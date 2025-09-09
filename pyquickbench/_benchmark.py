@@ -81,6 +81,10 @@ def run_benchmark(
         Function that prepares the inputs for the functions to be benchmarked.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
+    wrapup : :term:`python:callable`, optional
+        Function that transforms the outputs of the benchmark. Only makes sense if ``mode="scalar_output"`` or ``mode="vector_output"``.\n
+        See ??? TODO ??? :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
+        By default :data:`python:None`.
     deterministic_setup : :class:`python:bool`, optional\n
         Whether the result of the setup phase is deterministic (and hence can be cached) or not.\n
         By default :data:`python:True`.
@@ -401,6 +405,11 @@ def plot_benchmark(
         See :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
         Only used if ``all_out_names`` was not provided and ``mode="vector_output"``\n
         By default ``lambda n: {pyquickbench.default_ax_name: n}``.
+    wrapup : :term:`python:callable`, optional
+        Function that transforms the outputs of the benchmark.\n
+        See ??? TODO ??? :ref:`sphx_glr__build_auto_examples_tutorial_03-Preparing_inputs.py` for usage example.\n
+        Only used if ``all_out_names`` was not provided and ``mode="vector_output"``\n
+        By default :data:`python:None`.
     all_xvalues :  :class:`numpy:numpy.ndarray` | :data:`python:None`, optional
         Values to be plotted on the x-axis if those differ from argument values.\n
         See :ref:`sphx_glr__build_auto_examples_tutorial_05-Plotting_scalars.py` for usage example.\n 

@@ -3,61 +3,112 @@ import math
 import numpy as np
 import functools
 import pyquickbench
-import ot
-import itertools
+import scipy
 
 # print(ot.backend.get_available_backend_implementations())
 
-TT = pyquickbench.TimeTrain(names_reduction='sum', include_locs=False, relative_timings = True)
+# TT = pyquickbench.TimeTrain(names_reduction='sum', include_locs=False, relative_timings = True)
 
 # np.random.seed(seed=0)
 
-nvec = 10
-n = 4000
-lenlist = [n] * nvec
-# lenlist = [5, 20, 50, 100]
+nvec = 4
+n = 10000
+lenlist = [1000, 1000, 1000, 1000]
 
-nmc = 10000
-
-poc_exh = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_order_count, method = "exhaustive"), name="exhaustive")
-poc_mc = TT.tictoc(functools.partial(pyquickbench.rankstats.score_to_partial_order_count, method = "montecarlo", nmc = nmc), name="montecarlo")
-
-order_th = np.array(range(nvec))
-
-d = 0.01
+dlist = [0.1, 0.0, 0.333333333333333, 0.66666666666666]
+# dlist = [0.0, 0.666666666666666666666666666666]
 k = 2
 
-n_th_OK = 0
-n_mc_OK = 0
+l = [np.random.random(lenlist[ivec]) + dlist[ivec] for ivec in range(nvec)]
+nmc_all = [100, 200, 400, 800, 1600, 3200]
 
-n_repeat = 10
-for i_repeat in range(n_repeat):
-    
-    l = [np.random.random(lenlist[ivec]) + d*ivec for ivec in range(nvec)]
-    
-    res_exh = poc_exh(k, l)
-    A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(res_exh)
-    u_noreg, v_noreg = pyquickbench.cython.sinkhorn.sinkhorn_knopp(A, p, q)
-    order_exh = np.argsort(v_noreg)
-    
-    res_mc = poc_mc(k, l)
-    A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(res_mc)
-    u_noreg, v_noreg = pyquickbench.cython.sinkhorn.sinkhorn_knopp(A, p, q)
-    order_mc = np.argsort(v_noreg)
-    
-    if np.array_equal(order_exh, order_th):
-        n_th_OK += 1    
-    if np.array_equal(order_exh, order_mc):
-        n_mc_OK += 1
-        
+# order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l, method="montecarlo", nmc_all = nmc_all)
+# A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count)
 
-    
-print(f'{n_th_OK = } / {n_repeat}')
-print(f'{n_mc_OK = } / {n_repeat}')
+reg_beta = 0.
+reg_alpham1 = 0.
+# reg_beta = 0.1
+# reg_alpham1 = 0.1
+
+u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(A, p, q, reg_alpham1 = reg_alpham1, reg_beta = reg_beta)
+M = np.einsum('i,ij,j->ij',u,A,v)
+J = pyquickbench.rankstats.build_log_tangent_sinkhorn_problem(M)
+
+eigvals, eigvects = scipy.linalg.eigh(J)
+
+
+nsets = order_count.shape[0]
+
+# uprod = np.prod(u)
+uprod = 1.
+
+uscale = u
+# uscale = u /(order_count.sum(axis=1)/order_count.sum())
+# uscale = u /(order_count.sum(axis=1)/order_count.sum()) / (uprod**(1/nsets))
+
+print(p)
+print(q)
 print()
-    
-    
+logu = np.log(u)
+logv = np.log(v)
+lam = logv.sum() - logu.sum()
+logu -= lam
+logv += lam
 
+print(logu)
+print(logv)
+print()
+print(M)
+# 
+# print()
+# print(v[0] / (v[0] + v[1]))
+# print(1/2)
+# 
+# print()
+# print(v[0] / (v[0] + v[2]))
+# print(2/9)
+# 
+# print()
+# print(v[0] / (v[0] + v[3]))
+# print(1/18)
+
+# print()
+# print(v[0] / (v[0] + v[1]))
+# print(1/18)
+
+
+for iset in range(nsets):
+    print(iset, pyquickbench.rankstats.unrank_combination(iset,nvec,k), uscale[iset], p[iset])
+
+
+print(v)
+print()
+
+# print(np.matmul(J, eigvects) - np.matmul(eigvects, np.diag(eigvals)))
+
+
+print(eigvals)
+# print(eigvects[:,0])
+# print(eigvects[:,1])
+# print(eigvects[:,2])
+
+
+n_tests_done = order_count.sum(axis=1) + 1
+
+
+for iset in range(nsets):
     
+    dpq = np.zeros((nsets+nvec), dtype=np.float64)
     
-print(TT)
+    dpq[iset] = 1. / n_tests_done[iset]
+    dpq[nsets:] = dq[iset,:] / n_tests_done[iset]
+    
+    dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
+    
+    print()
+    print(iset, pyquickbench.rankstats.unrank_combination(iset,nvec,k))
+    # print(dloguv[:nsets])
+    # print(dloguv[nsets:])
+    print(np.linalg.norm(dloguv[nsets:]))

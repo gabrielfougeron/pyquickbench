@@ -324,7 +324,7 @@ cdef inline Py_ssize_t _KendallTauInversions(Py_ssize_t *perm_a, Py_ssize_t *per
 
     return res
 
-def KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
+cpdef double KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
 
     cdef Py_ssize_t n = perm_a.shape[0]
 
@@ -336,5 +336,5 @@ def KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
 
     return dist
 
-def KendallTauRankCorrelation(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
+cpdef double KendallTauRankCorrelation(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
     return 1. - 2*KendallTauDistance(perm_a, perm_b)

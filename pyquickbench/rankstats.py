@@ -1,3 +1,4 @@
+import collections
 import itertools
 import math
 import numpy as np
@@ -122,38 +123,49 @@ def exhaustive_score_to_partial_order_count(k, l, opt="opt"):
         
     return res
 
-def montecarlo_score_to_partial_order_count(k, l, nmc = 1000, nrand_max = 10000):
+def montecarlo_score_to_partial_order_count(k, l, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     
     nvec = len(l)
     nfac = math.factorial(k)
     ncomb = math.comb(nvec, k)
+
+    if not isinstance(nmc_all, collections.abc.Iterable):
+        nmc_all = itertools.repeat(nmc_all, ncomb)
 
     if np.iinfo(np.intp).max < nfac:
         raise ValueError("Too many vectors")
 
     res = np.zeros((ncomb, nfac), dtype=np.intp)  
     
-    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+    if cap_nmc:
         
-        ll = [l[c] for c in comb]
-
-        nobs_tot = 1
-        for i in range(nvec):
-            nobs_tot *= l[i].shape[0]
+        for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
             
-        if nobs_tot <= nmc :
-            res[icomb,:] = exhaustive_score_to_perm_count(ll)
-        else:
+            ll = [l[c] for c in comb]
+
+            nobs_tot = 1
+            for i in range(nvec):
+                nobs_tot *= l[i].shape[0]
+                
+            if nobs_tot <= nmc :
+                res[icomb,:] = exhaustive_score_to_perm_count(ll)
+            else:
+                res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+
+    else:
+        
+        for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
+            ll = [l[c] for c in comb]
             res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
 
     return res
 
-def score_to_partial_order_count(k, l, method = "exhaustive", nmc = 1000, nrand_max = 10000):
+def score_to_partial_order_count(k, l, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     
     if method == "exhaustive":
         return exhaustive_score_to_partial_order_count(k, l)
     elif method == "montecarlo":
-        return montecarlo_score_to_partial_order_count(k, l, nmc = nmc, nrand_max = nrand_max)
+        return montecarlo_score_to_partial_order_count(k, l, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
     else:
         raise NotImplementedError
     
@@ -385,6 +397,59 @@ def build_sinkhorn_problem(order_count, minimize=False):
         q[i] = q_int[i] / total_sum
                 
     return A, p, q
+
+def build_sinkhorn_problem_2(order_count, minimize=False):
+    
+    nsets = order_count.shape[0]
+    nopt_per_set = order_count.shape[1]
+
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    
+    nopts = nvec
+    
+    if minimize:
+        i_opt = 0
+    else:
+        i_opt = k-1
+
+    p_int = np.zeros(nsets, dtype=order_count.dtype)    
+    q_int = np.zeros(nopts, dtype=order_count.dtype)
+    
+    dq = np.zeros((nsets,nopts), dtype=np.float64)    
+    
+    total_sum = 0
+    
+    A = np.zeros((nsets, nopts), dtype=np.float64)
+    
+    for iset, comb in enumerate(itertools.combinations(range(nvec), k)):
+
+        for jperm in range(nopt_per_set):
+            
+            perm = from_left_lehmer(jperm, k)
+            
+            val = order_count[iset, jperm]
+            
+            total_sum += val
+            p_int[iset] += val
+            q_int[comb[perm[i_opt]]] += val
+            
+            dq[iset, comb[perm[i_opt]]] += val
+            
+            for j in comb:
+                A[iset, j] = 1.
+        
+    p = np.empty(nsets, dtype=np.float64)    
+    q = np.empty(nopts, dtype=np.float64)
+        
+    for i in range(nsets):
+        p[i] = p_int[i] / total_sum        
+    for i in range(nopts):
+        q[i] = q_int[i] / total_sum
+                
+    for i in range(nsets):
+        dq[i,:] /= dq[i,:].sum()
+                
+    return A, p, q, dq
             
 def build_log_tangent_sinkhorn_problem(M):    
     
