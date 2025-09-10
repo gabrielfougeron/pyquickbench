@@ -15,17 +15,20 @@ nvec = 4
 n = 10000
 lenlist = [1000, 1000, 1000, 1000]
 
-dlist = [0.1, 0.0, 0.333333333333333, 0.66666666666666]
+dlist = [0.0, 0.0, 0.333333333333333, 0.66666666666666]
 # dlist = [0.0, 0.666666666666666666666666666666]
 k = 2
 
 l = [np.random.random(lenlist[ivec]) + dlist[ivec] for ivec in range(nvec)]
-nmc_all = [100, 200, 400, 800, 1600, 3200]
+nmc_all = np.array([1, 1, 1, 1, 1, 1])
 
 # order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
 order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l, method="montecarlo", nmc_all = nmc_all)
 # A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count)
+A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.000001)
+
+assert np.array_equal(nmc_all, order_count.sum(axis=1))
+
 
 reg_beta = 0.
 reg_alpham1 = 0.
@@ -107,8 +110,12 @@ for iset in range(nsets):
     
     dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
     
+    du = u*dloguv[:nsets]
+    dv = v*dloguv[nsets:]
+    
     print()
     print(iset, pyquickbench.rankstats.unrank_combination(iset,nvec,k))
     # print(dloguv[:nsets])
     # print(dloguv[nsets:])
-    print(np.linalg.norm(dloguv[nsets:]))
+    # print(dv)
+    print(np.linalg.norm(dv))

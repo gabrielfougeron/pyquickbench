@@ -352,7 +352,7 @@ def condorcet_top_order(order_count, minimize=False):
 #         
 #     return res
 
-def build_sinkhorn_problem(order_count, minimize=False):
+def build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False):
     
     nsets = order_count.shape[0]
     nopt_per_set = order_count.shape[1]
@@ -391,14 +391,20 @@ def build_sinkhorn_problem(order_count, minimize=False):
     p = np.empty(nsets, dtype=np.float64)    
     q = np.empty(nopts, dtype=np.float64)
         
+    alpha = (1. - reg_eps) / total_sum  
+    beta = reg_eps / nsets   
+    
     for i in range(nsets):
-        p[i] = p_int[i] / total_sum        
+        p[i] = alpha * p_int[i] + beta
+        
+    beta = reg_eps / nopts   
+        
     for i in range(nopts):
-        q[i] = q_int[i] / total_sum
+        q[i] = alpha * q_int[i] + beta
                 
     return A, p, q
 
-def build_sinkhorn_problem_2(order_count, minimize=False):
+def build_sinkhorn_problem_2(order_count, reg_eps = 0., minimize=False):
     
     nsets = order_count.shape[0]
     nopt_per_set = order_count.shape[1]
@@ -441,10 +447,16 @@ def build_sinkhorn_problem_2(order_count, minimize=False):
     p = np.empty(nsets, dtype=np.float64)    
     q = np.empty(nopts, dtype=np.float64)
         
+    alpha = (1. - reg_eps) / total_sum  
+    beta = reg_eps / nsets   
+    
     for i in range(nsets):
-        p[i] = p_int[i] / total_sum        
+        p[i] = alpha * p_int[i] + beta
+        
+    beta = reg_eps / nopts   
+        
     for i in range(nopts):
-        q[i] = q_int[i] / total_sum
+        q[i] = alpha * q_int[i] + beta
                 
     for i in range(nsets):
         dq[i,:] /= dq[i,:].sum()
