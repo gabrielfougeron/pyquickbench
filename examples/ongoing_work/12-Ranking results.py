@@ -102,10 +102,10 @@ def count_order_max(score_list, method, nmc):
     return pyquickbench.rankstats.from_left_lehmer(imax, nvec)
 
 all_funs = [
-    average_order       ,
-    median_order        ,
-    condorcet_order     ,
-    count_order_max     ,
+    # average_order       ,
+    # median_order        ,
+    # condorcet_order     ,
+    # count_order_max     ,
 ]
 
 nvec = 5
@@ -156,77 +156,77 @@ plot_intent = {
     pyquickbench.repeat_ax_name : 'reduction_avg'   ,
 }
 
-pyquickbench.plot_benchmark(
-    all_values                          ,
-    all_args                            ,
-    all_funs                            ,
-    setup = setup                       ,
-    wrapup = metrics                    ,
-    mode = "vector_output"              ,
-    plot_intent = plot_intent           ,
-    xlabel = "Base distribution separation" ,
-    logx_plot = False                       ,
-    logy_plot = False                       ,
-    plot_ylim = [-0.05,1.05]                ,
-    show = True                             ,
-)
-
-# %%
-# 
-# basename = 'ranking_results_2'
-# bench_filename = os.path.join(timings_folder, basename+'.npz')
-# 
-# n_repeat = 100
-# 
-# nmc_max = 200.
-# nnmc = 32*4
-# 
-# all_args = {
-#     "nvec"  : [nvec]   ,
-#     "nobs"  : [100]  ,
-#     "d"     : [0.1]  ,
-#     "method"  : ["montecarlo"]  ,
-#     "nmc"     : [int(nmc_max*i/nnmc) for i in range(1,nnmc+1)]  ,
-# }
-# 
-# all_values = pyquickbench.run_benchmark(
+# pyquickbench.plot_benchmark(
+#     all_values                          ,
 #     all_args                            ,
 #     all_funs                            ,
 #     setup = setup                       ,
 #     wrapup = metrics                    ,
 #     mode = "vector_output"              ,
-#     n_repeat = n_repeat                 ,
-#     filename = bench_filename           ,
-#     n_out = 3                           ,
-#     StopOnExcept = True                 ,
-#     ShowProgress = True                 ,
-#     deterministic_setup = False         ,
-#     # ForceBenchmark = True               ,
-#     pooltype = "process"                ,
-# )
-# 
-# plot_intent = {
-#     "nvec"                      : 'same'            ,
-#     "nobs"                      : 'same'            ,
-#     "d"                         : 'same'          ,
-#     "method"                    : 'same'            ,
-#     "nmc"                       : 'points'            ,
-#     pyquickbench.fun_ax_name    : 'curve_color'     ,
-#     pyquickbench.out_ax_name    : 'subplot_grid_y'  ,
-#     pyquickbench.repeat_ax_name : 'reduction_avg'   ,
-# }
-# 
-# pyquickbench.plot_benchmark(
-#     all_values                              ,
-#     all_args                                ,
-#     all_funs                                ,
-#     setup = setup                           ,
-#     wrapup = metrics                        ,
-#     mode = "vector_output"                  ,
-#     plot_intent = plot_intent               ,
-#     xlabel = "Number of MonteCarlo comparisons" ,
+#     plot_intent = plot_intent           ,
+#     xlabel = "Base distribution separation" ,
 #     logx_plot = False                       ,
 #     logy_plot = False                       ,
 #     plot_ylim = [-0.05,1.05]                ,
 #     show = True                             ,
 # )
+
+# %%
+
+basename = 'ranking_results_2'
+bench_filename = os.path.join(timings_folder, basename+'.npz')
+
+n_repeat = 1000
+
+nmc_max = 50.
+nnmc = 32
+
+all_args = {
+    "nvec"  : [nvec]   ,
+    "nobs"  : [100]  ,
+    "d"     : [0.1]  ,
+    "method"  : ["adaptive", "montecarlo", ]  ,
+    "nmc"     : [int(nmc_max*i/nnmc) for i in range(1,nnmc+1)]  ,
+}
+
+all_values = pyquickbench.run_benchmark(
+    all_args                            ,
+    all_funs                            ,
+    setup = setup                       ,
+    wrapup = metrics                    ,
+    mode = "vector_output"              ,
+    n_repeat = n_repeat                 ,
+    filename = bench_filename           ,
+    n_out = 3                           ,
+    StopOnExcept = True                 ,
+    ShowProgress = True                 ,
+    deterministic_setup = False         ,
+    ForceBenchmark = True               ,
+    pooltype = "process"                ,
+)
+
+plot_intent = {
+    "nvec"                      : 'same'            ,
+    "nobs"                      : 'same'            ,
+    "d"                         : 'same'          ,
+    "method"                    : 'curve_linestyle'            ,
+    "nmc"                       : 'points'            ,
+    pyquickbench.fun_ax_name    : 'curve_color'     ,
+    pyquickbench.out_ax_name    : 'subplot_grid_y'  ,
+    pyquickbench.repeat_ax_name : 'reduction_avg'   ,
+}
+
+pyquickbench.plot_benchmark(
+    all_values                              ,
+    all_args                                ,
+    all_funs                                ,
+    setup = setup                           ,
+    wrapup = metrics                        ,
+    mode = "vector_output"                  ,
+    plot_intent = plot_intent               ,
+    xlabel = "Number of MonteCarlo comparisons" ,
+    logx_plot = False                       ,
+    logy_plot = False                       ,
+    plot_ylim = [-0.05,1.05]                ,
+    show = True                             ,
+)

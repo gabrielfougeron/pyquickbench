@@ -56,6 +56,10 @@ J = pyquickbench.rankstats.build_log_tangent_sinkhorn_problem(M)
 
 eigvals, eigvects = scipy.linalg.eigh(J)
 
+err = np.linalg.norm( J - np.matmul(eigvects, np.matmul(np.diag(eigvals), eigvects.T)))
+print(err)
+assert err < eps
+
 
 nsets = order_count.shape[0]
 
@@ -125,6 +129,9 @@ for iset in range(nsets):
     dpq[nsets:] = dq[iset,:] / n_tests_done[iset]
     
     dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
+    
+    
+    
     
     du = u*dloguv[:nsets]
     dv = v*dloguv[nsets:]

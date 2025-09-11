@@ -19,6 +19,56 @@ cdef double zero_double = 0.
 cdef double one_double = 1.
 cdef double minusone_double = -1.
 
+
+cdef void _sinkhorn_knopp(
+    double[:,::1] M                 ,
+    double *a                       ,
+    double *b                       ,
+    double *u                       ,
+    double *v                       ,
+    int dim_a                       ,
+    int dim_b                       ,
+    double reg_alpham1 = 0.         ,
+    double reg_beta = 0.            ,
+    Py_ssize_t numItermax = 1000    ,
+    Py_ssize_t check_err_every = 100,
+    double stopThr = 1e-9           ,
+) noexcept nogil:
+
+    cdef Py_ssize_t i_iter
+    cdef Py_ssize_t  i_iter_rem = check_err_every-1
+    cdef Py_ssize_t i
+
+    cdef double tmp
+    cdef double * uM = <double*> malloc(sizeof(double)*dim_b)
+
+    cdef double err = 1.
+    for i_iter in range(numItermax):
+
+        scipy.linalg.cython_blas.dgemv(transn,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,u,&int_one,&zero_double,uM,&int_one)
+
+        if i_iter % check_err_every == i_iter_rem:
+
+            err = 0.
+            for i in range(dim_b):
+                tmp = v[i] * (uM[i] + reg_beta) - (b[i] + reg_alpham1)
+                err += tmp * tmp
+            err = csqrt(err)
+
+            if err < stopThr:
+                break
+
+        for i in range(dim_b):
+            v[i] = (b[i] + reg_alpham1) / (uM[i] + reg_beta)
+
+        scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,v,&int_one,&zero_double,u,&int_one)
+        for i in range(dim_a):
+            u[i] = a[i] / u[i]
+
+    free(uM)
+
+
+
 @cython.cdivision(True)
 def sinkhorn_knopp(
     double[:,::1] M                 ,
@@ -63,43 +113,14 @@ def sinkhorn_knopp(
         u = warmstart[0]
         v = warmstart[1]
 
-    cdef double *uptr = &u[0]
-    cdef double *vptr = &v[0]
-
-    cdef double *aptr = &a[0]
-    cdef double *bptr = &b[0]
-
-    cdef Py_ssize_t i_iter
-    cdef Py_ssize_t  i_iter_rem = check_err_every-1
-    cdef Py_ssize_t i
-
-    cdef double tmp
-    cdef double * uM = <double*> malloc(sizeof(double)*dim_b)
-
-    cdef double err = 1.
-    for i_iter in range(numItermax):
-
-        scipy.linalg.cython_blas.dgemv(transn,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,uptr,&int_one,&zero_double,uM,&int_one)
-
-        if i_iter % check_err_every == i_iter_rem:
-
-            err = 0.
-            for i in range(dim_b):
-                tmp = vptr[i] * (uM[i] + reg_beta) - (bptr[i] + reg_alpham1)
-                err += tmp * tmp
-            err = csqrt(err)
-
-            if err < stopThr:
-                break
-
-        for i in range(dim_b):
-            vptr[i] = (bptr[i] + reg_alpham1) / (uM[i] + reg_beta)
-
-        scipy.linalg.cython_blas.dgemv(transt,&dim_b,&dim_a,&one_double,&M[0,0],&dim_b,vptr,&int_one,&zero_double,uptr,&int_one)
-        for i in range(dim_a):
-            uptr[i] = aptr[i] / uptr[i]
-
-    free(uM)
+    _sinkhorn_knopp(
+        M   ,
+        &a[0]       , &b[0]     ,
+        &u[0]       , &v[0]     ,
+        dim_a       , dim_b     ,
+        reg_alpham1 , reg_beta  ,
+        numItermax  , check_err_every   , stopThr   ,
+    )
 
     return (np.asarray(u), np.asarray(v))
 

@@ -378,14 +378,12 @@ cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t[:,:
 
     return nvec, k
 
-cpdef project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=False):
+cdef void _project_order_count_best(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,::1] order_count_best, Py_ssize_t k, bint minimize=False) noexcept nogil:
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nopt_per_set = order_count.shape[1]
 
-    cdef Py_ssize_t nvec, k
-
-    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    cdef Py_ssize_t nvec = order_count_best.shape[1]
 
     cdef Py_ssize_t i_opt
 
@@ -394,7 +392,7 @@ cpdef project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=Fals
     else:
         i_opt = k-1
 
-    cdef Py_ssize_t[:,::1] order_count_best = np.zeros((nsets, nvec), dtype=np.intp)    
+    memset(&order_count_best[0,0], 0, sizeof(Py_ssize_t)*nsets*nvec)
 
     cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
     cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
@@ -414,5 +412,101 @@ cpdef project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=Fals
     free(perm)
     free(comb)
 
+def project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=False):
+    
+    cdef Py_ssize_t nsets = order_count.shape[0]
+    cdef Py_ssize_t nvec, k
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, nvec), dtype=np.intp)   
+
+    _project_order_count_best(order_count, order_count_best, k, minimize)
+
     return np.asarray(order_count_best)
     
+@cython.cdivision(True)
+cpdef void _build_sinkhorn_rhs(
+    Py_ssize_t[:,::1] order_count_best,
+    double[::1] p       ,
+    double[::1] q       ,
+    double[:,::1] dq    ,
+    double reg_eps = 0. ,
+) noexcept nogil:
+    
+    cdef Py_ssize_t nsets = order_count_best.shape[0]
+    cdef Py_ssize_t nvec = order_count_best.shape[1]
+
+    cdef Py_ssize_t iset, ivec
+    cdef double val
+
+    memset(&p[0], 0, sizeof(double)*nsets)
+    memset(&q[0], 0, sizeof(double)*nvec)
+    
+    for iset in range(nsets):
+        for ivec in range(nvec):
+            
+            val = order_count_best[iset, ivec]
+            
+            p[iset] += val
+            q[ivec] += val
+            dq[iset, ivec] = val
+    
+    cdef double total_sum = 0
+            
+    for iset in range(nsets):
+        val = p[iset]
+        total_sum += val
+        for ivec in range(nvec):
+            dq[iset, ivec] /= val
+
+    cdef double alpha, beta
+        
+    alpha = (1. - reg_eps) / total_sum  
+    beta = reg_eps / nsets   
+    
+    for i in range(nsets):
+        p[i] = alpha * p[i] + beta
+        
+    beta = reg_eps / nvec   
+        
+    for i in range(nvec):
+        q[i] = alpha * q[i] + beta
+
+def build_sinkhorn_rhs(
+    Py_ssize_t[:,::1] order_count_best  ,
+    double reg_eps = 0.                 ,
+):
+    
+    nsets = order_count_best.shape[0]
+    nvec = order_count_best.shape[1]
+
+    cdef double[::1] p = np.empty(nsets, dtype=np.float64)    
+    cdef double[::1] q = np.empty(nvec, dtype=np.float64)       
+    cdef double[:,::1] dq = np.empty((nsets, nvec), dtype=np.float64)
+
+    _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
+    
+    return np.asarray(p), np.asarray(q), np.asarray(dq)
+
+# @cython.cdivision(True)
+# def adaptive_find_best_icomb_update(
+#     Py_ssize_t[:,::1] order_count       ,
+#     Py_ssize_t[:,::1] order_count_best  ,
+#     Py_ssize_t ntot                     ,
+#     double[::1] p                       ,
+#     double[::1] q                       ,
+#     double[:,::1] dq                    ,
+# ):
+# 
+#     cdef Py_ssize_t nsets = order_count.shape[0]
+#     cdef Py_ssize_t nvec, k
+#     nvec, k = find_nvec_k_from_order_count_shape(order_count)
+# 
+#     _project_order_count_best(order_count, order_count_best, k, False)
+# 
+#     cdef double reg_eps = 1. / (n_tot + 1)
+# 
+#     _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
+# 
+#         
+#     cdef double reg_alpham1 = 0.
+#     cdef double reg_beta = 0.

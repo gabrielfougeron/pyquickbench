@@ -2,6 +2,7 @@ import collections
 import itertools
 import math
 import numpy as np
+import scipy
 
 from .cython.rankstats import (
     left_lehmer                                 ,
@@ -15,6 +16,12 @@ from .cython.rankstats import (
     KendallTauRankCorrelation                   ,
     find_nvec_k_from_order_count_shape          ,
     project_order_count_best                    ,
+    build_sinkhorn_rhs                          ,
+)
+
+from .cython.sinkhorn import (
+    sinkhorn_knopp                              ,
+    uv_to_loguv                                 ,
 )
     
 def exhaustive_score_to_perm_count(l):
@@ -168,7 +175,7 @@ def montecarlo_score_to_partial_order_count(k, l, order_count = None, nmc_all = 
             
     return order_count
 
-def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nmc_step = 1):
+def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nmc_step = 10):
     
     nvec = len(l)
     
@@ -183,22 +190,63 @@ def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 10
         order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
         
     n_tot = order_count.sum()
-        
+    nsets = order_count.shape[0]
     nmc_rem = nmc_all
     
     # I really only need A here ... at least as long as I don't have a matrix-free implementation
     A, p, q = build_sinkhorn_problem(order_count)
+    order_count_best = np.empty((nsets, nvec), dtype=np.intp)   
     
     while nmc_rem > 0:
         
         nmc = min(nmc_rem, nmc_step)
         
         order_count_best = project_order_count_best(order_count)
+        reg_eps = 1. / (n_tot + 1)
+        # reg_eps = 0.
+        p, q, dq = build_sinkhorn_rhs(order_count_best, reg_eps = reg_eps)
+        
+        reg_alpham1 = 0.
+        reg_beta = 0.
+        
+        u, v = sinkhorn_knopp(A, p, q, reg_alpham1 = reg_alpham1, reg_beta = reg_beta)
+        M = np.einsum('i,ij,j->ij',u,A,v)
+        
+        J = build_log_tangent_sinkhorn_problem(M)
+
+        eigvals, eigvects = scipy.linalg.eigh(J)
+        
+        n_tests_done = order_count_best.sum(axis=1) + 1
+        
+        dv_norm = np.empty(nsets, dtype=np.float64)
+        
+        for iset in range(nsets):
+            
+            dpq = np.zeros((nsets+nvec), dtype=np.float64)
+            dpq[iset] = 1. / n_tests_done[iset]
+            dpq[nsets:] = dq[iset,:] / n_tests_done[iset]
+            
+            # dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
+            
+            # pseudo inversion after symmetric eigendecomposition
+            dloguv = np.matmul(eigvects, dpq)
+            for i in range(dloguv.shape[0]):
+                if abs(eigvals[i]) > 1e-13:
+                    dloguv[i] /= eigvals[i]
+            dloguv = np.matmul(eigvects.T, dloguv)
+            
+            dv_norm[iset] = np.linalg.norm(v*dloguv[nsets:]) # Computing a norm1 here would be easier (just a dot product)
+
+        icomb = np.argmax(dv_norm)
         
         
         
         
+        comb = unrank_combination(icomb, nvec, k)
         
+        ll = [l[c] for c in comb]
+        
+        order_count[icomb,:] += montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc)
         
         n_tot += nmc
         nmc_rem -= nmc
@@ -224,6 +272,8 @@ def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive"
     elif method == "montecarlo":
         montecarlo_score_to_partial_order_count(k, l, order_count, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
     elif method == "adaptive":
+        montecarlo_score_to_partial_order_count(k, l, order_count, nmc_all = 1, nrand_max = 1)
+        nmc_all *= math.comb(nvec, k)
         adaptive_score_to_partial_order_count(k, l, order_count, nmc_all = nmc_all)
     else:
         raise NotImplementedError
@@ -492,45 +542,6 @@ def build_sinkhorn_problem_2(order_count, reg_eps = 0., minimize=False):
         dq[i,:] /= dq[i,:].sum()
                 
     return A, p, q, dq
-
-def build_sinkhorn_rhs(order_count_best, reg_eps = 0.):
-    
-    nsets = order_count_best.shape[0]
-    nvec = order_count_best.shape[1]
-
-    p = np.zeros(nsets, dtype=np.float64)    
-    q = np.zeros(nvec, dtype=np.float64)   
-    dq = np.empty((nsets, nvec), dtype=np.float64)
-    
-    for iset in range(nsets):
-        for ivec in range(nvec):
-            
-            val = order_count_best[iset, ivec]
-            
-            p[iset] += val
-            q[ivec] += val
-            dq[iset, ivec] = val
-    
-    total_sum = 0
-            
-    for iset in range(nsets):
-        val = p[iset]
-        total_sum += val
-        for ivec in range(nvec):
-            dq[iset, ivec] /= val
-        
-    alpha = (1. - reg_eps) / total_sum  
-    beta = reg_eps / nsets   
-    
-    for i in range(nsets):
-        p[i] = alpha * p[i] + beta
-        
-    beta = reg_eps / nvec   
-        
-    for i in range(nvec):
-        q[i] = alpha * q[i] + beta
-                
-    return p, q, dq
             
 def build_log_tangent_sinkhorn_problem(M):    
     
