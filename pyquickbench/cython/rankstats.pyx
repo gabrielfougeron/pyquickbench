@@ -338,3 +338,80 @@ cpdef double KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
 
 cpdef double KendallTauRankCorrelation(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
     return 1. - 2*KendallTauDistance(perm_a, perm_b)
+
+cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t[:,::1] order_count, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
+    
+    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
+    
+    cdef Py_ssize_t nsets = order_count.shape[0]
+    cdef Py_ssize_t  nopt_per_set = order_count.shape[1]
+    
+    cdef Py_ssize_t nvec, k
+    cdef Py_ssize_t j
+
+    cdef Py_ssize_t kfac = 1
+    for k in range(1,kmax):
+        kfac *= k
+        if kfac == nopt_per_set:
+            break
+    else:
+        raise ValueError("Could not determine k")
+    
+    cdef Py_ssize_t *c_arr = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec_max)
+    for nvec in range(nvec_max):
+        c_arr[nvec] = 1
+
+    for nvec in range(1,k):
+        for j in range(nvec-1,0,-1):
+            c_arr[j] += c_arr[j-1] 
+
+    for nvec in range(k,nvec_max):
+        for j in range(nvec-1,0,-1):
+            c_arr[j] += c_arr[j-1] 
+
+        if c_arr[k] == nsets:
+            break
+    else:
+        raise ValueError("Could not determine nvec")
+    
+    free(c_arr)
+
+    return nvec, k
+
+cpdef project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=False):
+    
+    cdef Py_ssize_t nsets = order_count.shape[0]
+    cdef Py_ssize_t nopt_per_set = order_count.shape[1]
+
+    cdef Py_ssize_t nvec, k
+
+    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+
+    cdef Py_ssize_t i_opt
+
+    if minimize:
+        i_opt = 0
+    else:
+        i_opt = k-1
+
+    cdef Py_ssize_t[:,::1] order_count_best = np.zeros((nsets, nvec), dtype=np.intp)    
+
+    cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
+    cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
+    cdef Py_ssize_t *comb = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
+
+    for iset in range(nsets):
+
+        _unrank_combination(iset, nvec, k, comb)
+
+        for jperm in range(nopt_per_set):
+            
+            _from_left_lehmer(jperm, k, digits, perm)
+
+            order_count_best[iset, comb[perm[i_opt]]] += order_count[iset, jperm]
+
+    free(digits)
+    free(perm)
+    free(comb)
+
+    return np.asarray(order_count_best)

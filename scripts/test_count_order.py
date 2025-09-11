@@ -20,12 +20,13 @@ dlist = [0.0, 0.0, 0.333333333333333, 0.66666666666666]
 k = 2
 
 l = [np.random.random(lenlist[ivec]) + dlist[ivec] for ivec in range(nvec)]
-nmc_all = np.array([1, 1, 1, 1, 1, 1])
+nmc_all = np.array([10, 1000, 1000, 1000, 1000, 1000])
+# nmc_all = np.ones(6, dtype=np.intp) * 100000
 
 # order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
 order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l, method="montecarlo", nmc_all = nmc_all)
 # A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
-A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.000001)
+A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.00000)
 
 assert np.array_equal(nmc_all, order_count.sum(axis=1))
 

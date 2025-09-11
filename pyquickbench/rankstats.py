@@ -13,6 +13,8 @@ from .cython.rankstats import (
     montecarlo_score_to_perm_count              ,
     KendallTauDistance                          ,
     KendallTauRankCorrelation                   ,
+    find_nvec_k_from_order_count_shape          ,
+    project_order_count_best                    ,
 )
     
 def exhaustive_score_to_perm_count(l):
@@ -99,44 +101,50 @@ def exhaustive_score_to_perm_count_brute_force(l):
         
     return res
 
-def exhaustive_score_to_partial_order_count(k, l, opt="opt"):
+def exhaustive_score_to_partial_order_count(k, l, order_count = None, opt="opt"):
     
     nvec = len(l)
-    nfac = math.factorial(k)
-    ncomb = math.comb(nvec, k)
 
-    if np.iinfo(np.intp).max < nfac:
-        raise ValueError("Too many vectors")
+    if order_count is None:
+        
+        nfac = math.factorial(k)
+        ncomb = math.comb(nvec, k)
 
-    res = np.zeros((ncomb, nfac), dtype=np.intp)    
+        if np.iinfo(np.intp).max < nfac:
+            raise ValueError("Too many vectors")
+        
+        order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
     
     for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
         
         ll = [l[c] for c in comb]
 
         if opt == "opt":
-            res[icomb,:] = exhaustive_score_to_perm_count(ll)
+            order_count[icomb,:] += exhaustive_score_to_perm_count(ll)
         elif opt == "brute_force":
-            res[icomb,:] = exhaustive_score_to_perm_count_brute_force(ll)
+            order_count[icomb,:] += exhaustive_score_to_perm_count_brute_force(ll)
         else:
             raise ValueError('Unknown backend')
-        
-    return res
+    
+    return order_count
 
-def montecarlo_score_to_partial_order_count(k, l, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+def montecarlo_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     
     nvec = len(l)
-    nfac = math.factorial(k)
-    ncomb = math.comb(nvec, k)
+    
+    if order_count is None:
+        
+        nfac = math.factorial(k)
+        ncomb = math.comb(nvec, k)
+
+        if np.iinfo(np.intp).max < nfac:
+            raise ValueError("Too many vectors")
+        
+        order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
 
     if not isinstance(nmc_all, collections.abc.Iterable):
-        nmc_all = itertools.repeat(nmc_all, ncomb)
+        nmc_all = itertools.repeat(nmc_all)
 
-    if np.iinfo(np.intp).max < nfac:
-        raise ValueError("Too many vectors")
-
-    res = np.zeros((ncomb, nfac), dtype=np.intp)  
-    
     if cap_nmc:
         
         for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
@@ -148,57 +156,61 @@ def montecarlo_score_to_partial_order_count(k, l, nmc_all = 1000, nrand_max = 10
                 nobs_tot *= l[i].shape[0]
                 
             if nobs_tot <= nmc :
-                res[icomb,:] = exhaustive_score_to_perm_count(ll)
+                order_count[icomb,:] += exhaustive_score_to_perm_count(ll)
             else:
-                res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+                order_count[icomb,:] += montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
 
     else:
         
         for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
             ll = [l[c] for c in comb]
-            res[icomb,:] = montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+            order_count[icomb,:] += montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+            
+    return order_count
 
-    return res
+def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+    
+    nvec = len(l)
+    
+    if order_count is None:
+        
+        nfac = math.factorial(k)
+        ncomb = math.comb(nvec, k)
 
-def score_to_partial_order_count(k, l, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+        if np.iinfo(np.intp).max < nfac:
+            raise ValueError("Too many vectors")
+        
+        order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
+        
+        
+        
+        
+    return order_count
+
+def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+    
+    nvec = len(l)
+
+    if order_count is None:
+        
+        nfac = math.factorial(k)
+        ncomb = math.comb(nvec, k)
+
+        if np.iinfo(np.intp).max < nfac:
+            raise ValueError("Too many vectors")
+        
+        order_count = np.zeros((ncomb, nfac), dtype=np.intp)   
     
     if method == "exhaustive":
-        return exhaustive_score_to_partial_order_count(k, l)
+        exhaustive_score_to_partial_order_count(k, l, order_count)
     elif method == "montecarlo":
-        return montecarlo_score_to_partial_order_count(k, l, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
+        montecarlo_score_to_partial_order_count(k, l, order_count, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
+    elif method == "adaptive":
+        adaptive_score_to_partial_order_count(k, l, order_count)
     else:
         raise NotImplementedError
     
-def find_nvec_k_from_order_count_shape(order_count, kmax = 100, nvec_max = 100):
-    
-    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
-    
-    nsets = order_count.shape[0]
-    nopt_per_set = order_count.shape[1]
-    
-    kfac = 1
-    for k in range(1,kmax):
-        kfac *= k
-        if kfac == nopt_per_set:
-            break
-    else:
-        raise ValueError("Could not determine k")
-    
-    c_arr = np.ones(nvec_max, dtype=np.intp)
-    for nvec in range(1,k):
-        for kk in range(nvec-1,0,-1):
-            c_arr[kk] += c_arr[kk-1] 
-
-    for nvec in range(k,nvec_max):
-        for kk in range(nvec-1,0,-1):
-            c_arr[kk] += c_arr[kk-1] 
-
-        if c_arr[k] == nsets:
-            break
-    else:
-        raise ValueError("Could not determine nvec")
-    
-    return nvec, k
+    return order_count
 
 def fuse_score_to_partial_order_count(order_count, idx_fused):
     
