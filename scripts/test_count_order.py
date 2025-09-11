@@ -11,6 +11,8 @@ import scipy
 
 # np.random.seed(seed=0)
 
+eps = 1e-14
+
 nvec = 4
 n = 10000
 lenlist = [1000, 1000, 1000, 1000]
@@ -25,10 +27,22 @@ nmc_all = np.array([10, 1000, 1000, 1000, 1000, 1000])
 
 # order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
 order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l, method="montecarlo", nmc_all = nmc_all)
+assert np.array_equal(nmc_all, order_count.sum(axis=1))
+
+
 # A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
 A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.00000)
 
-assert np.array_equal(nmc_all, order_count.sum(axis=1))
+order_count_best = pyquickbench.rankstats.project_order_count_best(order_count)
+pp, qq, dqq = pyquickbench.rankstats.build_sinkhorn_rhs(order_count_best, reg_eps = 0.00000)
+
+assert np.linalg.norm(pp-p) < eps
+assert np.linalg.norm(qq-q) < eps
+assert np.linalg.norm(dqq-dq) < eps
+
+
+
+
 
 
 reg_beta = 0.
@@ -55,14 +69,15 @@ uscale = u
 print(p)
 print(q)
 print()
-logu = np.log(u)
-logv = np.log(v)
-lam = logv.sum() - logu.sum()
-logu -= lam
-logv += lam
+logu, logv = pyquickbench.cython.sinkhorn.uv_to_loguv(u, v)
+
+# lam = (logv.sum() - logu.sum()) / (nsets+nvec)
+# logu += lam
+# logv -= lam
 
 print(logu)
 print(logv)
+print(logv.sum() - logu.sum())
 print()
 print(M)
 # 

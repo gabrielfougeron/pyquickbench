@@ -168,7 +168,7 @@ def montecarlo_score_to_partial_order_count(k, l, order_count = None, nmc_all = 
             
     return order_count
 
-def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nmc_step = 1):
     
     nvec = len(l)
     
@@ -182,8 +182,26 @@ def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 10
         
         order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
         
+    n_tot = order_count.sum()
+        
+    nmc_rem = nmc_all
+    
+    # I really only need A here ... at least as long as I don't have a matrix-free implementation
+    A, p, q = build_sinkhorn_problem(order_count)
+    
+    while nmc_rem > 0:
+        
+        nmc = min(nmc_rem, nmc_step)
+        
+        order_count_best = project_order_count_best(order_count)
         
         
+        
+        
+        
+        
+        n_tot += nmc
+        nmc_rem -= nmc
         
     return order_count
 
@@ -206,7 +224,7 @@ def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive"
     elif method == "montecarlo":
         montecarlo_score_to_partial_order_count(k, l, order_count, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
     elif method == "adaptive":
-        adaptive_score_to_partial_order_count(k, l, order_count)
+        adaptive_score_to_partial_order_count(k, l, order_count, nmc_all = nmc_all)
     else:
         raise NotImplementedError
     
@@ -474,6 +492,45 @@ def build_sinkhorn_problem_2(order_count, reg_eps = 0., minimize=False):
         dq[i,:] /= dq[i,:].sum()
                 
     return A, p, q, dq
+
+def build_sinkhorn_rhs(order_count_best, reg_eps = 0.):
+    
+    nsets = order_count_best.shape[0]
+    nvec = order_count_best.shape[1]
+
+    p = np.zeros(nsets, dtype=np.float64)    
+    q = np.zeros(nvec, dtype=np.float64)   
+    dq = np.empty((nsets, nvec), dtype=np.float64)
+    
+    for iset in range(nsets):
+        for ivec in range(nvec):
+            
+            val = order_count_best[iset, ivec]
+            
+            p[iset] += val
+            q[ivec] += val
+            dq[iset, ivec] = val
+    
+    total_sum = 0
+            
+    for iset in range(nsets):
+        val = p[iset]
+        total_sum += val
+        for ivec in range(nvec):
+            dq[iset, ivec] /= val
+        
+    alpha = (1. - reg_eps) / total_sum  
+    beta = reg_eps / nsets   
+    
+    for i in range(nsets):
+        p[i] = alpha * p[i] + beta
+        
+    beta = reg_eps / nvec   
+        
+    for i in range(nvec):
+        q[i] = alpha * q[i] + beta
+                
+    return p, q, dq
             
 def build_log_tangent_sinkhorn_problem(M):    
     

@@ -68,6 +68,24 @@ def test_exhaustive_score_to_partial_order_count(lenlist):
         poc_bf =  pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l, opt="brute_force")
         
         assert np.array_equal(poc_opt, poc_bf)
+        
+@pytest.mark.parametrize("lenlist", lenlist_list)
+def test_exhaustive_score_to_partial_order_count(lenlist, tol = 1e-14):
+    
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    for k in range(1,nvec+1):
+
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        
+        order_count_best = pyquickbench.rankstats.project_order_count_best(order_count)
+        A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.00000)
+        pp, qq, dqq = pyquickbench.rankstats.build_sinkhorn_rhs(order_count_best, reg_eps = 0.00000)
+
+        assert np.linalg.norm(pp-p) < tol
+        assert np.linalg.norm(qq-q) < tol
+        assert np.linalg.norm(dqq-dq) < tol
 
 def test_fuse_score_to_partial_count():
     

@@ -5,6 +5,7 @@ np.import_array()
 cimport cython
 
 from libc.math cimport sqrt as csqrt
+from libc.math cimport log as clog
 from libc.stdlib cimport malloc, free, rand
 from libc.string cimport memset
 
@@ -101,3 +102,37 @@ def sinkhorn_knopp(
     free(uM)
 
     return (np.asarray(u), np.asarray(v))
+
+@cython.cdivision(True)
+cdef void _inplace_uv_to_loguv(double[::1] u, double[::1] v) noexcept nogil:
+
+    cdef Py_ssize_t i
+    cdef double val = 0.
+    cdef double lam = 0.
+
+    for i in range(v.shape[0]):
+        val = clog(v[i])
+        lam += val
+        v[i] = val
+
+    for i in range(u.shape[0]):
+        val = clog(u[i])
+        lam -= val
+        u[i] = val
+
+    lam /= (v.shape[0] + u.shape[0])
+
+    for i in range(v.shape[0]):
+        v[i] -= lam
+
+    for i in range(u.shape[0]):
+        u[i] += lam
+
+def uv_to_loguv(double[::1] u, double[::1] v):
+
+    cdef np.ndarray[double, ndim=1, mode='c'] logu = np.copy(u)
+    cdef np.ndarray[double, ndim=1, mode='c'] logv = np.copy(v)
+
+    _inplace_uv_to_loguv(logu, logv)
+
+    return logu, logv
