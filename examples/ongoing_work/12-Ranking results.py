@@ -176,14 +176,14 @@ plot_intent = {
 basename = 'ranking_results_2'
 bench_filename = os.path.join(timings_folder, basename+'.npz')
 
-n_repeat = 1000
+n_repeat = 10000
 
 nmc_max = 50.
 nnmc = 32
 
 all_args = {
     "nvec"  : [nvec]   ,
-    "nobs"  : [100]  ,
+    "nobs"  : [1000]  ,
     "d"     : [0.1]  ,
     "method"  : ["adaptive", "montecarlo", ]  ,
     "nmc"     : [int(nmc_max*i/nnmc) for i in range(1,nnmc+1)]  ,

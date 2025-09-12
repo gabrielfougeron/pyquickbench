@@ -114,11 +114,11 @@ def sinkhorn_knopp(
         v = warmstart[1]
 
     _sinkhorn_knopp(
-        M   ,
-        &a[0]       , &b[0]     ,
-        &u[0]       , &v[0]     ,
-        dim_a       , dim_b     ,
-        reg_alpham1 , reg_beta  ,
+        M           ,
+        &a[0]       , &b[0]             ,
+        &u[0]       , &v[0]             ,
+        dim_a       , dim_b             ,
+        reg_alpham1 , reg_beta          ,
         numItermax  , check_err_every   , stopThr   ,
     )
 

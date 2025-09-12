@@ -339,42 +339,62 @@ cpdef double KendallTauDistance(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
 cpdef double KendallTauRankCorrelation(Py_ssize_t[::1] perm_a, Py_ssize_t[::1] perm_b):
     return 1. - 2*KendallTauDistance(perm_a, perm_b)
 
-cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t[:,::1] order_count, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
-    
-    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
-    
-    cdef Py_ssize_t nsets = order_count.shape[0]
-    cdef Py_ssize_t  nopt_per_set = order_count.shape[1]
-    
-    cdef Py_ssize_t nvec, k
-    cdef Py_ssize_t j
+cdef inline Py_ssize_t _find_factorial(Py_ssize_t fac, Py_ssize_t kmax) noexcept nogil:
 
+    cdef Py_ssize_t k
     cdef Py_ssize_t kfac = 1
     for k in range(1,kmax):
         kfac *= k
-        if kfac == nopt_per_set:
+        if kfac == fac:
             break
     else:
-        raise ValueError("Could not determine k")
+        k = -1
+
+    return k
+
+cdef inline Py_ssize_t _find_ncomb(Py_ssize_t ncomb, Py_ssize_t k, Py_ssize_t nmax) noexcept nogil:
+
+    cdef Py_ssize_t j, nvec
     
-    cdef Py_ssize_t *c_arr = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec_max)
-    for nvec in range(nvec_max):
+    cdef Py_ssize_t *c_arr = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nmax)
+    
+    for nvec in range(k):
         c_arr[nvec] = 1
 
     for nvec in range(1,k):
         for j in range(nvec-1,0,-1):
             c_arr[j] += c_arr[j-1] 
 
-    for nvec in range(k,nvec_max):
+    for nvec in range(k,nmax):
+        c_arr[nvec] = 1
         for j in range(nvec-1,0,-1):
             c_arr[j] += c_arr[j-1] 
 
-        if c_arr[k] == nsets:
+        if c_arr[k] == ncomb:
             break
     else:
-        raise ValueError("Could not determine nvec")
+        nvec = -1
     
     free(c_arr)
+
+    return nvec
+
+cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nsets, Py_ssize_t nopt_per_set, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
+    
+    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
+    
+    # cdef Py_ssize_t nsets = order_count.shape[0]
+    # cdef Py_ssize_t  nopt_per_set = order_count.shape[1]
+    
+    cdef Py_ssize_t nvec, k
+
+    k = _find_factorial(nopt_per_set, kmax)
+    if k < 0:
+        raise ValueError("Could not determine k")
+
+    nvec = _find_ncomb(nsets, k, nvec_max)
+    if nvec < 0:
+        raise ValueError("Could not determine nvec")
 
     return nvec, k
 
@@ -416,7 +436,7 @@ def project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=False)
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nvec, k
-    nvec, k = find_nvec_k_from_order_count_shape(order_count)
+    nvec, k = find_nvec_k_from_order_count_shape(nsets, order_count.shape[1])
     cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, nvec), dtype=np.intp)   
 
     _project_order_count_best(order_count, order_count_best, k, minimize)
@@ -486,27 +506,3 @@ def build_sinkhorn_rhs(
     _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
     
     return np.asarray(p), np.asarray(q), np.asarray(dq)
-
-# @cython.cdivision(True)
-# def adaptive_find_best_icomb_update(
-#     Py_ssize_t[:,::1] order_count       ,
-#     Py_ssize_t[:,::1] order_count_best  ,
-#     Py_ssize_t ntot                     ,
-#     double[::1] p                       ,
-#     double[::1] q                       ,
-#     double[:,::1] dq                    ,
-# ):
-# 
-#     cdef Py_ssize_t nsets = order_count.shape[0]
-#     cdef Py_ssize_t nvec, k
-#     nvec, k = find_nvec_k_from_order_count_shape(order_count)
-# 
-#     _project_order_count_best(order_count, order_count_best, k, False)
-# 
-#     cdef double reg_eps = 1. / (n_tot + 1)
-# 
-#     _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
-# 
-#         
-#     cdef double reg_alpham1 = 0.
-#     cdef double reg_beta = 0.
