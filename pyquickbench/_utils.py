@@ -120,6 +120,7 @@ def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
     
     if file_ext == '.npy':
         all_vals = np.load(filename, allow_pickle = allow_pickle)    
+        file_shape = None
 
         BenchmarkUpToDate = True
         assert all_vals.ndim == len(shape)
@@ -130,6 +131,12 @@ def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
         file_content = np.load(filename, allow_pickle = allow_pickle)
         all_vals = file_content['all_vals']
         
+        # This should stay consistent with _build_args_shapes
+        file_shape = {key:val for (key,val) in file_content.items() if key!='all_vals'}
+        file_shape[fun_ax_name] = all_vals.shape[-3]
+        file_shape[repeat_ax_name] = all_vals.shape[-2]
+        file_shape[out_ax_name] = all_vals.shape[-1]
+
         BenchmarkUpToDate = (all_vals.ndim == len(shape))
         
         if BenchmarkUpToDate:
@@ -152,7 +159,7 @@ def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
     else:
         raise ValueError(f'Unknown file extension {file_ext}')
 
-    return all_vals, BenchmarkUpToDate
+    return file_shape, all_vals, BenchmarkUpToDate
 
 def _save_benchmark_file(filename, all_vals, all_args):
     

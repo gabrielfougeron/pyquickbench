@@ -38,31 +38,31 @@ from pyquickbench._utils import (
 from pyquickbench._defaults import *
 
 def run_benchmark(
-    all_args                : typing.Union[dict, typing.Iterable]                   ,
-    all_funs                : typing.Union[dict, typing.Iterable]                   ,
+    all_args                : typing.Union[dict, typing.Iterable]   = []            ,
+    all_funs                : typing.Union[dict, typing.Iterable]   = []            ,
     *                                                                               ,
-    mode                    : str                       = "timings"                 ,
+    mode                    : str                                   = "timings"     ,
     setup                   : typing.Callable[[int], typing.Dict[str, typing.Any]]
-                                                        = default_setup             ,
+                                                                    = default_setup ,
     wrapup                  : typing.Union[typing.Callable, None]
-                                                                = None              ,
-    deterministic_setup     : bool                      = True                      ,
-    n_repeat                : int                       = 1                         ,
-    n_out                   : typing.Union[int, None]   = None                      ,
-    nproc                   : typing.Union[int, None]   = None                      ,
-    pooltype                : typing.Union[str, None]   = None                      ,
-    time_per_test           : float                     = 0.2                       ,
-    filename                : typing.Union[str, None]   = None                      ,
-    ForceBenchmark          : bool                      = False                     ,
-    PreventBenchmark        : bool                      = False                     ,
-    allow_pickle            : bool                      = False                     ,
-    StopOnExcept            : bool                      = False                     ,
-    ShowProgress            : bool                      = False                     ,
-    WarmUp                  : bool                      = False                     ,
-    MonotonicAxes           : list                      = []                        ,
-    timeout                 : float                     = 1.                        ,
-    show                    : bool                      = False                     ,
-    return_array_descriptor : bool                      = False                     ,
+                                                                    = None          ,
+    deterministic_setup     : bool                                  = True          ,
+    n_repeat                : int                                   = 1             ,
+    n_out                   : typing.Union[int, None]               = None          ,
+    nproc                   : typing.Union[int, None]               = None          ,
+    pooltype                : typing.Union[str, None]               = None          ,
+    time_per_test           : float                                 = 0.2           ,
+    filename                : typing.Union[str, None]               = None          ,
+    ForceBenchmark          : bool                                  = False         ,
+    PreventBenchmark        : bool                                  = False         ,
+    allow_pickle            : bool                                  = False         ,
+    StopOnExcept            : bool                                  = False         ,
+    ShowProgress            : bool                                  = False         ,
+    WarmUp                  : bool                                  = False         ,
+    MonotonicAxes           : list                                  = []            ,
+    timeout                 : float                                 = 1.            ,
+    show                    : bool                                  = False         ,
+    return_array_descriptor : bool                                  = False         ,
     **plot_kwargs           : typing.Dict[str, typing.Any]                          ,
 ) -> typing.Union[np.typing.NDArray[np.float64], None] :
     """ Runs a full benchmark.
@@ -169,16 +169,13 @@ def run_benchmark(
 
     args_shape, res_shape = _build_args_shapes(all_args, all_funs, n_repeat, n_out)
     
-    if return_array_descriptor:
-        return res_shape
-    
     MonotonicAxes_idx = _arg_names_list_to_idx(MonotonicAxes, all_args)
 
     if Load_timings_file:
         
         try:
             
-            all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape, allow_pickle = allow_pickle)
+            benchfile_shape, all_vals, BenchmarkUpToDate = _load_benchmark_file(filename, all_args, res_shape, allow_pickle = allow_pickle)
 
             DoBenchmark = not(BenchmarkUpToDate) and not(PreventBenchmark)
             if not(BenchmarkUpToDate) and PreventBenchmark:
@@ -196,6 +193,12 @@ def run_benchmark(
         
         all_vals = None
         DoBenchmark = not(PreventBenchmark)
+
+    if return_array_descriptor:
+        if all_vals is None:
+            return res_shape
+        else:
+            return benchfile_shape, all_vals
 
     if DoBenchmark:
 

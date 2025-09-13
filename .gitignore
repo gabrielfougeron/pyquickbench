@@ -26,6 +26,7 @@
 .hypothesis/
 .pytest_cache
 *__pycache__*
+AI_bench/
 dist/
 build/
 wheelhouse/

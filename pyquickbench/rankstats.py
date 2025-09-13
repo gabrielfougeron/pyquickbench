@@ -280,10 +280,6 @@ def get_best_icomb(order_count, A):
     return icomb
 
 
-
-
-
-
 def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     
     nvec = len(l)
