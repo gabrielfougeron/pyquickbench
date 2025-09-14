@@ -15,8 +15,9 @@ from .cython.rankstats import (
     KendallTauDistance                          ,
     KendallTauRankCorrelation                   ,
     find_nvec_k_from_order_count_shape          ,
-    project_order_count_best                    ,
+    order_count_to_best_count                   ,
     build_sinkhorn_rhs                          ,
+    build_sinkhorn_rhs_new                      ,
 )
 
 from .cython.sinkhorn import (
@@ -219,7 +220,7 @@ def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 10
 
 def get_best_icomb(order_count, A):
 
-    order_count_best = project_order_count_best(order_count)
+    order_count_best = order_count_to_best_count(order_count)
     
     nsets = order_count_best.shape[0]
     nvec = order_count_best.shape[1]
@@ -459,6 +460,19 @@ def condorcet_top_order(order_count, minimize=False):
 #         
 #     return res
 
+def build_sinkhorn_mat(nvec, k):
+    
+    nsets = math.comb(nvec, k)
+    
+    A = np.zeros((nsets, nvec), dtype=np.float64)
+    
+    for iset, comb in enumerate(itertools.combinations(range(nvec), k)):
+
+        for j in comb:
+            A[iset, j] = 1.
+        
+    return A
+
 def build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False):
     
     nsets = order_count.shape[0]
@@ -481,6 +495,9 @@ def build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False):
     A = np.zeros((nsets, nopts), dtype=np.float64)
     
     for iset, comb in enumerate(itertools.combinations(range(nvec), k)):
+        
+        for j in comb:
+            A[iset, j] = 1.
 
         for jperm in range(nopt_per_set):
             
@@ -491,9 +508,6 @@ def build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False):
             total_sum += val
             p_int[iset] += val
             q_int[comb[perm[i_opt]]] += val
-            
-            for j in comb:
-                A[iset, j] = 1.
         
     p = np.empty(nsets, dtype=np.float64)    
     q = np.empty(nopts, dtype=np.float64)
@@ -535,6 +549,9 @@ def build_sinkhorn_problem_2(order_count, reg_eps = 0., minimize=False):
     A = np.zeros((nsets, nopts), dtype=np.float64)
     
     for iset, comb in enumerate(itertools.combinations(range(nvec), k)):
+        
+        for j in comb:
+            A[iset, j] = 1.
 
         for jperm in range(nopt_per_set):
             
@@ -547,9 +564,6 @@ def build_sinkhorn_problem_2(order_count, reg_eps = 0., minimize=False):
             q_int[comb[perm[i_opt]]] += val
             
             dq[iset, comb[perm[i_opt]]] += val
-            
-            for j in comb:
-                A[iset, j] = 1.
         
     p = np.empty(nsets, dtype=np.float64)    
     q = np.empty(nopts, dtype=np.float64)

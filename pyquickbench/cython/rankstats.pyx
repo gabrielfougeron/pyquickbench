@@ -506,3 +506,88 @@ def build_sinkhorn_rhs(
     _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
     
     return np.asarray(p), np.asarray(q), np.asarray(dq)
+
+
+
+@cython.cdivision(True)
+cpdef void _build_sinkhorn_rhs_new(
+    Py_ssize_t[:,::1] best_count,
+    double[::1] p       ,
+    double[::1] q       ,
+    # double[:,::1] dq    ,
+    double reg_eps = 0. ,
+) noexcept nogil:
+    
+    cdef Py_ssize_t nsets = best_count.shape[0]
+    cdef Py_ssize_t k = best_count.shape[1]
+    cdef Py_ssize_t nvec = q.shape[0]
+
+    cdef Py_ssize_t iset, ivec, ik
+    cdef double val
+
+    memset(&p[0], 0, sizeof(double)*nsets)
+    memset(&q[0], 0, sizeof(double)*nvec)
+
+
+    cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
+    cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
+    cdef Py_ssize_t *comb = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
+
+    for iset in range(nsets):
+
+        _unrank_combination(iset, nvec, k, comb)
+
+        for ik in range(k):
+
+            val = best_count[iset, ik]
+            
+            p[iset] += val
+            q[comb[ik]] += val
+    #         dq[iset, ivec] = val ???
+
+    cdef double total_sum = 0
+
+    for ivec in range(nvec):
+        total_sum += q[ivec]
+            
+    # for iset in range(nsets):
+    #     val = p[iset]
+    #     total_sum += val
+    #     for ivec in range(nvec):
+    #         dq[iset, ivec] /= val
+
+    cdef double alpha, beta
+        
+    alpha = (1. - reg_eps) / total_sum  
+    beta = reg_eps / nsets   
+    
+    for i in range(nsets):
+        p[i] = alpha * p[i] + beta
+        
+    beta = reg_eps / nvec   
+        
+    for i in range(nvec):
+        q[i] = alpha * q[i] + beta
+
+    free(digits)
+    free(perm)
+    free(comb)
+
+def build_sinkhorn_rhs_new(
+    Py_ssize_t[:,::1] best_count    ,
+    double reg_eps = 0.             ,
+):
+    
+    cdef Py_ssize_t nsets = best_count.shape[0]
+    cdef Py_ssize_t k = best_count.shape[1]
+
+    cdef Py_ssize_t nvec = _find_ncomb(nsets, k, 100)
+    if nvec < 0:
+        raise ValueError("Could not determine nvec")
+
+    cdef double[::1] p = np.empty(nsets, dtype=np.float64)    
+    cdef double[::1] q = np.empty(nvec, dtype=np.float64)       
+
+    _build_sinkhorn_rhs_new(best_count, p, q, reg_eps)
+    
+    return np.asarray(p), np.asarray(q)

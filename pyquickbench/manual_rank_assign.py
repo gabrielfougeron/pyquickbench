@@ -6,9 +6,14 @@ import scipy
 
 from . import rankstats
 
+from pyquickbench.cython.sinkhorn import sinkhorn_knopp
+
 from pyquickbench._benchmark import run_benchmark
 from pyquickbench._defaults import *
-from pyquickbench._utils import _prod_rel_shapes
+from pyquickbench._utils import (
+    _prod_rel_shapes            ,
+    _from_mem_shift_restricted  ,
+)
 
 class ManualRankAssign():
 
@@ -30,6 +35,13 @@ class ManualRankAssign():
             return_array_descriptor = True  ,
             StopOnExcept = True             ,
         )
+            
+        # for key, val in self.benchfile_shape.items():
+        #     print(key)
+        #     print(val)
+        #     print()
+        #     
+        # exit()
             
         compare_intent_order = {} # Recreate dict so that order is consistent with benchfile_shape
 
@@ -89,25 +101,74 @@ class ManualRankAssign():
 
     def next_set(self):
         
-        self.next_iset()
-        i_group_arr = np.random.randint(self.n_group)
-        i_compare_arr = rankstats.unrank_combination(self.cur_iset, self.n_compare, self.k)
-
-        # vals_list = []
-        # for (i_group, i_compare) in zip(i_group_arr, i_compare_arr):
-            
-            # i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
-            
+        iset = self.next_iset()
         
-        # return
+        i_group_arr = np.random.randint(self.n_group, size=self.k)
+        i_compare_arr = rankstats.unrank_combination(iset, self.n_compare, self.k)
+
+        idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
+
+        vals_list = []
+        for (i_group, i_compare) in zip(i_group_arr, i_compare_arr):
+            
+            idx_group   = _from_mem_shift_restricted(i_group  , self.idx_all_group  , self.all_vals.shape)
+            idx_compare = _from_mem_shift_restricted(i_compare, self.idx_all_compare, self.all_vals.shape)
+
+            for i, j in zip(idx_group, self.idx_all_group):
+                idx_vals_arr[j] = i
+            for i, j in zip(idx_compare, self.idx_all_compare):
+                idx_vals_arr[j] = i
+
+            idx_vals = tuple(idx_vals_arr)
+
+            vals_list.append(self.all_vals[idx_vals])
+        
+        return iset, vals_list
     
     def next_iset(self):
-        self.cur_iset = np.argmin(self.best_count.sum(axis=1))
+        return np.argmin(self.best_count.sum(axis=1))
     
-    def vote_for_ibest(self, ibest):
-
-        self.best_count[self.cur_iset, ibest] += 1
+    def vote_for_ibest(self,cur_iset, ibest):
+        self.best_count[cur_iset, ibest] += 1
     
     def save_results(self):
-        
         np.save(self.best_count_filename, self.best_count)
+        
+    def get_order(self):
+        
+        A = rankstats.build_sinkhorn_mat(self.n_compare, self.k)
+        p, q = rankstats.build_sinkhorn_rhs_new(self.best_count, reg_eps = 0.00000)
+        
+        reg_beta = 0.
+        reg_alpham1 = 0.
+        u, v = sinkhorn_knopp(A, p, q, reg_alpham1 = reg_alpham1, reg_beta = reg_beta)
+
+        compare_order = np.argsort(v)
+        
+        compare_args = []
+        for i_compare in compare_order:
+            
+            idx_compare = _from_mem_shift_restricted(i_compare, self.idx_all_compare, self.all_vals.shape)
+            
+            args = {}
+            
+            for i, (key, val) in enumerate(self.benchfile_shape.items()):
+                
+                if i in self.idx_all_compare:
+                    
+                    j = self.idx_all_compare.index(i)
+
+                    try:
+                    
+                        args[key] = val[idx_compare[j]]
+                        
+                    except Exception as exc:
+                        
+                        args[key] = idx_compare[j]
+                        
+                
+                
+            compare_args.append(args)
+
+        return compare_args
+            

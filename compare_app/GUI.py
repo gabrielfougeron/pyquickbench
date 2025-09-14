@@ -80,6 +80,11 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master, **kwargs)
         
+        self.width = 10 # Does not matter, will be changed automatically soon
+        
+        # TODO Change this for grid layout
+        self.num_cols = self.master.rank_assign.k
+        
         self.img_dir = os.path.join(self.master.rank_assign.bench_root, "imgs")
         self.all_images = []
         for f in os.listdir(self.img_dir):
@@ -90,13 +95,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
 
-        self.fillScrollRegion()
+        self.cache_next_choice()
+        self.present_next_choice()
 
     def on_key_press(self, event):
 
         ibest_choice = -1
-        
-        print(f'{event.keysym = }')
         
         if event.keysym == "Escape":
             self.save_and_wrapup()
@@ -109,33 +113,62 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
                 ibest_choice = 1
 
         if ibest_choice >= 0:
-            # self.master.rank_assign.vote_for_ibest(ibest_choice)
-            self.fillScrollRegion()
-            self.resize_images()
-    
+            self.master.rank_assign.vote_for_ibest(self.cur_iset, ibest_choice)
+            self.present_next_choice()
+            
     def save_and_wrapup(self):
         
         self.master.rank_assign.save_results()
         self.master.quit()
     
-    def fillScrollRegion(self):
+    def cache_next_choice(self):
 
-        n_images = len(self.all_images)
+        self.iset_cache, self.vals_set_cache = self.master.rank_assign.next_set()
+
+        assert len(self.vals_set_cache) == self.master.rank_assign.k
         
-        ### use instance variable to store the number of columns
-        self.num_cols = self.master.rank_assign.k
-        for i in range(self.num_cols):
+        self.img_cache = []
+        self.tkimg_cache = []
+        
+        width = self.width - self.num_cols * 4   # cater border and hightlight of labels
+        img_width = width // self.num_cols
+        
+        for val in self.vals_set_cache:
+            
+            img_path = self.get_img_path(val)
+            img = Image.open(img_path)
+            img = ImageOps.exif_transpose(img)
+            tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+            
+            self.img_cache.append(img)
+            self.tkimg_cache.append(tkimg)
+            
+    def present_next_choice(self):
+        
+        self.cur_iset = self.iset_cache
+        vals_set = self.vals_set_cache
+        
+        assert len(vals_set) == self.master.rank_assign.k
+        
+        for i in range(self.master.rank_assign.k):
             
             row, col = divmod(i, self.num_cols)
-            i_img = np.random.randint(n_images)
-            
-            img = Image.open(self.all_images[i_img])
-            img = ImageOps.exif_transpose(img)
+
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
             lbl.configure(anchor="center", background='black')  
-            lbl.image = img  ### save the original image for later resize
+            lbl.image = self.img_cache[i]  ### save the original image for later resize
+            lbl.tkimg = self.tkimg_cache[i]
+            lbl.config(image=lbl.tkimg,anchor="center", background='black')
+            
+        self.after(250, self.cache_next_choice)
+    
+    def get_img_path(self, val):
+        
+        img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        
+        return img_path
 
     def resize_images(self, width=None):
         
@@ -154,6 +187,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             ### show the image
             lbl.tkimg = ImageTk.PhotoImage(img)
             lbl.config(image=lbl.tkimg,anchor="center", background='black')
+            
+        # Resize cache as well
+        self.tkimg_cache = []
+        for img in self.img_cache:
+            tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+            self.tkimg_cache.append(tkimg)
 
     def do(self):
         pass

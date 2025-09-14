@@ -23,7 +23,19 @@ bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
 
 rank_assign = pyquickbench.ManualRankAssign(bench_root, k=2)
 
-
-
 img_compare_GUI = GUI.ImageCompareGUI(rank_assign)
 img_compare_GUI()
+
+print()
+
+order = rank_assign.get_order()
+
+for rank, d in enumerate(order):
+    
+    print(f'{rank = }')
+    
+    for key, val in d.items():
+        
+        print(key, ':', val)
+        
+    print() 
