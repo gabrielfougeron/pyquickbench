@@ -211,13 +211,6 @@ def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 10
         
     return order_count
 
-# def get_best_icomb(order_count, A):
-# 
-#     icomb = np.argmin(order_count.sum(axis=1))
-#     
-#     return icomb
-
-
 def get_best_icomb(order_count, A):
 
     order_count_best = order_count_to_best_count(order_count)

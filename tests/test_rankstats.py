@@ -79,7 +79,7 @@ def test_exhaustive_score_to_partial_order_count(lenlist, tol = 1e-14):
 
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
         
-        order_count_best = pyquickbench.rankstats.project_order_count_best(order_count)
+        order_count_best = pyquickbench.rankstats.order_count_to_best_count(order_count)
         A, p, q, dq = pyquickbench.rankstats.build_sinkhorn_problem_2(order_count, reg_eps = 0.00000)
         pp, qq, dqq = pyquickbench.rankstats.build_sinkhorn_rhs(order_count_best, reg_eps = 0.00000)
 

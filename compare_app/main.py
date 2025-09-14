@@ -20,19 +20,25 @@ except (NameError, ValueError):
 sys.path.append(__PROJECT_ROOT__)
 
 bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
+# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR_2")
 
-rank_assign = pyquickbench.ManualRankAssign(bench_root, k=2)
+# compare_intent = {}
+# compare_intent = {"t5xxl_prompt" : "group"}
+compare_intent = {"lora_name" : "group"}
+
+rank_assign = pyquickbench.ManualRankAssign(bench_root, k=2, compare_intent=compare_intent)
 
 img_compare_GUI = GUI.ImageCompareGUI(rank_assign)
 img_compare_GUI()
 
 print()
 
-order = rank_assign.get_order()
+order, v = rank_assign.get_order()
 
 for rank, d in enumerate(order):
     
     print(f'{rank = }')
+    print(f'ELO = {v[rank]}')
     
     for key, val in d.items():
         

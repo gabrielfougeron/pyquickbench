@@ -126,7 +126,10 @@ class ManualRankAssign():
         return iset, vals_list
     
     def next_iset(self):
-        return np.argmin(self.best_count.sum(axis=1))
+        
+        # return np.argmin(self.best_count.sum(axis=1))
+        
+        return np.random.choice(self.ncomb, p=scipy.special.softmax(-self.best_count.sum(axis=1)))
     
     def vote_for_ibest(self,cur_iset, ibest):
         self.best_count[cur_iset, ibest] += 1
@@ -145,6 +148,8 @@ class ManualRankAssign():
 
         compare_order = np.argsort(v)
         
+        logu, logv = rankstats.uv_to_loguv(u, v)
+        
         compare_args = []
         for i_compare in compare_order:
             
@@ -155,20 +160,14 @@ class ManualRankAssign():
             for i, (key, val) in enumerate(self.benchfile_shape.items()):
                 
                 if i in self.idx_all_compare:
-                    
                     j = self.idx_all_compare.index(i)
 
                     try:
-                    
                         args[key] = val[idx_compare[j]]
-                        
                     except Exception as exc:
-                        
                         args[key] = idx_compare[j]
-                        
-                
-                
+                       
             compare_args.append(args)
 
-        return compare_args
+        return compare_args, logv[compare_order]
             

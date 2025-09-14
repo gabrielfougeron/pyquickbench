@@ -95,6 +95,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
 
+        self.all_lbls = []
+
         self.cache_next_choice()
         self.present_next_choice()
 
@@ -107,10 +109,10 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         if event.keysym == 'Left':
             if self.master.rank_assign.k == 2:
-                ibest_choice = 0
+                ibest_choice = self.img_perm[0]
         elif event.keysym == 'Right':
             if self.master.rank_assign.k == 2:
-                ibest_choice = 1
+                ibest_choice = self.img_perm[1]
 
         if ibest_choice >= 0:
             self.master.rank_assign.vote_for_ibest(self.cur_iset, ibest_choice)
@@ -126,7 +128,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.iset_cache, self.vals_set_cache = self.master.rank_assign.next_set()
 
         assert len(self.vals_set_cache) == self.master.rank_assign.k
-        
+
         self.img_cache = []
         self.tkimg_cache = []
         
@@ -137,7 +139,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
             img_path = self.get_img_path(val)
             img = Image.open(img_path)
-            img = ImageOps.exif_transpose(img)
+            # img = ImageOps.exif_transpose(img)
             tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
             
             self.img_cache.append(img)
@@ -145,14 +147,22 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
     def present_next_choice(self):
         
+        for lbl in self.all_lbls:
+            lbl.image.close()
+            lbl.destroy()
+            
+        self.all_lbls = []
+        
         self.cur_iset = self.iset_cache
         vals_set = self.vals_set_cache
         
         assert len(vals_set) == self.master.rank_assign.k
         
+        self.img_perm = np.random.permutation(self.master.rank_assign.k)
+        
         for i in range(self.master.rank_assign.k):
             
-            row, col = divmod(i, self.num_cols)
+            row, col = divmod(self.img_perm[i], self.num_cols)
 
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
@@ -161,6 +171,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             lbl.image = self.img_cache[i]  ### save the original image for later resize
             lbl.tkimg = self.tkimg_cache[i]
             lbl.config(image=lbl.tkimg,anchor="center", background='black')
+            
+            self.all_lbls.append(lbl)
             
         self.after(250, self.cache_next_choice)
     
