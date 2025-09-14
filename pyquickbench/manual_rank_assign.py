@@ -1,5 +1,5 @@
-import collections
-import itertools
+
+import os
 import math
 import numpy as np
 import scipy
@@ -8,7 +8,7 @@ from . import rankstats
 
 from pyquickbench._benchmark import run_benchmark
 from pyquickbench._defaults import *
-from pyquickbench._utils import *
+from pyquickbench._utils import _prod_rel_shapes
 
 class ManualRankAssign():
 
@@ -19,11 +19,13 @@ class ManualRankAssign():
         k = 2                   ,
     ):
         
+        self.cur_icompare = -1
+        
         self.bench_root = bench_root
         self.bench_filename = os.path.join(bench_root, "bench.npz")
-        self.res_filename = os.path.join(bench_root, "order_count.npy")
+        self.best_count_filename = os.path.join(bench_root, "best_count.npy")
         
-        benchfile_shape, all_vals = run_benchmark(
+        self.benchfile_shape, self.all_vals = run_benchmark(
             filename = self.bench_filename  ,
             return_array_descriptor = True  ,
             StopOnExcept = True             ,
@@ -31,7 +33,7 @@ class ManualRankAssign():
             
         compare_intent_order = {} # Recreate dict so that order is consistent with benchfile_shape
 
-        for key, val in benchfile_shape.items():
+        for key, val in self.benchfile_shape.items():
             
             intent_in = compare_intent.get(key)
             
@@ -55,31 +57,57 @@ class ManualRankAssign():
         self.name_group = []
         self.name_compare = []
 
-        for i, (name, value) in enumerate(compare_intent.items()):
+        for i, (name, value) in enumerate(self.compare_intent.items()):
             
-            if name == "group":
+            if value == "group":
                 self.idx_all_group.append(i)
                 self.name_group.append(name)
-            elif name == "compare":
+                
+            elif value == "compare":
                 self.idx_all_compare.append(i)
                 self.name_compare.append(name)
-            
+            else:
+                raise ValueError(f'Unknown compare intent {value}')
+             
         self.n_group    = _prod_rel_shapes(self.idx_all_group     , self.all_vals.shape)
         self.n_compare  = _prod_rel_shapes(self.idx_all_compare   , self.all_vals.shape)
-            
+
         self.k = k
+        self.ncomb = math.comb(self.n_compare, self.k)
 
-        ncomb = math.comb(self.n_compare, self.k)
-        nfac = math.factorial(self.k)
-
-        if os.path.isfile(self.res_filename):
+        if os.path.isfile(self.best_count_filename):
             
-            order_count = np.load(self.res_filename)
+            self.best_count = np.load(self.best_count_filename)
             
-            assert order_count.shape[0] == ncomb
-            assert order_count.shape[1] == nfac
+            if (self.best_count.shape[0] != self.ncomb) or (self.best_count.shape[1] != self.k):
+                
+                raise ValueError(f'Best count in file {self.best_count_filename} has wrong shape. Expected {(self.ncomb, self.k)}, received {self.best_count.shape}.')
             
         else:
-            order_count = np.zeros((ncomb, nfac), dtype=np.intp)
-
             
+            self.best_count = np.zeros((self.ncomb, self.k), dtype=np.intp)
+
+    def next_set(self):
+        
+        self.next_iset()
+        i_group_arr = np.random.randint(self.n_group)
+        i_compare_arr = rankstats.unrank_combination(self.cur_iset, self.n_compare, self.k)
+
+        # vals_list = []
+        # for (i_group, i_compare) in zip(i_group_arr, i_compare_arr):
+            
+            # i_color, idx_curve_color = _get_rel_idx_from_maze(idx_all_curve_color, idx_vals, all_vals.shape)
+            
+        
+        # return
+    
+    def next_iset(self):
+        self.cur_iset = np.argmin(self.best_count.sum(axis=1))
+    
+    def vote_for_ibest(self, ibest):
+
+        self.best_count[self.cur_iset, ibest] += 1
+    
+    def save_results(self):
+        
+        np.save(self.best_count_filename, self.best_count)

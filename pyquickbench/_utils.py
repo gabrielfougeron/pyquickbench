@@ -50,7 +50,7 @@ def _count_Truthy(iterator):
                 first_true_idx = i
     return count, first_true_idx
 
-def _mem_shift_restricted(idx, shape, only):
+def _mem_shift_restricted(idx, only, shape):
     
     res = 0
     prod_shapes = 1
@@ -61,22 +61,30 @@ def _mem_shift_restricted(idx, shape, only):
         
     return res
 
-def _prod_rel_shapes(idx_rel, shape):
+def _from_mem_shift_restricted(i_shift, only, shape):
+    
+    idx = np.zeros(len(only), dtype=np.intp)
+
+    for i, j in enumerate(only):
+        i_shift, idx[i] = divmod(i_shift, shape[j])
+
+    return idx
+    
+def _prod_rel_shapes(only, shape):
     
     prod_shapes = 1
-    for idx in idx_rel:
-        
+    for idx in only:
         prod_shapes *= shape[idx]
     
     return prod_shapes
 
 def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
 
-    idx_items = np.zeros(len(idx_all_items), dtype=int)
+    idx_items = np.zeros(len(idx_all_items), dtype=np.intp)
     for i, j in enumerate(idx_all_items):
         idx_items[i] = idx_vals[j] 
 
-    i_item = _mem_shift_restricted(idx_items, shape, idx_all_items)
+    i_item = _mem_shift_restricted(idx_items, idx_all_items, shape)
     
     return i_item, idx_items
 

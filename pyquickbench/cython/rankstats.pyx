@@ -398,7 +398,7 @@ cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nse
 
     return nvec, k
 
-cdef void _project_order_count_best(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,::1] order_count_best, Py_ssize_t k, bint minimize=False) noexcept nogil:
+cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,::1] order_count_best, Py_ssize_t k, bint minimize=False) noexcept nogil:
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nopt_per_set = order_count.shape[1]
@@ -432,14 +432,14 @@ cdef void _project_order_count_best(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,
     free(perm)
     free(comb)
 
-def project_order_count_best(Py_ssize_t[:,::1] order_count, bint minimize=False):
+def order_count_to_best_count(Py_ssize_t[:,::1] order_count, bint minimize=False):
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nvec, k
     nvec, k = find_nvec_k_from_order_count_shape(nsets, order_count.shape[1])
     cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, nvec), dtype=np.intp)   
 
-    _project_order_count_best(order_count, order_count_best, k, minimize)
+    _order_count_to_best_count(order_count, order_count_best, k, minimize)
 
     return np.asarray(order_count_best)
     

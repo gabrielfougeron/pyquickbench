@@ -21,12 +21,9 @@ sys.path.append(__PROJECT_ROOT__)
 
 bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
 
-rank_assign = ManualRankAssign(bench_root, k=2)
+rank_assign = pyquickbench.ManualRankAssign(bench_root, k=2)
 
-# 
-# 
-# GUI.GUI(
-#     bench_root      ,
-#     k               ,
-#     order_count     ,
-# )
+
+
+img_compare_GUI = GUI.ImageCompareGUI(rank_assign)
+img_compare_GUI()

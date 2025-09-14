@@ -5,7 +5,7 @@ from typing import Iterable
 from PIL import Image, ImageTk, ImageOps
 import pyquickbench
 
-class ScrollFrame(tk.Frame):
+class ImageCompareScrollFrame(tk.Frame):
     
     def __init__(self, master, r=0, c=0, **kwargs):
         ### get the resize callback
@@ -75,55 +75,55 @@ class ScrollFrame(tk.Frame):
         return self
 
 
-class AuxiliaryWindow(tk.Frame):
-    def __init__(self, master, base_dir, k, order_count, **kwargs):
+class ImageCompareAuxiliaryWindow(tk.Frame):
+    
+    def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master, **kwargs)
         
-        self.base_dir = base_dir
-        self.img_dir = os.path.join(self.base_dir, "imgs")
+        self.img_dir = os.path.join(self.master.rank_assign.bench_root, "imgs")
         self.all_images = []
         for f in os.listdir(self.img_dir):
             root, ext = os.path.splitext(f)
             if ext.lower() in [".png", ".jpg"]:
                 self.all_images.append(os.path.join(self.img_dir, f))
 
-        self.k = k
-        self.order_count = order_count
-
-        self.scroll = ScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
+        self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
 
         self.fillScrollRegion()
 
     def on_key_press(self, event):
 
-        Change_img = False
+        ibest_choice = -1
+        
+        print(f'{event.keysym = }')
         
         if event.keysym == "Escape":
             self.save_and_wrapup()
         
         if event.keysym == 'Left':
-            print('Left')
-            Change_img = True
+            if self.master.rank_assign.k == 2:
+                ibest_choice = 0
         elif event.keysym == 'Right':
-            print('Right')
-            Change_img = True
-        
-        if Change_img:
+            if self.master.rank_assign.k == 2:
+                ibest_choice = 1
+
+        if ibest_choice >= 0:
+            # self.master.rank_assign.vote_for_ibest(ibest_choice)
             self.fillScrollRegion()
             self.resize_images()
     
     def save_and_wrapup(self):
         
-        np.save(os.path.join(self.base_dir, "order_count.npy"), self.order_count)
-        self.quit()
+        self.master.rank_assign.save_results()
+        self.master.quit()
     
     def fillScrollRegion(self):
 
         n_images = len(self.all_images)
         
         ### use instance variable to store the number of columns
-        self.num_cols = self.k
+        self.num_cols = self.master.rank_assign.k
         for i in range(self.num_cols):
             
             row, col = divmod(i, self.num_cols)
@@ -158,14 +158,15 @@ class AuxiliaryWindow(tk.Frame):
     def do(self):
         pass
 
-class GUI(tk.Tk):
+class ImageCompareGUI(tk.Tk):
     
-    def __init__(self, base_dir, k, order_count):
+    def __init__(self, rank_assign):
         tk.Tk.__init__(self)
         
         self.title('Ultra Minimalist GUI')
+        self.rank_assign = rank_assign
 
-        aux = AuxiliaryWindow(self, base_dir, k, order_count)
+        aux = ImageCompareAuxiliaryWindow(self)
         aux.pack(expand=1, fill="both")
         
         self.bind("<KeyPress>", aux.on_key_press)

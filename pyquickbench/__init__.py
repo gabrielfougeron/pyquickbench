@@ -87,6 +87,7 @@ from ._time_train import TimeTrain
 
 from . import rankstats
 from . import sort
+from .manual_rank_assign import ManualRankAssign
 
 # Ugly hack to define Sphinx docstrings for variables
 default_ax_name = default_ax_name
