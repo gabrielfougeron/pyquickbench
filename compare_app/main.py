@@ -33,7 +33,11 @@ img_compare_GUI()
 
 print()
 
-order, v = rank_assign.get_order()
+# compare_intent = {"lora_strength" : "group"}
+compare_intent = {"lora_name" : "group"}
+
+
+order, v = rank_assign.get_order(compare_intent = compare_intent)
 
 for rank, d in enumerate(order):
     
