@@ -148,7 +148,9 @@ class ManualRankAssign():
 
         compare_order = np.argsort(v)
         
-        logu, logv = rankstats.uv_to_loguv(u, v)
+        v_scal = v / v.sum()
+        
+        # logu, logv = rankstats.uv_to_loguv(u, v)
         
         compare_args = []
         for i_compare in compare_order:
@@ -169,5 +171,5 @@ class ManualRankAssign():
                        
             compare_args.append(args)
 
-        return compare_args, logv[compare_order]
+        return compare_args, v_scal[compare_order]
             

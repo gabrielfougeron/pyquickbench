@@ -9,8 +9,9 @@ from .cython.rankstats import (
     from_left_lehmer                            ,
     rank_combination                            ,
     unrank_combination                          ,
+    exhaustive_score_to_best_count_inner_loop   ,
     exhaustive_score_to_perm_count_inner_loop   ,
-    exhaustive_score_to_perm_count_inner_loop   ,
+    montecarlo_score_to_best_count              ,
     montecarlo_score_to_perm_count              ,
     KendallTauDistance                          ,
     KendallTauRankCorrelation                   ,
@@ -24,8 +25,8 @@ from .cython.sinkhorn import (
     sinkhorn_knopp                              ,
     uv_to_loguv                                 ,
 )
-    
-def exhaustive_score_to_perm_count(l):
+
+def compress_scores(l):
     
     nvec = len(l)
 
@@ -79,7 +80,45 @@ def exhaustive_score_to_perm_count(l):
     for i in range(nvec):
         ivec_to_idx_sorted_compressed[i] = np.array(ivec_to_idx_sorted_compressed[i])
 
+    return ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr
+    
+def exhaustive_score_to_best_count(l):
+    
+    ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr = compress_scores(l)
+    
+    return exhaustive_score_to_best_count_inner_loop(ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr)
+
+def exhaustive_score_to_perm_count(l):
+    
+    ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr = compress_scores(l)
+    
     return exhaustive_score_to_perm_count_inner_loop(ivec_to_idx_sorted_compressed, idx_sorted_to_ivec_len_arr)
+
+def exhaustive_score_to_best_count_brute_force(l):
+    
+    nvec = len(l)
+
+    prod = 1
+    for i in range(nvec):
+        prod *= l[i].shape[0]
+
+    if np.iinfo(np.intp).max < prod:
+        raise ValueError("Too many observations in vectors")
+    
+    res = np.zeros(nvec, dtype=np.intp)   
+    vals = np.empty(nvec, dtype=np.float64)
+    
+    ranges = [range(l[i].shape[0]) for i in range(nvec)]
+    
+    for I in itertools.product(*ranges):
+        
+        for i in range(nvec):
+            vals[i] = l[i][I[i]]
+        
+        i = np.argmax(vals)
+        res[i] += 1
+        
+    return res
 
 def exhaustive_score_to_perm_count_brute_force(l):
     
@@ -109,6 +148,27 @@ def exhaustive_score_to_perm_count_brute_force(l):
         
     return res
 
+def exhaustive_score_to_partial_best_count(k, l, best_count = None, opt="opt"):
+    
+    nvec = len(l)
+
+    if best_count is None:
+        ncomb = math.comb(nvec, k)
+        best_count = np.zeros((ncomb, k), dtype=np.intp) 
+    
+    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+        
+        ll = [l[c] for c in comb]
+
+        if opt == "opt":
+            best_count[icomb,:] += exhaustive_score_to_best_count(ll)
+        elif opt == "brute_force":
+            best_count[icomb,:] += exhaustive_score_to_best_count_brute_force(ll)
+        else:
+            raise ValueError('Unknown backend')
+    
+    return best_count
+
 def exhaustive_score_to_partial_order_count(k, l, order_count = None, opt="opt"):
     
     nvec = len(l)
@@ -135,6 +195,40 @@ def exhaustive_score_to_partial_order_count(k, l, order_count = None, opt="opt")
             raise ValueError('Unknown backend')
     
     return order_count
+
+def montecarlo_score_to_partial_best_count(k, l, best_count = None, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+    
+    nvec = len(l)
+    
+    if best_count is None:
+        ncomb = math.comb(nvec, k)
+        best_count = np.zeros((ncomb, k), dtype=np.intp) 
+
+    if not isinstance(nmc_all, collections.abc.Iterable):
+        nmc_all = itertools.repeat(nmc_all)
+
+    if cap_nmc:
+        
+        for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
+            
+            ll = [l[c] for c in comb]
+
+            nobs_tot = 1
+            for i in range(nvec):
+                nobs_tot *= l[i].shape[0]
+                
+            if nobs_tot <= nmc :
+                best_count[icomb,:] += exhaustive_score_to_perm_count(ll)
+            else:
+                best_count[icomb,:] += montecarlo_score_to_perm_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+
+    else:
+        
+        for icomb, (comb, nmc) in enumerate(zip(itertools.combinations(range(nvec), k), nmc_all)):
+            ll = [l[c] for c in comb]
+            best_count[icomb,:] += montecarlo_score_to_best_count(ll, ll[0][0], nmc = nmc, nrand_max = nrand_max)
+            
+    return best_count
 
 def montecarlo_score_to_partial_order_count(k, l, order_count = None, nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     
@@ -273,6 +367,27 @@ def get_best_icomb(order_count, A):
 
     return icomb
 
+
+def score_to_partial_best_count(k, l, best_count = None, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
+    
+    nvec = len(l)
+
+    if best_count is None:
+        ncomb = math.comb(nvec, k)
+        best_count = np.zeros((ncomb, k), dtype=np.intp)   
+    
+    if method == "exhaustive":
+        exhaustive_score_to_partial_best_count(k, l, best_count)
+    elif method == "montecarlo":
+        montecarlo_score_to_partial_best_count(k, l, best_count, nmc_all = nmc_all, nrand_max = nrand_max, cap_nmc = cap_nmc)
+    # elif method == "adaptive":
+    #     montecarlo_score_to_partial_best_count(k, l, best_count, nmc_all = 1, nrand_max = 1)
+    #     nmc_all = (nmc_all - 1) * math.comb(nvec, k)
+    #     adaptive_score_to_partial_best_count(k, l, best_count, nmc_all = nmc_all)
+    else:
+        raise NotImplementedError
+    
+    return best_count
 
 def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive", nmc_all = 1000, nrand_max = 10000, cap_nmc = True):
     

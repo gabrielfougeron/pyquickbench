@@ -173,6 +173,23 @@ ctypedef fused num_t:
     float
     double
 
+cdef inline Py_ssize_t _argmax(Py_ssize_t n, num_t* arr) noexcept nogil:
+
+    cdef Py_ssize_t i, imax
+    cdef num_t valmax
+
+    imax = 0
+    valmax = arr[0]
+
+    for i in range(1,n):
+
+        if valmax < arr[i]:
+
+            valmax = arr[i]
+            imax = i
+    
+    return imax
+
 cdef inline void _insertion_argsort(Py_ssize_t n, num_t* arr, Py_ssize_t* perm) noexcept nogil:
 
     cdef Py_ssize_t i, j
@@ -199,6 +216,55 @@ def insertion_argsort(num_t[::1] arr):
     _insertion_argsort(arr.shape[0], &arr[0], &res[0])
 
     return res
+
+def exhaustive_score_to_best_count_inner_loop(list l, Py_ssize_t[::1] cnt):
+
+    cdef Py_ssize_t nvec = len(l)
+    cdef Py_ssize_t[::1] res = np.zeros(nvec, dtype=np.intp)
+
+    cdef Py_ssize_t[::1] tmp
+    cdef Py_ssize_t ivec, it, val
+    cdef Py_ssize_t mul
+
+    cdef Py_ssize_t **ivec_to_idx_ptr = <Py_ssize_t**> malloc(sizeof(Py_ssize_t*)*nvec)
+    
+    cdef Py_ssize_t *ranges = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
+    cdef Py_ssize_t *itr = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
+    memset(itr, 0, sizeof(Py_ssize_t)*nvec)
+
+    cdef Py_ssize_t nmax = 1
+    for ivec in range(nvec):
+        tmp = l[ivec]
+        ranges[ivec] = tmp.shape[0]
+        nmax *= ranges[ivec]
+        ivec_to_idx_ptr[ivec] = &tmp[0]
+
+    cdef Py_ssize_t *idx = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*nvec)
+
+    for it in range(nmax):
+
+        mul = 1
+        for ivec in range(nvec):
+            val = ivec_to_idx_ptr[ivec][itr[ivec]]
+            idx[ivec] = val
+            mul *= cnt[val]
+
+        i = _argmax(nvec, idx)
+        res[i] += mul
+
+        for ivec in range(nvec):
+            itr[ivec] += 1
+            if itr[ivec] != ranges[ivec]:
+                break
+            else:
+                itr[ivec] = 0
+
+    free(ivec_to_idx_ptr)
+    free(idx)
+    free(ranges)
+    free(itr)
+    
+    return np.asarray(res)
 
 def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
 
@@ -254,6 +320,52 @@ def exhaustive_score_to_perm_count_inner_loop(list l, Py_ssize_t[::1] cnt):
     free(idx)
     free(ranges)
     free(itr)
+    
+    return np.asarray(res)
+
+def montecarlo_score_to_best_count(list l, num_t key, Py_ssize_t nmc = 1000, Py_ssize_t nrand_max = 10000):
+
+    cdef Py_ssize_t nvec = len(l)
+    cdef Py_ssize_t[::1] res = np.zeros(nvec, dtype=np.intp)
+
+    cdef Py_ssize_t[::1] tmp_intp
+    cdef Py_ssize_t ivec, it, val
+
+    cdef Py_ssize_t **idx_all = <Py_ssize_t**> malloc(sizeof(Py_ssize_t*)*nvec)
+    
+    cdef num_t **ivec_to_idx_ptr = <num_t**> malloc(sizeof(num_t*)*nvec)
+    cdef num_t[::1] tmp
+    for ivec in range(nvec):
+        tmp = l[ivec]
+        ivec_to_idx_ptr[ivec] = &tmp[0]
+
+    cdef num_t *idx = <num_t*> malloc(sizeof(num_t)*nvec)
+
+    cdef Py_ssize_t nit
+    cdef Py_ssize_t nmc_rem = nmc
+
+    while nmc_rem > 0 :
+
+        nit = min(nrand_max, nmc_rem)
+        nmc_rem -= nit
+
+        idx_all_list = []
+        for ivec in range(nvec):
+            tmp_intp = np.random.randint(l[ivec].shape[0], size = nit, dtype=np.intp)
+            idx_all_list.append(tmp_intp)
+            idx_all[ivec] = &tmp_intp[0]
+
+        for it in range(nit):
+
+            for ivec in range(nvec):
+                idx[ivec] = ivec_to_idx_ptr[ivec][idx_all[ivec][it]]
+
+            i = _argmax(nvec, idx)
+            res[i] += 1
+
+    free(idx_all)
+    free(ivec_to_idx_ptr)
+    free(idx)
     
     return np.asarray(res)
 

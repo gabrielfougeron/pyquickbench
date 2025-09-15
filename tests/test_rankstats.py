@@ -57,7 +57,7 @@ def test_unrank_combinations():
                     assert cpt_comb[i] == comb[i]
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
-def test_exhaustive_score_to_partial_order_count(lenlist):
+def test_exhaustive_score_to_partial_count(lenlist):
     
     nvec = len(lenlist)
     l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
@@ -69,8 +69,13 @@ def test_exhaustive_score_to_partial_order_count(lenlist):
         
         assert np.array_equal(poc_opt, poc_bf)
         
+        pbc_opt = pyquickbench.rankstats.exhaustive_score_to_partial_best_count(k, l, opt="opt")
+        pbc_bf =  pyquickbench.rankstats.exhaustive_score_to_partial_best_count(k, l, opt="brute_force")
+        
+        assert np.array_equal(pbc_opt, pbc_bf)
+        
 @pytest.mark.parametrize("lenlist", lenlist_list)
-def test_exhaustive_score_to_partial_order_count(lenlist, tol = 1e-14):
+def test_NEEDS_CHANGE(lenlist, tol = 1e-14):
     
     nvec = len(lenlist)
     l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]

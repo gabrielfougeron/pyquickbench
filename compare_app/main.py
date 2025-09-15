@@ -19,12 +19,12 @@ except (NameError, ValueError):
 
 sys.path.append(__PROJECT_ROOT__)
 
-bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
-# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR_2")
+# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
+bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR_2")
 
 # compare_intent = {}
-# compare_intent = {"t5xxl_prompt" : "group"}
-compare_intent = {"lora_name" : "group"}
+compare_intent = {"t5xxl_prompt" : "group"}
+# compare_intent = {"lora_name" : "group"}
 
 rank_assign = pyquickbench.ManualRankAssign(bench_root, k=2, compare_intent=compare_intent)
 
@@ -38,7 +38,7 @@ order, v = rank_assign.get_order()
 for rank, d in enumerate(order):
     
     print(f'{rank = }')
-    print(f'ELO = {v[rank]}')
+    print(f'P-L weight = {v[rank]}')
     
     for key, val in d.items():
         
