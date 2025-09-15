@@ -491,6 +491,21 @@ cdef inline Py_ssize_t _find_ncomb(Py_ssize_t ncomb, Py_ssize_t k, Py_ssize_t nm
 
     return nvec
 
+cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nsets, Py_ssize_t k, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
+    
+    # Find nvec, k such that factorial(k) == best_count.shape[1] and comb(k,nvec) == best_count.shape[0]
+    
+    # cdef Py_ssize_t nsets = best_count.shape[0]
+    # cdef Py_ssize_t  nopt_per_set = best_count.shape[1]
+    
+    cdef Py_ssize_t nvec
+
+    nvec = _find_ncomb(nsets, k, nvec_max)
+    if nvec < 0:
+        raise ValueError("Could not determine nvec")
+
+    return nvec, k
+
 cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nsets, Py_ssize_t nopt_per_set, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
     
     # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
@@ -528,28 +543,24 @@ cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:
 
     cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
     cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
-    cdef Py_ssize_t *comb = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
 
     for iset in range(nsets):
-
-        _unrank_combination(iset, nvec, k, comb)
 
         for jperm in range(nopt_per_set):
             
             _from_left_lehmer(jperm, k, digits, perm)
 
-            order_count_best[iset, comb[perm[i_opt]]] += order_count[iset, jperm]
+            order_count_best[iset, perm[i_opt]] += order_count[iset, jperm]
 
     free(digits)
     free(perm)
-    free(comb)
 
 def order_count_to_best_count(Py_ssize_t[:,::1] order_count, bint minimize=False):
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nvec, k
     nvec, k = find_nvec_k_from_order_count_shape(nsets, order_count.shape[1])
-    cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, nvec), dtype=np.intp)   
+    cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, k), dtype=np.intp)   
 
     _order_count_to_best_count(order_count, order_count_best, k, minimize)
 

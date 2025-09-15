@@ -75,6 +75,22 @@ def test_exhaustive_score_to_partial_count(lenlist):
         assert np.array_equal(pbc_opt, pbc_bf)
         
 @pytest.mark.parametrize("lenlist", lenlist_list)
+def test_order_count_to_best_count(lenlist, tol = 1e-14):
+    
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    for k in range(1,nvec+1):
+
+        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        best_count_project = pyquickbench.rankstats.order_count_to_best_count(order_count)
+
+        best_count_direct = pyquickbench.rankstats.score_to_partial_best_count(k, l)
+
+        assert np.array_equal(best_count_project, best_count_direct)
+        
+@pytest.mark.skip("NEEDS CHANGE")
+@pytest.mark.parametrize("lenlist", lenlist_list)
 def test_NEEDS_CHANGE(lenlist, tol = 1e-14):
     
     nvec = len(lenlist)
@@ -92,7 +108,40 @@ def test_NEEDS_CHANGE(lenlist, tol = 1e-14):
         assert np.linalg.norm(qq-q) < tol
         assert np.linalg.norm(dqq-dq) < tol
 
-def test_fuse_score_to_partial_count():
+def test_fuse_score_to_partial_best_count():
+    
+    nvec = 10
+    nobs = 15
+    l = [np.random.random(np.random.randint(nobs//2, nobs)) for ivec in range(nvec)]
+    
+    nfuse = 4
+    l_fused = []
+    idx_fused = [[] for ifuse in range(nfuse)]
+    
+    n_missing = 2
+    
+    for ifuse in range(nfuse):
+        ivec = ifuse
+        
+        idx_fused[ifuse].append(ivec)
+        l_fused.append(l[ivec])
+
+    for ivec in range(nfuse, nvec-n_missing):
+        ifuse = np.random.randint(nfuse)
+        
+        idx_fused[ifuse].append(ivec)
+        l_fused[ifuse] = np.concatenate((l_fused[ifuse], l[ivec]))
+        
+    for k in range(2,nfuse+1):
+        
+        best_count = pyquickbench.rankstats.score_to_partial_best_count(k, l)
+        best_count_fused_from_list = pyquickbench.rankstats.score_to_partial_best_count(k, l_fused)
+        
+        best_count_fused_from_best_count = pyquickbench.rankstats.fuse_score_to_partial_best_count(best_count, idx_fused)
+        
+        assert np.array_equal(best_count_fused_from_list, best_count_fused_from_best_count)
+        
+def test_fuse_score_to_partial_order_count():
     
     nvec = 10
     nobs = 15

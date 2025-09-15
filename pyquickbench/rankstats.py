@@ -15,6 +15,7 @@ from .cython.rankstats import (
     montecarlo_score_to_perm_count              ,
     KendallTauDistance                          ,
     KendallTauRankCorrelation                   ,
+    find_nvec_k_from_best_count_shape           ,
     find_nvec_k_from_order_count_shape          ,
     order_count_to_best_count                   ,
     build_sinkhorn_rhs                          ,
@@ -415,6 +416,56 @@ def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive"
         raise NotImplementedError
     
     return order_count
+
+def fuse_score_to_partial_best_count(best_count, idx_fused):
+    
+    nvec, k = find_nvec_k_from_best_count_shape(best_count.shape[0], best_count.shape[1])
+    nfuse = len(idx_fused)
+    
+    ncomb = best_count.shape[0]
+    ncombfuse = math.comb(nfuse, k)
+
+    res = np.zeros((ncombfuse, k), dtype=np.intp)  
+    
+    ivec_to_idx_fused = np.full(nvec, -1, dtype=np.intp)
+    
+    for ifuse, idx in enumerate(idx_fused):
+        for i in idx:
+            ivec_to_idx_fused[i] = ifuse
+        
+    combfuse_unsorted = np.empty(k, dtype=np.intp)
+    combfuse = np.empty(k, dtype=np.intp)
+
+    for icomb, comb in enumerate(itertools.combinations(range(nvec), k)):
+
+        for i in range(k):
+            combfuse_unsorted[i] = ivec_to_idx_fused[comb[i]]
+            
+        fuse_perm_sort = np.argsort(combfuse_unsorted)
+
+        if combfuse_unsorted[fuse_perm_sort[0]] < 0:
+            continue
+        
+        for i in range(k):
+            combfuse[i] = combfuse_unsorted[fuse_perm_sort[i]]
+            
+        for i in range(k-1):
+            if  combfuse[i+1] == combfuse[i]:
+                HasRepeatedEl = True
+                break
+        else:
+            HasRepeatedEl = False
+            
+        if HasRepeatedEl:
+            continue
+
+        icombfuse = rank_combination(combfuse, nfuse, k)
+        
+        for ibest in range(k):
+            
+            res[icombfuse, ibest] += best_count[icomb, fuse_perm_sort[ibest]]
+
+    return res
 
 def fuse_score_to_partial_order_count(order_count, idx_fused):
     
