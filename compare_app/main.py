@@ -20,7 +20,7 @@ except (NameError, ValueError):
 sys.path.append(__PROJECT_ROOT__)
 
 # bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
-bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR_2")
+bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "sarah_x4")
 
 # compare_intent = {}
 compare_intent = {"t5xxl_prompt" : "group"}
@@ -34,7 +34,12 @@ img_compare_GUI()
 print()
 
 # compare_intent = {"lora_strength" : "group"}
-compare_intent = {"lora_name" : "group"}
+
+compare_intent = {
+    # "lora_name" : "group"       ,
+    "lora_strength" : "group"   ,
+    "sampler_steps" : "group"   ,
+}
 
 
 order, v = rank_assign.get_order(compare_intent = compare_intent)

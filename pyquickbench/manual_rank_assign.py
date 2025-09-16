@@ -20,19 +20,33 @@ from pyquickbench._utils import (
 )
 
 class ManualRankAssign():
+    
+    @property
+    def compare_intent(self):
+        return self._compare_intent
+    
+    @compare_intent.setter
+    def compare_intent(self, d):
+        self._compare_intent = self.complete_compare_intent(d)
+
+        group_tuple, compare_tuple = self.divide_compare_intent(self.compare_intent)
+        self.idx_all_group  , self.name_group  , self.n_group = group_tuple
+        self.idx_all_compare, self.name_compare, self.n_compare = compare_tuple
+        
+        self.ncomb = math.comb(self.n_compare, self.k)
 
     def __init__(
-        self                    ,
-        bench_root              ,
-        compare_intent  = {}    ,
-        k = 2                   ,
+        self                ,
+        bench_root          ,
+        compare_intent = {} ,
+        k = 2               ,
     ):
         
         self.cur_icompare = -1
         
         self.bench_root = bench_root
-        self.bench_filename = os.path.join(bench_root, "bench.npz")
-        self.best_count_filename = os.path.join(bench_root, "best_count.npy")
+        self.bench_filename = os.path.join(self.bench_root, "bench.npz")
+        self.best_count_filename = os.path.join(self.bench_root, "best_count.npz")
         
         self.benchfile_shape, self.all_vals = run_benchmark(
             filename = self.bench_filename  ,
@@ -40,26 +54,13 @@ class ManualRankAssign():
             StopOnExcept = True             ,
         )
 
-        self.compare_intent = self.complete_compare_intent(compare_intent)
-
-        (self.idx_all_group, self.name_group, self.n_group), (self.idx_all_compare, self.name_compare, self.n_compare) = self.divide_compare_intent(self.compare_intent)
-
         self.k = k
-        self.ncomb = math.comb(self.n_compare, self.k)
 
-        if os.path.isfile(self.best_count_filename):
-            
-            self.best_count = np.load(self.best_count_filename)
-            
-            if (self.best_count.shape[0] != self.ncomb) or (self.best_count.shape[1] != self.k):
-                
-                raise ValueError(f'Best count in file {self.best_count_filename} has wrong shape. Expected {(self.ncomb, self.k)}, received {self.best_count.shape}.')
-            
-        else:
-            
-            self.best_count = np.zeros((self.ncomb, self.k), dtype=np.intp)
+        self.compare_intent = compare_intent
+        
+        self.load_results()
 
-    def complete_compare_intent(self, compare_intent):
+    def complete_compare_intent(self, compare_intent = {}):
         
         compare_intent_out = {} # Recreate dict no matter what so that order is consistent with benchfile_shape
 
@@ -83,7 +84,7 @@ class ManualRankAssign():
     
     def complete_finer_compare_intent(self, fine_compare_intent):
         
-        compare_intent_out = {} # Recreate dict no matter what so that order is consistent with benchfile_shape
+        compare_intent_out = {} # Recreate dict no matter what so that order is consistent with compare_intent
 
         for key, init_intent in self.compare_intent.items():
             
@@ -149,15 +150,69 @@ class ManualRankAssign():
     
     def next_iset(self):
         
+        # Deterministic arg min
         # return np.argmin(self.best_count.sum(axis=1))
         
+        # "Soft" random arg min
         return np.random.choice(self.ncomb, p=scipy.special.softmax(-self.best_count.sum(axis=1)))
     
     def vote_for_ibest(self,cur_iset, ibest):
-        self.best_count[cur_iset, ibest] += 1
+        
+        if ibest < 0:
+            # When you really don't know what to vote for. Since best_count has dtype np.intp, don't do halves.
+            self.best_count[cur_iset, :] += 1
+        else:
+            self.best_count[cur_iset, ibest] += 1
+    
+    def load_results(self):
+        
+        file_bas, file_ext = os.path.splitext(self.best_count_filename)
+        
+        if os.path.isfile(self.best_count_filename):
+            
+            if file_ext == '.npy':
+                self.best_count = np.load(self.best_count_filename) 
+                loaded_compare_intent = {}
+                
+            elif file_ext == '.npz':
+                
+                file_content = np.load(self.best_count_filename)
+                self.best_count = file_content['best_count']
+                
+                loaded_compare_intent = {key:val for (key,val) in file_content.items() if key!='best_count'}
+
+            else:
+                raise ValueError(f'Unknown file extension {file_ext}')
+
+        else:
+            
+            self.best_count = np.zeros((self.ncomb, self.k), dtype=np.intp)
+            loaded_compare_intent = {}
+            
+        self.compare_intent = self.complete_finer_compare_intent(loaded_compare_intent)
+        
+        if self.ncomb != self.best_count.shape[0]:
+            raise ValueError(f'Incompatible compare intents with loaded best_count')
     
     def save_results(self):
-        np.save(self.best_count_filename, self.best_count)
+        
+        # self.best_count_filename = os.path.join(self.bench_root, "best_count.npz")
+
+        file_bas, file_ext = os.path.splitext(self.best_count_filename)
+            
+        if file_ext == '.npy':
+            np.save(self.best_count_filename, self.best_count)   
+            
+        elif file_ext == '.npz':
+
+            np.savez(
+                self.best_count_filename        ,
+                best_count = self.best_count    ,
+                **self.compare_intent           ,
+            )
+            
+        else:
+            raise ValueError(f'Unknown file extension {file_ext}')
         
     def get_order(self, compare_intent = None):
         

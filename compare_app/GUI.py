@@ -102,7 +102,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
     def on_key_press(self, event):
 
-        ibest_choice = -1
+        ibest_choice = -2
+        
+        # print(event.keysym)
         
         if event.keysym == "Escape":
             self.save_and_wrapup()
@@ -113,8 +115,10 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         elif event.keysym == 'Right':
             if self.master.rank_assign.k == 2:
                 ibest_choice = self.img_perm[1]
+        elif event.keysym == 'Up':
+            ibest_choice = -1
 
-        if ibest_choice >= 0:
+        if ibest_choice >= -1:
             self.master.rank_assign.vote_for_ibest(self.cur_iset, ibest_choice)
             self.present_next_choice()
             
