@@ -769,7 +769,7 @@ def plot_benchmark(
             all_legend_subplot_grid_y.append(plot_legend[name])
         elif value.startswith("reduction_"):
             n_reductions += 1
-            name = value[10:]
+            name = value[10:]   # len("reduction_") == 10
             idx_all_reduction[name].append(i)
         else:
             raise ValueError("This error should never be raised")

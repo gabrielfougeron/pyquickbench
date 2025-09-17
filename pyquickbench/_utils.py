@@ -63,7 +63,7 @@ def _mem_shift_restricted(idx, only, shape):
 
 def _from_mem_shift_restricted(i_shift, only, shape):
     
-    idx = np.zeros(len(only), dtype=np.intp)
+    idx = np.empty(len(only), dtype=np.intp)
 
     for i, j in enumerate(only):
         i_shift, idx[i] = divmod(i_shift, shape[j])
@@ -80,7 +80,7 @@ def _prod_rel_shapes(only, shape):
 
 def _get_rel_idx_from_maze(idx_all_items, idx_vals, shape):
 
-    idx_items = np.zeros(len(idx_all_items), dtype=np.intp)
+    idx_items = np.empty(len(idx_all_items), dtype=np.intp)
     for i, j in enumerate(idx_all_items):
         idx_items[i] = idx_vals[j] 
 
