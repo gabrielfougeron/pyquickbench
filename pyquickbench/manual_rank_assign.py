@@ -106,14 +106,17 @@ class ManualRankAssign():
         
         self.bench_root = bench_root
         self.bench_filename = os.path.join(self.bench_root, "bench.npz")
-        self.best_count_filename = os.path.join(self.bench_root, "best_count.npz")
+        self.best_count_filename = os.path.join(self.bench_root, f"best_count_k_{k}.npz")
         
+        if not os.path.isfile(self.bench_filename):
+            raise ValueError(f"Benchmark file {self.bench_filename} not found.")
+
         self.benchfile_shape, self.all_vals = run_benchmark(
             filename = self.bench_filename  ,
             return_array_descriptor = True  ,
             StopOnExcept = True             ,
         )
-        
+
         self.benchfile_names = [key for key in self.benchfile_shape]
 
         self.iset_stiffness = iset_stiffness
@@ -302,6 +305,9 @@ class ManualRankAssign():
                 file_content = np.load(self.best_count_filename)
                 self.best_count = file_content['best_count']
                 
+                if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
+                    raise ValueError(f"Loaded results have wrong shape. Received {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
+                
                 loaded_compare_intent = {key:val for (key,val) in file_content.items() if key!='best_count'}
 
             else:
@@ -350,11 +356,10 @@ class ManualRankAssign():
             
         else:
             
-            # raise NotImplementedError
             finer_compare_intent = self.complete_finer_compare_intent(compare_intent)
-
+            
             _, (idx_all_compare, name_compare, n_compare, n_compare_unres) = self.divide_compare_intent(finer_compare_intent)
-
+            
             i_compare_fused = [[] for ifuse in range(n_compare)]
 
             for self_idx_compare_res in itertools.product(*[range(self.restrict_shape[i]) for i in self.idx_all_compare]):
@@ -368,10 +373,12 @@ class ManualRankAssign():
                 i_compare = _mem_shift_restricted(idx_compare  , idx_all_compare  , self.restrict_shape)
                                 
                 i_compare_fused[i_compare].append(self_i_compare)
-                
+
             best_count = rankstats.fuse_score_to_partial_best_count(np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:]), i_compare_fused)
 
-
+        if (n_compare < self.k):
+            raise ValueError("Not enough items to compare")
+            
         n_votes = best_count.sum()
 
         A = rankstats.build_sinkhorn_mat(n_compare, self.k)

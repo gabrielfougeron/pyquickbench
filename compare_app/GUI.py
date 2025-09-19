@@ -40,18 +40,19 @@ class ImageCompareScrollFrame(tk.Frame):
     # makes frame width match canvas width
     def on_canvas_configure(self, event):
         # function to do the final resize task
-        def final_update(width):
+
+        def final_update(width, height):
             
-            self.canvas.itemconfig(self.frame_id, width=width)
+            self.canvas.itemconfig(self.frame_id, width=width, height=height)
             if self.resize_images_func:
-                self.resize_images_func(width)
+                self.resize_images_func(width, height)
             self.task = None
 
         if self.task:
             self.after_cancel(self.task)
         # don't do resize task during resizing the canvas to improve performance
         # so delay the task using .after()
-        self.task = self.after(50, final_update, event.width)
+        self.task = self.after(50, final_update, event.width, event.height)
 
     # when frame dimensions change pass the area to the canvas scroll region
     def on_frame_configure(self, event):
@@ -81,17 +82,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         tk.Frame.__init__(self, master, **kwargs)
         
         self.width = 10 # Does not matter, will be changed automatically soon
+        self.height = 10 # Does not matter, will be changed automatically soon
         
         # TODO Change this for grid layout
         self.num_cols = self.master.rank_assign.k
+        self.num_rows = 1
         
-        # self.img_dir = os.path.join(self.master.rank_assign.bench_root, "imgs")
-        # self.all_images = []
-        # for f in os.listdir(self.img_dir):
-        #     root, ext = os.path.splitext(f)
-        #     if ext.lower() in [".png", ".jpg"]:
-        #         self.all_images.append(os.path.join(self.img_dir, f))
-
         self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
 
@@ -100,13 +96,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.cache_init()
         self.fill_cache()
         self.resize_images()
-        # self.display_current_choice()
 
     def on_key_press(self, event):
 
-        ibest_choice = -2
+        vote = None
         
-        print(event.keysym)
+        # print(event.keysym)
         
         if event.keysym == "Escape":
             self.save_and_wrapup()
@@ -117,23 +112,40 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         if event.keysym == 'Left':
             if self.master.rank_assign.k == 2:
-                ibest_choice = self.img_perm[0]
+                vote = 0
                 
         elif event.keysym == 'Right':
             if self.master.rank_assign.k == 2:
-                ibest_choice = self.img_perm[1]
+                vote = 1
                 
-        elif event.keysym == 'Up':
-            ibest_choice = -1
+        elif event.keysym.startswith("KP_"):
+            vote = int(event.keysym[3:]) - 1
+            
+        elif event.keysym.startswith("F"):
 
-        if ibest_choice >= -1:
-            self.vote_current_choice(ibest_choice)
-            self.incr_cache()
-            self.display_current_choice()
-            self.fill_cache()
+            if len(event.keysym) > 1:
+                vote = int(event.keysym[1:]) - 1
+            
+        elif event.keysym == 'Up' or event.keysym == 'space':
+            vote = -1
+
+        if vote is not None:
+
+            if vote < 0:
+                ibest_choice = -1
+            elif vote < self.master.rank_assign.k:
+                ibest_choice = self.img_perm[vote]
+            else:
+                ibest_choice = None
+            
+            if ibest_choice is not None:
+                
+                self.vote_current_choice(ibest_choice)
+                self.incr_cache()
+                self.display_current_choice()
+                self.fill_cache()
             
     def save_and_wrapup(self):
-        
         self.master.rank_assign.save_results()
         self.master.quit()
         
@@ -160,18 +172,23 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
             iset, vals_set = self.master.rank_assign.next_set()
 
-            width = self.width - self.num_cols * 4   # cater border and hightlight of labels
+            width = self.width - (self.num_cols-1) * 4 
+            width = max(width, self.num_cols)
             img_width = width // self.num_cols
             
+            height = self.height - (self.num_rows-1) * 4 
+            height = max(height, self.num_rows)
+            img_height = height // self.num_rows
+
             img_cache = []
             tkimg_cache = []
             
             for val in vals_set:
-                
+
                 img_path = self.get_img_path(val)
                 img = Image.open(img_path)
                 ImageOps.exif_transpose(img, in_place=True)
-                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
                 
                 img_cache.append(img)
                 tkimg_cache.append(tkimg)
@@ -198,11 +215,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     def decr_cache(self):
         
         if self.i_cache > 0:
+            
+            self.i_cache -= 1
+
             if self.vote_cache[self.i_cache] is not None:
                 self.vote(self.i_cache, self.vote_cache[self.i_cache], mul = -1)
                 self.vote_cache[self.i_cache] = None
-            
-            self.i_cache -= 1
             
     def vote_current_choice(self, ibest_choice):
         self.vote(self.i_cache, ibest_choice)
@@ -245,35 +263,36 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         return img_path
 
-    def resize_images(self, width=None):
+    def resize_images(self, width=None, height=None):
         
         if width is None:
             width = self.width
         else:
-            self.width = width
+            self.width = width       
+             
+        if height is None:
+            height = self.height
+        else:
+            self.height = height
         
-        width -= self.num_cols * 4   # cater border and hightlight of labels
-        ### calculate the grid size
+        width -= (self.num_cols-1) * 4 
+        width = max(width, self.num_cols)
         img_width = width // self.num_cols
+        
+        height -= (self.num_rows-1) * 4 
+        height = max(height, self.num_rows)
+        img_height = width // self.num_rows
         
         cache_wave = self.all_img_cache[self.i_cache]
         img_cache = cache_wave[0]
         tkimg_cache = []
         for img in img_cache:
-            tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+            tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
             tkimg_cache.append(tkimg)
         cache_wave[1] = tkimg_cache
         
         self.display_current_choice(new_perm = False)
         
-        # ### go through all the labels
-        # for lbl in self.scrollframe.winfo_children():
-        #     ### resize the image keeping the aspect ratio
-        #     img = ImageOps.contain(lbl.image, (img_width, img_width))
-        #     ### show the image
-        #     lbl.tkimg = ImageTk.PhotoImage(img)
-        #     lbl.config(image=lbl.tkimg,anchor="center", background='black')
-
         for i_cache, cache_wave in enumerate(self.all_img_cache):
             
             if i_cache == self.i_cache:
@@ -284,7 +303,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             tkimg_cache = []
             
             for img in img_cache:
-                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
                 tkimg_cache.append(tkimg)
                 
             cache_wave[1] = tkimg_cache

@@ -7,25 +7,24 @@ import pyquickbench
 import GUI
 
 
-try:
-    __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.pardir))
+# try:
+#     __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.path.dirname(__file__),os.pardir))
+# 
+#     if ':' in __PROJECT_ROOT__:
+#         __PROJECT_ROOT__ = os.getcwd()
+# 
+# except (NameError, ValueError): 
+# 
+#     __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.getcwd(),os.pardir,os.pardir))
+# 
+# sys.path.append(__PROJECT_ROOT__)
 
-    if ':' in __PROJECT_ROOT__:
-        __PROJECT_ROOT__ = os.getcwd()
+bench_root = '/mnt/e/ComfyUI/ComfyUI/output/cli/Marin_dev_all'
+# bench_root = '/mnt/e/ComfyUI/ComfyUI/output/cli/sarah_x4'
+# bench_root = '/mnt/e/ComfyUI/ComfyUI/output/cli/ambiebambii_dev_all'
 
-except (NameError, ValueError): 
-
-    __PROJECT_ROOT__ = os.path.abspath(os.path.join(os.getcwd(),os.pardir,os.pardir))
-
-sys.path.append(__PROJECT_ROOT__)
-
-# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
-# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "sarah_x4")
-# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "meadows")
-bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "Tristan_dev_all")
-
-# compare_intent = {}
-# compare_intent = {"t5xxl_prompt" : "group"}
+compare_intent = {}
+compare_intent = {"t5xxl_prompt" : "group"}
 # compare_intent = {"lora_name" : "group"}
 
 # restrict_values = {
@@ -38,8 +37,8 @@ bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "Tristan_dev_all")
 # restrict_values = None
 
 rank_assign = pyquickbench.ManualRankAssign(
-    bench_root, k=2,
-    # compare_intent = compare_intent,
+    bench_root, k=3,
+    compare_intent = compare_intent,
     # restrict_values = restrict_values,
 )
 
@@ -58,13 +57,12 @@ print()
 
 compare_intent = {
     # "lora_name" : "group"       ,
-    "lora_name" : "group"       ,
-    "lora_strength" : "group"   ,
-    "unet_name" : "group"   ,
-    "sampler_steps" : "group"   ,
-    "flux_guidance" : "group"   ,
-    "function" : "group"   ,
-    # "t5xxl_prompt" : "group"   ,
+    # "lora_strength" : "group"   ,
+    # "unet_name" : "group"   ,
+    # "sampler_steps" : "group"   ,
+    # "flux_guidance" : "group"   ,
+    # "function" : "group"   ,
+    "t5xxl_prompt" : "group"   ,
 }
 
 

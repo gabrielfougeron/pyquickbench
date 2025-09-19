@@ -493,7 +493,7 @@ cdef inline Py_ssize_t _find_ncomb(Py_ssize_t ncomb, Py_ssize_t k, Py_ssize_t nm
 
 cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nsets, Py_ssize_t k, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
     
-    # Find nvec, k such that factorial(k) == best_count.shape[1] and comb(k,nvec) == best_count.shape[0]
+    # Find nvec, k such that k == best_count.shape[1] and comb(nvec,k) == best_count.shape[0]
     
     # cdef Py_ssize_t nsets = best_count.shape[0]
     # cdef Py_ssize_t  nopt_per_set = best_count.shape[1]
@@ -508,7 +508,7 @@ cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nset
 
 cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nsets, Py_ssize_t nopt_per_set, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
     
-    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(k,nvec) == order_count.shape[0]
+    # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(nvec,k) == order_count.shape[0]
     
     # cdef Py_ssize_t nsets = order_count.shape[0]
     # cdef Py_ssize_t  nopt_per_set = order_count.shape[1]
@@ -651,9 +651,6 @@ cpdef void _build_sinkhorn_rhs_new(
     memset(&p[0], 0, sizeof(double)*nsets)
     memset(&q[0], 0, sizeof(double)*nvec)
 
-
-    cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
-    cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
     cdef Py_ssize_t *comb = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
 
     for iset in range(nsets):
@@ -692,8 +689,6 @@ cpdef void _build_sinkhorn_rhs_new(
     for i in range(nvec):
         q[i] = alpha * q[i] + beta
 
-    free(digits)
-    free(perm)
     free(comb)
 
 def build_sinkhorn_rhs_new(
