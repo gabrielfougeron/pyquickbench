@@ -85,84 +85,147 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         # TODO Change this for grid layout
         self.num_cols = self.master.rank_assign.k
         
-        self.img_dir = os.path.join(self.master.rank_assign.bench_root, "imgs")
-        self.all_images = []
-        for f in os.listdir(self.img_dir):
-            root, ext = os.path.splitext(f)
-            if ext.lower() in [".png", ".jpg"]:
-                self.all_images.append(os.path.join(self.img_dir, f))
+        # self.img_dir = os.path.join(self.master.rank_assign.bench_root, "imgs")
+        # self.all_images = []
+        # for f in os.listdir(self.img_dir):
+        #     root, ext = os.path.splitext(f)
+        #     if ext.lower() in [".png", ".jpg"]:
+        #         self.all_images.append(os.path.join(self.img_dir, f))
 
         self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
 
         self.all_lbls = []
-
-        self.cache_next_choice()
-        self.present_next_choice()
+        
+        self.cache_init()
+        self.fill_cache()
+        self.resize_images()
+        # self.display_current_choice()
 
     def on_key_press(self, event):
 
         ibest_choice = -2
         
-        # print(event.keysym)
+        print(event.keysym)
         
         if event.keysym == "Escape":
             self.save_and_wrapup()
+            
+        elif event.keysym == "BackSpace":
+            self.decr_cache()
+            self.display_current_choice()
         
         if event.keysym == 'Left':
             if self.master.rank_assign.k == 2:
                 ibest_choice = self.img_perm[0]
+                
         elif event.keysym == 'Right':
             if self.master.rank_assign.k == 2:
                 ibest_choice = self.img_perm[1]
+                
         elif event.keysym == 'Up':
             ibest_choice = -1
 
         if ibest_choice >= -1:
-            self.master.rank_assign.vote_for_ibest(self.cur_iset, ibest_choice)
-            self.present_next_choice()
+            self.vote_current_choice(ibest_choice)
+            self.incr_cache()
+            self.display_current_choice()
+            self.fill_cache()
             
     def save_and_wrapup(self):
         
         self.master.rank_assign.save_results()
         self.master.quit()
-    
-    def cache_next_choice(self):
-
-        self.iset_cache, self.vals_set_cache = self.master.rank_assign.next_set()
-
-        assert len(self.vals_set_cache) == self.master.rank_assign.k
-
-        self.img_cache = []
-        self.tkimg_cache = []
         
-        width = self.width - self.num_cols * 4   # cater border and hightlight of labels
-        img_width = width // self.num_cols
+    def cache_init(self):
         
-        for val in self.vals_set_cache:
-            
-            img_path = self.get_img_path(val)
-            img = Image.open(img_path)
-            # img = ImageOps.exif_transpose(img)
-            tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
-            
-            self.img_cache.append(img)
-            self.tkimg_cache.append(tkimg)
-            
-    def present_next_choice(self):
-        
-        for lbl in self.all_lbls:
-            lbl.image.close()
-            lbl.destroy()
-            
-        self.all_lbls = []
-        
-        self.cur_iset = self.iset_cache
-        vals_set = self.vals_set_cache
-        
-        assert len(vals_set) == self.master.rank_assign.k
+        self.n_prev_max = 3
+        self.n_cache = self.n_prev_max + 2
+        self.i_cache = 0
         
         self.img_perm = np.random.permutation(self.master.rank_assign.k)
+        
+        self.all_img_cache = []
+        self.iset_cache = []
+        self.vals_set_cache = []
+        self.vote_cache = []
+        
+        self.fill_cache()
+        
+    def fill_cache(self):
+        
+        nfill = self.n_cache - len(self.all_img_cache)
+
+        for ifill in range(nfill):
+
+            iset, vals_set = self.master.rank_assign.next_set()
+
+            width = self.width - self.num_cols * 4   # cater border and hightlight of labels
+            img_width = width // self.num_cols
+            
+            img_cache = []
+            tkimg_cache = []
+            
+            for val in vals_set:
+                
+                img_path = self.get_img_path(val)
+                img = Image.open(img_path)
+                ImageOps.exif_transpose(img, in_place=True)
+                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+                
+                img_cache.append(img)
+                tkimg_cache.append(tkimg)
+                
+            self.iset_cache.append(iset)
+            self.vals_set_cache.append(vals_set)
+            self.all_img_cache.append([img_cache, tkimg_cache])
+            self.vote_cache.append(None)
+
+            
+    def incr_cache(self):
+        
+        if self.i_cache < self.n_prev_max:
+            self.i_cache += 1  
+        
+        else:
+
+            self.iset_cache.pop(0)
+            self.vals_set_cache.pop(0)
+            img_cache, tkimg_cache = self.all_img_cache.pop(0)
+            for img in img_cache:
+                img.close()
+            
+    def decr_cache(self):
+        
+        if self.i_cache > 0:
+            if self.vote_cache[self.i_cache] is not None:
+                self.vote(self.i_cache, self.vote_cache[self.i_cache], mul = -1)
+                self.vote_cache[self.i_cache] = None
+            
+            self.i_cache -= 1
+            
+    def vote_current_choice(self, ibest_choice):
+        self.vote(self.i_cache, ibest_choice)
+        
+    def vote(self, i_cache, ibest_choice, mul = 1):
+        
+        self.vote_cache[i_cache] = ibest_choice
+        self.master.rank_assign.vote_for_ibest(self.iset_cache[i_cache], ibest_choice, mul = mul)
+        
+    def display_current_choice(self, new_perm = True):
+        
+        for lbl in self.all_lbls:
+            lbl.destroy()
+        self.all_lbls = []
+            
+        cur_iset = self.iset_cache[self.i_cache]
+        vals_set = self.vals_set_cache[self.i_cache]
+        img_cache, tkimg_cache = self.all_img_cache[self.i_cache]
+
+        assert len(vals_set) == self.master.rank_assign.k
+        
+        if new_perm:
+            self.img_perm = np.random.permutation(self.master.rank_assign.k)
         
         for i in range(self.master.rank_assign.k):
             
@@ -172,13 +235,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
             lbl.configure(anchor="center", background='black')  
-            lbl.image = self.img_cache[i]  ### save the original image for later resize
-            lbl.tkimg = self.tkimg_cache[i]
-            lbl.config(image=lbl.tkimg,anchor="center", background='black')
+            lbl.config(image=tkimg_cache[i], anchor="center", background='black')
             
             self.all_lbls.append(lbl)
-            
-        self.after(250, self.cache_next_choice)
     
     def get_img_path(self, val):
         
@@ -196,19 +255,39 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         width -= self.num_cols * 4   # cater border and hightlight of labels
         ### calculate the grid size
         img_width = width // self.num_cols
-        ### go through all the labels
-        for lbl in self.scrollframe.winfo_children():
-            ### resize the image keeping the aspect ratio
-            img = ImageOps.contain(lbl.image, (img_width, img_width))
-            ### show the image
-            lbl.tkimg = ImageTk.PhotoImage(img)
-            lbl.config(image=lbl.tkimg,anchor="center", background='black')
-            
-        # Resize cache as well
-        self.tkimg_cache = []
-        for img in self.img_cache:
+        
+        cache_wave = self.all_img_cache[self.i_cache]
+        img_cache = cache_wave[0]
+        tkimg_cache = []
+        for img in img_cache:
             tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
-            self.tkimg_cache.append(tkimg)
+            tkimg_cache.append(tkimg)
+        cache_wave[1] = tkimg_cache
+        
+        self.display_current_choice(new_perm = False)
+        
+        # ### go through all the labels
+        # for lbl in self.scrollframe.winfo_children():
+        #     ### resize the image keeping the aspect ratio
+        #     img = ImageOps.contain(lbl.image, (img_width, img_width))
+        #     ### show the image
+        #     lbl.tkimg = ImageTk.PhotoImage(img)
+        #     lbl.config(image=lbl.tkimg,anchor="center", background='black')
+
+        for i_cache, cache_wave in enumerate(self.all_img_cache):
+            
+            if i_cache == self.i_cache:
+                continue
+            
+            img_cache = cache_wave[0]
+            
+            tkimg_cache = []
+            
+            for img in img_cache:
+                tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_width)))
+                tkimg_cache.append(tkimg)
+                
+            cache_wave[1] = tkimg_cache
 
     def do(self):
         pass

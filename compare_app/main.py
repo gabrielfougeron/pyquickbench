@@ -20,29 +20,37 @@ except (NameError, ValueError):
 sys.path.append(__PROJECT_ROOT__)
 
 # bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "AR")
-bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "sarah_x4")
+# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "sarah_x4")
+# bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "meadows")
+bench_root = os.path.join(__PROJECT_ROOT__, "AI_bench", "Tristan_dev_all")
 
 # compare_intent = {}
-compare_intent = {"t5xxl_prompt" : "group"}
+# compare_intent = {"t5xxl_prompt" : "group"}
 # compare_intent = {"lora_name" : "group"}
 
-restrict_values = {
-    "lora_name" : [
-        # 'sarah\\saraheveliina_alpha16_dev_rank2_bf16-step04000.safetensors' ,
-        'sarah\\saraheveliina_double_rank4_bf16-step04000.safetensors'      ,
-        # 'sarah\\saraheveliina_single_noT5_rank4_bf16-step04000.safetensors' ,
-        # 'sarah\\saraheveliina_single_rank4_bf16-step04000.safetensors'       ,
-    ]
-}
+# restrict_values = {
+#     "unet_name" : [
+#         'flux\\flux1-dev.safetensors',
+#         # 'flux\\flux1-krea-dev.safetensors'
+#     ]
+# }
+
+# restrict_values = None
 
 rank_assign = pyquickbench.ManualRankAssign(
     bench_root, k=2,
-    compare_intent=compare_intent,
-    restrict_values=restrict_values
+    # compare_intent = compare_intent,
+    # restrict_values = restrict_values,
 )
+
+# print(rank_assign.benchfile_shape)
+
+
 
 img_compare_GUI = GUI.ImageCompareGUI(rank_assign)
 img_compare_GUI()
+
+
 
 print()
 
@@ -50,15 +58,18 @@ print()
 
 compare_intent = {
     # "lora_name" : "group"       ,
-    # "lora_strength" : "group"   ,
+    "lora_name" : "group"       ,
+    "lora_strength" : "group"   ,
+    "unet_name" : "group"   ,
     "sampler_steps" : "group"   ,
+    "flux_guidance" : "group"   ,
+    "function" : "group"   ,
+    # "t5xxl_prompt" : "group"   ,
 }
 
 
 
 # compare_intent = None
-
-
 
 
 n_votes, order, v = rank_assign.get_order(compare_intent = compare_intent)

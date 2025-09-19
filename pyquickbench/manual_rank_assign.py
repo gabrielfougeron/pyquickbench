@@ -275,17 +275,17 @@ class ManualRankAssign():
 
         return np.random.choice(self.nset_res, p=p)
     
-    def vote_for_ibest(self, cur_iset, ibest):
+    def vote_for_ibest(self, iset_res, ibest, mul = 1):
         
-        iset_unres = self.iset_res_to_unres[cur_iset]
+        iset_unres = self.iset_res_to_unres[iset_res]
         
         if ibest < 0:
             # When you really don't know what to vote for. Since best_count has dtype np.intp, don't do halves.
-            self.best_count[iset_unres, :] += 1
-            self.n_votes_set[iset_unres] += self.best_count.shape[1]
+            self.best_count[iset_unres, :] += mul
+            self.n_votes_set[iset_unres] += self.best_count.shape[1]*mul
         else:
-            self.best_count[iset_unres, ibest] += 1
-            self.n_votes_set[iset_unres] += 1
+            self.best_count[iset_unres, ibest] += mul
+            self.n_votes_set[iset_unres] += mul
     
     def load_results(self):
         
