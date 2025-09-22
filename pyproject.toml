@@ -41,6 +41,9 @@ file = ["requirements/requirements.txt"]
 docs  = {file = ["requirements/requirements-docs.txt" ]}
 tests = {file = ["requirements/requirements-tests.txt"]}
 
+[project.scripts]
+imgs-compare = "pyquickbench.compare_app.run:entrypoint_CLI_run"
+
 [project.urls]
 Homepage = "https://gabrielfougeron.github.io/pyquickbench/"
 Documentation = "https://gabrielfougeron.github.io/pyquickbench/"

@@ -24,12 +24,14 @@ class ManualRankAssign():
     
     @property
     def restrict_values(self):
+        return self.build_restrict_values(self.benchfile_shape, self.restrict_idx)
+
+    @staticmethod
+    def build_restrict_values(benchfile_shape, restrict_idx):
         
         res = {}
         
-        for key, idx in zip(self.benchfile_names, self.restrict_idx):
-            
-            bench_vals = self.benchfile_shape[key]
+        for (key, bench_vals), idx in zip(benchfile_shape.items(), restrict_idx):
             
             if hasattr(bench_vals, '__getitem__'):
             
@@ -56,9 +58,14 @@ class ManualRankAssign():
     def compare_intent(self, d):
         self._compare_intent = self.complete_compare_intent(d)
 
-        group_tuple, compare_tuple = self.divide_compare_intent(self.compare_intent)
+        group_tuple, compare_tuple = self.divide_compare_intent(self._compare_intent)
         self.idx_all_group  , self.name_group  , self.n_group  , self.n_group_unres   = group_tuple
         self.idx_all_compare, self.name_compare, self.n_compare, self.n_compare_unres = compare_tuple
+        
+        self.nset_unres = math.comb(self.n_compare_unres, self.k)
+        self.nset_res = math.comb(self.n_compare, self.k)
+        
+        self.iset_res_to_unres = self.compute_iset_res_to_unres()
 
     def i_compare_res_to_unres(self, i_compare_res):
 
@@ -95,7 +102,10 @@ class ManualRankAssign():
 
     def __init__(
         self                    ,
-        bench_root              ,
+        *                       ,
+        benchfile_shape = None  ,
+        all_vals = None         ,
+        bench_root = './'       ,
         compare_intent = {}     ,
         restrict_values = {}    ,
         k = 2                   ,
@@ -104,18 +114,12 @@ class ManualRankAssign():
         
         self.cur_icompare = -1
         
-        self.bench_root = bench_root
-        self.bench_filename = os.path.join(self.bench_root, "bench.npz")
-        self.best_count_filename = os.path.join(self.bench_root, f"best_count_k_{k}.npz")
-        
-        if not os.path.isfile(self.bench_filename):
-            raise ValueError(f"Benchmark file {self.bench_filename} not found.")
 
-        self.benchfile_shape, self.all_vals = run_benchmark(
-            filename = self.bench_filename  ,
-            return_array_descriptor = True  ,
-            StopOnExcept = True             ,
-        )
+        self.benchfile_shape = benchfile_shape
+        self.all_vals = all_vals
+        
+        self.bench_root = bench_root
+        self.best_count_filename = os.path.join(self.bench_root, f"best_count_k_{k}.npz")
 
         self.benchfile_names = [key for key in self.benchfile_shape]
 
@@ -123,19 +127,41 @@ class ManualRankAssign():
         self.k = k
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
-        
-        self.nset_unres = math.comb(self.n_compare_unres, self.k)
-        self.nset_res = math.comb(self.n_compare, self.k)
-        
-        self.iset_res_to_unres = self.compute_iset_res_to_unres()
 
         self.load_results()
 
-    def complete_compare_intent(self, compare_intent = {}):
+    def print_restrict_bench(self):
+        
+        restrict_values = self.restrict_values
+        
+        for key, vals in restrict_values.items():
+
+            print(key, ":")
+            
+            if hasattr(vals, '__getitem__'):
+                for val in vals:
+                    print("    ", val)
+            elif hasattr(vals, '__len__'):
+                i = len(vals)-1
+                if i > 0:
+                    print("    ",f"0 - {i}")
+                else:
+                    print("    ",f"{i}")
+            else:
+                i = vals-1
+                if i > 0:
+                    print("    ",f"0 - {i}")
+                else:
+                    print("    ",f"{i}")
+                    
+            print()
+
+    @staticmethod
+    def default_compare_intent(benchfile_shape, compare_intent = {}):
         
         compare_intent_out = {} # Recreate dict no matter what so that order is consistent with benchfile_shape
 
-        for key, val in self.benchfile_shape.items():
+        for key, val in benchfile_shape.items():
             
             intent_in = compare_intent.get(key)
             
@@ -152,21 +178,25 @@ class ManualRankAssign():
             compare_intent_out[key] = intent
         
         return compare_intent_out
+
+    def complete_compare_intent(self, compare_intent = {}):
+        return self.default_compare_intent(self.benchfile_shape, compare_intent = compare_intent)
     
-    def complete_restrict_values(self, restrict_values = {}):
+    @staticmethod
+    def default_restrict_values(benchfile_shape, restrict_values = {}):
         
         restrict_idx = [] # Order is consistent with benchfile_shape
 
-        for key, val in self.benchfile_shape.items():
+        for key, val in benchfile_shape.items():
             
             restrict_in = restrict_values.get(key)
             
             if restrict_in is None:
                 
                 if hasattr(val, "__len__"):
-                    idx = range(len(val))
+                    idx = list(range(len(val)))
                 else:
-                    idx = range(val)
+                    idx = list(range(val))
 
             else:
                 
@@ -200,11 +230,14 @@ class ManualRankAssign():
         
         return restrict_idx, restrict_shape
     
+    def complete_restrict_values(self, restrict_values = {}):
+        return self.default_restrict_values(self.benchfile_shape, restrict_values = restrict_values)
+    
     def complete_finer_compare_intent(self, fine_compare_intent):
         
         compare_intent_out = {} # Recreate dict no matter what so that order is consistent with compare_intent
 
-        for key, init_intent in self.compare_intent.items():
+        for key, init_intent in self._compare_intent.items():
             
             fine_intent = fine_compare_intent.get(key, init_intent)
             
@@ -243,6 +276,39 @@ class ManualRankAssign():
         n_compare_unres  = _prod_rel_shapes(idx_all_compare   , self.all_vals.shape)
 
         return (idx_all_group, name_group, n_group, n_group_unres), (idx_all_compare, name_compare, n_compare, n_compare_unres)
+
+    def fuse_compare_intent(self, compare_intent = None):
+
+        if compare_intent is None:
+            
+            idx_all_compare = self.idx_all_compare
+            name_compare = self.name_compare
+            n_compare = self.n_compare
+            best_count = np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:])
+            
+        else:
+            
+            finer_compare_intent = self.complete_finer_compare_intent(compare_intent)
+            
+            _, (idx_all_compare, name_compare, n_compare, n_compare_unres) = self.divide_compare_intent(finer_compare_intent)
+            
+            i_compare_fused = [[] for ifuse in range(n_compare)]
+
+            for self_idx_compare_res in itertools.product(*[range(self.restrict_shape[i]) for i in self.idx_all_compare]):
+                        
+                idx_compare = []
+                for i_cmp_new in idx_all_compare:
+                    i_cmp = self.idx_all_compare.index(i_cmp_new)
+                    idx_compare.append(self_idx_compare_res[i_cmp])
+                    
+                self_i_compare = _mem_shift_restricted(self_idx_compare_res  , self.idx_all_compare  , self.restrict_shape)
+                i_compare = _mem_shift_restricted(idx_compare  , idx_all_compare  , self.restrict_shape)
+                                
+                i_compare_fused[i_compare].append(self_i_compare)
+
+            best_count = rankstats.fuse_score_to_partial_best_count(np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:]), i_compare_fused)
+
+        return idx_all_compare, name_compare, n_compare, best_count
 
     def next_set(self, iset = None):
         
@@ -347,35 +413,8 @@ class ManualRankAssign():
         
     def get_order(self, compare_intent = None):
         
-        if compare_intent is None:
-            
-            idx_all_compare = self.idx_all_compare
-            name_compare = self.name_compare
-            n_compare = self.n_compare
-            best_count = np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:])
-            
-        else:
-            
-            finer_compare_intent = self.complete_finer_compare_intent(compare_intent)
-            
-            _, (idx_all_compare, name_compare, n_compare, n_compare_unres) = self.divide_compare_intent(finer_compare_intent)
-            
-            i_compare_fused = [[] for ifuse in range(n_compare)]
-
-            for self_idx_compare_res in itertools.product(*[range(self.restrict_shape[i]) for i in self.idx_all_compare]):
-                        
-                idx_compare = []
-                for i_cmp_new in idx_all_compare:
-                    i_cmp = self.idx_all_compare.index(i_cmp_new)
-                    idx_compare.append(self_idx_compare_res[i_cmp])
-                    
-                self_i_compare = _mem_shift_restricted(self_idx_compare_res  , self.idx_all_compare  , self.restrict_shape)
-                i_compare = _mem_shift_restricted(idx_compare  , idx_all_compare  , self.restrict_shape)
-                                
-                i_compare_fused[i_compare].append(self_i_compare)
-
-            best_count = rankstats.fuse_score_to_partial_best_count(np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:]), i_compare_fused)
-
+        idx_all_compare, name_compare, n_compare, best_count = self.fuse_compare_intent(compare_intent = compare_intent)
+        
         if (n_compare < self.k):
             raise ValueError("Not enough items to compare")
             

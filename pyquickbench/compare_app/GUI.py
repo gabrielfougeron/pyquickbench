@@ -103,9 +103,13 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         # print(event.keysym)
         
-        if event.keysym == "Escape":
-            self.save_and_wrapup()
+        if event.keysym == "s":
+            self.master.rank_assign.save_results()
             
+        if event.keysym == "Escape":
+            self.master.rank_assign.save_results()
+            self.master.quit()
+                
         elif event.keysym == "BackSpace":
             self.decr_cache()
             self.display_current_choice()
@@ -144,10 +148,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
                 self.incr_cache()
                 self.display_current_choice()
                 self.fill_cache()
-            
-    def save_and_wrapup(self):
-        self.master.rank_assign.save_results()
-        self.master.quit()
         
     def cache_init(self):
         

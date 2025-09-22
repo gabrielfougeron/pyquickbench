@@ -698,3 +698,12 @@ def _log_violin_plot(
         
         for ix, pos in enumerate(positions):
             ax.scatter(np.full(nobs, pos), dataset[:,ix], marker=marker, color=color)
+            
+# def _convert_benchfile_shape(benchfile_shape):
+#     
+#     benchfile_shape_out = {}
+#     
+#     for key, vals in benchfile_shape.items:
+#         benchfile_shape_out[key] = list(vals)
+#         
+#     return benchfile_shape_out
