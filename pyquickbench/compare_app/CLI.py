@@ -122,25 +122,14 @@ class BenchmarkTree(Tree):
                         self.restrict_idx[i].insert(idx, j)
                         label.append_text(Text("    selected", style = Style(color = "green")))
 
+                    self.app.rank_assign = self.app.build_rank_assign()
+
                 else:
                     
                     raise ValueError(f'Unknown data type : {type(data)}')
                 
                 self.cur_highlighted_node.set_label(label)
-                
-                
-                
-                
-                # self.bench_filename = os.path.join(self.app.Workspace_dir, self.value)
-                # self.benchfile_shape, self.all_vals, self.best_count, self.restrict_idx, self.restrict_shape, self.compare_intent = load_benchfile(self.bench_filename)
-                # self.populate_bench_tree()
-                
-                self.app.rank_assign = self.app.build_rank_assign()
-                
-                
-                
-                
-                
+ 
                 self.app.print_compare_results()
 
     def populate_bench_tree(self):
@@ -284,14 +273,13 @@ class ImageCompareCLI(App):
         tree = self.query_one("#bench_tree")  
         k = int(self.query_one("#k_input").value)
         
-        # restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
-        restrict_values = {}
+        restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
         
         rank_assign = ManualRankAssign(
             bench_root = self.Workspace_dir         ,
             benchfile_shape = tree.benchfile_shape  ,
             all_vals = tree.all_vals                ,
-            compare_intent = tree.compare_intent    ,
+            compare_intent = {}                     ,
             restrict_values = restrict_values       ,
             best_count = tree.best_count            ,
             k = k                                   ,
