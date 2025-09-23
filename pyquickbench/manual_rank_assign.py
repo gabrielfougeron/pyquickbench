@@ -371,9 +371,6 @@ class ManualRankAssign():
                 file_content = np.load(self.best_count_filename)
                 self.best_count = file_content['best_count']
                 
-                if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
-                    raise ValueError(f"Loaded results have wrong shape. Received {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
-                
                 loaded_compare_intent = {key:val for (key,val) in file_content.items() if key!='best_count'}
 
             else:
@@ -386,15 +383,13 @@ class ManualRankAssign():
             
         self.compare_intent = self.complete_finer_compare_intent(loaded_compare_intent)
         
-        if self.nset_unres != self.best_count.shape[0]:
-            raise ValueError(f'Incompatible compare intents with loaded best_count')
-        
+        if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
+            raise ValueError(f"Loaded results have wrong shape. Loaded {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
+
         self.n_votes_set = self.best_count.sum(axis=1)
     
     def save_results(self):
         
-        # self.best_count_filename = os.path.join(self.bench_root, "best_count.npz")
-
         file_bas, file_ext = os.path.splitext(self.best_count_filename)
             
         if file_ext == '.npy':

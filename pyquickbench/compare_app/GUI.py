@@ -81,8 +81,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     def __init__(self, master, **kwargs):
         tk.Frame.__init__(self, master, **kwargs)
         
-        self.width = 10 # Does not matter, will be changed automatically soon
-        self.height = 10 # Does not matter, will be changed automatically soon
+        self.width = 10 # Does not matter, will be changed automatically soon after __init__
+        self.height = 10 # Does not matter, will be changed automatically soon after __init__
         
         # TODO Change this for grid layout
         self.num_cols = self.master.rank_assign.k
@@ -108,6 +108,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
         if event.keysym == "Escape":
             self.master.rank_assign.save_results()
+            self.master.destroy()
             self.master.quit()
                 
         elif event.keysym == "BackSpace":

@@ -43,11 +43,7 @@ def CLI_run(cli_args):
         )
         app.run()
         
-        for mess in app.messages:
-            print(mess)
-                
     else:
-
         print(f'Workspace directory {args.Workspace_dir} not found.')
 
 def entrypoint_CLI_run():

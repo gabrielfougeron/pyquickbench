@@ -6,13 +6,27 @@ Input.-valid:focus {
     border: tall $success;
 }
 Label {
-    width: 40;
-    height: 1;
+    height: 3;
+    padding: 0 0 0 3;
+    content-align-vertical: middle;
 }
 Input, Select {
     width: 40;
     height: 3;
 }
 .maxheight {
-    height: 4;
+    height:4;
+}
+.setwidth {
+    width: 40;
+}
+Button {
+    content-align-vertical: middle;
+    content-align-horizontal: center;
+}
+BenchmarkTree {
+    overflow-y: scroll;
+}
+RichLog {
+    overflow-y: scroll;
 }
