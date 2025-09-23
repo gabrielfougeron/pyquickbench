@@ -103,24 +103,22 @@ class ManualRankAssign():
     def __init__(
         self                    ,
         *                       ,
+        bench_root = './'       ,
         benchfile_shape = None  ,
         all_vals = None         ,
-        bench_root = './'       ,
         compare_intent = {}     ,
         restrict_values = {}    ,
+        best_count = None       ,
         k = 2                   ,
         iset_stiffness = 1.     ,
     ):
         
         self.cur_icompare = -1
         
-
+        self.bench_root = bench_root
         self.benchfile_shape = benchfile_shape
         self.all_vals = all_vals
         
-        self.bench_root = bench_root
-        self.best_count_filename = os.path.join(self.bench_root, f"best_count_k_{k}.npz")
-
         self.benchfile_names = [key for key in self.benchfile_shape]
 
         self.iset_stiffness = iset_stiffness
@@ -128,7 +126,17 @@ class ManualRankAssign():
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
 
-        self.load_results()
+        if best_count is None:
+            best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
+            
+        self.best_count = best_count
+        self.n_votes_set = self.best_count.sum(axis=1)
+
+    def get_img_path(self, val):
+        
+        img_path = os.path.join(self.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        
+        return img_path
 
     def print_restrict_bench(self):
         
@@ -356,51 +364,56 @@ class ManualRankAssign():
             self.best_count[iset_unres, ibest] += mul
             self.n_votes_set[iset_unres] += mul
     
-    def load_results(self):
-        
-        file_bas, file_ext = os.path.splitext(self.best_count_filename)
-        
-        if os.path.isfile(self.best_count_filename):
-            
-            if file_ext == '.npy':
-                self.best_count = np.load(self.best_count_filename) 
-                loaded_compare_intent = {}
-                
-            elif file_ext == '.npz':
-                
-                file_content = np.load(self.best_count_filename)
-                self.best_count = file_content['best_count']
-                
-                loaded_compare_intent = {key:val for (key,val) in file_content.items() if key!='best_count'}
-
-            else:
-                raise ValueError(f'Unknown file extension {file_ext}')
-
-        else:
-            
-            self.best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
-            loaded_compare_intent = {}
-            
-        self.compare_intent = self.complete_finer_compare_intent(loaded_compare_intent)
-        
-        if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
-            raise ValueError(f"Loaded results have wrong shape. Loaded {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
-
-        self.n_votes_set = self.best_count.sum(axis=1)
+#     def load_results(self, best_count_filename):
+#         
+#         file_bas, file_ext = os.path.splitext(best_count_filename)
+#         
+#         if os.path.isfile(best_count_filename):
+#             
+#             if file_ext == '.npy':
+#                 self.best_count = np.load(best_count_filename) 
+#                 loaded_compare_intent = {}
+#                 
+#             elif file_ext == '.npz':
+#                 
+#                 file_content = np.load(best_count_filename)
+#                 self.best_count = file_content['best_count']
+#                 
+#                 loaded_compare_intent = {key:val for (key,val) in file_content.items() if key not in ['best_count']}
+# 
+#             else:
+#                 raise ValueError(f'Unknown file extension {file_ext}')
+# 
+#         else:
+#             
+#             self.best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
+#             loaded_compare_intent = {}
+#             
+#         self.compare_intent = self.complete_finer_compare_intent(loaded_compare_intent)
+#         
+#         if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
+#             raise ValueError(f"Loaded results have wrong shape. Loaded {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
+# 
+#         self.n_votes_set = self.best_count.sum(axis=1)
     
-    def save_results(self):
+    def save_results(self, best_count_filename = None):
         
-        file_bas, file_ext = os.path.splitext(self.best_count_filename)
+        if best_count_filename is None:
+            best_count_filename = self.best_count_filename
+        
+        file_bas, file_ext = os.path.splitext(best_count_filename)
             
         if file_ext == '.npy':
-            np.save(self.best_count_filename, self.best_count)   
+            np.save(best_count_filename, self.best_count)   
             
         elif file_ext == '.npz':
 
             np.savez(
-                self.best_count_filename        ,
-                best_count = self.best_count    ,
-                **self.compare_intent           ,
+                best_count_filename                     ,
+                best_count = self.best_count            ,
+                compare_intent = self.compare_intent    ,
+                all_vals = self.all_vals                ,
+                **self.benchfile_shape                  ,
             )
             
         else:

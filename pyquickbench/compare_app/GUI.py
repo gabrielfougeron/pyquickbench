@@ -186,7 +186,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
             for val in vals_set:
 
-                img_path = self.get_img_path(val)
+                img_path = self.master.rank_assign.get_img_path(val)
                 img = Image.open(img_path)
                 ImageOps.exif_transpose(img, in_place=True)
                 tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
