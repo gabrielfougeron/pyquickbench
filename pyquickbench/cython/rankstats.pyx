@@ -491,7 +491,7 @@ cdef inline Py_ssize_t _find_ncomb(Py_ssize_t ncomb, Py_ssize_t k, Py_ssize_t nm
 
     return nvec
 
-cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nsets, Py_ssize_t k, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
+cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nsets, Py_ssize_t k, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 10000):
     
     # Find nvec, k such that k == best_count.shape[1] and comb(nvec,k) == best_count.shape[0]
     
@@ -506,7 +506,7 @@ cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_best_count_shape(Py_ssize_t nset
 
     return nvec, k
 
-cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nsets, Py_ssize_t nopt_per_set, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 100):
+cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nsets, Py_ssize_t nopt_per_set, Py_ssize_t kmax = 100, Py_ssize_t nvec_max = 10000):
     
     # Find nvec, k such that factorial(k) == order_count.shape[1] and comb(nvec,k) == order_count.shape[0]
     
@@ -699,7 +699,7 @@ def build_sinkhorn_rhs_new(
     cdef Py_ssize_t nsets = best_count.shape[0]
     cdef Py_ssize_t k = best_count.shape[1]
 
-    cdef Py_ssize_t nvec = _find_ncomb(nsets, k, 100)
+    cdef Py_ssize_t nvec = _find_ncomb(nsets, k, 10000)
     if nvec < 0:
         raise ValueError("Could not determine nvec")
 

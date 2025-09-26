@@ -1,11 +1,12 @@
 import os
 import bisect
+import asyncio
 import numpy as np
 
 from rich.text import Text
 from rich.style import Style
 
-from textual import on
+from textual import on, work
 from textual.app import App
 from textual.widgets import Footer, Header, Tree
 from textual.widgets import Input, Label, Select, Button, RichLog
@@ -16,7 +17,6 @@ from . import GUI
 from pyquickbench._defaults import *
 from pyquickbench._benchmark import run_benchmark
 from pyquickbench.manual_rank_assign import ManualRankAssign
-# from pyquickbench._utils import _convert_benchfile_shape
 
 cycle_intents = {
     "compare" : "group",
@@ -50,10 +50,11 @@ def load_benchfile(bench_filename):
 
     restrict_idx, restrict_shape = ManualRankAssign.default_restrict_values(benchfile_shape)
     
-    compare_intent = file_content.get('compare_intent').flatten()[0] # dirty hack
-    
+    compare_intent = file_content.get('compare_intent')
     if compare_intent is None:
         compare_intent = ManualRankAssign.default_compare_intent(benchfile_shape)
+    else:
+        compare_intent = compare_intent.flatten()[0] # dirty hack
     
     best_count = file_content.get('best_count')
 
@@ -130,7 +131,7 @@ class BenchmarkTree(Tree):
                 
                 self.cur_highlighted_node.set_label(label)
  
-                self.app.print_compare_results()
+                self.app.compare_results_with_label()
 
     def populate_bench_tree(self):
 
@@ -165,6 +166,7 @@ class ImageCompareCLI(App):
     CSS_PATH = "CLI.tcss"
     
     BINDINGS = [
+        ("escape", "quit", "Quit app"),
         ("c", "start_compare_GUI", "Start comparing!"),
     ]
 
@@ -221,7 +223,7 @@ class ImageCompareCLI(App):
         with Horizontal(classes="maxheight"):
             with Center(classes="setwidth"):
                 yield Button("Start comparing!", id = "CompareButton")
-            yield Label()
+            yield Label(id="CompareLabel")
 
         yield Footer()
         
@@ -230,22 +232,11 @@ class ImageCompareCLI(App):
         if event.control.id == 'bench_file_select':
 
             try:
-                
-                tree = self.query_one("#bench_tree")    
-                tree.clear()
-
-                tree.bench_filename = os.path.join(self.Workspace_dir, event.value)
-                tree.benchfile_shape, tree.all_vals, tree.best_count, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
-                tree.populate_bench_tree()
-                
-                self.rank_assign = self.build_rank_assign()
-                self.rank_assign.best_count_filename = tree.bench_filename
-                self.print_compare_results()
-
+                self.load_bench()
             except Exception as exc:
                 self.notify(f'{exc}', timeout=60)
-                raise exc
-                
+                # raise exc
+    
     def on_input_changed(self, event):
         
         if event.control.id == 'save_filename_input':
@@ -254,19 +245,75 @@ class ImageCompareCLI(App):
                 lbl.content = Text("Warning: File exists", style = Style(color = "orange3"))
             else:
                 lbl.content = ""
+                
+            try:
+                self.rank_assign.best_count_filename = event.value
+            except:
+                pass
+                
+        elif event.control.id == 'k_input':
+            if not event.validation_result.is_valid:
+                return
+            
+            self.load_bench()
 
     @on(Button.Pressed, "#CompareButton")
     def action_start_compare_GUI(self):
         
-        try:
+        
+        lbl = self.query_one("#CompareLabel")  
+        lbl.content = Text("Please compare images in GUI, then press Escape.", style = Style(color = "orange3"))
+        self.call_after_refresh(self.lauch_GUI_then_compare)
 
-            img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign)
-            img_compare_GUI()
-            
+    def lauch_GUI_then_compare(self):
+
+        self.lauch_GUI()
+        self.compare_results_with_label()
+        
+    def compare_results_with_label(self):
+    
+        lbl = self.query_one("#CompareLabel")  
+        lbl.content = Text("Crunching the latest results. Please wait...", style = Style(color = "orange3"))
+        self.call_after_refresh(self.print_compare_results_then_reset_label)
+
+    def print_compare_results_then_reset_label(self):
+
+        try:
             self.print_compare_results()
-                      
         except Exception as exc:
             self.notify(f'{exc}', timeout=60)
+        lbl = self.query_one("#CompareLabel")  
+
+        lbl.content = ""
+        
+    def lauch_GUI(self):
+
+        img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign)
+        img_compare_GUI()
+    
+    def load_bench(self):
+        
+        bench_filename = self.query_one("#bench_file_select").value
+        
+        tree = self.query_one("#bench_tree")    
+        tree.clear()
+
+        try:
+            tree.bench_filename = os.path.join(self.Workspace_dir, bench_filename)
+        except Exception as exc:
+            # self.notify(f'{exc}', timeout=60)
+            self.rank_assign = None
+            self.compare_results_with_label()
+            return
+        
+        tree.benchfile_shape, tree.all_vals, tree.best_count, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
+        tree.populate_bench_tree()
+        
+        self.rank_assign = self.build_rank_assign()
+        
+        save_filename_input = self.query_one("#save_filename_input")  
+        self.rank_assign.best_count_filename = save_filename_input.value
+        self.compare_results_with_label()
     
     def build_rank_assign(self):
         
@@ -290,20 +337,24 @@ class ImageCompareCLI(App):
         return rank_assign
 
     def print_compare_results(self):
+ 
+        res_print = self.query_one("#results_print")  
+        res_print.clear()
         
         if self.rank_assign is None:
             return
         
         tree = self.query_one("#bench_tree")  
-        k = int(self.query_one("#k_input").value)
-        
-        res_print = self.query_one("#results_print")  
-        res_print.clear()
 
         try:
             n_votes, order, v = self.rank_assign.get_order(compare_intent = tree.compare_intent)
         except ValueError as exc:
             res_print.write("Not enough items to compare.")
+            # res_print.write(exc)
+            
+            # res_print.write(f"Total number of votes: {self.rank_assign.best_count.sum()}")
+            # res_print.write(f"{self.rank_assign.best_count.shape = }")
+            # res_print.write(exc)
             return
     
         res_print.write(f"Total number of votes: {self.rank_assign.best_count.sum()}")
@@ -317,11 +368,10 @@ class ImageCompareCLI(App):
                 
                 rank = v.shape[0]-i
                 
-                res_print.write(f'{rank = }')
-                res_print.write(f'P-L weight = {v[i]}')
+                res_print.write(f'{rank = }, P-L weight = {v[i]:.3f}')
                 
                 for key, val in d.items():
-                    res_print.write(f"{key}:{val}")
+                    res_print.write(f"{key}: {val}")
                     
                 res_print.write("") 
         else:

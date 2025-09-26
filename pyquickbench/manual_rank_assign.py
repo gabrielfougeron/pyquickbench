@@ -111,6 +111,7 @@ class ManualRankAssign():
         best_count = None       ,
         k = 2                   ,
         iset_stiffness = 1.     ,
+        
     ):
         
         self.cur_icompare = -1
@@ -125,7 +126,13 @@ class ManualRankAssign():
         self.k = k
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
-
+        
+        
+        if best_count is not None:
+            if best_count.shape != (self.nset_unres , self.k):
+                best_count = None
+                # raise ValueError(f"Received best_count with wrong shape. Expected {(self.nset_unres , self.k)}, received {best_count.shape}.")
+            
         if best_count is None:
             best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
             
@@ -425,18 +432,25 @@ class ManualRankAssign():
         
         if (n_compare < self.k):
             raise ValueError("Not enough items to compare")
-            
-        n_votes = best_count.sum()
-
-        A = rankstats.build_sinkhorn_mat(n_compare, self.k)
-        p, q = rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = 0.00000)
         
-        reg_beta = 0.
-        reg_alpham1 = 0.
-        u, v = sinkhorn_knopp(A, p, q, reg_alpham1 = reg_alpham1, reg_beta = reg_beta)
+        n_votes = best_count.sum()
+                
+        if (n_votes < 1):
+            
+            nvec, k = rankstats.find_nvec_k_from_best_count_shape(best_count.shape[0], best_count.shape[1])
+            v = np.ones(nvec, dtype=np.float64)
+            
+        else:
+
+            A = rankstats.build_sinkhorn_mat(n_compare, self.k)
+            reg_eps = 1./(n_votes+1)
+            p, q = rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = reg_eps)
+
+            reg_beta = 0.
+            reg_alpham1 = 0.
+            u, v = sinkhorn_knopp(A, p, q, reg_alpham1 = reg_alpham1, reg_beta = reg_beta)
 
         compare_order = np.argsort(v)
-        
         v_scal = v / v.sum()
         
         # logu, logv = rankstats.uv_to_loguv(u, v)

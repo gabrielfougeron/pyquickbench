@@ -140,7 +140,7 @@ def _load_benchmark_file(filename, all_args_in, shape, allow_pickle = False):
         all_vals = file_content['all_vals']
         
         # This should stay consistent with _build_args_shapes
-        file_shape = {key:val for (key,val) in file_content.items() if key!='all_vals'}
+        file_shape = {key:val for (key,val) in file_content.items() if key not in ['all_vals', 'compare_intent', 'best_count', fun_ax_name, repeat_ax_name, out_ax_name]}
         file_shape[fun_ax_name] = all_vals.shape[-3]
         file_shape[repeat_ax_name] = all_vals.shape[-2]
         file_shape[out_ax_name] = all_vals.shape[-1]
