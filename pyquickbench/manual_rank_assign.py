@@ -442,7 +442,7 @@ class ManualRankAssign():
             
         else:
 
-            A = rankstats.build_sinkhorn_mat(n_compare, self.k)
+            A = rankstats.build_sinkhorn_best_count_mat(n_compare, self.k)
             reg_eps = 1./(n_votes+1)
             p, q = rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = reg_eps)
 

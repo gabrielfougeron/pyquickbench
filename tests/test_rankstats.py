@@ -22,6 +22,8 @@ lenlist_illcond_list = [
     [2,3,4,5]   ,
 ]
 
+nvec_list = [4,5,6]
+
 def test_factorial_base():
     
     n = 10
@@ -82,10 +84,10 @@ def test_order_count_to_best_count(lenlist, tol = 1e-14):
 
     for k in range(1,nvec+1):
 
-        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
+        order_count = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l)
         best_count_project = pyquickbench.rankstats.order_count_to_best_count(order_count)
 
-        best_count_direct = pyquickbench.rankstats.score_to_partial_best_count(k, l)
+        best_count_direct = pyquickbench.rankstats.exhaustive_score_to_partial_best_count(k, l)
 
         assert np.array_equal(best_count_project, best_count_direct)
         
@@ -167,12 +169,71 @@ def test_fuse_score_to_partial_order_count():
         
     for k in range(2,nfuse+1):
         
-        order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        order_count_fused_from_list = pyquickbench.rankstats.score_to_partial_order_count(k, l_fused)
+        order_count = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l)
+        order_count_fused_from_list = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l_fused)
         
         order_count_fused_from_order_count = pyquickbench.rankstats.fuse_score_to_partial_order_count(order_count, idx_fused)
         
         assert np.array_equal(order_count_fused_from_list, order_count_fused_from_order_count)
+
+@pytest.mark.parametrize("nvec", nvec_list)
+def test_order_count_lower_k(nvec, tol = 1e-14):
+    # Lists all have the same lengths. CAN WE DO BETTER ?
+    
+    n = 10
+    l = [np.random.random(n) for ivec in range(nvec)]
+
+    all_order_count = [None] # shift elems => k is the index
+
+    for k in range(1,nvec+1):
+        order_count = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l)
+        all_order_count.append(order_count)
+
+    for kbig in range(1,nvec+1):
+        
+        for ksmall in range(1,kbig+1):
+            order_count_big = all_order_count[kbig]
+            order_count_small = all_order_count[ksmall]
+            
+            order_count_lower = pyquickbench.rankstats.order_count_lower_k(order_count_big, ksmall)
+
+            A, p_lower, q_lower = pyquickbench.rankstats.build_sinkhorn_problem(order_count_lower)
+            A, p_small, q_small = pyquickbench.rankstats.build_sinkhorn_problem(order_count_small)
+            
+            assert np.allclose(p_lower, p_small, atol = tol, rtol = tol)
+            assert np.allclose(q_lower, q_small, atol = tol, rtol = tol)
+
+@pytest.mark.parametrize("lenlist", lenlist_list)
+def test_order_count_lower_k_2(lenlist, tol = 1e-14):
+    # Can we find the correct scaling for lists of non equal lengths ?
+    
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    all_order_count = [None] # shift elems => k is the index
+
+    for k in range(1,nvec+1):
+        order_count = pyquickbench.rankstats.exhaustive_score_to_partial_order_count(k, l)
+        all_order_count.append(order_count)
+
+    for kbig in range(1,nvec+1):
+        
+        for ksmall in range(1,kbig+1):
+            
+            order_count_big = all_order_count[kbig]
+            order_count_small = all_order_count[ksmall]
+            
+            order_count_lower = pyquickbench.rankstats.order_count_lower_k(order_count_big, ksmall)
+
+            order_count_lower_scal = order_count_lower / order_count_lower.sum(axis=1, keepdims=True)
+            order_count_small_scal = order_count_small / order_count_small.sum(axis=1, keepdims=True)
+            
+            assert np.allclose(order_count_lower_scal, order_count_small_scal, atol = tol, rtol = tol)
+            
+            assert np.array_equal(
+                order_count_lower * order_count_small.sum(axis=1, keepdims=True),
+                order_count_small * order_count_lower.sum(axis=1, keepdims=True),
+            )
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):

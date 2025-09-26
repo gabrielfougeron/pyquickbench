@@ -26,6 +26,17 @@ cdef inline Py_ssize_t _binomial(Py_ssize_t n, Py_ssize_t k) noexcept nogil:
 
     return res
 
+cdef inline Py_ssize_t _factorial(Py_ssize_t n) noexcept nogil:
+
+    cdef Py_ssize_t i, res
+
+    res = 1
+
+    for i in range(2,n+1):
+        res *= i
+
+    return res
+
 @cython.cdivision(True)
 cdef inline void _to_factorial_base(Py_ssize_t i, Py_ssize_t n, Py_ssize_t *out) noexcept nogil:
 
@@ -525,12 +536,12 @@ cpdef (Py_ssize_t, Py_ssize_t) find_nvec_k_from_order_count_shape(Py_ssize_t nse
 
     return nvec, k
 
-cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,::1] order_count_best, Py_ssize_t k, bint minimize=False) noexcept nogil:
+cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:,::1] best_count, Py_ssize_t k, bint minimize=False) noexcept nogil:
     
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nopt_per_set = order_count.shape[1]
 
-    cdef Py_ssize_t nvec = order_count_best.shape[1]
+    cdef Py_ssize_t nvec = best_count.shape[1]
 
     cdef Py_ssize_t i_opt
 
@@ -539,7 +550,7 @@ cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:
     else:
         i_opt = k-1
 
-    memset(&order_count_best[0,0], 0, sizeof(Py_ssize_t)*nsets*nvec)
+    memset(&best_count[0,0], 0, sizeof(Py_ssize_t)*nsets*nvec)
 
     cdef Py_ssize_t *digits = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*(k-1))
     cdef Py_ssize_t *perm = <Py_ssize_t*> malloc(sizeof(Py_ssize_t)*k)
@@ -550,7 +561,7 @@ cdef void _order_count_to_best_count(Py_ssize_t[:,::1] order_count, Py_ssize_t[:
             
             _from_left_lehmer(jperm, k, digits, perm)
 
-            order_count_best[iset, perm[i_opt]] += order_count[iset, jperm]
+            best_count[iset, perm[i_opt]] += order_count[iset, jperm]
 
     free(digits)
     free(perm)
@@ -560,23 +571,53 @@ def order_count_to_best_count(Py_ssize_t[:,::1] order_count, bint minimize=False
     cdef Py_ssize_t nsets = order_count.shape[0]
     cdef Py_ssize_t nvec, k
     nvec, k = find_nvec_k_from_order_count_shape(nsets, order_count.shape[1])
-    cdef Py_ssize_t[:,::1] order_count_best = np.empty((nsets, k), dtype=np.intp)   
+    cdef Py_ssize_t[:,::1] best_count = np.empty((nsets, k), dtype=np.intp)   
 
-    _order_count_to_best_count(order_count, order_count_best, k, minimize)
+    _order_count_to_best_count(order_count, best_count, k, minimize)
 
-    return np.asarray(order_count_best)
-    
+    return np.asarray(best_count)
+
+# 
+# def order_count_lower_k(Py_ssize_t[:,::1] order_count, Py_ssize_t k_new):
+#     
+#     cdef Py_ssize_t nsets_old = order_count.shape[0]
+#     cdef Py_ssize_t nvec, k_old
+#     nvec, k_old = find_nvec_k_from_order_count_shape(nsets_old, order_count.shape[1])
+# 
+#     cdef Py_ssize_t nsets_new = _binomial(nvec, k_new)
+#     cdef Py_ssize_t kfac_new = 
+#     cdef Py_ssize_t[:,::1] order_count_new = np.empty((nsets_new, k_new), dtype=np.intp)   
+# 
+#     _order_count_lower_k(order_count, order_count_new)
+# 
+#     return np.asarray(order_count)
+# 
+
+# 
+# def best_count_lower_k(Py_ssize_t[:,::1] best_count, Py_ssize_t k_new):
+#     
+#     cdef Py_ssize_t nsets_old = best_count.shape[0]
+#     cdef Py_ssize_t nvec, k_old
+#     nvec, k_old = find_nvec_k_from_best_count_shape(nsets_old, best_count.shape[1])
+# 
+#     nsets_new = _binomial(nvec, k_new)
+#     cdef Py_ssize_t[:,::1] best_count_new = np.empty((nsets_new, k_new), dtype=np.intp)   
+# 
+#     _best_count_lower_k(best_count, best_count_new, k_new)
+# 
+#     return np.asarray(best_count)
+#     
 @cython.cdivision(True)
 cpdef void _build_sinkhorn_rhs(
-    Py_ssize_t[:,::1] order_count_best,
+    Py_ssize_t[:,::1] best_count,
     double[::1] p       ,
     double[::1] q       ,
     double[:,::1] dq    ,
     double reg_eps = 0. ,
 ) noexcept nogil:
     
-    cdef Py_ssize_t nsets = order_count_best.shape[0]
-    cdef Py_ssize_t nvec = order_count_best.shape[1]
+    cdef Py_ssize_t nsets = best_count.shape[0]
+    cdef Py_ssize_t nvec = best_count.shape[1]
 
     cdef Py_ssize_t iset, ivec
     cdef double val
@@ -587,7 +628,7 @@ cpdef void _build_sinkhorn_rhs(
     for iset in range(nsets):
         for ivec in range(nvec):
             
-            val = order_count_best[iset, ivec]
+            val = best_count[iset, ivec]
             
             p[iset] += val
             q[ivec] += val
@@ -615,18 +656,18 @@ cpdef void _build_sinkhorn_rhs(
         q[i] = alpha * q[i] + beta
 
 def build_sinkhorn_rhs(
-    Py_ssize_t[:,::1] order_count_best  ,
-    double reg_eps = 0.                 ,
+    Py_ssize_t[:,::1] best_count    ,
+    double reg_eps = 0.             ,
 ):
     
-    nsets = order_count_best.shape[0]
-    nvec = order_count_best.shape[1]
+    nsets = best_count.shape[0]
+    nvec = best_count.shape[1]
 
     cdef double[::1] p = np.empty(nsets, dtype=np.float64)    
     cdef double[::1] q = np.empty(nvec, dtype=np.float64)       
     cdef double[:,::1] dq = np.empty((nsets, nvec), dtype=np.float64)
 
-    _build_sinkhorn_rhs(order_count_best, p, q, dq, reg_eps)
+    _build_sinkhorn_rhs(best_count, p, q, dq, reg_eps)
     
     return np.asarray(p), np.asarray(q), np.asarray(dq)
 
@@ -634,7 +675,8 @@ def build_sinkhorn_rhs(
 
 @cython.cdivision(True)
 cpdef void _build_sinkhorn_rhs_new(
-    Py_ssize_t[:,::1] best_count,
+    # Py_ssize_t[:,::1] best_count,
+    num_t[:,::1] best_count,
     double[::1] p       ,
     double[::1] q       ,
     # double[:,::1] dq    ,
@@ -692,7 +734,8 @@ cpdef void _build_sinkhorn_rhs_new(
     free(comb)
 
 def build_sinkhorn_rhs_new(
-    Py_ssize_t[:,::1] best_count    ,
+    # Py_ssize_t[:,::1] best_count    ,
+    num_t[:,::1] best_count    ,
     double reg_eps = 0.             ,
 ):
     
