@@ -27,6 +27,17 @@ from .cython.sinkhorn import (
     uv_to_loguv                                 ,
 )
 
+def find_nvec_k(nsets, nopt_per_set, kmax = 100, nvec_max = 10000, vote_mode = "" ):
+    
+    if vote_mode == "best":
+        nvec, k = find_nvec_k_from_best_count_shape(nsets, nopt_per_set, kmax, nvec_max)
+    elif vote_mode == "order":
+        nvec, k = find_nvec_k_from_order_count_shape(nsets, nopt_per_set, kmax, nvec_max)
+    else:
+        raise ValueError(f"Unknown mode {vote_mode}")
+    
+    return nvec, k
+
 def compress_scores(l):
     
     nvec = len(l)
@@ -237,18 +248,20 @@ def montecarlo_score_to_partial_order_count(k, l, order_count = None, nmc_all = 
     
     nvec = len(l)
     
+    nfac = math.factorial(k)
+    ncomb = math.comb(nvec, k)
+
     if order_count is None:
         
-        nfac = math.factorial(k)
-        ncomb = math.comb(nvec, k)
-
         if np.iinfo(np.intp).max < nfac:
             raise ValueError("Too many vectors")
         
         order_count = np.zeros((ncomb, nfac), dtype=np.intp) 
 
     if not isinstance(nmc_all, collections.abc.Iterable):
-        nmc_all = itertools.repeat(nmc_all)
+        nmc_per_ncomb, nmc_rem = divmod(nmc_all, ncomb)
+        nmc_all = np.full(ncomb, nmc_per_ncomb, dtype = np.intp)
+        nmc_all[:nmc_rem] += 1
 
     if cap_nmc:
         
@@ -418,6 +431,16 @@ def score_to_partial_order_count(k, l, order_count = None, method = "exhaustive"
         raise NotImplementedError
     
     return order_count
+
+def fuse_score_to_partial_vote_count(mode, vote_count, idx_fused):
+    
+    if mode == "best":
+        res = fuse_score_to_partial_best_count(vote_count, idx_fused)
+        
+    elif mode == "order":
+        res = fuse_score_to_partial_order_count(vote_count, idx_fused)
+    
+    return res
 
 def fuse_score_to_partial_best_count(best_count, idx_fused):
     

@@ -675,7 +675,6 @@ def build_sinkhorn_rhs(
 
 @cython.cdivision(True)
 cpdef void _build_sinkhorn_rhs_new(
-    # Py_ssize_t[:,::1] best_count,
     num_t[:,::1] best_count,
     double[::1] p       ,
     double[::1] q       ,
@@ -734,9 +733,8 @@ cpdef void _build_sinkhorn_rhs_new(
     free(comb)
 
 def build_sinkhorn_rhs_new(
-    # Py_ssize_t[:,::1] best_count    ,
-    num_t[:,::1] best_count    ,
-    double reg_eps = 0.             ,
+    num_t[:,::1] best_count ,
+    double reg_eps = 0.     ,
 ):
     
     cdef Py_ssize_t nsets = best_count.shape[0]

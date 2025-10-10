@@ -65,31 +65,16 @@ def metrics(ranking):
         'FoundFirst' : FoundFirst(ranking)                                  ,
     }
 
-do = 1.
-
-def setup(nvec, nobs, d, method, nmc):
+do = 0.
+def setup(nvec, nobs, d, method, nmc, k):
     l = [np.random.random(nobs) + (do+d*ivec) for ivec in range(nvec)]
-    return {"score_list" : l,"method" : method, "nmc" : nmc}
+    return {"score_list" : l, "k":k, "method" : method, "nmc" : nmc}
 
-def average_order(score_list, method, nmc):
-    nvec = len(score_list)
-    moy = np.array([np.mean(score_list[ivec]) for ivec in range(nvec)])
-    return np.argsort(moy)
-    
-# def median_order(score_list, method, nmc):
-#     nvec = len(score_list)
-#     med = np.array([np.median(score_list[ivec]) for ivec in range(nvec)])
-#     return np.argsort(med)
-# 
-# def condorcet_order(score_list, method, nmc):
-#     order_count = pyquickbench.rankstats.score_to_partial_order_count(2, score_list, method=method, nmc_all=nmc)
-#     return pyquickbench.rankstats.condorcet_top_order(order_count)
-
-def plackett_luce_order(score_list, k, method, nmc):
+def plackett_luce_best_count(score_list, k, method, nmc):
     best_count = pyquickbench.rankstats.score_to_partial_best_count(k, score_list, method=method, nmc_all=nmc)
     nvec = len(score_list)
     A = pyquickbench.rankstats.build_sinkhorn_best_count_mat(nvec, k)
-    reg_eps = 0.
+    reg_eps = 0.00001
     p, q = pyquickbench.rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = reg_eps)
     
     u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
@@ -99,39 +84,42 @@ def plackett_luce_order(score_list, k, method, nmc):
     )
     return np.argsort(v)
 
-# def count_order_max(score_list, method, nmc):
-#     nvec = len(score_list)
-#     order_count = pyquickbench.rankstats.score_to_partial_order_count(nvec, score_list, method=method, nmc_all=nmc)
-#     imax = np.argmax(order_count[0,:])
-#     return pyquickbench.rankstats.from_left_lehmer(imax, nvec)
+def plackett_luce_best_order(score_list, k, method, nmc):
+    order_count_big = pyquickbench.rankstats.score_to_partial_order_count(k, score_list, method=method, nmc_all=nmc)
+    order_count_lower = pyquickbench.rankstats.order_count_lower_k(order_count_big, 2)
+    nvec = len(score_list)
+
+    reg_eps = 0.00001    
+    A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count_lower, reg_eps = reg_eps)
+    
+    u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
+        A, p, q,
+        numItermax = 10000  ,
+        stopThr = 1e-13     ,
+    )
+    return np.argsort(v)
+
+
+
 
 all_funs = [
-    average_order       ,
-    # median_order        ,
-    # condorcet_order     ,
-    # count_order_max     ,
+    plackett_luce_best_count    ,
+    plackett_luce_best_order    ,
 ]
 
-nvec = 8
+# ddmax = 0.4
+# nd = 32*4-1
+# dd = ddmax/nd
+# 
+# n_repeat = 10
 
-for k in range(2,nvec+1):
-    f = functools.partial(plackett_luce_order, k=k)
-    f.__name__ = f'plackett_luce_order_{k}'
-    all_funs.append(f)
-
-ddmax = 0.4
-nd = 32*4-1
-dd = ddmax/nd
-
-n_repeat = 10
-
-all_args = {
-    "nvec"  : [nvec]   ,
-    "nobs"  : [10]  ,
-    "d"     : [dd*i for i in range(nd+1)]  ,
-    "method"  : ["exhaustive"]  ,
-    "nmc"     : [0]  ,
-}
+# all_args = {
+#     "nvec"  : [nvec]   ,
+#     "nobs"  : [10]  ,
+#     "d"     : [dd*i for i in range(nd+1)]  ,
+#     "method"  : ["exhaustive"]  ,
+#     "nmc"     : [0]  ,
+# }
 
 # all_values = pyquickbench.run_benchmark(
 #     all_args                            ,
@@ -180,17 +168,19 @@ all_args = {
 basename = 'ranking_results_2'
 bench_filename = os.path.join(timings_folder, basename+'.npz')
 
-n_repeat = 10000 
+n_repeat = 10000
+nvec = 6
 
-nmc_max = 1000.
+nmc_max = 200.
 nnmc = 32
 
 all_args = {
-    "nvec"  : [nvec]   ,
+    "nvec"  : [nvec]        ,
     "nobs"  : [1000]  ,
     "d"     : [0.1]  ,
     "method"  : ["montecarlo"]  ,
     "nmc"     : [int(nmc_max*i/nnmc) for i in range(1,nnmc+1)]  ,
+    "k"     : [2,3,4,5,6],
 }
 
 all_values = pyquickbench.run_benchmark(
@@ -205,7 +195,7 @@ all_values = pyquickbench.run_benchmark(
     StopOnExcept = True                 ,
     ShowProgress = True                 ,
     deterministic_setup = False         ,
-    ForceBenchmark = True               ,
+    # ForceBenchmark = True               ,
     pooltype = "process"                ,
 )
 
@@ -213,9 +203,10 @@ plot_intent = {
     "nvec"                      : 'same'            ,
     "nobs"                      : 'same'            ,
     "d"                         : 'same'          ,
-    "method"                    : 'curve_linestyle'            ,
+    "method"                    : 'same'            ,
     "nmc"                       : 'points'            ,
-    pyquickbench.fun_ax_name    : 'curve_color'     ,
+    "k"                         : 'curve_color'            ,
+    pyquickbench.fun_ax_name    : 'curve_linestyle'     ,
     pyquickbench.out_ax_name    : 'subplot_grid_y'  ,
     pyquickbench.repeat_ax_name : 'reduction_avg'   ,
 }

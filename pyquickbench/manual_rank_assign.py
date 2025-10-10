@@ -20,6 +20,8 @@ from pyquickbench._utils import (
     _get_rel_idx_from_maze      ,
 )
 
+all_vote_modes = ["best", "order"]
+
 class ManualRankAssign():
     
     @property
@@ -108,7 +110,8 @@ class ManualRankAssign():
         all_vals = None         ,
         compare_intent = {}     ,
         restrict_values = {}    ,
-        best_count = None       ,
+        vote_count = None       ,
+        vote_mode = None        ,
         k = 2                   ,
         iset_stiffness = 1.     ,
         
@@ -124,20 +127,33 @@ class ManualRankAssign():
 
         self.iset_stiffness = iset_stiffness
         self.k = k
+        if vote_mode is None:
+            self.vote_mode = "best"
+        else:
+            if vote_mode in all_vote_modes:
+                self.vote_mode = vote_mode
+            else:
+                raise ValueError(f"Unknown {vote_mode = }. Possible values are {all_vote_modes}.")
+        
+        if self.vote_mode == "best":
+            self.nopt_per_set = self.k
+            
+        elif self.vote_mode == "order":
+            self.nopt_per_set = math.factorial(self.k)
+            
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
         
-        
-        if best_count is not None:
-            if best_count.shape != (self.nset_unres , self.k):
-                best_count = None
-                # raise ValueError(f"Received best_count with wrong shape. Expected {(self.nset_unres , self.k)}, received {best_count.shape}.")
+        if vote_count is not None:
+            if vote_count.shape != (self.nset_unres , self.nopt_per_set):
+                vote_count = None
+                # raise ValueError(f"Received vote_count with wrong shape. Expected {(self.nset_unres , self.nopt_per_set)}, received {vote_count.shape}.")
             
-        if best_count is None:
-            best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
+        if vote_count is None:
+            vote_count = np.zeros((self.nset_unres, self.nopt_per_set), dtype=np.intp)
             
-        self.best_count = best_count
-        self.n_votes_set = self.best_count.sum(axis=1)
+        self.vote_count = vote_count
+        self.n_votes_set = self.vote_count.sum(axis=1)
 
     def get_img_path(self, val):
         
@@ -299,7 +315,7 @@ class ManualRankAssign():
             idx_all_compare = self.idx_all_compare
             name_compare = self.name_compare
             n_compare = self.n_compare
-            best_count = np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:])
+            vote_count = np.ascontiguousarray(self.vote_count[self.iset_res_to_unres,:])
             
         else:
             
@@ -321,9 +337,9 @@ class ManualRankAssign():
                                 
                 i_compare_fused[i_compare].append(self_i_compare)
 
-            best_count = rankstats.fuse_score_to_partial_best_count(np.ascontiguousarray(self.best_count[self.iset_res_to_unres,:]), i_compare_fused)
+            vote_count = rankstats.fuse_score_to_partial_vote_count(self.vote_mode, np.ascontiguousarray(self.vote_count[self.iset_res_to_unres,:]), i_compare_fused)
 
-        return idx_all_compare, name_compare, n_compare, best_count
+        return idx_all_compare, name_compare, n_compare, vote_count
 
     def next_set(self, iset = None):
         
@@ -364,60 +380,29 @@ class ManualRankAssign():
         iset_unres = self.iset_res_to_unres[iset_res]
         
         if ibest < 0:
-            # When you really don't know what to vote for. Since best_count has dtype np.intp, don't do halves.
-            self.best_count[iset_unres, :] += mul
-            self.n_votes_set[iset_unres] += self.best_count.shape[1]*mul
+            # When you really don't know what to vote for. Since vote_count has dtype np.intp, don't do halves.
+            self.vote_count[iset_unres, :] += mul
+            self.n_votes_set[iset_unres] += self.vote_count.shape[1]*mul
         else:
-            self.best_count[iset_unres, ibest] += mul
+            self.vote_count[iset_unres, ibest] += mul
             self.n_votes_set[iset_unres] += mul
     
-#     def load_results(self, best_count_filename):
-#         
-#         file_bas, file_ext = os.path.splitext(best_count_filename)
-#         
-#         if os.path.isfile(best_count_filename):
-#             
-#             if file_ext == '.npy':
-#                 self.best_count = np.load(best_count_filename) 
-#                 loaded_compare_intent = {}
-#                 
-#             elif file_ext == '.npz':
-#                 
-#                 file_content = np.load(best_count_filename)
-#                 self.best_count = file_content['best_count']
-#                 
-#                 loaded_compare_intent = {key:val for (key,val) in file_content.items() if key not in ['best_count']}
-# 
-#             else:
-#                 raise ValueError(f'Unknown file extension {file_ext}')
-# 
-#         else:
-#             
-#             self.best_count = np.zeros((self.nset_unres, self.k), dtype=np.intp)
-#             loaded_compare_intent = {}
-#             
-#         self.compare_intent = self.complete_finer_compare_intent(loaded_compare_intent)
-#         
-#         if (self.best_count.shape[0] != self.nset_unres) or (self.best_count.shape[1] != self.k):
-#             raise ValueError(f"Loaded results have wrong shape. Loaded {self.best_count.shape}, expected {(self.nset_unres, self.k)}. ")
-# 
-#         self.n_votes_set = self.best_count.sum(axis=1)
-    
-    def save_results(self, best_count_filename = None):
+    def save_results(self, vote_count_filename = None):
         
-        if best_count_filename is None:
-            best_count_filename = self.best_count_filename
+        if vote_count_filename is None:
+            vote_count_filename = self.vote_count_filename
         
-        file_bas, file_ext = os.path.splitext(best_count_filename)
+        file_bas, file_ext = os.path.splitext(vote_count_filename)
             
         if file_ext == '.npy':
-            np.save(best_count_filename, self.best_count)   
+            np.save(vote_count_filename, self.vote_count)   
             
         elif file_ext == '.npz':
 
             np.savez(
-                best_count_filename                     ,
-                best_count = self.best_count            ,
+                vote_count_filename                     ,
+                vote_count = self.vote_count            ,
+                vote_mode = self.vote_mode              ,
                 compare_intent = self.compare_intent    ,
                 all_vals = self.all_vals                ,
                 **self.benchfile_shape                  ,
@@ -428,23 +413,26 @@ class ManualRankAssign():
         
     def get_order(self, compare_intent = None):
         
-        idx_all_compare, name_compare, n_compare, best_count = self.fuse_compare_intent(compare_intent = compare_intent)
+        idx_all_compare, name_compare, n_compare, vote_count = self.fuse_compare_intent(compare_intent = compare_intent)
         
         if (n_compare < self.k):
             raise ValueError("Not enough items to compare")
         
-        n_votes = best_count.sum()
+        n_votes = vote_count.sum()
+        
+        if self.vote_mode != "best":
+            raise NotImplementedError
                 
         if (n_votes < 1):
             
-            nvec, k = rankstats.find_nvec_k_from_best_count_shape(best_count.shape[0], best_count.shape[1])
+            nvec, k = rankstats.find_nvec_k(vote_count.shape[0], vote_count.shape[1], vote_mode = self.vote_mode)
             v = np.ones(nvec, dtype=np.float64)
             
         else:
 
             A = rankstats.build_sinkhorn_best_count_mat(n_compare, self.k)
             reg_eps = 1./(n_votes+1)
-            p, q = rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = reg_eps)
+            p, q = rankstats.build_sinkhorn_rhs_new(vote_count, reg_eps = reg_eps)
 
             reg_beta = 0.
             reg_alpham1 = 0.

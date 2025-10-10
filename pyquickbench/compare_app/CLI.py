@@ -17,6 +17,7 @@ from . import GUI
 from pyquickbench._defaults import *
 from pyquickbench._benchmark import run_benchmark
 from pyquickbench.manual_rank_assign import ManualRankAssign
+from pyquickbench.rankstats import find_nvec_k
 
 cycle_intents = {
     "compare" : "group",
@@ -43,7 +44,7 @@ def load_benchfile(bench_filename):
     all_vals = file_content.get('all_vals')
     
     # This should stay consistent with _build_args_shapes
-    benchfile_shape = {key:val for (key,val) in file_content.items() if key not in ['all_vals', 'compare_intent', 'best_count', fun_ax_name, repeat_ax_name, out_ax_name]}
+    benchfile_shape = {key:val for (key,val) in file_content.items() if key not in ['all_vals', 'compare_intent', 'vote_count', 'vote_mode', fun_ax_name, repeat_ax_name, out_ax_name]}
     benchfile_shape[fun_ax_name] = all_vals.shape[-3]
     benchfile_shape[repeat_ax_name] = all_vals.shape[-2]
     benchfile_shape[out_ax_name] = all_vals.shape[-1]
@@ -56,9 +57,10 @@ def load_benchfile(bench_filename):
     else:
         compare_intent = compare_intent.flatten()[0] # dirty hack
     
-    best_count = file_content.get('best_count')
+    vote_count = file_content.get('vote_count')
+    vote_mode = file_content.get('vote_mode')
 
-    return benchfile_shape, all_vals, best_count, restrict_idx, restrict_shape, compare_intent
+    return benchfile_shape, all_vals, vote_count, vote_mode, restrict_idx, restrict_shape, compare_intent
 
 class BenchmarkTree(Tree):
     
@@ -205,8 +207,14 @@ class ImageCompareCLI(App):
             yield Label("", classes="setwidth", id="save_filename_exists")
             
         with Horizontal(classes="maxheight"):
+            yield Label("Voting mode", classes="setwidth")
+            yield Select.from_values(["best", "order"], value = "best", id="vote_mode_select")
+            yield Label("", classes="setwidth", id="vote_mode_warning")
+            
+        with Horizontal(classes="maxheight"):
             yield Label("Number of options in a comparison", classes="setwidth")
             yield Input(placeholder="Enter a number ...", value = "2", validators=[Number(minimum=2)], id="k_input")
+            yield Label("", classes="setwidth", id="k_input_warning")
         
         tree = BenchmarkTree("Benchmark", id="bench_tree")
         tree.show_root = False
@@ -228,9 +236,22 @@ class ImageCompareCLI(App):
         yield Footer()
         
     def on_select_changed(self, event):
+        # TODO : rationalize that
         
-        if event.control.id == 'bench_file_select':
+        if event.control.id == "bench_file_select":
 
+            try:
+                
+                save_filename_input = self.query_one("#save_filename_input")  
+                save_filename_input.value = event.control.value
+
+                self.load_bench()
+            except Exception as exc:
+                self.notify(f'{exc}', timeout=60)
+                # raise exc
+    
+        elif event.control.id == "vote_mode_select":
+            
             try:
                 self.load_bench()
             except Exception as exc:
@@ -247,7 +268,7 @@ class ImageCompareCLI(App):
                 lbl.content = ""
                 
             try:
-                self.rank_assign.best_count_filename = event.value
+                self.rank_assign.vote_count_filename = event.value
             except:
                 pass
                 
@@ -259,7 +280,6 @@ class ImageCompareCLI(App):
 
     @on(Button.Pressed, "#CompareButton")
     def action_start_compare_GUI(self):
-        
         
         lbl = self.query_one("#CompareLabel")  
         lbl.content = Text("Please compare images in GUI, then press Escape.", style = Style(color = "orange3"))
@@ -282,8 +302,9 @@ class ImageCompareCLI(App):
             self.print_compare_results()
         except Exception as exc:
             self.notify(f'{exc}', timeout=60)
+            raise exc
+            
         lbl = self.query_one("#CompareLabel")  
-
         lbl.content = ""
         
     def lauch_GUI(self):
@@ -306,19 +327,36 @@ class ImageCompareCLI(App):
             self.compare_results_with_label()
             return
         
-        tree.benchfile_shape, tree.all_vals, tree.best_count, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
+        tree.benchfile_shape, tree.all_vals, tree.vote_count, tree.vote_mode, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
         tree.populate_bench_tree()
         
         self.rank_assign = self.build_rank_assign()
         
         save_filename_input = self.query_one("#save_filename_input")  
-        self.rank_assign.best_count_filename = save_filename_input.value
+        self.rank_assign.vote_count_filename = save_filename_input.value
         self.compare_results_with_label()
     
     def build_rank_assign(self):
         
-        tree = self.query_one("#bench_tree")  
-        k = int(self.query_one("#k_input").value)
+        tree = self.query_one("#bench_tree")
+        k_CLI = int(self.query_one("#k_input").value)
+        vote_mode_CLI = self.query_one("#vote_mode_select").value
+        
+        lbl = self.query_one("#vote_mode_warning")  
+        lbl.content = ""
+        if tree.vote_mode is not None:
+            if vote_mode_CLI != tree.vote_mode:
+                lbl.content = Text(f"Warning: Value differs from saved value {tree.vote_mode}", style = Style(color = "orange3"))
+
+        lbl = self.query_one("#k_input_warning")  
+        lbl.content = ""
+
+        if (tree.vote_count is not None) and (tree.vote_mode is not None):
+            nvec_save, k_save = find_nvec_k(tree.vote_count.shape[0], tree.vote_count.shape[1], vote_mode = tree.vote_mode)
+
+            if k_save != k_CLI:
+                lbl.content = Text(f"Warning: Value differs from saved value {k_save}", style = Style(color = "orange3"))
+
         
         restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
         
@@ -328,11 +366,12 @@ class ImageCompareCLI(App):
             all_vals = tree.all_vals                ,
             compare_intent = {}                     ,
             restrict_values = restrict_values       ,
-            best_count = tree.best_count            ,
-            k = k                                   ,
+            vote_count = tree.vote_count            ,
+            vote_mode = tree.vote_mode              ,
+            k = k_CLI                               ,
         )
         
-        rank_assign.best_count_filename = self.query_one("#save_filename_input").value
+        rank_assign.vote_count_filename = self.query_one("#save_filename_input").value
         
         return rank_assign
 
@@ -352,12 +391,12 @@ class ImageCompareCLI(App):
             res_print.write("Not enough items to compare.")
             # res_print.write(exc)
             
-            # res_print.write(f"Total number of votes: {self.rank_assign.best_count.sum()}")
-            # res_print.write(f"{self.rank_assign.best_count.shape = }")
+            # res_print.write(f"Total number of votes: {self.rank_assign.vote_count.sum()}")
+            # res_print.write(f"{self.rank_assign.vote_count.shape = }")
             # res_print.write(exc)
             return
     
-        res_print.write(f"Total number of votes: {self.rank_assign.best_count.sum()}")
+        res_print.write(f"Total number of votes: {self.rank_assign.vote_count.sum()}")
         res_print.write(f"Total number of votes in comparison: {n_votes}")
 
         if np.all(np.isfinite(v)):
