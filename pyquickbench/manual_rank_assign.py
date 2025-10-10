@@ -429,10 +429,9 @@ class ManualRankAssign():
             v = np.ones(nvec, dtype=np.float64)
             
         else:
-
-            A = rankstats.build_sinkhorn_best_count_mat(n_compare, self.k)
+            
             reg_eps = 1./(n_votes+1)
-            p, q = rankstats.build_sinkhorn_rhs_new(vote_count, reg_eps = reg_eps)
+            A, p, q = rankstats.build_sinkhorn_problem(vote_count, self.vote_mode, reg_eps = reg_eps, minimize = False)
 
             reg_beta = 0.
             reg_alpham1 = 0.

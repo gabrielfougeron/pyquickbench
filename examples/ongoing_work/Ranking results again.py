@@ -75,7 +75,7 @@ def plackett_luce_best_count(score_list, k, method, nmc):
     nvec = len(score_list)
     A = pyquickbench.rankstats.build_sinkhorn_best_count_mat(nvec, k)
     reg_eps = 0.00001
-    p, q = pyquickbench.rankstats.build_sinkhorn_rhs_new(best_count, reg_eps = reg_eps)
+    p, q = pyquickbench.rankstats.build_sinkhorn_rhs_best_count(best_count, reg_eps, nvec)
     
     u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
         A, p, q,

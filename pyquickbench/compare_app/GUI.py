@@ -85,8 +85,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.height = 10 # Does not matter, will be changed automatically soon after __init__
         
         # TODO Change this for grid layout
-        self.num_cols = self.master.rank_assign.k
-        self.num_rows = 1
+        self.num_cols = self.master.num_cols
+        self.num_rows = self.master.num_rows
         
         self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
         self.scrollframe = self.scroll.frame
@@ -168,19 +168,22 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     def fill_cache(self):
         
         nfill = self.n_cache - len(self.all_img_cache)
+        
+        padx = 4
+        pady = 4
 
         for ifill in range(nfill):
 
             iset, vals_set = self.master.rank_assign.next_set()
 
-            width = self.width - (self.num_cols-1) * 4 
+            width = self.width - (self.num_cols-1) * padx
             width = max(width, self.num_cols)
             img_width = width // self.num_cols
             
-            height = self.height - (self.num_rows-1) * 4 
+            height = self.height - (self.num_rows-1) * pady
             height = max(height, self.num_rows)
             img_height = height // self.num_rows
-
+            
             img_cache = []
             tkimg_cache = []
             
@@ -266,6 +269,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
     def resize_images(self, width=None, height=None):
         
+        padx = 4
+        pady = 4
+
         if width is None:
             width = self.width
         else:
@@ -276,13 +282,13 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         else:
             self.height = height
         
-        width -= (self.num_cols-1) * 4 
+        width -= (self.num_cols-1) * padx
         width = max(width, self.num_cols)
         img_width = width // self.num_cols
         
-        height -= (self.num_rows-1) * 4 
+        height -= (self.num_rows-1) * pady
         height = max(height, self.num_rows)
-        img_height = width // self.num_rows
+        img_height = height // self.num_rows
         
         cache_wave = self.all_img_cache[self.i_cache]
         img_cache = cache_wave[0]
@@ -314,11 +320,19 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
 class ImageCompareGUI(tk.Tk):
     
-    def __init__(self, rank_assign):
+    def __init__(self, rank_assign, num_rows = 1, num_cols = None):
         tk.Tk.__init__(self)
         
         self.title('Ultra Minimalist GUI')
         self.rank_assign = rank_assign
+        
+        if num_cols is None:
+            num_cols, rem = divmod(rank_assign.k, num_rows)
+            if rem != 0:
+                raise ValueError(f"Remainder is {rem} and should be 0")
+
+        self.num_rows = num_rows
+        self.num_cols = num_cols
 
         aux = ImageCompareAuxiliaryWindow(self)
         aux.pack(expand=1, fill="both")

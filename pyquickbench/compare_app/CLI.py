@@ -309,7 +309,8 @@ class ImageCompareCLI(App):
         
     def lauch_GUI(self):
 
-        img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign)
+        # img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign)
+        img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = 2, num_cols = None)
         img_compare_GUI()
     
     def load_bench(self):

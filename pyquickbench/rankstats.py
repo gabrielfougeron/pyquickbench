@@ -19,7 +19,7 @@ from .cython.rankstats import (
     find_nvec_k_from_order_count_shape          ,
     order_count_to_best_count                   ,
     build_sinkhorn_rhs                          ,
-    build_sinkhorn_rhs_new                      ,
+    build_sinkhorn_rhs_best_count               ,
 )
 
 from .cython.sinkhorn import (
@@ -303,7 +303,7 @@ def adaptive_score_to_partial_order_count(k, l, order_count = None, nmc_all = 10
     nmc_rem = nmc_all
     
     # I really only need A here ... at least as long as I don't have a matrix-free implementation
-    A, p, q = build_sinkhorn_problem(order_count)
+    A, p, q = build_sinkhorn_problem_order(order_count)
     
     while nmc_rem > 0:
         
@@ -723,7 +723,29 @@ def build_sinkhorn_best_count_mat(nvec, k):
         
     return A
 
-def build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False):
+def build_sinkhorn_problem(vote_count, vote_mode, reg_eps = 0., minimize = False):
+    
+    nvec, k = find_nvec_k(vote_count.shape[0], vote_count.shape[1], vote_mode = vote_mode)
+    
+    if vote_mode == "best":
+        
+        A = build_sinkhorn_best_count_mat(nvec, k)
+        p, q = build_sinkhorn_rhs_best_count(vote_count, reg_eps, nvec)
+
+    elif vote_count == "order":
+        
+        order_count_k2 = order_count_lower_k(vote_count, 2)
+        best_count = order_count_to_best_count(order_count_k2)
+        
+        A = build_sinkhorn_best_count_mat(nvec, 2)
+        p, q = build_sinkhorn_rhs_best_count(best_count, reg_eps, nvec)
+        
+    else:
+        raise NotImplementedError
+    
+    return A, p, q
+
+def build_sinkhorn_problem_order(order_count, reg_eps = 0., minimize=False):
     
     nsets = order_count.shape[0]
     nopt_per_set = order_count.shape[1]

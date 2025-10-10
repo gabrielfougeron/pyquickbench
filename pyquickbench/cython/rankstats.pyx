@@ -576,37 +576,7 @@ def order_count_to_best_count(Py_ssize_t[:,::1] order_count, bint minimize=False
     _order_count_to_best_count(order_count, best_count, k, minimize)
 
     return np.asarray(best_count)
-
-# 
-# def order_count_lower_k(Py_ssize_t[:,::1] order_count, Py_ssize_t k_new):
-#     
-#     cdef Py_ssize_t nsets_old = order_count.shape[0]
-#     cdef Py_ssize_t nvec, k_old
-#     nvec, k_old = find_nvec_k_from_order_count_shape(nsets_old, order_count.shape[1])
-# 
-#     cdef Py_ssize_t nsets_new = _binomial(nvec, k_new)
-#     cdef Py_ssize_t kfac_new = 
-#     cdef Py_ssize_t[:,::1] order_count_new = np.empty((nsets_new, k_new), dtype=np.intp)   
-# 
-#     _order_count_lower_k(order_count, order_count_new)
-# 
-#     return np.asarray(order_count)
-# 
-
-# 
-# def best_count_lower_k(Py_ssize_t[:,::1] best_count, Py_ssize_t k_new):
-#     
-#     cdef Py_ssize_t nsets_old = best_count.shape[0]
-#     cdef Py_ssize_t nvec, k_old
-#     nvec, k_old = find_nvec_k_from_best_count_shape(nsets_old, best_count.shape[1])
-# 
-#     nsets_new = _binomial(nvec, k_new)
-#     cdef Py_ssize_t[:,::1] best_count_new = np.empty((nsets_new, k_new), dtype=np.intp)   
-# 
-#     _best_count_lower_k(best_count, best_count_new, k_new)
-# 
-#     return np.asarray(best_count)
-#     
+ 
 @cython.cdivision(True)
 cpdef void _build_sinkhorn_rhs(
     Py_ssize_t[:,::1] best_count,
@@ -675,11 +645,10 @@ def build_sinkhorn_rhs(
 
 @cython.cdivision(True)
 cpdef void _build_sinkhorn_rhs_new(
-    num_t[:,::1] best_count,
-    double[::1] p       ,
-    double[::1] q       ,
-    # double[:,::1] dq    ,
-    double reg_eps = 0. ,
+    num_t[:,::1] best_count ,
+    double[::1] p           ,
+    double[::1] q           ,
+    double reg_eps = 0.     ,
 ) noexcept nogil:
     
     cdef Py_ssize_t nsets = best_count.shape[0]
@@ -704,19 +673,12 @@ cpdef void _build_sinkhorn_rhs_new(
             
             p[iset] += val
             q[comb[ik]] += val
-    #         dq[iset, ivec] = val ???
 
     cdef double total_sum = 0
 
     for ivec in range(nvec):
         total_sum += q[ivec]
             
-    # for iset in range(nsets):
-    #     val = p[iset]
-    #     total_sum += val
-    #     for ivec in range(nvec):
-    #         dq[iset, ivec] /= val
-
     cdef double alpha, beta
         
     alpha = (1. - reg_eps) / total_sum  
@@ -732,17 +694,19 @@ cpdef void _build_sinkhorn_rhs_new(
 
     free(comb)
 
-def build_sinkhorn_rhs_new(
+def build_sinkhorn_rhs_best_count(
     num_t[:,::1] best_count ,
     double reg_eps = 0.     ,
+    Py_ssize_t nvec = -1    ,
 ):
     
     cdef Py_ssize_t nsets = best_count.shape[0]
     cdef Py_ssize_t k = best_count.shape[1]
 
-    cdef Py_ssize_t nvec = _find_ncomb(nsets, k, 10000)
     if nvec < 0:
-        raise ValueError("Could not determine nvec")
+        nvec = _find_ncomb(nsets, k, 10000)
+        if nvec < 0:
+            raise ValueError("Could not determine nvec")
 
     cdef double[::1] p = np.empty(nsets, dtype=np.float64)    
     cdef double[::1] q = np.empty(nvec, dtype=np.float64)       

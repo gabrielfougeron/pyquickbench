@@ -30,14 +30,14 @@ nmc_all = np.array([10, 1000, 1000, 1000, 1000, 1000])
 order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l, method="montecarlo", nmc_all = nmc_all)
 
 project_order_count_best = TT.tictoc(pyquickbench.rankstats.project_order_count_best, name="project_order_count_best")
-build_sinkhorn_problem = TT.tictoc(pyquickbench.rankstats.build_sinkhorn_problem, name="build_sinkhorn_problem")
+build_sinkhorn_problem_order = TT.tictoc(pyquickbench.rankstats.build_sinkhorn_problem_order, name="build_sinkhorn_problem_order")
 
 
 n_repeat = 100000
 for i_repeat in range(n_repeat):
 
     order_count_best = project_order_count_best(order_count)
-    A, p, q = build_sinkhorn_problem(order_count, reg_eps = 0., minimize=False)
+    A, p, q = build_sinkhorn_problem_order(order_count, reg_eps = 0., minimize=False)
 
 sum_tot = order_count_best.sum()
 pp = order_count_best.sum(axis=1) / sum_tot
