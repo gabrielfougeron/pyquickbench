@@ -206,15 +206,20 @@ class ImageCompareCLI(App):
             yield Input(placeholder="Filename ...", value = save_filename_value, validators=[Function(lambda x:x.endswith(".npz"))], id="save_filename_input")
             yield Label("", classes="setwidth", id="save_filename_exists")
             
-        with Horizontal(classes="maxheight"):
-            yield Label("Voting mode", classes="setwidth")
-            yield Select.from_values(["best", "order"], value = "best", id="vote_mode_select")
-            yield Label("", classes="setwidth", id="vote_mode_warning")
+        # with Horizontal(classes="maxheight"):
+        #     yield Label("Voting mode", classes="setwidth")
+        #     yield Select.from_values(["best", "order"], value = "best", id="vote_mode_select")
+        #     yield Label("", classes="setwidth", id="vote_mode_warning")
             
         with Horizontal(classes="maxheight"):
             yield Label("Number of options in a comparison", classes="setwidth")
             yield Input(placeholder="Enter a number ...", value = "2", validators=[Number(minimum=2)], id="k_input")
             yield Label("", classes="setwidth", id="k_input_warning")
+        
+        with Horizontal(classes="maxheight"):
+            yield Label("Number of rows / columns in GUI", classes="setwidth")
+            yield Input(placeholder="Enter a number of rows ...", value = "1", validators=[Number(minimum=1)], id="nrows_input")
+            yield Input(placeholder="Enter a number of columns ...", value = "2", validators=[Number(minimum=1)], id="ncols_input")
         
         tree = BenchmarkTree("Benchmark", id="bench_tree")
         tree.show_root = False
@@ -309,7 +314,14 @@ class ImageCompareCLI(App):
         
     def lauch_GUI(self):
 
-        img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = 2, num_cols = None)
+        nrows_CLI = int(self.query_one("#nrows_input").value)
+        ncols_CLI = int(self.query_one("#ncols_input").value)
+        
+        if self.rank_assign.nchoices_vote > nrows_CLI * ncols_CLI:
+            raise ValueError
+
+        img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = nrows_CLI, num_cols = ncols_CLI)
+
         img_compare_GUI()
     
     def load_bench(self):
@@ -340,7 +352,12 @@ class ImageCompareCLI(App):
         
         tree = self.query_one("#bench_tree")
         nchoices_CLI = int(self.query_one("#k_input").value)
-        vote_mode_CLI = self.query_one("#vote_mode_select").value
+        
+        try:
+            vote_mode_CLI = self.query_one("#vote_mode_select").value
+        except:
+            vote_mode_CLI = "best"
+        
         
         # lbl = self.query_one("#vote_mode_warning")  
         # lbl.content = ""

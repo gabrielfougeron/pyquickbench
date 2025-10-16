@@ -368,10 +368,10 @@ class ManualRankAssign():
         return idx_all_compare, name_compare, n_compare, store_count
 
     def next_set(self, iset = None):
-        
+
         if iset is None:
             iset = self.next_iset()
-        
+
         i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
         i_compare_arr = rankstats.unrank_combination(iset, self.n_compare, self.nchoices_vote)
 
@@ -417,7 +417,7 @@ class ManualRankAssign():
 
         chosen_elems_arr = np.array(chosen_elems_list, dtype=np.intp)
         
-        return rankstats.rank_combination(chosen_elems_arr, self.nset_store_res, self.nopts_vote)
+        return rankstats.rank_combination(chosen_elems_arr, self.n_compare, self.nchoices_vote)
     
     def vote_for_ibest(self, iset_vote_res, ibest_vote, mul = 1):
         

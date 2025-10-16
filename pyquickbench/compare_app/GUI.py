@@ -79,22 +79,25 @@ class ImageCompareScrollFrame(tk.Frame):
 class ImageCompareAuxiliaryWindow(tk.Frame):
     
     def __init__(self, master, **kwargs):
-        tk.Frame.__init__(self, master, **kwargs)
         
+        tk.Frame.__init__(self, master, **kwargs)
+
         self.width = 10 # Does not matter, will be changed automatically soon after __init__
         self.height = 10 # Does not matter, will be changed automatically soon after __init__
         
-        # TODO Change this for grid layout
         self.num_cols = self.master.num_cols
         self.num_rows = self.master.num_rows
-        
-        self.scroll = ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images).colcfg(range(1), weight=1).rowcfg(range(1), weight=1)
-        self.scrollframe = self.scroll.frame
 
+        self.scroll = (
+            ImageCompareScrollFrame(self, r=0, c=0, resize_images_func=self.resize_images)
+            .colcfg(range(self.num_cols), weight=1)
+            .rowcfg(range(self.num_rows), weight=1)
+        )
+        self.scrollframe = self.scroll.frame
+        
         self.all_lbls = []
         
         self.cache_init()
-        self.fill_cache()
         self.resize_images()
 
     def on_key_press(self, event):
@@ -160,7 +163,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.iset_cache = []
         self.vals_set_cache = []
         self.vote_cache = []
-        
+
         self.fill_cache()
         
     def fill_cache(self):
@@ -181,13 +184,14 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             height = self.height - (self.num_rows-1) * pady
             height = max(height, self.num_rows)
             img_height = height // self.num_rows
-            
+
             img_cache = []
             tkimg_cache = []
             
             for val in vals_set:
 
                 img_path = self.master.rank_assign.get_img_path(val)
+
                 img = Image.open(img_path)
                 ImageOps.exif_transpose(img, in_place=True)
                 tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
@@ -234,6 +238,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
     def display_current_choice(self, new_perm = True):
         
+        # Prevents memory leaks ?
         for lbl in self.all_lbls:
             lbl.destroy()
         self.all_lbls = []
@@ -255,8 +260,15 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
             lbl.configure(anchor="center", background='black')  
-            lbl.config(image=tkimg_cache[i], anchor="center", background='black')
+            lbl.config(image=tkimg_cache[i], anchor="center", background='black')     
+            self.all_lbls.append(lbl)   
             
+        for i in range(self.master.rank_assign.nchoices_vote, self.num_rows*self.num_cols):
+            row, col = divmod(i, self.num_cols)
+            ### just create a label without showing the image initially
+            lbl = ttk.Label(self.scrollframe, anchor="center")
+            lbl.grid(row=row, column=col, sticky='nsew')
+            lbl.configure(anchor="center", background='black')  
             self.all_lbls.append(lbl)
     
     def get_img_path(self, val):
@@ -319,8 +331,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 class ImageCompareGUI(tk.Tk):
     
     def __init__(self, rank_assign, num_rows = 1, num_cols = None):
+
         tk.Tk.__init__(self)
-        
+
         self.title('Ultra Minimalist GUI')
         self.rank_assign = rank_assign
         
@@ -337,7 +350,6 @@ class ImageCompareGUI(tk.Tk):
 
         aux = ImageCompareAuxiliaryWindow(self)
         aux.pack(expand=1, fill="both")
-        
         self.bind("<KeyPress>", aux.on_key_press)
 
     def __call__(self):
