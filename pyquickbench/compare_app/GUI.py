@@ -100,9 +100,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     def on_key_press(self, event):
 
         vote = None
-        
-        # print(event.keysym)
-        
+
         if event.keysym == "s":
             self.master.rank_assign.save_results()
             
@@ -116,11 +114,11 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             self.display_current_choice()
         
         if event.keysym == 'Left':
-            if self.master.rank_assign.k == 2:
+            if self.master.rank_assign.nchoices_vote == 2 and self.num_rows == 1 and  self.num_cols == 2:
                 vote = 0
                 
         elif event.keysym == 'Right':
-            if self.master.rank_assign.k == 2:
+            if self.master.rank_assign.nchoices_vote == 2 and self.num_rows == 1 and  self.num_cols == 2:
                 vote = 1
                 
         elif event.keysym.startswith("KP_"):
@@ -138,7 +136,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
             if vote < 0:
                 ibest_choice = -1
-            elif vote < self.master.rank_assign.k:
+            elif vote < self.master.rank_assign.nchoices_vote:
                 ibest_choice = self.img_perm[vote]
             else:
                 ibest_choice = None
@@ -156,7 +154,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.n_cache = self.n_prev_max + 2
         self.i_cache = 0
         
-        self.img_perm = np.random.permutation(self.master.rank_assign.k)
+        self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
         
         self.all_img_cache = []
         self.iset_cache = []
@@ -244,12 +242,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         vals_set = self.vals_set_cache[self.i_cache]
         img_cache, tkimg_cache = self.all_img_cache[self.i_cache]
 
-        assert len(vals_set) == self.master.rank_assign.k
+        assert len(vals_set) == self.master.rank_assign.nchoices_vote
         
         if new_perm:
-            self.img_perm = np.random.permutation(self.master.rank_assign.k)
+            self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
         
-        for i in range(self.master.rank_assign.k):
+        for i in range(self.master.rank_assign.nchoices_vote):
             
             row, col = divmod(self.img_perm[i], self.num_cols)
 
@@ -326,8 +324,11 @@ class ImageCompareGUI(tk.Tk):
         self.title('Ultra Minimalist GUI')
         self.rank_assign = rank_assign
         
+        if rank_assign.vote_mode != "best":
+            raise NotImplementedError
+        
         if num_cols is None:
-            num_cols, rem = divmod(rank_assign.k, num_rows)
+            num_cols, rem = divmod(rank_assign.nchoices_vote, num_rows)
             if rem != 0:
                 raise ValueError(f"Remainder is {rem} and should be 0")
 

@@ -90,7 +90,7 @@ class ManualRankAssign():
             
             i_compare_arr_res = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_store)
             
-            for i in range(self.k):
+            for i in range(self.nchoices_store):
                 
                 idx_compare_res = _from_mem_shift_restricted(i_compare_arr_res[i], self.idx_all_compare, self.restrict_shape)   
                 
@@ -172,8 +172,8 @@ class ManualRankAssign():
         
         if store_count is not None:
             if store_count.shape != (self.nset_store_unres , self.nopts_store):
-                store_count = None
-                # raise ValueError(f"Received store_count with wrong shape. Expected {(self.nset_store_unres , self.nopts_store)}, received {store_count.shape}.")
+                # store_count = None
+                raise ValueError(f"Received store_count with wrong shape. Expected {(self.nset_store_unres , self.nopts_store)}, received {store_count.shape}.")
             
         if store_count is None:
             store_count = np.zeros((self.nset_store_unres, self.nopts_store), dtype=np.intp)
@@ -372,8 +372,8 @@ class ManualRankAssign():
         if iset is None:
             iset = self.next_iset()
         
-        i_group_arr = np.random.randint(self.n_group, size=self.k)
-        i_compare_arr = rankstats.unrank_combination(iset, self.n_compare, self.k)
+        i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
+        i_compare_arr = rankstats.unrank_combination(iset, self.n_compare, self.nchoices_vote)
 
         idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
 
@@ -404,8 +404,8 @@ class ManualRankAssign():
         
         while n_elem_chosen < self.nchoices_vote:
             
-            iset_res = np.random.choice(self.nset_res, p=p)
-            elems_res = rankstats.unrank_combination(iset_res, self.nset_res, self.nopts_store)
+            iset_res = np.random.choice(self.nset_store_res, p=p)
+            elems_res = rankstats.unrank_combination(iset_res, self.nset_store_res, self.nopts_store)
             
             for elem in elems_res:
                 
@@ -417,7 +417,7 @@ class ManualRankAssign():
 
         chosen_elems_arr = np.array(chosen_elems_list, dtype=np.intp)
         
-        return rankstats.rank_combination(chosen_elems_arr, self.nset_res, self.nopts_vote)
+        return rankstats.rank_combination(chosen_elems_arr, self.nset_store_res, self.nopts_vote)
     
     def vote_for_ibest(self, iset_vote_res, ibest_vote, mul = 1):
         
@@ -461,8 +461,8 @@ class ManualRankAssign():
 
             np.savez(
                 store_count_filename                    ,
-                vote_count = self.store_count           ,
-                vote_mode = self.store_mode             ,
+                store_count = self.store_count          ,
+                store_mode = self.store_mode            ,
                 compare_intent = self.compare_intent    ,
                 all_vals = self.all_vals                ,
                 **self.benchfile_shape                  ,
@@ -475,7 +475,7 @@ class ManualRankAssign():
         
         idx_all_compare, name_compare, n_compare, store_count = self.fuse_compare_intent(compare_intent = compare_intent)
         
-        if (n_compare < self.k):
+        if (n_compare < self.nchoices_store):
             raise ValueError("Not enough items to compare")
         
         n_store = store_count.sum()
@@ -491,7 +491,7 @@ class ManualRankAssign():
         else:
             
             reg_eps = 1./(n_store+1)
-            A, p, q = rankstats.build_sinkhorn_problem(store_count, self.store_mode, reg_eps = reg_eps, minimize = False)
+            A, p, q = rankstats.build_sinkhorn_problem(store_count, self.store_mode, reg_eps = reg_eps)
 
             reg_beta = 0.
             reg_alpham1 = 0.

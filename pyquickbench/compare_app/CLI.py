@@ -44,7 +44,7 @@ def load_benchfile(bench_filename):
     all_vals = file_content.get('all_vals')
     
     # This should stay consistent with _build_args_shapes
-    benchfile_shape = {key:val for (key,val) in file_content.items() if key not in ['all_vals', 'compare_intent', 'vote_count', 'vote_mode', fun_ax_name, repeat_ax_name, out_ax_name]}
+    benchfile_shape = {key:val for (key,val) in file_content.items() if key not in ['all_vals', 'compare_intent', 'store_count', 'store_mode', fun_ax_name, repeat_ax_name, out_ax_name]}
     benchfile_shape[fun_ax_name] = all_vals.shape[-3]
     benchfile_shape[repeat_ax_name] = all_vals.shape[-2]
     benchfile_shape[out_ax_name] = all_vals.shape[-1]
@@ -57,10 +57,10 @@ def load_benchfile(bench_filename):
     else:
         compare_intent = compare_intent.flatten()[0] # dirty hack
     
-    vote_count = file_content.get('vote_count')
-    vote_mode = file_content.get('vote_mode')
+    store_count = file_content.get('store_count')
+    store_mode = file_content.get('store_mode')
 
-    return benchfile_shape, all_vals, vote_count, vote_mode, restrict_idx, restrict_shape, compare_intent
+    return benchfile_shape, all_vals, store_count, store_mode, restrict_idx, restrict_shape, compare_intent
 
 class BenchmarkTree(Tree):
     
@@ -268,7 +268,7 @@ class ImageCompareCLI(App):
                 lbl.content = ""
                 
             try:
-                self.rank_assign.vote_count_filename = event.value
+                self.rank_assign.store_count_filename = event.value
             except:
                 pass
                 
@@ -309,7 +309,6 @@ class ImageCompareCLI(App):
         
     def lauch_GUI(self):
 
-        # img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign)
         img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = 2, num_cols = None)
         img_compare_GUI()
     
@@ -328,35 +327,35 @@ class ImageCompareCLI(App):
             self.compare_results_with_label()
             return
         
-        tree.benchfile_shape, tree.all_vals, tree.vote_count, tree.vote_mode, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
+        tree.benchfile_shape, tree.all_vals, tree.store_count, tree.store_mode, tree.restrict_idx, tree.restrict_shape, tree.compare_intent = load_benchfile(tree.bench_filename)
         tree.populate_bench_tree()
         
         self.rank_assign = self.build_rank_assign()
         
         save_filename_input = self.query_one("#save_filename_input")  
-        self.rank_assign.vote_count_filename = save_filename_input.value
+        self.rank_assign.store_count_filename = save_filename_input.value
         self.compare_results_with_label()
     
     def build_rank_assign(self):
         
         tree = self.query_one("#bench_tree")
-        k_CLI = int(self.query_one("#k_input").value)
+        nchoices_CLI = int(self.query_one("#k_input").value)
         vote_mode_CLI = self.query_one("#vote_mode_select").value
         
-        lbl = self.query_one("#vote_mode_warning")  
-        lbl.content = ""
-        if tree.vote_mode is not None:
-            if vote_mode_CLI != tree.vote_mode:
-                lbl.content = Text(f"Warning: Value differs from saved value {tree.vote_mode}", style = Style(color = "orange3"))
+        # lbl = self.query_one("#vote_mode_warning")  
+        # lbl.content = ""
+        # # if tree.vote_mode is not None:
+        # #     if vote_mode_CLI != tree.vote_mode:
+        # #         lbl.content = Text(f"Warning: Value differs from saved value {tree.vote_mode}", style = Style(color = "orange3"))
 
-        lbl = self.query_one("#k_input_warning")  
-        lbl.content = ""
-
-        if (tree.vote_count is not None) and (tree.vote_mode is not None):
-            nvec_save, k_save = find_nvec_k(tree.vote_count.shape[0], tree.vote_count.shape[1], vote_mode = tree.vote_mode)
-
-            if k_save != k_CLI:
-                lbl.content = Text(f"Warning: Value differs from saved value {k_save}", style = Style(color = "orange3"))
+        # lbl = self.query_one("#k_input_warning")  
+        # lbl.content = ""
+# 
+#         if (tree.store_count is not None) and (tree.vote_mode is not None):
+#             nvec_save, k_save = find_nvec_k(tree.store_count.shape[0], tree.store_count.shape[1], vote_mode = tree.vote_mode) PROBLEME ICI
+# 
+#             if k_save != k_CLI:
+#                 lbl.content = Text(f"Warning: Value differs from saved value {k_save}", style = Style(color = "orange3"))
 
         
         restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
@@ -367,12 +366,14 @@ class ImageCompareCLI(App):
             all_vals = tree.all_vals                ,
             compare_intent = {}                     ,
             restrict_values = restrict_values       ,
-            vote_count = tree.vote_count            ,
-            vote_mode = tree.vote_mode              ,
-            k = k_CLI                               ,
+            vote_mode = vote_mode_CLI               ,
+            nchoices_vote = nchoices_CLI            ,
+            store_mode = tree.store_mode            ,
+            nchoices_store = 2                      ,
+            store_count = tree.store_count          ,
         )
         
-        rank_assign.vote_count_filename = self.query_one("#save_filename_input").value
+        rank_assign.store_count_filename = self.query_one("#save_filename_input").value
         
         return rank_assign
 
@@ -392,12 +393,12 @@ class ImageCompareCLI(App):
             res_print.write("Not enough items to compare.")
             # res_print.write(exc)
             
-            # res_print.write(f"Total number of votes: {self.rank_assign.vote_count.sum()}")
-            # res_print.write(f"{self.rank_assign.vote_count.shape = }")
+            # res_print.write(f"Total number of votes: {self.rank_assign.store_count.sum()}")
+            # res_print.write(f"{self.rank_assign.store_count.shape = }")
             # res_print.write(exc)
             return
     
-        res_print.write(f"Total number of votes: {self.rank_assign.vote_count.sum()}")
+        res_print.write(f"Total number of votes: {self.rank_assign.store_count.sum()}")
         res_print.write(f"Total number of votes in comparison: {n_votes}")
 
         if np.all(np.isfinite(v)):
