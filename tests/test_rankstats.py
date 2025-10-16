@@ -197,8 +197,8 @@ def test_order_count_lower_k(nvec, tol = 1e-14):
             
             order_count_lower = pyquickbench.rankstats.order_count_lower_k(order_count_big, ksmall)
 
-            A, p_lower, q_lower = pyquickbench.rankstats.build_sinkhorn_problem(order_count_lower)
-            A, p_small, q_small = pyquickbench.rankstats.build_sinkhorn_problem(order_count_small)
+            A, p_lower, q_lower = pyquickbench.rankstats.build_sinkhorn_problem_order(order_count_lower)
+            A, p_small, q_small = pyquickbench.rankstats.build_sinkhorn_problem_order(order_count_small)
             
             assert np.allclose(p_lower, p_small, atol = tol, rtol = tol)
             assert np.allclose(q_lower, q_small, atol = tol, rtol = tol)
@@ -225,8 +225,8 @@ def test_order_count_lower_k_2(lenlist, tol = 1e-14):
             
             order_count_lower = pyquickbench.rankstats.order_count_lower_k(order_count_big, ksmall)
 
-            order_count_lower_scal = order_count_lower / order_count_lower.sum(axis=1, keepdims=True)
             order_count_small_scal = order_count_small / order_count_small.sum(axis=1, keepdims=True)
+            order_count_lower_scal = order_count_lower / order_count_lower.sum(axis=1, keepdims=True)
             
             assert np.allclose(order_count_lower_scal, order_count_small_scal, atol = tol, rtol = tol)
             
@@ -234,6 +234,83 @@ def test_order_count_lower_k_2(lenlist, tol = 1e-14):
                 order_count_lower * order_count_small.sum(axis=1, keepdims=True),
                 order_count_small * order_count_lower.sum(axis=1, keepdims=True),
             )
+
+@pytest.mark.skip("Currently building")
+@pytest.mark.parametrize("nvec", nvec_list)
+def test_best_count_lower_k(nvec, tol = 1e-14):
+    # ??????
+    
+    n = 10
+    l = [np.random.random(n) for ivec in range(nvec)]
+
+    all_best_count = [None] # shift elems => k is the index
+
+    for k in range(1,nvec+1):
+        best_count = pyquickbench.rankstats.exhaustive_score_to_partial_best_count(k, l)
+        all_best_count.append(best_count)
+
+    for kbig in range(1,nvec+1):
+        
+        for ksmall in range(1,kbig+1):
+            best_count_big = all_best_count[kbig]
+            best_count_small = all_best_count[ksmall]
+            
+            best_count_lower = pyquickbench.rankstats.best_count_lower_k(best_count_big, ksmall)
+
+            A, p_lower, q_lower = pyquickbench.rankstats.build_sinkhorn_problem(best_count_lower, vote_mode="best")
+            A, p_small, q_small = pyquickbench.rankstats.build_sinkhorn_problem(best_count_small, vote_mode="best")
+
+            # assert np.allclose(p_lower, p_small, atol = tol, rtol = tol)
+            # assert np.allclose(q_lower, q_small, atol = tol, rtol = tol)
+            
+    assert False
+
+@pytest.mark.skip("Currently building")
+@pytest.mark.parametrize("lenlist", lenlist_list)
+def test_best_count_lower_k_2(lenlist, tol = 1e-14):
+    # ???????
+    
+    nvec = len(lenlist)
+    l = [np.random.random(lenlist[ivec]) for ivec in range(nvec)]
+
+    all_best_count = [None] # shift elems => k is the index
+
+    for k in range(1,nvec+1):
+        best_count = pyquickbench.rankstats.exhaustive_score_to_partial_best_count(k, l)
+        all_best_count.append(best_count)
+
+    for kbig in range(1,nvec+1):
+        
+        for ksmall in range(1,kbig+1):
+            
+            best_count_big = all_best_count[kbig]
+            best_count_small = all_best_count[ksmall]
+            
+            best_count_lower = pyquickbench.rankstats.best_count_lower_k(best_count_big, ksmall)
+            
+            print()
+            print(kbig, ksmall)
+            
+            print(best_count_small)
+            print(best_count_lower)
+
+            best_count_small_scal = best_count_small / best_count_small.sum(axis=1, keepdims=True)
+            best_count_lower_scal = best_count_lower / best_count_lower.sum(axis=1, keepdims=True)
+            
+            
+            print(best_count_small_scal)
+            print(best_count_lower_scal)
+            
+            
+#             
+#             assert np.allclose(best_count_lower_scal, best_count_small_scal, atol = tol, rtol = tol)
+#             
+#             assert np.array_equal(
+#                 best_count_lower * best_count_small.sum(axis=1, keepdims=True),
+#                 best_count_small * best_count_lower.sum(axis=1, keepdims=True),
+#             )
+
+    assert False
 
 @pytest.mark.parametrize("lenlist", lenlist_list)
 def test_sinkhorn_solver(lenlist, reltol=1e-8):
@@ -244,7 +321,7 @@ def test_sinkhorn_solver(lenlist, reltol=1e-8):
     for k in range(2,nvec+1):
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem_order(order_count)
         
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
             A, p, q,
@@ -269,7 +346,7 @@ def test_sinkhorn_solver_illcond(lenlist, reltol=1e-8):
     for k in range(2,nvec+1):
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem_order(order_count)
         
         u, v = pyquickbench.cython.sinkhorn.sinkhorn_knopp(
             A, p, q,
@@ -295,7 +372,7 @@ def test_luce_gradient(lenlist, reltol=1e-8):
     for k in range(2,nvec+1):
         
         order_count = pyquickbench.rankstats.score_to_partial_order_count(k, l)
-        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem(order_count)
+        A, p, q = pyquickbench.rankstats.build_sinkhorn_problem_order(order_count)
         
         nsets = p.shape[0]
         nopts = q.shape[0]
@@ -317,14 +394,14 @@ def test_luce_gradient(lenlist, reltol=1e-8):
         J = pyquickbench.rankstats.build_log_tangent_sinkhorn_problem(M)
         
         order_countp = pyquickbench.rankstats.score_to_partial_order_count(k, lp)
-        A, pp, qp = pyquickbench.rankstats.build_sinkhorn_problem(order_countp)
+        A, pp, qp = pyquickbench.rankstats.build_sinkhorn_problem_order(order_countp)
         
         dp = p
         dq = q
         
         dpq = np.concatenate((dp,dq))
         
-        dloguv , _ , _ , _= np.linalg.lstsq(J,dpq)
+        dloguv , _ , _ , _= np.linalg.lstsq(J, dpq, rcond=None)
 
         neps = 5
         start_exp = -3

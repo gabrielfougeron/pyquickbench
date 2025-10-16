@@ -228,6 +228,22 @@ def insertion_argsort(num_t[::1] arr):
 
     return res
 
+cdef inline Py_ssize_t _find_in_arr(Py_ssize_t size, num_t* arr, num_t val) noexcept nogil:
+
+    cdef Py_ssize_t i, res
+
+    for i in range(size):
+        if arr[i] == val:
+            res = i
+            break
+    else:
+        res = -1
+
+    return res
+
+def find_in_arr(num_t[::1] arr, num_t val):
+    return _find_in_arr(arr.shape[0], &arr[0], val)
+
 def exhaustive_score_to_best_count_inner_loop(list l, Py_ssize_t[::1] cnt):
 
     cdef Py_ssize_t nvec = len(l)

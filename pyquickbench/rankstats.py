@@ -9,6 +9,7 @@ from .cython.rankstats import (
     from_left_lehmer                            ,
     rank_combination                            ,
     unrank_combination                          ,
+    find_in_arr                                 ,
     exhaustive_score_to_best_count_inner_loop   ,
     exhaustive_score_to_perm_count_inner_loop   ,
     montecarlo_score_to_best_count              ,
@@ -554,28 +555,6 @@ def fuse_score_to_partial_order_count(order_count, idx_fused):
 
     return res
 
-def order_count_to_best_count_py(order_count, minimize = False):
-    
-    nsets = order_count.shape[0]
-    nopt_per_set = order_count.shape[1]
-    nvec, k = find_nvec_k_from_order_count_shape(nsets, nopt_per_set)
-    best_count = np.zeros((nsets, k), dtype = order_count.dtype)   
-    
-    if minimize:
-        i_opt = 0
-    else:
-        i_opt = k-1
-
-    for iset in range(nsets):
-
-        for jperm in range(nopt_per_set):
-            
-            perm = from_left_lehmer(jperm, k)
-            
-            best_count[iset, perm[i_opt]] += order_count[iset, jperm]
-
-    return best_count
-
 def order_count_lower_k(order_count, k_new):
     
     kfac_old = order_count.shape[1]
@@ -619,6 +598,194 @@ def order_count_lower_k(order_count, k_new):
                 order_count_new[icomb_new, iperm_new] += order_count[icomb_old, iperm_old]
 
     return order_count_new
+
+def single_order_to_lower_k(icomb_old, iperm_old, nvec, k_old, k_new):
+
+    if k_old < k_new:
+        return ValueError(f"k_old should be greater than k_new. Received {k_old = }, {k_new = }.")
+
+    icomb_new_list = []
+    iperm_new_list = []
+    
+    comb_new = np.empty(k_new, dtype=np.intp)
+    perm_rel = np.empty(k_new, dtype=np.intp)
+
+    perm_old = from_left_lehmer(iperm_old, k_old)
+    perm_old_inv = np.empty(k_old, dtype=np.intp)
+    for i in range(k_old):
+        perm_old_inv[perm_old[i]] = i
+
+    comb_old = unrank_combination(icomb_old, nvec, k_old)
+
+    for comb_rel in itertools.combinations(range(k_old), k_new):
+        
+        for i in range(k_new):
+            comb_new[i] = comb_old[comb_rel[i]]
+
+        icomb_new = rank_combination(comb_new, nvec, k_new)
+
+        for i in range(k_new):
+            perm_rel[i] = perm_old_inv[comb_rel[i]]
+        
+        perm_new = np.argsort(perm_rel)
+        iperm_new = left_lehmer(perm_new)
+        
+        icomb_new_list.append(icomb_new)
+        iperm_new_list.append(iperm_new)
+
+    return icomb_new_list, iperm_new_list
+
+def best_count_lower_k(best_count, k_new):
+    
+    nvec, k_old = find_nvec_k_from_best_count_shape(best_count.shape[0], best_count.shape[1])
+
+    if k_old < k_new:
+        return ValueError(f"k_old should be greater than k_new. Received {k_old = }, {k_new = }.")
+
+    nsets_new = math.comb(nvec, k_new)
+    best_count_new = np.zeros((nsets_new, k_new), dtype=best_count.dtype)    
+    
+    comb_new = np.empty(k_new, dtype=np.intp)
+
+    for icomb_old, comb_old in enumerate(itertools.combinations(range(nvec), k_old)):
+
+        for comb_rel in itertools.combinations(range(k_old), k_new):
+
+            for i in range(k_new):
+                comb_new[i] = comb_old[comb_rel[i]]
+
+            icomb_new = rank_combination(comb_new, nvec, k_new)
+
+            for i_old in range(k_old):
+                
+                i_new = find_in_arr(comb_new, comb_old[i_old])
+                
+                if i_new >= 0:
+
+                    assert comb_new[i_new] == comb_old[i_old]
+
+                    best_count_new[icomb_new, i_new] += best_count[icomb_old, i_old]
+
+    return best_count_new
+
+def single_best_to_lower_k(icomb_old, i_old, nvec, k_old, k_new):
+
+    if k_old < k_new:
+        return ValueError(f"k_old should be greater than k_new. Received {k_old = }, {k_new = }.")
+
+    icomb_new_list = []
+    i_new_list = []
+
+    comb_new = np.empty(k_new, dtype=np.intp)
+
+    comb_old = unrank_combination(icomb_old, nvec, k_old)
+
+    for comb_rel in itertools.combinations(range(k_old), k_new):
+
+        for i in range(k_new):
+            comb_new[i] = comb_old[comb_rel[i]]
+
+        icomb_new = rank_combination(comb_new, nvec, k_new)
+
+        i_new = find_in_arr(comb_new, comb_old[i_old])
+        
+        if i_new >= 0:
+
+            assert comb_new[i_new] == comb_old[i_old]
+            
+            icomb_new_list.append(icomb_new)
+            i_new_list.append(i_new)
+
+    return icomb_new_list, i_new_list
+
+def order_count_to_best_count_lower_k(order_count, k_new, minimize=False):
+    
+    kfac_old = order_count.shape[1]
+    nvec, k_old = find_nvec_k_from_order_count_shape(order_count.shape[0], order_count.shape[1])
+
+    if k_old < k_new:
+        return ValueError(f"k_old should be greater than k_new. Received {k_old = }, {k_new = }.")
+
+    if minimize:
+        i_opt = 0
+    else:
+        i_opt = k_new-1
+
+    nsets_new = math.comb(nvec, k_new)
+    best_count_new = np.zeros((nsets_new, k_new), dtype=order_count.dtype)    
+    
+    comb_new = np.empty(k_new, dtype=np.intp)
+    perm_rel = np.empty(k_new, dtype=np.intp)
+    perm_old_inv = np.empty(k_old, dtype=np.intp)
+
+    for icomb_old, comb_old in enumerate(itertools.combinations(range(nvec), k_old)):
+
+        for comb_rel in itertools.combinations(range(k_old), k_new):
+            
+            for i in range(k_new):
+                comb_new[i] = comb_old[comb_rel[i]]
+
+            icomb_new = rank_combination(comb_new, nvec, k_new)
+
+            for iperm_old in range(kfac_old):
+                
+                perm_old = from_left_lehmer(iperm_old, k_old)
+
+                for i in range(k_old):
+                    perm_old_inv[perm_old[i]] = i
+
+                for i in range(k_new):
+                    perm_rel[i] = perm_old_inv[comb_rel[i]]
+                
+                perm_new = np.argsort(perm_rel)
+                
+                i_new = perm_new[i_opt]
+
+                best_count_new[icomb_new, i_new] += order_count[icomb_old, iperm_old]
+
+    return best_count_new
+
+def single_order_to_best_lower_k(icomb_old, iperm_old, nvec, k_old, k_new, minimize=False):
+
+    if k_old < k_new:
+        return ValueError(f"k_old should be greater than k_new. Received {k_old = }, {k_new = }.")
+
+    if minimize:
+        i_opt = 0
+    else:
+        i_opt = k_new-1
+
+    icomb_new_list = []
+    i_new_list = []
+    
+    comb_new = np.empty(k_new, dtype=np.intp)
+    perm_rel = np.empty(k_new, dtype=np.intp)
+
+    perm_old = from_left_lehmer(iperm_old, k_old)
+    perm_old_inv = np.empty(k_old, dtype=np.intp)
+    for i in range(k_old):
+        perm_old_inv[perm_old[i]] = i
+
+    comb_old = unrank_combination(icomb_old, nvec, k_old)
+
+    for comb_rel in itertools.combinations(range(k_old), k_new):
+        
+        for i in range(k_new):
+            comb_new[i] = comb_old[comb_rel[i]]
+
+        icomb_new = rank_combination(comb_new, nvec, k_new)
+
+        for i in range(k_new):
+            perm_rel[i] = perm_old_inv[comb_rel[i]]
+        
+        perm_new = np.argsort(perm_rel)
+        
+        i_new = perm_new[i_opt]
+        
+        icomb_new_list.append(icomb_new)
+        i_new_list.append(i_new)
+
+    return icomb_new_list, i_new_list
 
 def condorcet_top_order(order_count, minimize=False):
     
@@ -723,7 +890,7 @@ def build_sinkhorn_best_count_mat(nvec, k):
         
     return A
 
-def build_sinkhorn_problem(vote_count, vote_mode, reg_eps = 0., minimize = False):
+def build_sinkhorn_problem(vote_count, vote_mode, reg_eps = 0.):
     
     nvec, k = find_nvec_k(vote_count.shape[0], vote_count.shape[1], vote_mode = vote_mode)
     

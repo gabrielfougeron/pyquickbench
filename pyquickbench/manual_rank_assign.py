@@ -21,6 +21,7 @@ from pyquickbench._utils import (
 )
 
 all_vote_modes = ["best", "order"]
+all_store_modes = ["best", "order"]
 
 class ManualRankAssign():
     
@@ -64,8 +65,8 @@ class ManualRankAssign():
         self.idx_all_group  , self.name_group  , self.n_group  , self.n_group_unres   = group_tuple
         self.idx_all_compare, self.name_compare, self.n_compare, self.n_compare_unres = compare_tuple
         
-        self.nset_unres = math.comb(self.n_compare_unres, self.k)
-        self.nset_res = math.comb(self.n_compare, self.k)
+        self.nset_store_unres = math.comb(self.n_compare_unres, self.nchoices_store)
+        self.nset_store_res = math.comb(self.n_compare, self.nchoices_store)
         
         self.iset_res_to_unres = self.compute_iset_res_to_unres()
 
@@ -81,13 +82,13 @@ class ManualRankAssign():
     
     def compute_iset_res_to_unres(self):
     
-        iset_res_to_unres = np.empty(self.nset_res, dtype=np.intp)
-        i_compare_arr_unres = np.empty(self.k, dtype=np.intp)
+        iset_res_to_unres = np.empty(self.nset_store_res, dtype=np.intp)
+        i_compare_arr_unres = np.empty(self.nchoices_store, dtype=np.intp)
         idx_compare_unres = np.empty(len(self.restrict_shape), dtype=np.intp)
         
-        for iset_res in range(self.nset_res):
+        for iset_res in range(self.nset_store_res):
             
-            i_compare_arr_res = rankstats.unrank_combination(iset_res, self.n_compare, self.k)
+            i_compare_arr_res = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_store)
             
             for i in range(self.k):
                 
@@ -98,7 +99,7 @@ class ManualRankAssign():
 
                 i_compare_arr_unres[i] = _mem_shift_restricted(idx_compare_unres, self.idx_all_compare ,self.all_vals.shape)
 
-            iset_res_to_unres[iset_res] = rankstats.rank_combination(i_compare_arr_unres, self.n_compare_unres, self.k)
+            iset_res_to_unres[iset_res] = rankstats.rank_combination(i_compare_arr_unres, self.n_compare_unres, self.nchoices_store)
 
         return iset_res_to_unres
 
@@ -110,9 +111,11 @@ class ManualRankAssign():
         all_vals = None         ,
         compare_intent = {}     ,
         restrict_values = {}    ,
-        vote_count = None       ,
         vote_mode = None        ,
-        k = 2                   ,
+        nchoices_vote = 2       ,
+        store_mode = None       ,
+        nchoices_store = 2      ,
+        store_count = None      ,
         iset_stiffness = 1.     ,
         
     ):
@@ -126,7 +129,13 @@ class ManualRankAssign():
         self.benchfile_names = [key for key in self.benchfile_shape]
 
         self.iset_stiffness = iset_stiffness
-        self.k = k
+        
+        if nchoices_vote < nchoices_store:
+            raise ValueError(f"nchoices_vote should be greater or equal than nchoices_store. Received {nchoices_vote = } < {nchoices_store = }.")
+
+        self.nchoices_vote = nchoices_vote
+        self.nchoices_store = nchoices_store
+        
         if vote_mode is None:
             self.vote_mode = "best"
         else:
@@ -134,29 +143,46 @@ class ManualRankAssign():
                 self.vote_mode = vote_mode
             else:
                 raise ValueError(f"Unknown {vote_mode = }. Possible values are {all_vote_modes}.")
-        
+
+        if store_mode is None:
+            self.store_mode = "best"
+        else:
+            if store_mode in all_store_modes:
+                self.store_mode = store_mode
+            else:
+                raise ValueError(f"Unknown {store_mode = }. Possible values are {all_store_modes}.")
+
         if self.vote_mode == "best":
-            self.nopt_per_set = self.k
+            self.nopts_vote = self.nchoices_vote
             
         elif self.vote_mode == "order":
-            self.nopt_per_set = math.factorial(self.k)
+            self.nopts_vote = math.factorial(self.nchoices_vote)
             
+        if self.store_mode == "best":
+            self.nopts_store = self.nchoices_store
+            
+        elif self.store_mode == "order":
+            self.nopts_store = math.factorial(self.nchoices_store)
+            
+        # TODO Further restrict incompatibilities between vote_mode and store_mode ?
+
+        # Lots is happening here. Those are properties with custom setters.
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
         
-        if vote_count is not None:
-            if vote_count.shape != (self.nset_unres , self.nopt_per_set):
-                vote_count = None
-                # raise ValueError(f"Received vote_count with wrong shape. Expected {(self.nset_unres , self.nopt_per_set)}, received {vote_count.shape}.")
+        if store_count is not None:
+            if store_count.shape != (self.nset_store_unres , self.nopts_store):
+                store_count = None
+                # raise ValueError(f"Received store_count with wrong shape. Expected {(self.nset_store_unres , self.nopts_store)}, received {store_count.shape}.")
             
-        if vote_count is None:
-            vote_count = np.zeros((self.nset_unres, self.nopt_per_set), dtype=np.intp)
+        if store_count is None:
+            store_count = np.zeros((self.nset_store_unres, self.nopts_store), dtype=np.intp)
             
-        self.vote_count = vote_count
-        self.n_votes_set = self.vote_count.sum(axis=1)
+        self.store_count = store_count
+        self.n_store_set = self.store_count.sum(axis=1)
 
     def get_img_path(self, val):
-        
+
         img_path = os.path.join(self.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
         
         return img_path
@@ -315,7 +341,7 @@ class ManualRankAssign():
             idx_all_compare = self.idx_all_compare
             name_compare = self.name_compare
             n_compare = self.n_compare
-            vote_count = np.ascontiguousarray(self.vote_count[self.iset_res_to_unres,:])
+            store_count = np.ascontiguousarray(self.store_count[self.iset_res_to_unres,:])
             
         else:
             
@@ -337,9 +363,9 @@ class ManualRankAssign():
                                 
                 i_compare_fused[i_compare].append(self_i_compare)
 
-            vote_count = rankstats.fuse_score_to_partial_vote_count(self.vote_mode, np.ascontiguousarray(self.vote_count[self.iset_res_to_unres,:]), i_compare_fused)
+            store_count = rankstats.fuse_score_to_partial_vote_count(self.store_mode, np.ascontiguousarray(self.store_count[self.iset_res_to_unres,:]), i_compare_fused)
 
-        return idx_all_compare, name_compare, n_compare, vote_count
+        return idx_all_compare, name_compare, n_compare, store_count
 
     def next_set(self, iset = None):
         
@@ -369,40 +395,74 @@ class ManualRankAssign():
         return iset, vals_list
     
     def next_iset(self):
+        
+        # Probability meansure on restricted stored sets
+        p = scipy.special.softmax((-self.iset_stiffness)*self.n_store_set[self.iset_res_to_unres])
 
-        higher_means_likelier = (-self.iset_stiffness)*self.n_votes_set[self.iset_res_to_unres]
-        p = scipy.special.softmax(higher_means_likelier)
+        chosen_elems_list = []
+        n_elem_chosen = 0
+        
+        while n_elem_chosen < self.nchoices_vote:
+            
+            iset_res = np.random.choice(self.nset_res, p=p)
+            elems_res = rankstats.unrank_combination(iset_res, self.nset_res, self.nopts_store)
+            
+            for elem in elems_res:
+                
+                chosen_elems_list.append(elem)
+                n_elem_chosen += 1
+                
+                if n_elem_chosen == self.nchoices_vote:
+                    break
 
-        return np.random.choice(self.nset_res, p=p)
+        chosen_elems_arr = np.array(chosen_elems_list, dtype=np.intp)
+        
+        return rankstats.rank_combination(chosen_elems_arr, self.nset_res, self.nopts_vote)
     
-    def vote_for_ibest(self, iset_res, ibest, mul = 1):
+    def vote_for_ibest(self, iset_vote_res, ibest_vote, mul = 1):
         
-        iset_unres = self.iset_res_to_unres[iset_res]
+        # Receives a vote in format vote_mode, and stores it in format store_mode
+        iset_vote_unres = self.iset_res_to_unres[iset_vote_res]
         
-        if ibest < 0:
-            # When you really don't know what to vote for. Since vote_count has dtype np.intp, don't do halves.
-            self.vote_count[iset_unres, :] += mul
-            self.n_votes_set[iset_unres] += self.vote_count.shape[1]*mul
+        if ibest_vote < 0:
+            ibest_vote_list = list(range(self.nopts_vote))
         else:
-            self.vote_count[iset_unres, ibest] += mul
-            self.n_votes_set[iset_unres] += mul
-    
-    def save_results(self, vote_count_filename = None):
+            ibest_vote_list = [ibest_vote]
         
-        if vote_count_filename is None:
-            vote_count_filename = self.vote_count_filename
+        if self.vote_mode == "order" and self.store_mode == "order":
+            vote_to_store_reduce = rankstats.single_order_to_lower_k
+        elif self.vote_mode == "order" and self.store_mode == "best":
+            vote_to_store_reduce = rankstats.single_order_to_best_lower_k
+        elif self.vote_mode == "best" and self.store_mode == "best":
+            vote_to_store_reduce = rankstats.single_best_to_lower_k
+        else:
+            raise NotImplementedError
         
-        file_bas, file_ext = os.path.splitext(vote_count_filename)
+        for ibest in ibest_vote_list:
+            
+            iset_store_list, ibest_store_list = vote_to_store_reduce(iset_vote_unres, ibest, self.n_compare_unres, self.nchoices_vote, self.nchoices_store)
+
+            for iset_store, ibest_store in zip(iset_store_list, ibest_store_list):
+            
+                self.store_count[iset_store, ibest_store] += mul
+                self.n_store_set[iset_store] += mul
+
+    def save_results(self, store_count_filename = None):
+        
+        if store_count_filename is None:
+            store_count_filename = self.store_count_filename
+        
+        file_bas, file_ext = os.path.splitext(store_count_filename)
             
         if file_ext == '.npy':
-            np.save(vote_count_filename, self.vote_count)   
+            np.save(store_count_filename, self.store_count)   
             
         elif file_ext == '.npz':
 
             np.savez(
-                vote_count_filename                     ,
-                vote_count = self.vote_count            ,
-                vote_mode = self.vote_mode              ,
+                store_count_filename                    ,
+                vote_count = self.store_count           ,
+                vote_mode = self.store_mode             ,
                 compare_intent = self.compare_intent    ,
                 all_vals = self.all_vals                ,
                 **self.benchfile_shape                  ,
@@ -413,25 +473,25 @@ class ManualRankAssign():
         
     def get_order(self, compare_intent = None):
         
-        idx_all_compare, name_compare, n_compare, vote_count = self.fuse_compare_intent(compare_intent = compare_intent)
+        idx_all_compare, name_compare, n_compare, store_count = self.fuse_compare_intent(compare_intent = compare_intent)
         
         if (n_compare < self.k):
             raise ValueError("Not enough items to compare")
         
-        n_votes = vote_count.sum()
+        n_store = store_count.sum()
         
-        if self.vote_mode != "best":
+        if self.store_mode != "best":
             raise NotImplementedError
                 
-        if (n_votes < 1):
+        if (n_store < 1):
             
-            nvec, k = rankstats.find_nvec_k(vote_count.shape[0], vote_count.shape[1], vote_mode = self.vote_mode)
+            nvec, k = rankstats.find_nvec_k(store_count.shape[0], store_count.shape[1], vote_mode = self.store_mode)
             v = np.ones(nvec, dtype=np.float64)
             
         else:
             
-            reg_eps = 1./(n_votes+1)
-            A, p, q = rankstats.build_sinkhorn_problem(vote_count, self.vote_mode, reg_eps = reg_eps, minimize = False)
+            reg_eps = 1./(n_store+1)
+            A, p, q = rankstats.build_sinkhorn_problem(store_count, self.store_mode, reg_eps = reg_eps, minimize = False)
 
             reg_beta = 0.
             reg_alpham1 = 0.
@@ -464,5 +524,5 @@ class ManualRankAssign():
 
             compare_args.append(args)
 
-        return n_votes, compare_args, v_scal[compare_order]
+        return n_store, compare_args, v_scal[compare_order]
             
