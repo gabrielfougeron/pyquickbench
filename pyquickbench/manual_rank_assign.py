@@ -372,13 +372,13 @@ class ManualRankAssign():
 
         return idx_all_compare, name_compare, n_compare, store_count
 
-    def next_set(self, iset = None):
+    def next_set(self, iset_res = None):
 
-        if iset is None:
-            iset = self.next_iset()
+        if iset_res is None:
+            iset_res = self.next_iset_res()
 
         i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
-        i_compare_arr = rankstats.unrank_combination(iset, self.n_compare, self.nchoices_vote)
+        i_compare_arr = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_vote)
 
         idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
 
@@ -397,37 +397,35 @@ class ManualRankAssign():
 
             vals_list.append(self.all_vals[idx_vals])
         
-        return iset, vals_list
+        return iset_res, vals_list
     
-    def next_iset(self):
+    def next_iset_res(self):
         
-        # Probability meansure on restricted stored sets
+        # Probability measure on restricted stored sets
         p = scipy.special.softmax((-self.iset_stiffness)*self.n_store_set[self.iset_res_to_unres])
 
-        chosen_elems_list = []
-        n_elem_chosen = 0
+        chosen_elems_set = set()
         
-        while n_elem_chosen < self.nchoices_vote:
+        while len(chosen_elems_set) < self.nchoices_vote:
             
             iset_res = np.random.choice(self.nset_store_res, p=p)
             elems_res = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_store)
-            
+
             for elem in elems_res:
                 
-                chosen_elems_list.append(elem)
-                n_elem_chosen += 1
+                chosen_elems_set.add(elem)
                 
-                if n_elem_chosen == self.nchoices_vote:
+                if len(chosen_elems_set) == self.nchoices_vote:
                     break
 
-        chosen_elems_arr = np.array(chosen_elems_list, dtype=np.intp)
+        chosen_elems_arr = np.sort(np.fromiter(chosen_elems_set, dtype=np.intp))
+
+        iset_res = rankstats.rank_combination(chosen_elems_arr, self.n_compare, self.nchoices_vote)
         
-        iset = rankstats.rank_combination(chosen_elems_arr, self.n_compare, self.nchoices_vote)
+        assert 0 <= iset_res
+        assert iset_res <= math.comb(self.n_compare, self.nchoices_vote)
         
-        assert 0 <= iset
-        assert iset <= math.comb(self.n_compare, self.nchoices_vote)
-        
-        return iset
+        return iset_res
     
     def vote_for_ibest(self, iset_vote_res, ibest_vote, mul = 1):
 

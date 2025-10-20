@@ -692,7 +692,7 @@ def single_best_to_lower_k(icomb_old, i_old, nvec, k_old, k_new):
         if i_new >= 0:
 
             assert comb_new[i_new] == comb_old[i_old]
-            
+
             icomb_new_list.append(icomb_new)
             i_new_list.append(i_new)
 

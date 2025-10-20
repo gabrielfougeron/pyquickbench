@@ -146,7 +146,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
                 ibest_choice = None
             
             if ibest_choice is not None:
-                
                 self.vote_and_next(ibest_choice)
     
     def vote_and_next(self, ibest_choice):
@@ -161,7 +160,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.n_cache = self.n_prev_max + 2
         self.i_cache = 0
         
-        self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
+        self.new_img_perm()
         
         self.all_img_cache = []
         self.iset_cache = []
@@ -191,10 +190,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
             img_cache = []
             tkimg_cache = []
+            img_paths = []
             
             for val in vals_set:
 
                 img_path = self.master.rank_assign.get_img_path(val)
+                img_paths.append(img_path)
 
                 img = Image.open(img_path)
                 ImageOps.exif_transpose(img, in_place=True)
@@ -205,7 +206,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
                 
             self.iset_cache.append(iset)
             self.vals_set_cache.append(vals_set)
-            self.all_img_cache.append([img_cache, tkimg_cache])
+            self.all_img_cache.append([img_cache, tkimg_cache, img_paths])
             self.vote_cache.append(None)
 
     def incr_cache(self):
@@ -217,7 +218,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
             self.iset_cache.pop(0)
             self.vals_set_cache.pop(0)
-            img_cache, tkimg_cache = self.all_img_cache.pop(0)
+            img_cache, tkimg_cache, _ = self.all_img_cache.pop(0)
             for img in img_cache:
                 img.close()
             
@@ -238,7 +239,15 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         self.vote_cache[i_cache] = ibest_choice
         self.master.rank_assign.vote_for_ibest(self.iset_cache[i_cache], ibest_choice, mul = mul)
-
+        
+    def new_img_perm(self):
+            self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
+            # self.img_perm = np.array(range(self.master.rank_assign.nchoices_vote), dtype=np.intp)
+            
+            # self.img_perm_inv = np.empty(self.master.rank_assign.nchoices_vote, dtype=np.intp)
+            # for i in range(self.master.rank_assign.nchoices_vote):
+            #     self.img_perm_inv[self.img_perm[i]] = i
+        
     def display_current_choice(self, new_perm = True):
         
         # Prevents memory leaks ?
@@ -248,23 +257,23 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
         cur_iset = self.iset_cache[self.i_cache]
         vals_set = self.vals_set_cache[self.i_cache]
-        img_cache, tkimg_cache = self.all_img_cache[self.i_cache]
+        img_cache, tkimg_cache, img_paths = self.all_img_cache[self.i_cache]
 
         assert len(vals_set) == self.master.rank_assign.nchoices_vote
         
         if new_perm:
-            self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
+            self.new_img_perm()
         
         for i in range(self.master.rank_assign.nchoices_vote):
-            
-            row, col = divmod(self.img_perm[i], self.num_cols)
+
+            row, col = divmod(i, self.num_cols)
 
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
-            lbl.bind("<Button-1>", lambda e : self.vote_and_next(self.img_perm[i]))
+            lbl.bind("<Button-1>", lambda e, ii=self.img_perm[i] : self.vote_and_next(ii))
             lbl.configure(anchor="center", background='black')  
-            lbl.config(image=tkimg_cache[i], anchor="center", background='black')    
+            lbl.config(image=tkimg_cache[self.img_perm[i]], anchor="center", background='black')    
             self.all_lbls.append(lbl)   
             
         for i in range(self.master.rank_assign.nchoices_vote, self.num_rows*self.num_cols):
