@@ -314,9 +314,18 @@ class ImageCompareCLI(App):
         
     def lauch_GUI(self):
 
-        nrows_CLI = int(self.query_one("#nrows_input").value)
-        ncols_CLI = int(self.query_one("#ncols_input").value)
+        nrows_input = self.query_one("#nrows_input")
+        if nrows_input.validate(nrows_input.value).is_valid:
+            nrows_CLI = int(nrows_input.value)
+        else:
+            return
         
+        ncols_input = self.query_one("#ncols_input")
+        if ncols_input.validate(ncols_input.value).is_valid:
+            ncols_CLI = int(ncols_input.value)
+        else:
+            return
+
         if self.rank_assign.nchoices_vote > nrows_CLI * ncols_CLI:
             raise ValueError
 
@@ -327,7 +336,7 @@ class ImageCompareCLI(App):
     def load_bench(self):
         
         bench_filename = self.query_one("#bench_file_select").value
-        
+
         tree = self.query_one("#bench_tree")    
         tree.clear()
 
@@ -351,8 +360,14 @@ class ImageCompareCLI(App):
     def build_rank_assign(self):
         
         tree = self.query_one("#bench_tree")
-        nchoices_CLI = int(self.query_one("#k_input").value)
         
+        k_input = self.query_one("#k_input")
+        if k_input.validate(k_input.value).is_valid:
+            nchoices_CLI = int(k_input.value)
+        else:
+            return
+
+        # Choice is currently deactivated
         try:
             vote_mode_CLI = self.query_one("#vote_mode_select").value
         except:

@@ -1,9 +1,10 @@
 import os
 import numpy as np
 import tkinter as tk, tkinter.ttk as ttk
+import tkinter.messagebox as messagebox
 from typing import Iterable
 from PIL import Image, ImageTk, ImageOps
-import pyquickbench
+import traceback
 
 class ImageCompareScrollFrame(tk.Frame):
     
@@ -146,10 +147,13 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             
             if ibest_choice is not None:
                 
-                self.vote_current_choice(ibest_choice)
-                self.incr_cache()
-                self.display_current_choice()
-                self.fill_cache()
+                self.vote_and_next(ibest_choice)
+    
+    def vote_and_next(self, ibest_choice):
+        self.vote_current_choice(ibest_choice)
+        self.incr_cache()
+        self.display_current_choice()
+        self.fill_cache()
         
     def cache_init(self):
         
@@ -204,7 +208,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             self.all_img_cache.append([img_cache, tkimg_cache])
             self.vote_cache.append(None)
 
-            
     def incr_cache(self):
         
         if self.i_cache < self.n_prev_max:
@@ -235,7 +238,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         self.vote_cache[i_cache] = ibest_choice
         self.master.rank_assign.vote_for_ibest(self.iset_cache[i_cache], ibest_choice, mul = mul)
-        
+
     def display_current_choice(self, new_perm = True):
         
         # Prevents memory leaks ?
@@ -259,8 +262,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
+            lbl.bind("<Button-1>", lambda e : self.vote_and_next(self.img_perm[i]))
             lbl.configure(anchor="center", background='black')  
-            lbl.config(image=tkimg_cache[i], anchor="center", background='black')     
+            lbl.config(image=tkimg_cache[i], anchor="center", background='black')    
             self.all_lbls.append(lbl)   
             
         for i in range(self.master.rank_assign.nchoices_vote, self.num_rows*self.num_cols):
@@ -354,3 +358,9 @@ class ImageCompareGUI(tk.Tk):
 
     def __call__(self):
         self.mainloop()
+        
+def show_error(self, *args):
+    err = traceback.format_exception(*args)
+    messagebox.showerror('Exception',err)
+
+tk.Tk.report_callback_exception = show_error

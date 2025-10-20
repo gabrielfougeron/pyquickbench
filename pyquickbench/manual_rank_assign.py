@@ -67,6 +67,9 @@ class ManualRankAssign():
         
         self.nset_store_unres = math.comb(self.n_compare_unres, self.nchoices_store)
         self.nset_store_res = math.comb(self.n_compare, self.nchoices_store)
+
+        assert self.nset_store_unres <= np.iinfo(np.intp).max
+        assert self.nset_store_res <= np.iinfo(np.intp).max
         
         self.iset_res_to_unres = self.compute_iset_res_to_unres()
 
@@ -135,7 +138,7 @@ class ManualRankAssign():
 
         self.nchoices_vote = nchoices_vote
         self.nchoices_store = nchoices_store
-        
+
         if vote_mode is None:
             self.vote_mode = "best"
         else:
@@ -163,12 +166,14 @@ class ManualRankAssign():
             
         elif self.store_mode == "order":
             self.nopts_store = math.factorial(self.nchoices_store)
-            
+
         # TODO Further restrict incompatibilities between vote_mode and store_mode ?
 
         # Lots is happening here. Those are properties with custom setters.
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
+
+        assert math.comb(self.n_compare, self.nchoices_vote) <= np.iinfo(np.intp).max    
         
         if store_count is not None:
             if store_count.shape != (self.nset_store_unres , self.nopts_store):
@@ -405,7 +410,7 @@ class ManualRankAssign():
         while n_elem_chosen < self.nchoices_vote:
             
             iset_res = np.random.choice(self.nset_store_res, p=p)
-            elems_res = rankstats.unrank_combination(iset_res, self.nset_store_res, self.nopts_store)
+            elems_res = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_store)
             
             for elem in elems_res:
                 
@@ -417,18 +422,20 @@ class ManualRankAssign():
 
         chosen_elems_arr = np.array(chosen_elems_list, dtype=np.intp)
         
-        return rankstats.rank_combination(chosen_elems_arr, self.n_compare, self.nchoices_vote)
+        iset = rankstats.rank_combination(chosen_elems_arr, self.n_compare, self.nchoices_vote)
+        
+        assert 0 <= iset
+        assert iset <= math.comb(self.n_compare, self.nchoices_vote)
+        
+        return iset
     
     def vote_for_ibest(self, iset_vote_res, ibest_vote, mul = 1):
-        
-        # Receives a vote in format vote_mode, and stores it in format store_mode
-        iset_vote_unres = self.iset_res_to_unres[iset_vote_res]
-        
+
         if ibest_vote < 0:
             ibest_vote_list = list(range(self.nopts_vote))
         else:
             ibest_vote_list = [ibest_vote]
-        
+
         if self.vote_mode == "order" and self.store_mode == "order":
             vote_to_store_reduce = rankstats.single_order_to_lower_k
         elif self.vote_mode == "order" and self.store_mode == "best":
@@ -439,13 +446,14 @@ class ManualRankAssign():
             raise NotImplementedError
         
         for ibest in ibest_vote_list:
-            
-            iset_store_list, ibest_store_list = vote_to_store_reduce(iset_vote_unres, ibest, self.n_compare_unres, self.nchoices_vote, self.nchoices_store)
 
-            for iset_store, ibest_store in zip(iset_store_list, ibest_store_list):
-            
-                self.store_count[iset_store, ibest_store] += mul
-                self.n_store_set[iset_store] += mul
+            iset_store_res_list, ibest_store_list = vote_to_store_reduce(iset_vote_res, ibest, self.n_compare, self.nchoices_vote, self.nchoices_store)
+
+            for iset_store_res, ibest_store in zip(iset_store_res_list, ibest_store_list):
+
+                iset_store_unres = self.iset_res_to_unres[iset_store_res]
+                self.store_count[iset_store_unres, ibest_store] += mul
+                self.n_store_set[iset_store_unres] += mul
 
     def save_results(self, store_count_filename = None):
         
