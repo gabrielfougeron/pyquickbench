@@ -1,7 +1,13 @@
 import os
 import numpy as np
-import tkinter as tk, tkinter.ttk as ttk
-import tkinter.messagebox as messagebox
+
+# TODO : make this cleaner
+try:
+    import tkinter as tk, tkinter.ttk as ttk
+    import tkinter.messagebox as messagebox
+except:
+    pass
+
 from typing import Iterable
 from PIL import Image, ImageTk, ImageOps
 import traceback
