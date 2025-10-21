@@ -5,11 +5,12 @@ import numpy as np
 try:
     import tkinter as tk, tkinter.ttk as ttk
     import tkinter.messagebox as messagebox
+    from PIL import ImageTk
 except:
     pass
 
 from typing import Iterable
-from PIL import Image, ImageTk, ImageOps
+from PIL import Image, ImageOps
 import traceback
 
 class ImageCompareScrollFrame(tk.Frame):
