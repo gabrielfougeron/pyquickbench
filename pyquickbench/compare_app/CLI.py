@@ -1,4 +1,5 @@
 import os
+import shutil
 import bisect
 import asyncio
 import numpy as np
@@ -18,6 +19,20 @@ from pyquickbench._defaults import *
 from pyquickbench._benchmark import run_benchmark
 from pyquickbench.manual_rank_assign import ManualRankAssign
 from pyquickbench.rankstats import find_nvec_k
+
+
+import logging
+# logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+
+logger = logging.getLogger(__name__)
+
+
+
 
 cycle_intents = {
     "compare" : "group",
@@ -61,6 +76,82 @@ def load_benchfile(bench_filename):
     store_mode = file_content.get('store_mode')
 
     return benchfile_shape, all_vals, store_count, store_mode, restrict_idx, restrict_shape, compare_intent
+
+def explore_dirwise_benchmark(input_dir):
+    
+    ref_filenames = None
+    fullpath_list = []
+    
+    for path in os.listdir(input_dir):
+        
+        fullpath = os.path.join(input_dir, path)
+                
+        if os.path.isdir(fullpath):
+            
+            all_filenames = set(os.listdir(fullpath))
+            fullpath_list.append(fullpath)
+
+            if ref_filenames is None:
+                ref_filenames = all_filenames
+                
+            else:
+                
+                if len(ref_filenames) != len(all_filenames):
+                    raise ValueError(f'Error: directory {fullpath_list[0]} has {len(ref_filenames)} files whereas directory {fullpath} has {len(all_filenames)} files.')
+                
+                for f in all_filenames:
+                    if f not in ref_filenames:
+                        raise ValueError(f'File {f} is in {fullpath} but not in {fullpath_list[0]}.')
+
+    ref_filenames = list(ref_filenames)
+    
+    return ref_filenames, fullpath_list
+
+def create_dirwise_benchmark(input_dir, output_dir):
+    
+    filenames_list, path_list = explore_dirwise_benchmark(input_dir)
+    
+    img_to_num_dict = {}
+    
+    os.makedirs(os.path.join(output_dir, "imgs"), exist_ok = True)
+    
+    num = 0
+    for filename in filenames_list:
+        for path in path_list:
+            
+            input_fullname = os.path.join(path, filename)
+            base, ext = os.path.splitext(filename)
+            img_to_num_dict[f'{input_fullname}'] = float(num)
+            shutil.copy(input_fullname, os.path.join(output_dir, "imgs", f"image_{num}{ext}"))
+            num += 1
+            
+    all_args = {
+        "filename" : filenames_list ,
+        "path" : path_list          ,
+    }
+
+    def setup(filename, path):
+        return {"filename":filename, "path":path}
+
+    # def bench_fun(filename, path):
+    #     return img_to_num_dict[f'{os.path.join(path, filename)}']
+    # 
+    def bench_fun(filename, path):
+        return os.path.join(path, filename)
+    
+    bench_filename = os.path.join(output_dir, 'bench.npz')
+    
+    run_benchmark(
+        all_args                    ,
+        [bench_fun]                 ,
+        setup=setup                 ,
+        n_out = 1                   ,
+        mode = "scalar_output"      ,
+        StopOnExcept = True         ,
+        filename = bench_filename   ,
+        ShowProgress = False        ,
+        ForceBenchmark = True       ,
+    ) 
 
 class BenchmarkTree(Tree):
     
@@ -329,6 +420,14 @@ class ImageCompareCLI(App):
         if self.rank_assign.nchoices_vote > nrows_CLI * ncols_CLI:
             raise ValueError
 
+
+        # ????
+        tree = self.query_one("#bench_tree")    
+        self.rank_assign.compare_intent = tree.compare_intent 
+
+        logger.info("Before GUI launch")
+        logger.info(self.rank_assign.compare_intent)
+
         img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = nrows_CLI, num_cols = ncols_CLI)
 
         img_compare_GUI()
@@ -352,6 +451,10 @@ class ImageCompareCLI(App):
         tree.populate_bench_tree()
         
         self.rank_assign = self.build_rank_assign()
+        
+        # ????
+        self.rank_assign.compare_intent = tree.compare_intent 
+        
         
         save_filename_input = self.query_one("#save_filename_input")  
         self.rank_assign.store_count_filename = save_filename_input.value
@@ -392,6 +495,10 @@ class ImageCompareCLI(App):
         
         restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
         
+        
+            
+        logger.info("CLI build MRA")
+        
         rank_assign = ManualRankAssign(
             bench_root = self.Workspace_dir         ,
             benchfile_shape = tree.benchfile_shape  ,
@@ -420,6 +527,17 @@ class ImageCompareCLI(App):
         tree = self.query_one("#bench_tree")  
 
         try:
+            
+            
+            
+            
+            
+            logger.info("tree.compare_intent")
+            logger.info(tree.compare_intent)
+            
+            
+            
+            
             n_votes, order, v = self.rank_assign.get_order(compare_intent = tree.compare_intent)
         except ValueError as exc:
             res_print.write("Not enough items to compare.")

@@ -83,7 +83,6 @@ class ImageCompareScrollFrame(tk.Frame):
         # so this can be used inline
         return self
 
-
 class ImageCompareAuxiliaryWindow(tk.Frame):
     
     def __init__(self, master, **kwargs):
@@ -293,7 +292,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
     
     def get_img_path(self, val):
         
-        img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        # img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{int(val)}.jpg")
         
         return img_path
 

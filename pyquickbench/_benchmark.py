@@ -204,8 +204,16 @@ def run_benchmark(
 
         for fun in all_funs_list:
             _check_sig_no_pos_only(fun)
+            
+        # all_vals_dtype = np.float64
+        all_vals_dtype = str
         
-        all_vals = np.full(list(res_shape.values()), -1.) # Negative values
+        if all_vals_dtype in [np.float64]:
+            all_vals = np.full(list(res_shape.values()), -1., dtype=all_vals_dtype) # Negative values
+        elif all_vals_dtype in [str]:
+            all_vals = np.full(list(res_shape.values()), "", dtype=all_vals_dtype)
+        else:
+            raise ValueError(f"Invalid output dtype: {all_vals_dtype}")
         
         total_iterations = _product(args_shape.values())
         
@@ -245,10 +253,9 @@ def run_benchmark(
         elif mode in ["scalar_output", "vector_output"]: 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup)
+            extra_submit_args = (setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup, all_vals_dtype)
         
         else:
-                
             raise ValueError(f'Unknown mode {mode}')
             
         with progress_bar(total = total_iterations) as progress, PoolExecutor(nproc) as executor:
@@ -268,6 +275,7 @@ def run_benchmark(
                 setattr(future, "all_vals", all_vals)
                 setattr(future, "timeout", timeout)
                 setattr(future, "MonotonicAxes_idx", MonotonicAxes_idx)
+                setattr(future, "mode", mode)
 
                 future.add_done_callback(_treat_future_result)
                 future.add_done_callback(lambda _: progress.update(1))

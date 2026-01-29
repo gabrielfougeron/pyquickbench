@@ -20,6 +20,21 @@ from pyquickbench._utils import (
     _get_rel_idx_from_maze      ,
 )
 
+
+
+import logging
+# logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.basicConfig(
+    filename='myapp.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger(__name__)
+
+
+
+
 all_vote_modes = ["best", "order"]
 all_store_modes = ["best", "order"]
 
@@ -172,6 +187,11 @@ class ManualRankAssign():
         # Lots is happening here. Those are properties with custom setters.
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
+        
+        
+        logger.info("init MRA")
+        logger.info(self.compare_intent)
+        
 
         assert math.comb(self.n_compare, self.nchoices_vote) <= np.iinfo(np.intp).max    
         
@@ -188,7 +208,8 @@ class ManualRankAssign():
 
     def get_img_path(self, val):
 
-        img_path = os.path.join(self.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        # img_path = os.path.join(self.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
+        img_path = os.path.join(self.bench_root, "imgs", f"image_{int(val)}.jpg")
         
         return img_path
 
@@ -269,7 +290,13 @@ class ManualRankAssign():
                     if isinstance(val, collections.abc.Iterable):
                         
                         for i, v in enumerate(val):
-                            if v == res_val:
+                            
+                            is_eq = v == res_val
+
+                            if hasattr(is_eq, 'all'):
+                                is_eq = is_eq.all()
+                                
+                            if is_eq:
                                 break
                         else:
                             i = None
@@ -377,7 +404,9 @@ class ManualRankAssign():
         if iset_res is None:
             iset_res = self.next_iset_res()
 
-        i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
+        # i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
+        i_group_arr = [np.random.randint(self.n_group)]*self.nchoices_vote
+        
         i_compare_arr = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_vote)
 
         idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
@@ -396,6 +425,9 @@ class ManualRankAssign():
             idx_vals = tuple(idx_vals_arr)
 
             vals_list.append(self.all_vals[idx_vals])
+        
+        
+        
         
         return iset_res, vals_list
     

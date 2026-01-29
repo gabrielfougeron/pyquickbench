@@ -273,12 +273,20 @@ class FakeProgressBar(object):
     def update(self, *args):
         pass
                
-def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup):
+def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup, all_vals_dtype):
 
     if deterministic_setup:
         setup_vars_dict = _return_setup_vars_dict(setup, args)
     n_funs = len(all_funs_list)
-    vals = np.full((n_funs, n_repeat, n_out), np.nan)
+    
+    if all_vals_dtype in [np.float64]:
+        init_val = np.nan
+    elif all_vals_dtype in [str]:
+        init_val = ""
+    else:
+        raise ValueError(f"Invalid output dtype: {all_vals_dtype}")
+        
+    vals = np.full((n_funs, n_repeat, n_out), init_val, dtype=all_vals_dtype)
     
     for i_repeat in range(n_repeat):
 
@@ -309,6 +317,9 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
                     assert n_out == 1
                     vals[i_fun, i_repeat, :] = float(res)
                     
+                elif isinstance(res, str):
+                    vals[i_fun, i_repeat, :] = res            
+                            
                 elif isinstance(res, np.ndarray):
                     assert res.ndim == 1
                     assert n_out == res.shape[0]
@@ -558,21 +569,28 @@ def _treat_future_result(future):
         
         res = future.result()
         
-        for i_fun in range(res.shape[0]):
+        if future.mode == "timings":
             
-            tot_time = np.sum(res[i_fun,:])
-            
-            if (tot_time > future.timeout):
+            for i_fun in range(res.shape[0]):
                 
-                all_idx_list = list(future.i_args)
+                tot_time = np.sum(res[i_fun,:])
+                
+                if (tot_time > future.timeout):
+                    
+                    all_idx_list = list(future.i_args)
 
-                for idx in future.MonotonicAxes_idx:
-                    all_idx_list[idx] = slice(future.i_args[idx], None, None)
-        
-                all_idx_list.append(i_fun)
-                all_idx_list.append(slice(None))
-                all_idx = tuple(all_idx_list)
-                future.all_vals[all_idx] = np.nan
+                    for idx in future.MonotonicAxes_idx:
+                        all_idx_list[idx] = slice(future.i_args[idx], None, None)
+            
+                    all_idx_list.append(i_fun)
+                    all_idx_list.append(slice(None))
+                    all_idx = tuple(all_idx_list)
+                    future.all_vals[all_idx] = np.nan
+            
+        elif future.mode in ["scalar_output", "vector_output"]: 
+            pass
+        else:
+            raise ValueError(f'Unknown mode {mode}')
         
         all_idx_list = list(future.i_args)
         all_idx_list.append(slice(None))
