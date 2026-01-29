@@ -76,9 +76,10 @@ class ManualRankAssign():
     def compare_intent(self, d):
         self._compare_intent = self.complete_compare_intent(d)
 
-        group_tuple, compare_tuple = self.divide_compare_intent(self._compare_intent)
-        self.idx_all_group  , self.name_group  , self.n_group  , self.n_group_unres   = group_tuple
-        self.idx_all_compare, self.name_compare, self.n_compare, self.n_compare_unres = compare_tuple
+        immiscible_tuple, group_tuple, compare_tuple = self.divide_compare_intent(self._compare_intent)
+        self.idx_all_immiscible , self.name_immiscible  , self.n_immiscible , self.n_immiscible_unres   = immiscible_tuple
+        self.idx_all_group      , self.name_group       , self.n_group      , self.n_group_unres        = group_tuple
+        self.idx_all_compare    , self.name_compare     , self.n_compare    , self.n_compare_unres      = compare_tuple
         
         self.nset_store_unres = math.comb(self.n_compare_unres, self.nchoices_store)
         self.nset_store_res = math.comb(self.n_compare, self.nchoices_store)
@@ -323,8 +324,8 @@ class ManualRankAssign():
             
             fine_intent = fine_compare_intent.get(key, init_intent)
             
-            if (fine_intent == 'compare') and (init_intent == 'group'):
-                raise ValueError(f"Cannot compare {key} than was previously grouped")
+            if (fine_intent == 'compare') and (init_intent != 'compare'):
+                raise ValueError(f"Need to compare {key} that was previously grouped instead of specified {init_intent}.")
 
             compare_intent_out[key] = fine_intent
         
@@ -332,15 +333,21 @@ class ManualRankAssign():
         
     def divide_compare_intent(self, compare_intent):
         
+        idx_all_immiscible = []
         idx_all_group = []
         idx_all_compare = []
 
+        name_immiscible = []
         name_group = []
         name_compare = []
 
         for i, (name, value) in enumerate(compare_intent.items()):
             
-            if value == "group":
+            if value == "immiscible":
+                idx_all_immiscible.append(i)
+                name_immiscible.append(name)
+                
+            elif value == "group":
                 idx_all_group.append(i)
                 name_group.append(name)
                 
@@ -351,13 +358,15 @@ class ManualRankAssign():
             else:
                 raise ValueError(f'Unknown compare intent {value}')
              
-        n_group    = _prod_rel_shapes(idx_all_group     , self.restrict_shape)
-        n_compare  = _prod_rel_shapes(idx_all_compare   , self.restrict_shape)
+        n_immiscible    = _prod_rel_shapes(idx_all_immiscible   , self.restrict_shape)
+        n_group         = _prod_rel_shapes(idx_all_group        , self.restrict_shape)
+        n_compare       = _prod_rel_shapes(idx_all_compare      , self.restrict_shape)
         
-        n_group_unres    = _prod_rel_shapes(idx_all_group     , self.all_vals.shape)
-        n_compare_unres  = _prod_rel_shapes(idx_all_compare   , self.all_vals.shape)
+        n_immiscible_unres  = _prod_rel_shapes(idx_all_immiscible   , self.all_vals.shape)
+        n_group_unres       = _prod_rel_shapes(idx_all_group        , self.all_vals.shape)
+        n_compare_unres     = _prod_rel_shapes(idx_all_compare      , self.all_vals.shape)
 
-        return (idx_all_group, name_group, n_group, n_group_unres), (idx_all_compare, name_compare, n_compare, n_compare_unres)
+        return (idx_all_immiscible, name_immiscible, n_immiscible, n_immiscible_unres), (idx_all_group, name_group, n_group, n_group_unres), (idx_all_compare, name_compare, n_compare, n_compare_unres)
 
     def fuse_compare_intent(self, compare_intent = None):
 
@@ -397,19 +406,22 @@ class ManualRankAssign():
         if iset_res is None:
             iset_res = self.next_iset_res()
 
-        # i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
-        i_group_arr = [np.random.randint(self.n_group)]*self.nchoices_vote
+        i_immiscible_arr = [np.random.randint(self.n_immiscible)]*self.nchoices_vote
+        i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
         
         i_compare_arr = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_vote)
 
         idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
 
         vals_list = []
-        for (i_group, i_compare) in zip(i_group_arr, i_compare_arr):
+        for (i_immiscible, i_group, i_compare) in zip(i_immiscible_arr, i_group_arr, i_compare_arr):
             
-            idx_group   = _from_mem_shift_restricted(i_group  , self.idx_all_group  , self.restrict_shape)
-            idx_compare = _from_mem_shift_restricted(i_compare, self.idx_all_compare, self.restrict_shape)
+            idx_immiscible  = _from_mem_shift_restricted(i_immiscible   , self.idx_all_immiscible   , self.restrict_shape)
+            idx_group       = _from_mem_shift_restricted(i_group        , self.idx_all_group        , self.restrict_shape)
+            idx_compare     = _from_mem_shift_restricted(i_compare      , self.idx_all_compare      , self.restrict_shape)
 
+            for i, j in zip(idx_immiscible, self.idx_all_immiscible):
+                idx_vals_arr[j] = self.restrict_idx[j][i]
             for i, j in zip(idx_group, self.idx_all_group):
                 idx_vals_arr[j] = self.restrict_idx[j][i]
             for i, j in zip(idx_compare, self.idx_all_compare):

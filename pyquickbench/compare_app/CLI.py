@@ -35,13 +35,15 @@ logger = logging.getLogger(__name__)
 
 
 cycle_intents = {
-    "compare" : "group",
-    "group" : "compare",
+    "compare" : "group"     ,
+    "group" : "immiscible"  ,
+    "immiscible" : "compare",
 }
 
 intents_label_color = {
-    "compare" : "green",
-    "group" : "orange1",
+    "compare"       : "green"   ,
+    "group"         : "orange1" ,
+    "immiscible"    : "red"     ,
 }
 
 bench_default_filename = "bench.npz"
@@ -141,8 +143,8 @@ def create_dirwise_benchmark(input_dir):
 class BenchmarkTree(Tree):
     
     BINDINGS = [
-        ("left", "toggle_select", "Toggle group / compare, restrict / unrestrict"),
-        ("right", "toggle_select", "Toggle group / compare, restrict / unrestrict"),
+        ("left", "toggle_select", "Toggle values"),
+        ("right", "toggle_select", "Toggle values"),
     ]
     
     def __init__(self, *args, **kwargs):
