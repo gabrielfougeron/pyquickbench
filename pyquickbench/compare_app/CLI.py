@@ -20,30 +20,16 @@ from pyquickbench._benchmark import run_benchmark
 from pyquickbench.manual_rank_assign import ManualRankAssign
 from pyquickbench.rankstats import find_nvec_k
 
-
-import logging
-# logging.basicConfig(filename='myapp.log', level=logging.INFO)
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-
-
-logger = logging.getLogger(__name__)
-
-
-
-
 cycle_intents = {
-    "compare" : "group"     ,
-    "group" : "immiscible"  ,
     "immiscible" : "compare",
+    "group" : "immiscible"  ,
+    "compare" : "group"     ,
 }
 
 intents_label_color = {
-    "compare"       : "green"   ,
-    "group"         : "orange1" ,
     "immiscible"    : "red"     ,
+    "group"         : "orange1" ,
+    "compare"       : "green"   ,
 }
 
 bench_default_filename = "bench.npz"
@@ -407,13 +393,8 @@ class ImageCompareCLI(App):
         if self.rank_assign.nchoices_vote > nrows_CLI * ncols_CLI:
             raise ValueError
 
-
-        # ????
         tree = self.query_one("#bench_tree")    
         self.rank_assign.compare_intent = tree.compare_intent 
-
-        logger.info("Before GUI launch")
-        logger.info(self.rank_assign.compare_intent)
 
         img_compare_GUI = GUI.ImageCompareGUI(self.rank_assign, num_rows = nrows_CLI, num_cols = ncols_CLI)
 
@@ -462,30 +443,9 @@ class ImageCompareCLI(App):
             vote_mode_CLI = self.query_one("#vote_mode_select").value
         except:
             vote_mode_CLI = "best"
-        
-        
-        # lbl = self.query_one("#vote_mode_warning")  
-        # lbl.content = ""
-        # # if tree.vote_mode is not None:
-        # #     if vote_mode_CLI != tree.vote_mode:
-        # #         lbl.content = Text(f"Warning: Value differs from saved value {tree.vote_mode}", style = Style(color = "orange3"))
 
-        # lbl = self.query_one("#k_input_warning")  
-        # lbl.content = ""
-# 
-#         if (tree.store_count is not None) and (tree.vote_mode is not None):
-#             nvec_save, k_save = find_nvec_k(tree.store_count.shape[0], tree.store_count.shape[1], vote_mode = tree.vote_mode) PROBLEME ICI
-# 
-#             if k_save != k_CLI:
-#                 lbl.content = Text(f"Warning: Value differs from saved value {k_save}", style = Style(color = "orange3"))
-
-        
         restrict_values = ManualRankAssign.build_restrict_values(tree.benchfile_shape, tree.restrict_idx)
-        
-        
-            
-        logger.info("CLI build MRA")
-        
+
         rank_assign = ManualRankAssign(
             bench_root = self.Workspace_dir         ,
             benchfile_shape = tree.benchfile_shape  ,
@@ -514,21 +474,13 @@ class ImageCompareCLI(App):
         tree = self.query_one("#bench_tree")  
 
         try:
-            
-            
-            
-            
-            
-            logger.info("tree.compare_intent")
-            logger.info(tree.compare_intent)
-            
-            
-            
-            
+
             n_votes, order, v = self.rank_assign.get_order(compare_intent = tree.compare_intent)
         except ValueError as exc:
             res_print.write("Not enough items to compare.")
             # res_print.write(exc)
+            
+            # raise exc
             
             # res_print.write(f"Total number of votes: {self.rank_assign.store_count.sum()}")
             # res_print.write(f"{self.rank_assign.store_count.shape = }")

@@ -20,21 +20,6 @@ from pyquickbench._utils import (
     _get_rel_idx_from_maze      ,
 )
 
-
-
-import logging
-# logging.basicConfig(filename='myapp.log', level=logging.INFO)
-logging.basicConfig(
-    filename='myapp.log',
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-
-logger = logging.getLogger(__name__)
-
-
-
-
 all_vote_modes = ["best", "order"]
 all_store_modes = ["best", "order"]
 
@@ -188,11 +173,6 @@ class ManualRankAssign():
         # Lots is happening here. Those are properties with custom setters.
         self.restrict_values = restrict_values
         self.compare_intent = compare_intent
-        
-        
-        logger.info("init MRA")
-        logger.info(self.compare_intent)
-        
 
         assert math.comb(self.n_compare, self.nchoices_vote) <= np.iinfo(np.intp).max    
         
@@ -381,7 +361,7 @@ class ManualRankAssign():
             
             finer_compare_intent = self.complete_finer_compare_intent(compare_intent)
             
-            _, (idx_all_compare, name_compare, n_compare, n_compare_unres) = self.divide_compare_intent(finer_compare_intent)
+            _, _, (idx_all_compare, name_compare, n_compare, n_compare_unres) = self.divide_compare_intent(finer_compare_intent)
             
             i_compare_fused = [[] for ifuse in range(n_compare)]
 
@@ -403,13 +383,12 @@ class ManualRankAssign():
 
     def next_set(self, iset_res = None):
 
+        i_immiscible_arr = [np.random.randint(self.n_immiscible)]*self.nchoices_vote        # Only one choice is made, choice is replicated ncoices_vote times
+        i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)              # nchoices_vote independant choices
+        
         if iset_res is None:
             iset_res = self.next_iset_res()
-
-        i_immiscible_arr = [np.random.randint(self.n_immiscible)]*self.nchoices_vote
-        i_group_arr = np.random.randint(self.n_group, size=self.nchoices_vote)
-        
-        i_compare_arr = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_vote)
+        i_compare_arr = rankstats.unrank_combination(iset_res, self.n_compare, self.nchoices_vote)  # Full choice is given by iset_res
 
         idx_vals_arr = np.empty(self.all_vals.ndim, dtype=np.intp)
 

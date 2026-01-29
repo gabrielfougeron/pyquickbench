@@ -1,7 +1,6 @@
 import os
 import numpy as np
 
-# TODO : make this cleaner
 try:
     import tkinter as tk, tkinter.ttk as ttk
     import tkinter.messagebox as messagebox
@@ -12,19 +11,6 @@ except:
 from typing import Iterable
 from PIL import Image, ImageOps
 import traceback
-
-
-import logging
-# logging.basicConfig(filename='myapp.log', level=logging.INFO)
-logging.basicConfig(
-    filename='myapp.log',
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-
-logger = logging.getLogger(__name__)
-
-
 
 class ImageCompareScrollFrame(tk.Frame):
     
@@ -257,11 +243,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
     def new_img_perm(self):
             self.img_perm = np.random.permutation(self.master.rank_assign.nchoices_vote)
-            # self.img_perm = np.array(range(self.master.rank_assign.nchoices_vote), dtype=np.intp)
-            
-            # self.img_perm_inv = np.empty(self.master.rank_assign.nchoices_vote, dtype=np.intp)
-            # for i in range(self.master.rank_assign.nchoices_vote):
-            #     self.img_perm_inv[self.img_perm[i]] = i
         
     def display_current_choice(self, new_perm = True):
         
@@ -273,12 +254,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         cur_iset = self.iset_cache[self.i_cache]
         img_path_set = self.img_path_set_cache[self.i_cache]
         img_cache, tkimg_cache, img_paths = self.all_img_cache[self.i_cache]
-
-        logger.info("c")
-        
-        logger.info(img_path_set)
-        logger.info(len(img_path_set))
-        logger.info(self.master.rank_assign.nchoices_vote)
 
         assert len(img_path_set) == self.master.rank_assign.nchoices_vote
         
