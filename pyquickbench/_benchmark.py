@@ -206,11 +206,14 @@ def run_benchmark(
             _check_sig_no_pos_only(fun)
             
         # all_vals_dtype = np.float64
-        all_vals_dtype = str
+        
+        # all_vals_dtype = str                      # This is only length one str
+        # all_vals_dtype = np.dtypes.StringDType    # Bug in numpy write array (feature is new in numpy 2.0)    
+        all_vals_dtype = '<U1000'                   # Fixed length strings of size 1000. This is obviously a workaround
         
         if all_vals_dtype in [np.float64]:
             all_vals = np.full(list(res_shape.values()), -1., dtype=all_vals_dtype) # Negative values
-        elif all_vals_dtype in [str]:
+        elif all_vals_dtype in [str, np.dtypes.StringDType, '<U1000']:
             all_vals = np.full(list(res_shape.values()), "", dtype=all_vals_dtype)
         else:
             raise ValueError(f"Invalid output dtype: {all_vals_dtype}")
@@ -287,7 +290,7 @@ def run_benchmark(
         if Save_timings_file:
             _save_benchmark_file(filename, all_vals, all_args)
             
-    # print(f'{all_vals = }')
+    print(f'{all_vals = }')
     
     if all_vals is None:
         warnings.warn("Benchmark was neither loaded not run")

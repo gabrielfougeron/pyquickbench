@@ -206,13 +206,6 @@ class ManualRankAssign():
         self.store_count = store_count
         self.n_store_set = self.store_count.sum(axis=1)
 
-    def get_img_path(self, val):
-
-        # img_path = os.path.join(self.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
-        img_path = os.path.join(self.bench_root, "imgs", f"image_{int(val)}.jpg")
-        
-        return img_path
-
     def print_restrict_bench(self):
         
         restrict_values = self.restrict_values
@@ -425,10 +418,7 @@ class ManualRankAssign():
             idx_vals = tuple(idx_vals_arr)
 
             vals_list.append(self.all_vals[idx_vals])
-        
-        
-        
-        
+
         return iset_res, vals_list
     
     def next_iset_res(self):

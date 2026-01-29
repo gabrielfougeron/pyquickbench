@@ -107,24 +107,10 @@ def explore_dirwise_benchmark(input_dir):
     
     return ref_filenames, fullpath_list
 
-def create_dirwise_benchmark(input_dir, output_dir):
+def create_dirwise_benchmark(input_dir):
     
     filenames_list, path_list = explore_dirwise_benchmark(input_dir)
-    
-    img_to_num_dict = {}
-    
-    os.makedirs(os.path.join(output_dir, "imgs"), exist_ok = True)
-    
-    num = 0
-    for filename in filenames_list:
-        for path in path_list:
-            
-            input_fullname = os.path.join(path, filename)
-            base, ext = os.path.splitext(filename)
-            img_to_num_dict[f'{input_fullname}'] = float(num)
-            shutil.copy(input_fullname, os.path.join(output_dir, "imgs", f"image_{num}{ext}"))
-            num += 1
-            
+  
     all_args = {
         "filename" : filenames_list ,
         "path" : path_list          ,
@@ -133,15 +119,12 @@ def create_dirwise_benchmark(input_dir, output_dir):
     def setup(filename, path):
         return {"filename":filename, "path":path}
 
-    # def bench_fun(filename, path):
-    #     return img_to_num_dict[f'{os.path.join(path, filename)}']
-    # 
     def bench_fun(filename, path):
         return os.path.join(path, filename)
     
-    bench_filename = os.path.join(output_dir, 'bench.npz')
+    bench_filename = os.path.join(input_dir, 'bench.npz')
     
-    run_benchmark(
+    res = run_benchmark(
         all_args                    ,
         [bench_fun]                 ,
         setup=setup                 ,
@@ -152,6 +135,8 @@ def create_dirwise_benchmark(input_dir, output_dir):
         ShowProgress = False        ,
         ForceBenchmark = True       ,
     ) 
+    
+    # print(res)
 
 class BenchmarkTree(Tree):
     

@@ -281,7 +281,7 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
     
     if all_vals_dtype in [np.float64]:
         init_val = np.nan
-    elif all_vals_dtype in [str]:
+    elif all_vals_dtype in [str, np.dtypes.StringDType, '<U1000']:
         init_val = ""
     else:
         raise ValueError(f"Invalid output dtype: {all_vals_dtype}")
@@ -318,7 +318,12 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
                     vals[i_fun, i_repeat, :] = float(res)
                     
                 elif isinstance(res, str):
-                    vals[i_fun, i_repeat, :] = res            
+                    
+                    print(res)
+                    
+                    vals[i_fun, i_repeat, :] = res          
+                    print(vals[i_fun, i_repeat, :])
+                      
                             
                 elif isinstance(res, np.ndarray):
                     assert res.ndim == 1
@@ -590,7 +595,7 @@ def _treat_future_result(future):
         elif future.mode in ["scalar_output", "vector_output"]: 
             pass
         else:
-            raise ValueError(f'Unknown mode {mode}')
+            raise ValueError(f'Unknown mode {future.mode}')
         
         all_idx_list = list(future.i_args)
         all_idx_list.append(slice(None))

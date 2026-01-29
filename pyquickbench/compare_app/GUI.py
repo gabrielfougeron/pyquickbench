@@ -13,6 +13,19 @@ from typing import Iterable
 from PIL import Image, ImageOps
 import traceback
 
+
+import logging
+# logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.basicConfig(
+    filename='myapp.log',
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger(__name__)
+
+
+
 class ImageCompareScrollFrame(tk.Frame):
     
     def __init__(self, master, r=0, c=0, **kwargs):
@@ -170,7 +183,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         
         self.all_img_cache = []
         self.iset_cache = []
-        self.vals_set_cache = []
+        self.img_path_set_cache = []
         self.vote_cache = []
 
         self.fill_cache()
@@ -184,7 +197,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
         for ifill in range(nfill):
 
-            iset, vals_set = self.master.rank_assign.next_set()
+            iset, img_path_set = self.master.rank_assign.next_set()
 
             width = self.width - (self.num_cols-1) * padx
             width = max(width, self.num_cols)
@@ -196,13 +209,9 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
 
             img_cache = []
             tkimg_cache = []
-            img_paths = []
             
-            for val in vals_set:
-
-                img_path = self.master.rank_assign.get_img_path(val)
-                img_paths.append(img_path)
-
+            for img_path in img_path_set:
+                
                 img = Image.open(img_path)
                 ImageOps.exif_transpose(img, in_place=True)
                 tkimg = ImageTk.PhotoImage(ImageOps.contain(img, (img_width, img_height)))
@@ -211,8 +220,8 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
                 tkimg_cache.append(tkimg)
                 
             self.iset_cache.append(iset)
-            self.vals_set_cache.append(vals_set)
-            self.all_img_cache.append([img_cache, tkimg_cache, img_paths])
+            self.img_path_set_cache.append(img_path_set)
+            self.all_img_cache.append([img_cache, tkimg_cache, img_path_set])
             self.vote_cache.append(None)
 
     def incr_cache(self):
@@ -223,7 +232,7 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         else:
 
             self.iset_cache.pop(0)
-            self.vals_set_cache.pop(0)
+            self.img_path_set_cache.pop(0)
             img_cache, tkimg_cache, _ = self.all_img_cache.pop(0)
             for img in img_cache:
                 img.close()
@@ -262,10 +271,16 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         self.all_lbls = []
             
         cur_iset = self.iset_cache[self.i_cache]
-        vals_set = self.vals_set_cache[self.i_cache]
+        img_path_set = self.img_path_set_cache[self.i_cache]
         img_cache, tkimg_cache, img_paths = self.all_img_cache[self.i_cache]
 
-        assert len(vals_set) == self.master.rank_assign.nchoices_vote
+        logger.info("c")
+        
+        logger.info(img_path_set)
+        logger.info(len(img_path_set))
+        logger.info(self.master.rank_assign.nchoices_vote)
+
+        assert len(img_path_set) == self.master.rank_assign.nchoices_vote
         
         if new_perm:
             self.new_img_perm()
@@ -289,13 +304,6 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             lbl.grid(row=row, column=col, sticky='nsew')
             lbl.configure(anchor="center", background='black')  
             self.all_lbls.append(lbl)
-    
-    def get_img_path(self, val):
-        
-        # img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{str(int(val)).zfill(5)}_.png")
-        img_path = os.path.join(self.master.rank_assign.bench_root, "imgs", f"image_{int(val)}.jpg")
-        
-        return img_path
 
     def resize_images(self, width=None, height=None):
         
