@@ -37,9 +37,21 @@ def CLI_run(cli_args):
             break
 
     if (FoundDir):
+        
+        bench_filename = None
+        for f in os.listdir(Workspace_dir):
+            
+            base, ext = os.path.splitext(f)
+            if ext in ['.npz']:
+                bench_filename = f
+                break        
+        
+        if bench_filename is None:
+            bench_filename = "bench.npz"
+            CLI.create_dirwise_benchmark(Workspace_dir, benchfile_name = bench_filename)
 
         app = CLI.ImageCompareCLI(
-            Workspace_dir = args.Workspace_dir
+            Workspace_dir = Workspace_dir
         )
         app.run()
         

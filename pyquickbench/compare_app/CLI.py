@@ -116,11 +116,11 @@ def explore_dirwise_benchmark(input_dir, sort_method = None):
 
     return ref_filenames, fullpath_list
 
-def create_dirwise_benchmark(input_dir, benchfile_name='bench.npz', sort_method = None, n_out = 1):
+def create_dirwise_benchmark(input_dir, benchfile_name='bench.npz', sort_method = "_num", n_out = 1):
     
     fixed_length_str_dtype = '<U1000'
     
-    filenames_list, path_list = explore_dirwise_benchmark(input_dir, sort_method = "_num")
+    filenames_list, path_list = explore_dirwise_benchmark(input_dir, sort_method = sort_method)
     
     nfiles = len(filenames_list)
     n, d = divmod(nfiles, n_out)
@@ -442,10 +442,7 @@ class ImageCompareCLI(App):
 
         try:
             tree.bench_filename = os.path.join(self.Workspace_dir, bench_filename)
-            
-            if not(os.path.isfile(tree.bench_filename)):
-                create_dirwise_benchmark(self.Workspace_dir, benchfile_name = bench_filename)
-            
+
         except Exception as exc:
             self.notify(f'{exc}', timeout=60)
             self.rank_assign = None

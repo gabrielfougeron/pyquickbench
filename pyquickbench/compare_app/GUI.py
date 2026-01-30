@@ -260,9 +260,11 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
         if new_perm:
             self.new_img_perm()
         
+        # Available images
         for i in range(self.master.rank_assign.nchoices_vote):
 
             row, col = divmod(i, self.num_cols)
+            row = self.num_rows-1-row   # Makes origin be the bottom left, just like my numpad
 
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
@@ -272,8 +274,12 @@ class ImageCompareAuxiliaryWindow(tk.Frame):
             lbl.config(image=tkimg_cache[self.img_perm[i]], anchor="center", background='black')    
             self.all_lbls.append(lbl)   
             
+        # Rest is black
         for i in range(self.master.rank_assign.nchoices_vote, self.num_rows*self.num_cols):
+            
             row, col = divmod(i, self.num_cols)
+            row = self.num_rows-1-row   # Makes origin be the bottom left, just like my numpad
+            
             ### just create a label without showing the image initially
             lbl = ttk.Label(self.scrollframe, anchor="center")
             lbl.grid(row=row, column=col, sticky='nsew')
