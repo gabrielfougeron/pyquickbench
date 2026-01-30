@@ -49,6 +49,7 @@ def run_benchmark(
     deterministic_setup     : bool                                  = True          ,
     n_repeat                : int                                   = 1             ,
     n_out                   : typing.Union[int, None]               = None          ,
+    dtype_out               : str                                   = np.float64    ,
     nproc                   : typing.Union[int, None]               = None          ,
     pooltype                : typing.Union[str, None]               = None          ,
     time_per_test           : float                                 = 0.2           ,
@@ -93,6 +94,9 @@ def run_benchmark(
         By default ``1``.
     n_out : :class:`python:int`, optional
         Number of output dimensions. A sensible default is provided if the value is not given.\n
+    dtype_out : :class:`python:str`, optional
+        Data type of output. Should be provided if ``mode="scalar_output"`` or ``mode="vector_output"`` and results should not be cast to :obj:`numpy:numpy.float64`. \n
+        By default :obj:`numpy:numpy.float64`.
     nproc : :class:`python:int`, optional
         Number of workers in :class:`python:concurrent.futures.Executor`.\n
         By default :func:`python:multiprocessing.cpu_count()`.
@@ -204,19 +208,13 @@ def run_benchmark(
 
         for fun in all_funs_list:
             _check_sig_no_pos_only(fun)
-            
-        # all_vals_dtype = np.float64
-        
-        # all_vals_dtype = str                      # This is only length one str
-        # all_vals_dtype = np.dtypes.StringDType    # Bug in numpy write array (feature is new in numpy 2.0)    
-        all_vals_dtype = '<U1000'                   # Fixed length strings of size 1000. This is obviously a workaround
-        
-        if all_vals_dtype in [np.float64]:
-            all_vals = np.full(list(res_shape.values()), -1., dtype=all_vals_dtype) # Negative values
-        elif all_vals_dtype in [str, np.dtypes.StringDType, '<U1000']:
-            all_vals = np.full(list(res_shape.values()), "", dtype=all_vals_dtype)
+
+        if dtype_out in [np.float64]:
+            all_vals = np.full(list(res_shape.values()), -1., dtype = dtype_out) # Negative values
+        elif dtype_out in [str, np.dtypes.StringDType, '<U1000']:
+            all_vals = np.full(list(res_shape.values()), "", dtype = dtype_out)
         else:
-            raise ValueError(f"Invalid output dtype: {all_vals_dtype}")
+            raise ValueError(f"Invalid output dtype: {dtype_out}")
         
         total_iterations = _product(args_shape.values())
         
@@ -256,7 +254,7 @@ def run_benchmark(
         elif mode in ["scalar_output", "vector_output"]: 
         
             measure_fun = _measure_output
-            extra_submit_args = (setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup, all_vals_dtype)
+            extra_submit_args = (setup, wrapup, all_funs_list, n_repeat, n_out, StopOnExcept, deterministic_setup, dtype_out)
         
         else:
             raise ValueError(f'Unknown mode {mode}')
@@ -290,7 +288,7 @@ def run_benchmark(
         if Save_timings_file:
             _save_benchmark_file(filename, all_vals, all_args)
             
-    print(f'{all_vals = }')
+    # print(f'{all_vals = }')
     
     if all_vals is None:
         warnings.warn("Benchmark was neither loaded not run")
@@ -917,7 +915,7 @@ def plot_benchmark(
                         plot_type = "curve"
             
             else:
-                if all_xvalues.dtype == np.dtype.str: 
+                if all_xvalues.dtype in [np.dtype.str]: 
                     plot_type = "bar"
                 else:
                     plot_type = "curve"

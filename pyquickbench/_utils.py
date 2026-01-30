@@ -318,13 +318,8 @@ def _measure_output(i_args, args, setup, wrapup, all_funs_list, n_repeat, n_out,
                     vals[i_fun, i_repeat, :] = float(res)
                     
                 elif isinstance(res, str):
-                    
-                    print(res)
-                    
                     vals[i_fun, i_repeat, :] = res          
-                    print(vals[i_fun, i_repeat, :])
-                      
-                            
+
                 elif isinstance(res, np.ndarray):
                     assert res.ndim == 1
                     assert n_out == res.shape[0]

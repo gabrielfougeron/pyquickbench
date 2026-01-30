@@ -1,7 +1,9 @@
 import os
 import shutil
 import bisect
+import numbers
 import asyncio
+
 import numpy as np
 
 from rich.text import Text
@@ -65,7 +67,25 @@ def load_benchfile(bench_filename):
 
     return benchfile_shape, all_vals, store_count, store_mode, restrict_idx, restrict_shape, compare_intent
 
-def explore_dirwise_benchmark(input_dir):
+def filename_to_last_num(filename):
+    
+    base, ext = os.path.splitext(filename)
+    last = base.split("_")[-1]
+    
+    try:
+        num = float(last)
+    except:
+        num = 0.
+        
+    return num
+
+all_file_orders = {
+    None            : lambda x : x          ,
+    "alphabetical"  : lambda x : x          ,
+    "_num"          : filename_to_last_num  ,
+}
+
+def explore_dirwise_benchmark(input_dir, sort_method = None):
     
     ref_filenames = None
     fullpath_list = []
@@ -92,39 +112,49 @@ def explore_dirwise_benchmark(input_dir):
                         raise ValueError(f'File {f} is in {fullpath} but not in {fullpath_list[0]}.')
 
     ref_filenames = list(ref_filenames)
-    
+    ref_filenames.sort(key = all_file_orders.get(sort_method))
+
     return ref_filenames, fullpath_list
 
-def create_dirwise_benchmark(input_dir):
+def create_dirwise_benchmark(input_dir, benchfile_name='bench.npz', sort_method = None, n_out = 1):
     
-    filenames_list, path_list = explore_dirwise_benchmark(input_dir)
-  
+    fixed_length_str_dtype = '<U1000'
+    
+    filenames_list, path_list = explore_dirwise_benchmark(input_dir, sort_method = "_num")
+    
+    nfiles = len(filenames_list)
+    n, d = divmod(nfiles, n_out)
+    
+    if d != 0:
+        raise ValueError(f"Found {nfiles} files, which is not divisible by {n_out}.")
+    
+    filenames_lol = [[filenames_list[i+n_out*j] for i in range(n_out)] for j in range(n)]
+    
     all_args = {
-        "filename" : filenames_list ,
+        "filenames" : filenames_lol ,
         "path" : path_list          ,
     }
 
-    def setup(filename, path):
-        return {"filename":filename, "path":path}
+    def setup(filenames, path):
+        return {"filenames":filenames, "path":path}
 
-    def bench_fun(filename, path):
-        return os.path.join(path, filename)
+    def bench_fun(filenames, path):
+        return np.array([os.path.join(path, filename) for filename in filenames], dtype = fixed_length_str_dtype)
     
-    bench_filename = os.path.join(input_dir, 'bench.npz')
+    bench_filename = os.path.join(input_dir, benchfile_name)
     
-    res = run_benchmark(
-        all_args                    ,
-        [bench_fun]                 ,
-        setup=setup                 ,
-        n_out = 1                   ,
-        mode = "scalar_output"      ,
-        StopOnExcept = True         ,
-        filename = bench_filename   ,
-        ShowProgress = False        ,
-        ForceBenchmark = True       ,
+    run_benchmark(
+        all_args                            ,
+        [bench_fun]                         ,
+        setup = setup                       ,
+        n_out = n_out                       ,
+        dtype_out = fixed_length_str_dtype  ,
+        mode = "scalar_output"              ,
+        StopOnExcept = True                 ,
+        filename = bench_filename           ,
+        ShowProgress = False                ,
+        ForceBenchmark = True               ,
     ) 
-    
-    # print(res)
 
 class BenchmarkTree(Tree):
     
@@ -403,14 +433,21 @@ class ImageCompareCLI(App):
     def load_bench(self):
         
         bench_filename = self.query_one("#bench_file_select").value
+        
+        if not isinstance(bench_filename, str):
+            bench_filename = "bench.npz"
 
         tree = self.query_one("#bench_tree")    
         tree.clear()
 
         try:
             tree.bench_filename = os.path.join(self.Workspace_dir, bench_filename)
+            
+            if not(os.path.isfile(tree.bench_filename)):
+                create_dirwise_benchmark(self.Workspace_dir, benchfile_name = bench_filename)
+            
         except Exception as exc:
-            # self.notify(f'{exc}', timeout=60)
+            self.notify(f'{exc}', timeout=60)
             self.rank_assign = None
             self.compare_results_with_label()
             return
@@ -419,10 +456,7 @@ class ImageCompareCLI(App):
         tree.populate_bench_tree()
         
         self.rank_assign = self.build_rank_assign()
-        
-        # ????
         self.rank_assign.compare_intent = tree.compare_intent 
-        
         
         save_filename_input = self.query_one("#save_filename_input")  
         self.rank_assign.store_count_filename = save_filename_input.value
